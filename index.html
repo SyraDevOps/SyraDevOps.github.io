@@ -1,292 +1,108 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Nova Guia</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My GitHub Page</title>
     <style>
-      body {
-        background: linear-gradient(135deg, #121212 0%, #2d2d2d 100%);
-        height: 100vh;
-        margin: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-        position: relative;
-      }
-      
-      .container {
-        width: 100%;
-        max-width: 800px;
-        padding: 20px;
-        position: relative;
-        z-index: 1;
-      }
-      
-      .animated-message {
-        color: #fff;
-        font-size: 2.2em;
-        font-family: 'Times New Roman', serif;
-        font-weight: 600;
-        opacity: 0;
-        transform: translateX(-60px);
-        animation: fadeInLeft 1.2s cubic-bezier(.23,1.02,.67,1.01) forwards;
-        text-align: left;
-        letter-spacing: 1px;
-        line-height: 1.5;
-        margin-bottom: 20px;
-        text-shadow: 0px 2px 4px rgba(0,0,0,0.3);
-      }
-      
-      .animated-message:nth-child(2) {
-        animation-delay: 0.4s;
-      }
-      
-      .logo {
-        position: absolute;
-        bottom: 40px;
-        right: 40px;
-        opacity: 0;
-        animation: fadeIn 1s ease-out 1.5s forwards;
-        text-align: center;
-      }
-      
-      .logo-text {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        font-family: 'Times New Roman', serif;
-        font-weight: bold;
-        color: #fff;
-        line-height: 0.9;
-      }
-      
-      .logo-text .top {
-        font-size: 3em;
-      }
-      
-      .logo-text .bottom {
-        font-size: 3em;
-      }
-      
-      .geometric-element {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        z-index: 0;
-      }
-      
-      .rect1 {
-        width: 150px;
-        height: 150px;
-        top: 20%;
-        left: 10%;
-        transform: rotate(15deg);
-        animation: floatRect1 15s ease-in-out infinite;
-      }
-      
-      .rect2 {
-        width: 100px;
-        height: 200px;
-        bottom: 15%;
-        left: 15%;
-        transform: rotate(-10deg);
-        animation: floatRect2 18s ease-in-out infinite;
-      }
-      
-      .rect3 {
-        width: 180px;
-        height: 80px;
-        top: 30%;
-        right: 12%;
-        transform: rotate(25deg);
-        animation: floatRect3 20s ease-in-out infinite;
-      }
-      
-      .circle {
-        position: absolute;
-        width: 120px;
-        height: 120px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        bottom: 30%;
-        right: 20%;
-        animation: floatCircle 16s ease-in-out infinite;
-      }
-      
-      .diamond {
-        position: absolute;
-        width: 100px;
-        height: 100px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.08);
-        transform: rotate(45deg);
-        top: 15%;
-        right: 30%;
-        animation: floatDiamond 22s ease-in-out infinite;
-      }
-      
-      .line {
-        position: absolute;
-        background: linear-gradient(90deg, transparent, rgba(77, 157, 255, 0.3), transparent);
-        height: 1px;
-        width: 80%;
-        left: 10%;
-        top: 50%;
-        z-index: 0;
-        animation: pulseLine 8s ease-in-out infinite;
-      }
-      
-      .particles {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-      }
-      
-      .particle {
-        position: absolute;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-      }
-      
-      @keyframes fadeInLeft {
-        to {
-          opacity: 1;
-          transform: translateX(0);
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-      }
-      
-      @keyframes fadeIn {
-        to {
-          opacity: 1;
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
         }
-      }
-      
-      @keyframes floatParticle {
-        0% { transform: translate(0, 0); }
-        50% { transform: translate(10px, -10px); }
-        100% { transform: translate(0, 0); }
-      }
-      
-      @keyframes floatRect1 {
-        0% { transform: rotate(15deg) translate(0, 0); }
-        25% { transform: rotate(18deg) translate(-10px, 15px); }
-        50% { transform: rotate(12deg) translate(10px, 25px); }
-        75% { transform: rotate(20deg) translate(15px, 5px); }
-        100% { transform: rotate(15deg) translate(0, 0); }
-      }
-      
-      @keyframes floatRect2 {
-        0% { transform: rotate(-10deg) translate(0, 0); }
-        30% { transform: rotate(-15deg) translate(-15px, -10px); }
-        60% { transform: rotate(-5deg) translate(15px, -20px); }
-        100% { transform: rotate(-10deg) translate(0, 0); }
-      }
-      
-      @keyframes floatRect3 {
-        0% { transform: rotate(25deg) translate(0, 0); }
-        33% { transform: rotate(28deg) translate(20px, 10px); }
-        66% { transform: rotate(22deg) translate(-15px, 20px); }
-        100% { transform: rotate(25deg) translate(0, 0); }
-      }
-      
-      @keyframes floatCircle {
-        0% { transform: translate(0, 0); }
-        40% { transform: translate(-20px, -15px); }
-        80% { transform: translate(20px, 10px); }
-        100% { transform: translate(0, 0); }
-      }
-      
-      @keyframes floatDiamond {
-        0% { transform: rotate(45deg) translate(0, 0); }
-        25% { transform: rotate(50deg) translate(-5px, 15px); }
-        50% { transform: rotate(40deg) translate(15px, -10px); }
-        75% { transform: rotate(47deg) translate(10px, 5px); }
-        100% { transform: rotate(45deg) translate(0, 0); }
-      }
-      
-      @keyframes pulseLine {
-        0% { opacity: 0.3; width: 75%; left: 12.5%; }
-        50% { opacity: 0.5; width: 85%; left: 7.5%; }
-        100% { opacity: 0.3; width: 75%; left: 12.5%; }
-      }
-      
-      /* Tornando as divs do CSS original do Min Browser invisíveis ou removendo-as */
-      body:not(.is-ntp) #ntp-background-controls {
-        display: none !important;
-      }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .message {
+            margin-bottom: 2rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-links a {
+            color: #3498db;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .social-links a:hover {
+            color: #2980b9;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+        }
     </style>
-    <!-- Acesso ao CSS padrão do navegador para compatibilidade -->
-    <link rel="stylesheet" href="../../css/base.css" />
-    <link rel="stylesheet" href="../../css/newTabPage.css" />
-  </head>
-  <body>
-    <div class="particles" id="particles"></div>
-    <div class="geometric-element rect1"></div>
-    <div class="geometric-element rect2"></div>
-    <div class="geometric-element rect3"></div>
-    <div class="geometric-element circle"></div>
-    <div class="geometric-element diamond"></div>
-    <div class="line"></div>
+</head>
+<body>
+    <header>
+        <h1>Welcome to My Page</h1>
+    </header>
     
     <div class="container">
-      <div class="animated-message">
-        O time da SYRA Dev Ops agradece
-      </div>
-      <div class="animated-message">
-        por confiar na gente
-      </div>
-    </div>
-    
-    <div class="logo">
-      <div class="logo-text">
-        <div class="top">SY</div>
-        <div class="bottom">RA</div>
-      </div>
-    </div>
-    
-    <script>
-      // Cria efeito de partículas no fundo
-      const particlesContainer = document.getElementById('particles');
-      
-      function createParticles() {
-        const count = 40;
+        <div class="message">
+            <h2>Hello there!</h2>
+            <p>Thank you for visiting my GitHub Pages site. This is a simple, clean page that contains both HTML and CSS in a single file.</p>
+            <p>Feel free to customize this template with your own content and style preferences.</p>
+        </div>
         
-        for (let i = 0; i < count; i++) {
-          const particle = document.createElement('div');
-          particle.classList.add('particle');
-          
-          // Tamanho aleatório entre 2px e 6px
-          const size = Math.random() * 4 + 2;
-          particle.style.width = `${size}px`;
-          particle.style.height = `${size}px`;
-          
-          // Posição aleatória
-          particle.style.left = `${Math.random() * 100}%`;
-          particle.style.top = `${Math.random() * 100}%`;
-          
-          // Opacidade aleatória
-          particle.style.opacity = Math.random() * 0.5;
-          
-          // Animação
-          particle.style.animation = `floatParticle ${Math.random() * 10 + 10}s linear infinite`;
-          particle.style.animationDelay = `${Math.random() * 5}s`;
-          
-          particlesContainer.appendChild(particle);
-        }
-      }
-      
-      createParticles();
-    </script>
-  </body>
-</html>
+        <div class="message">
+            <h2>About Me</h2>
+            <p>This is where you can add some information about yourself or your project. The styling is kept minimal but modern, making it easy to read and navigate.</p>
+        </div>
 
+        <div class="social-links">
+            <a href="#">GitHub</a>
+            <a href="#">LinkedIn</a>
+            <a href="#">Twitter</a>
+            <a href="#">Contact</a>
+        </div>
+    </div>
+    
+    <footer>
+        <p>&copy; 2025 Your Name - Hosted on GitHub Pages</p>
+    </footer>
+</body>
+</html>
