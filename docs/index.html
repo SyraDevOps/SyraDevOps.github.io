@@ -1,109 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-br">
 <head>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2547921887453012"
      crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <title>SYRA - Bem-vindo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My GitHub Page</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f5;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        h1 {
-            color: #2c3e50;
-            margin-bottom: 1rem;
-        }
-        
-        .container {
-            background-color: white;
-            border-radius: 8px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        .message {
-            margin-bottom: 2rem;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 2rem;
-            font-size: 0.9rem;
-            color: #666;
-        }
-        
-        .social-links {
+            background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
             display: flex;
+            flex-direction: column;
+            align-items: center;
             justify-content: center;
-            gap: 1rem;
-            margin-top: 1.5rem;
         }
-        
-        .social-links a {
-            color: #3498db;
-            text-decoration: none;
-            transition: color 0.3s;
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 40px;
         }
-        
-        .social-links a:hover {
-            color: #2980b9;
+        .logo {
+            width: 180px;
+            height: 180px;
+            border: 3px solid #222;
+            border-radius: 18px;
+            position: relative;
+            background: #fff;
+            box-shadow: 0 6px 32px 0 rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
-
-        @media (max-width: 600px) {
-            body {
-                padding: 1rem;
-            }
-            .container {
-                padding: 1.5rem;
-            }
+        .logo-text-top {
+            position: absolute;
+            top: 18px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #222;
+        }
+        .logo-text-bottom {
+            position: absolute;
+            bottom: 18px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            color: #222;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            color: #222;
+            margin: 0 0 10px 0;
+            letter-spacing: 0.05em;
+        }
+        p {
+            font-size: 1.2rem;
+            color: #444;
+            margin: 0 0 30px 0;
+            max-width: 400px;
+            text-align: center;
+        }
+        .btn-entrar {
+            padding: 12px 36px;
+            background: #222;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.07);
+        }
+        .btn-entrar:hover {
+            background: #444;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Page</h1>
-    </header>
-    
-    <div class="container">
-        <div class="message">
-            <h2>Hello there!</h2>
-            <p>Thank you for visiting my GitHub Pages site. This is a simple, clean page that contains both HTML and CSS in a single file.</p>
-            <p>Feel free to customize this template with your own content and style preferences.</p>
-        </div>
-        
-        <div class="message">
-            <h2>About Me</h2>
-            <p>This is where you can add some information about yourself or your project. The styling is kept minimal but modern, making it easy to read and navigate.</p>
-        </div>
-
-        <div class="social-links">
-            <a href="#">GitHub</a>
-            <a href="#">LinkedIn</a>
-            <a href="#">Twitter</a>
-            <a href="#">Contact</a>
+    <div class="logo-container">
+        <div class="logo">
+            <div class="logo-text-top">SY</div>
+            <div class="logo-text-bottom">RA</div>
         </div>
     </div>
-    
-    <footer>
-        <p>&copy; 2025 Your Name - Hosted on GitHub Pages</p>
-    </footer>
+    <h1>Bem-vindo à SYRA</h1>
+    <p>
+        Inovação, elegância e tecnologia para o seu negócio.<br>
+        Descubra soluções inteligentes com a SYRA.
+    </p>
+    <a href="#" class="btn-entrar">Entrar</a>
 </body>
 </html>
