@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LunaGPT - Syra</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #111;
+            padding: 0 40px;
+            height: 80px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        .logo {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #fff;
+            margin-right: 60px;
+            animation: slideDown 1s cubic-bezier(.77,0,.18,1) both;
+        }
+        nav ul {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        nav li {
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeMenu 0.7s forwards;
+        }
+        nav li:nth-child(1) { animation-delay: 0.3s; }
+        nav li:nth-child(2) { animation-delay: 0.5s; }
+        nav li:nth-child(3) { animation-delay: 0.7s; }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            padding: 8px 18px;
+            border-radius: 4px;
+            transition: background 0.3s, color 0.3s;
+        }
+        nav a:hover {
+            background: #fff;
+            color: #111;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-40px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        @keyframes fadeMenu {
+            to { opacity: 1; transform: translateY(0);}
+        }
+        @media (max-width: 700px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                height: auto;
+                padding: 20px;
+            }
+            .logo {
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+            nav ul {
+                flex-direction: column;
+                gap: 18px;
+            }
+        }
+        main {
+            max-width: 800px;
+            margin: 60px auto 0 auto;
+            background: rgba(30,30,30,0.92);
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+            padding: 40px 30px;
+        }
+        .luna-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 32px;
+        }
+        .luna-header img {
+            width: 160px;
+            height: 160px;
+            object-fit: contain;
+            border-radius: 16px;
+            background: #222;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+            margin-bottom: 18px;
+        }
+        .luna-header h1 {
+            color: #fff;
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-align: center;
+        }
+        .luna-header p {
+            color: #e0e0e0;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .luna-details {
+            color: #e0e0e0;
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+        }
+        .luna-details ul {
+            margin: 0 0 18px 0;
+            padding-left: 20px;
+        }
+        .luna-details li {
+            margin-bottom: 6px;
+        }
+        .luna-link {
+            display: inline-block;
+            background: #fff;
+            color: #111;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: background 0.3s, color 0.3s;
+            margin-top: 18px;
+        }
+        .luna-link:hover {
+            background: #111;
+            color: #fff;
+            border: 1px solid #fff;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-box">
+                <div class="logo-text-top">SY</div>
+                <div class="logo-text-bottom">RA</div>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="luna-header">
+            <img src="img/Luna.png" alt="LunaGPT">
+            <h1>🚀 LunaGPT — O Futuro da Inteligência Artificial em Português! 🇧🇷</h1>
+            <p>
+                LunaGPT é um sistema de diálogo neural avançado, desenvolvido 100% em português, com arquitetura híbrida de ponta que combina transformers, state-space models e mixture of experts.
+            </p>
+        </div>
+        <div class="luna-details">
+            <ul>
+                <li>🔹 Proatividade contextual</li>
+                <li>🔹 Personas personalizáveis</li>
+                <li>🔹 RAG adaptativo com precisão factual</li>
+                <li>🔹 Treinamento progressivo e adaptável a qualquer hardware</li>
+            </ul>
+            <p>
+                Ideal para empresas que valorizam privacidade, personalização e alta performance.<br>
+                Transforme seu atendimento com inteligência contextual de verdade.
+            </p>
+            <a class="luna-link" href="https://github.com/SyraDevOps/Luna" target="_blank">Acessar o LunaGPT no GitHub</a>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2023 Syra. All rights reserved.</p>
+    </footer>
+    <script src="js/main.js"></script>
+</body>
+</html>

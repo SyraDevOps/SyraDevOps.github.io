@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2547921887453012"
+    crossorigin="anonymous"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - Syra</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Custom styles for elegant header and menu animation */
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            background-color: #111;
+            padding: 0 40px;
+            height: 80px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        .logo {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #fff;
+            margin-right: 60px;
+            animation: slideDown 1s cubic-bezier(.77,0,.18,1) both;
+        }
+        nav ul {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        nav li {
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeMenu 0.7s forwards;
+        }
+        nav li:nth-child(1) { animation-delay: 0.3s; }
+        nav li:nth-child(2) { animation-delay: 0.5s; }
+        nav li:nth-child(3) { animation-delay: 0.7s; }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            padding: 8px 18px;
+            border-radius: 4px;
+            transition: background 0.3s, color 0.3s;
+        }
+        nav a:hover {
+            background: #fff;
+            color: #111;
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-40px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        @keyframes fadeMenu {
+            to { opacity: 1; transform: translateY(0);}
+        }
+        @media (max-width: 700px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                height: auto;
+                padding: 20px;
+            }
+            .logo {
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+            nav ul {
+                flex-direction: column;
+                gap: 18px;
+            }
+        }
+        main {
+            max-width: 90%;
+            width: 700px;
+            margin: 60px auto 0 auto;
+            background: rgba(30,30,30,0.85);
+            border-radius: 18px;
+            box-shadow: 0 4px 32px rgba(0,0,0,0.18);
+            padding: 40px 30px;
+        }
+        section h2 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+        section p {
+            font-size: 1.1rem;
+            color: #e0e0e0;
+        }
+
+        /* Carrossel e Cards */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .carousel-wrapper {
+            overflow: hidden;
+        }
+
+        .carousel {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .card {
+            min-width: 100%;
+            background-color: rgba(40, 40, 40, 0.9);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background-color: #222; /* Fundo para quando a imagem não carrega */
+            position: relative;
+        }
+
+        .card-image::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(0deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0) 50%);
+            pointer-events: none;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .card-image img {
+            transform: scale(1.05);
+        }
+
+        .card-content {
+            padding: 20px;
+        }
+
+        .card-content h3 {
+            margin-top: 0;
+            color: #fff;
+            font-size: 1.4rem;
+        }
+
+        .card-content p {
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .card-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #444;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .card-button:hover {
+            background-color: #666;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background 0.3s;
+            z-index: 10;
+        }
+
+        .carousel-button:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .carousel-button.prev {
+            left: 10px;
+        }
+
+        .carousel-button.next {
+            right: 10px;
+        }
+
+        .carousel-indicators {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+        }
+
+        .indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .indicator.active {
+            background-color: white;
+        }
+
+        /* Ajustes responsivos para dispositivos móveis */
+        @media (max-width: 768px) {
+            main {
+                max-width: 95%;
+                padding: 30px 20px;
+                margin-top: 30px;
+            }
+            
+            .card-content h3 {
+                font-size: 1.2rem;
+            }
+            
+            .card-content p {
+                font-size: 0.95rem;
+            }
+            
+            .carousel-button {
+                width: 32px;
+                height: 32px;
+            }
+            
+            section h2 {
+                font-size: 1.7rem;
+            }
+            
+            section p {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            main {
+                padding: 20px 15px;
+            }
+            
+            .card-image {
+                height: 150px;
+            }
+            
+            .card-content {
+                padding: 15px;
+            }
+            
+            .carousel-button {
+                width: 28px;
+                height: 28px;
+                font-size: 16px;
+            }
+            
+            .logo-box {
+                width: 40px;
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <div class="logo-box">
+                <div class="logo-text-top">SY</div>
+                <div class="logo-text-bottom">RA</div>
+            </div>
+        </div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="products.html">Products</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="carousel-container">
+            <div class="carousel-wrapper">
+                <div class="carousel">
+                    <div class="card">
+                        <div class="card-image">
+                            <img src="img/innovation.jpg" alt="Innovation Post">
+                        </div>
+                        <div class="card-content">
+                            <h3>Product Innovation</h3>
+                            <p>Discover our latest breakthrough in technology solutions.</p>
+                            <a href="./posts/innovation.html" class="card-button">Read More</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-image">
+                            <img src="img/sustainability.jpg" alt="Sustainability Post">
+                        </div>
+                        <div class="card-content">
+                            <h3>Sustainability Initiative</h3>
+                            <p>How we're reducing our carbon footprint and creating eco-friendly products.</p>
+                            <a href="./posts/sustainability.html" class="card-button">Read More</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-image">
+                            <img src="img/customer-stories.jpg" alt="Customer Stories">
+                        </div>
+                        <div class="card-content">
+                            <h3>Customer Success Stories</h3>
+                            <p>Real results from businesses using our products.</p>
+                            <a href="./posts/customer-stories.html" class="card-button">Read More</a>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-image">
+                            <img src="img/upcoming.jpg" alt="Upcoming Release">
+                        </div>
+                        <div class="card-content">
+                            <h3>Upcoming Release</h3>
+                            <p>Sneak peek at what we're launching next month.</p>
+                            <a href="./posts/upcoming-release.html" class="card-button">Read More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="carousel-button prev">&lt;</button>
+            <button class="carousel-button next">&gt;</button>
+            <div class="carousel-indicators"></div>
+        </div>
+        <section id="welcome">
+            <h2>Welcome to Syra</h2>
+            <p>We offer the best products to meet your needs.</p>
+        </section>
+        <section id="about">
+            <h2>About Us</h2>
+            <p>Learn more about our mission and values.</p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2023 Syra. All rights reserved.</p>
+    </footer>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const carousel = document.querySelector('.carousel');
+            const cards = document.querySelectorAll('.card');
+            const prevButton = document.querySelector('.carousel-button.prev');
+            const nextButton = document.querySelector('.carousel-button.next');
+            const indicators = document.querySelector('.carousel-indicators');
+            
+            let currentIndex = 0;
+            let touchStartX = 0;
+            let touchEndX = 0;
+            
+            // Create indicators
+            cards.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.classList.add('indicator');
+                if (index === 0) dot.classList.add('active');
+                dot.addEventListener('click', () => {
+                    goToSlide(index);
+                });
+                indicators.appendChild(dot);
+            });
+            
+            function updateCarousel() {
+                carousel.style.transform = `translateX(-${currentIndex * 100}%)`;
+                
+                // Update indicators
+                document.querySelectorAll('.indicator').forEach((dot, index) => {
+                    dot.classList.toggle('active', index === currentIndex);
+                });
+            }
+            
+            function goToSlide(index) {
+                currentIndex = index;
+                updateCarousel();
+            }
+            
+            function goToNext() {
+                currentIndex = (currentIndex + 1) % cards.length;
+                updateCarousel();
+            }
+            
+            function goToPrev() {
+                currentIndex = (currentIndex - 1 + cards.length) % cards.length;
+                updateCarousel();
+            }
+            
+            // Event listeners
+            nextButton.addEventListener('click', goToNext);
+            prevButton.addEventListener('click', goToPrev);
+            
+            // Touch events for mobile swipe
+            carousel.addEventListener('touchstart', (e) => {
+                touchStartX = e.changedTouches[0].screenX;
+            });
+            
+            carousel.addEventListener('touchend', (e) => {
+                touchEndX = e.changedTouches[0].screenX;
+                handleSwipe();
+            });
+            
+            function handleSwipe() {
+                if (touchStartX - touchEndX > 50) {
+                    goToNext();
+                } else if (touchEndX - touchStartX > 50) {
+                    goToPrev();
+                }
+            }
+            
+            // Auto-advance carousel (optional)
+            /*
+            setInterval(() => {
+                goToNext();
+            }, 5000);
+            */
+
+            // Pré-carregar imagens para melhorar desempenho
+            function preloadCarouselImages() {
+                const images = document.querySelectorAll('.card-image img');
+                images.forEach(img => {
+                    const src = img.getAttribute('src');
+                    if (src) {
+                        const preloadLink = document.createElement('link');
+                        preloadLink.href = src;
+                        preloadLink.rel = 'preload';
+                        preloadLink.as = 'image';
+                        document.head.appendChild(preloadLink);
+                    }
+                });
+            }
+
+            // Chamar função de pré-carregamento
+            preloadCarouselImages();
+
+            // Auto-advance carousel com pausa quando o mouse está sobre ele
+            let autoAdvanceInterval;
+            const startAutoAdvance = () => {
+                autoAdvanceInterval = setInterval(() => {
+                    goToNext();
+                }, 6000);
+            };
+
+            const stopAutoAdvance = () => {
+                clearInterval(autoAdvanceInterval);
+            };
+
+            startAutoAdvance();
+
+            carousel.addEventListener('mouseenter', stopAutoAdvance);
+            carousel.addEventListener('mouseleave', startAutoAdvance);
+        });
+    </script>
+</body>
+</html>
