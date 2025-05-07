@@ -1,52 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Partículas Animadas - S Y R A</title>
+  <title>S Y R A</title>
+
   <style>
-    body { margin: 0; overflow: hidden; background: #000; }
-    canvas { display: block; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background-color: #0a0a0a;
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+    }
   </style>
 </head>
 <body>
+
+<canvas id="bg-canvas"></canvas>
+
+<!-- Three.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/three@0.130.1/build/three.min.js"></script>
+
 <script>
   // === Setup básico ===
-  const scene    = new THREE.Scene();
-  const camera   = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 20);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 100);
   const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(innerWidth, innerHeight);
+  renderer.setSize(window.innerWidth, window.innerHeight);
   document.body.appendChild(renderer.domElement);
-  camera.position.z = 4;
-  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  camera.position.z = 6;
 
-  // === Partículas iniciais ===
-  const particleCount = 2000;
-  const geometry  = new THREE.BufferGeometry();
+  // === Estrelas móveis no fundo ===
+  function createDynamicStars() {
+    const starCount = 200;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(starCount * 3);
+    const velocities = [];
+
+    for (let i = 0; i < starCount; i++) {
+      const x = (Math.random() - 0.5) * 40;
+      const y = (Math.random() - 0.5) * 40;
+      const z = Math.random() * -20;
+      positions[i * 3] = x;
+      positions[i * 3 + 1] = y;
+      positions[i * 3 + 2] = z;
+
+      // Velocidade aleatória para cada estrela
+      velocities.push({
+        x: (Math.random() - 0.5) * 0.01,
+        y: (Math.random() - 0.5) * 0.01,
+        z: Math.random() * 0.005
+      });
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    const material = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: 0.05,
+      transparent: true,
+      opacity: 0.6
+    });
+
+    const stars = new THREE.Points(geometry, material);
+    stars.userData.velocities = velocities;
+    scene.add(stars);
+    return stars;
+  }
+
+  const stars = createDynamicStars();
+
+  // === Luz ambiente e luz direcional suave ===
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 0.3);
+  directionalLight.position.set(1, 1, 1).normalize();
+  scene.add(ambientLight, directionalLight);
+
+  // === Partículas iniciais (S Y R A + anel) ===
+  const particleCount = 1500;
+  const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
   const material = new THREE.PointsMaterial({
-    size: 0.02, color: 0x00ffff,
-    blending: THREE.AdditiveBlending, depthTest: false, transparent: true
+    size: 0.025,
+    color: 0x00f0ff,
+    blending: THREE.AdditiveBlending,
+    depthTest: false,
+    transparent: true
   });
+
   const particles = new THREE.Points(geometry, material);
   scene.add(particles);
 
-  // === Amostragem uniforme por área + ordenação angular ===
+  // === Função de amostragem de pontos em formas ===
   function samplePointsInMesh(geo, count) {
-    // prepara triângulos
-    const pos   = geo.attributes.position.array;
-    const idx   = geo.index ? geo.index.array : null;
-    const tris  = [];
+    const pos = geo.attributes.position.array;
+    const idx = geo.index ? geo.index.array : null;
+    const tris = [];
     if (idx) {
       for (let i = 0; i < idx.length; i += 3)
-        tris.push([ idx[i], idx[i+1], idx[i+2] ]);
+        tris.push([idx[i], idx[i+1], idx[i+2]]);
     } else {
       for (let i = 0; i < pos.length/3; i += 3)
-        tris.push([ i, i+1, i+2 ]);
+        tris.push([i, i+1, i+2]);
     }
-    // calcula áreas cumulativas
+
     const areas = tris.map(t => {
       const [a,b,c] = t;
       const ax=pos[3*a], ay=pos[3*a+1];
@@ -57,7 +123,6 @@
     });
     const cum = [], soma = areas.reduce((s,v,i)=>(cum[i]=s+v,s+v),0);
 
-    // amostra pontos
     const pts = [];
     for (let i = 0; i < count; i++) {
       const r = Math.random() * soma;
@@ -76,20 +141,17 @@
       pts.push([x,y,z]);
     }
 
-    // centraliza e ordena por ângulo
     const cx = pts.reduce((s,p)=>(s+p[0]),0)/count;
     const cy = pts.reduce((s,p)=>(s+p[1]),0)/count;
     pts.sort((p1,p2)=>{
       return Math.atan2(p1[1]-cy,p1[0]-cx) - Math.atan2(p2[1]-cy,p2[0]-cx);
     });
 
-    // flatten
     const out = new Float32Array(count*3);
     pts.forEach((p,i)=>{ out[3*i]=p[0]; out[3*i+1]=p[1]; out[3*i+2]=p[2]; });
     return out;
   }
 
-  // === Gera um anel “mesh” via ShapeGeometry de um círculo preenchido ===
   function makeRingMesh(segments=64) {
     const shape = new THREE.Shape();
     shape.absarc(0,0,1.2,0,Math.PI*2);
@@ -100,7 +162,6 @@
   new THREE.FontLoader().load(
     'https://threejs.org/examples/fonts/helvetiker_regular.typeface.json',
     font => {
-      // cria mesh de cada letra, centraliza e amostra
       const letters = ['S','Y','R','A'].map(ch => {
         const geo = new THREE.ShapeGeometry(font.generateShapes(ch, 1.5));
         geo.computeBoundingBox();
@@ -111,7 +172,6 @@
         return samplePointsInMesh(geo, particleCount);
       });
 
-      // prepara arrays completos
       const shapes = [
         samplePointsInMesh(makeRingMesh(), particleCount),
         letters[0],
@@ -120,21 +180,40 @@
         letters[3]
       ];
 
-      // === Animação interpolada ===
       let curr = 0, next = 1;
       let start = performance.now();
-      const duration = 2000;
+      const duration = 2500;
 
       function easeInOutCubic(t) {
-        return t<0.5
-          ? 4*t*t*t
-          : 1 - Math.pow(-2*t+2,3)/2;
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       }
 
+      // === Animação principal ===
       (function animate(time){
         requestAnimationFrame(animate);
+
+        // Atualiza posição das "estrelas"
+        const starPositions = stars.geometry.attributes.position.array;
+        const velocities = stars.userData.velocities;
+
+        for (let i = 0; i < starPositions.length; i += 3) {
+          starPositions[i] += velocities[i/3].x;
+          starPositions[i+1] += velocities[i/3].y;
+          starPositions[i+2] += velocities[i/3].z;
+
+          // Volta pro início se sair da tela
+          if (Math.abs(starPositions[i]) > 20 || Math.abs(starPositions[i+1]) > 20) {
+            starPositions[i] = (Math.random() - 0.5) * 40;
+            starPositions[i+1] = (Math.random() - 0.5) * 40;
+            starPositions[i+2] = Math.random() * -20;
+          }
+        }
+
+        stars.geometry.attributes.position.needsUpdate = true;
+
+        // Transição entre formas (SYRA + anel)
         const tRaw = (time - start) / duration;
-        const t = Math.min(tRaw,1);
+        const t = Math.min(tRaw, 1);
         const e = easeInOutCubic(t);
         const from = shapes[curr], to = shapes[next];
 
@@ -144,11 +223,11 @@
           positions[i3 + 1] = from[i3 + 1] + (to[i3 + 1] - from[i3 + 1]) * e;
           positions[i3 + 2] = from[i3 + 2] + (to[i3 + 2] - from[i3 + 2]) * e;
         }
+
         geometry.attributes.position.needsUpdate = true;
         renderer.render(scene, camera);
 
         if (t === 1) {
-          // avança shape quando completa transição
           curr = next;
           next = (next + 1) % shapes.length;
           start = time;
@@ -157,12 +236,13 @@
     }
   );
 
-  // === Responsividade ===
+  // Responsividade
   window.addEventListener('resize', () => {
-    renderer.setSize(innerWidth, innerHeight);
-    camera.aspect = innerWidth/innerHeight;
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    camera.aspect = window.innerWidth/window.innerHeight;
     camera.updateProjectionMatrix();
   });
 </script>
+
 </body>
 </html>
