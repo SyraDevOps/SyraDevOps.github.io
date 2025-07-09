@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sobre - Syra Vault</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <style>
+    /* --- CSS RESET & BASIC SETUP --- */
+    :root {
+      --bg-color-start: #0f172a;
+      --bg-color-end: #1e3a8a;
+      --primary-color: #60a5fa;
+      --secondary-color: #93c5fd;
+      --text-color: #e2e8f0;
+      --card-bg-color: rgba(255, 255, 255, 0.05);
+      --card-border-color: rgba(255, 255, 255, 0.1);
+      --font-primary: 'Poppins', sans-serif;
+      --font-secondary: 'Montserrat', sans-serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-secondary);
+      background: linear-gradient(135deg, var(--bg-color-start), var(--bg-color-end));
+      background-size: 200% 200%;
+      min-height: 100vh;
+      color: var(--text-color);
+      animation: gradient-animation 15s ease infinite;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradient-animation {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    /* --- HEADER & NAVIGATION --- */
+    .main-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 20px 0;
+      z-index: 1000;
+      background: rgba(15, 23, 42, 0.5);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--card-border-color);
+      transition: background 0.3s ease;
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-family: var(--font-primary);
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+    }
+    .logo span { color: var(--primary-color); }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 40px;
+    }
+
+    .nav-links a {
+      color: var(--text-color);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      position: relative;
+      transition: color 0.3s ease;
+    }
+    
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      width: 0;
+      height: 2px;
+      bottom: -5px;
+      left: 0;
+      background-color: var(--primary-color);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover { color: white; }
+    .nav-links a:hover::after { width: 100%; }
+    
+    .hamburger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        gap: 5px;
+    }
+    .hamburger .line {
+        width: 25px;
+        height: 3px;
+        background-color: white;
+        border-radius: 5px;
+        transition: all 0.3s ease-in-out;
+    }
+
+    /* --- MAIN CONTENT --- */
+    main {
+        padding-top: 120px; /* Space for the fixed header */
+    }
+
+    /* --- CONTENT SECTIONS --- */
+    .content-section {
+      padding: 60px 0;
+    }
+    .content-section:first-child {
+        padding-top: 20px;
+    }
+
+    .section-title, .main-title {
+      font-family: var(--font-primary);
+      font-size: 2.8rem;
+      text-align: center;
+      margin-bottom: 60px;
+      color: white;
+      position: relative;
+    }
+    .section-title::after, .main-title::after {
+        content: '';
+        display: block;
+        width: 80px;
+        height: 4px;
+        background-color: var(--primary-color);
+        margin: 15px auto 0;
+        border-radius: 2px;
+    }
+    
+    /* Animation class for scroll */
+    .animate-on-scroll {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    }
+    .animate-on-scroll.is-visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    /* Introduction Section */
+    .introduction p {
+      font-size: 1.2rem;
+      line-height: 1.8;
+      max-width: 800px;
+      margin: 0 auto 30px auto;
+      text-align: justify;
+      color: var(--secondary-color);
+    }
+    .introduction .highlight {
+      color: white;
+      font-weight: 500;
+    }
+
+    /* Pillars Section */
+    .pillars-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+    }
+
+    .pillar-card {
+      background: var(--card-bg-color);
+      border: 1px solid var(--card-border-color);
+      border-radius: 15px;
+      padding: 30px;
+      text-align: center;
+      backdrop-filter: blur(5px);
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    .pillar-card:hover {
+      transform: translateY(-10px);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .pillar-card .icon {
+      font-size: 3rem;
+      color: var(--primary-color);
+      margin-bottom: 20px;
+    }
+
+    .pillar-card h3 {
+      font-family: var(--font-primary);
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 15px;
+    }
+
+    .pillar-card p {
+      color: var(--secondary-color);
+      line-height: 1.6;
+    }
+    
+    /* Target Audience Section */
+    .audience-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 30px;
+    }
+    
+    .audience-card {
+        background: var(--card-bg-color);
+        padding: 40px;
+        border-radius: 15px;
+        border: 1px solid var(--card-border-color);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .audience-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: conic-gradient(
+            transparent,
+            rgba(96, 165, 250, 0.2),
+            transparent 30%
+        );
+        animation: rotate 6s linear infinite;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+    .audience-card:hover::before {
+        opacity: 1;
+    }
+
+    @keyframes rotate {
+        100% {
+            transform: rotate(1turn);
+        }
+    }
+    
+    .audience-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .audience-card h3 {
+        font-family: var(--font-primary);
+        font-size: 1.8rem;
+        color: var(--primary-color);
+        margin-bottom: 15px;
+    }
+    
+    .audience-card ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    
+    .audience-card li {
+        margin-bottom: 10px;
+        color: var(--secondary-color);
+        display: flex;
+        align-items: center;
+    }
+
+    .audience-card li i {
+        color: var(--primary-color);
+        margin-right: 12px;
+        font-size: 0.9rem;
+    }
+
+    /* --- FOOTER --- */
+    footer {
+      text-align: center;
+      padding: 40px 0;
+      border-top: 1px solid var(--card-border-color);
+      margin-top: 60px;
+      background: var(--bg-color-start);
+    }
+    footer p {
+        color: var(--secondary-color);
+    }
+
+    /* --- RESPONSIVE DESIGN --- */
+    @media (max-width: 992px) {
+      .section-title, .main-title { font-size: 2.5rem; }
+      .nav-links { gap: 25px; }
+      .audience-grid { grid-template-columns: 1fr; }
+    }
+    
+    @media (max-width: 768px) {
+      main { padding-top: 100px; }
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background: var(--bg-color-start);
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+      }
+      .nav-links.active {
+        display: flex;
+      }
+      .nav-links li {
+        margin: 10px 0;
+      }
+      .hamburger {
+        display: flex;
+      }
+      .hamburger.active .line:nth-child(1) {
+        transform: translateY(8px) rotate(45deg);
+      }
+      .hamburger.active .line:nth-child(2) {
+        opacity: 0;
+      }
+      .hamburger.active .line:nth-child(3) {
+        transform: translateY(-8px) rotate(-45deg);
+      }
+
+      .section-title, .main-title { font-size: 2.2rem; }
+    }
+
+  </style>
+</head>
+<body>
+  
+  <header class="main-header">
+    <nav class="container">
+      <a href="index.html" class="logo">Syra<span>Vault</span></a>
+      <ul class="nav-links">
+        <li><a href="index.html">Início</a></li>
+        <li><a href="modelos.html">Modelos</a></li>
+        <li><a href="sobre.html">Sobre</a></li>
+        <li><a href="contato.html">Contato</a></li>
+      </ul>
+      <div class="hamburger">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    
+    <!-- About Section -->
+    <section class="content-section">
+      <div class="container">
+        <h1 class="main-title animate-on-scroll">Sobre o Syra Vault</h1>
+        <div class="introduction">
+            <p class="animate-on-scroll">
+                <span class="highlight">Syra Vault</span> é uma plataforma desenvolvida pela <span class="highlight">Syra DevOps</span> com o objetivo de disponibilizar modelos prontos, otimizados e open source para acelerar o desenvolvimento de projetos técnicos e criativos.
+            </p>
+            <p class="animate-on-scroll" style="transition-delay: 0.1s;">
+                Com foco em agilidade, reusabilidade e performance, o Syra Vault oferece uma biblioteca crescente de modelos voltados para áreas como <span class="highlight">visão computacional</span>, <span class="highlight">processamento de linguagem natural</span>, <span class="highlight">chatbots</span>, <span class="highlight">modelos de classificação e clustering</span>, além de <span class="highlight">GPTs personalizados de alto desempenho</span>.
+            </p>
+            <p class="animate-on-scroll" style="transition-delay: 0.2s;">
+                Cada modelo do Syra Vault é cuidadosamente documentado, testado e mantido com atualizações frequentes. Acreditamos no poder do open source e no impacto de oferecer soluções acessíveis, reutilizáveis e escaláveis para profissionais, pesquisadores e startups.
+            </p>
+            <p class="animate-on-scroll" style="transition-delay: 0.3s;">
+                Seja para começar um projeto do zero ou integrar inteligência avançada ao seu sistema atual, o Syra Vault é o ponto de partida ideal.
+            </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pillars Section -->
+    <section class="content-section">
+      <div class="container">
+        <h2 class="section-title animate-on-scroll">Nossos Pilares</h2>
+        <div class="pillars-grid">
+          
+          <div class="pillar-card animate-on-scroll">
+            <div class="icon"><i class="fas fa-rocket"></i></div>
+            <h3>Agilidade e Performance</h3>
+            <p>Modelos pré-treinados e otimizados para acelerar seu pipeline de desenvolvimento, da prova de conceito à produção.</p>
+          </div>
+          
+          <div class="pillar-card animate-on-scroll" style="transition-delay: 0.1s;">
+            <div class="icon"><i class="fas fa-book-open"></i></div>
+            <h3>Open Source e Colaborativo</h3>
+            <p>Acesso irrestrito ao código, documentação detalhada e uma comunidade engajada. Contribua e faça parte da evolução.</p>
+          </div>
+          
+          <div class="pillar-card animate-on-scroll" style="transition-delay: 0.2s;">
+            <div class="icon"><i class="fas fa-brain"></i></div>
+            <h3>Tecnologia de Vanguarda</h3>
+            <p>Explore áreas como Visão Computacional, NLP, Chatbots e GPTs personalizados com implementações de última geração.</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+    
+    <!-- Target Audience Section -->
+    <section class="content-section">
+        <div class="container">
+            <h2 class="section-title animate-on-scroll">Construído para Inovadores</h2>
+            <div class="audience-grid">
+                
+                <div class="audience-card animate-on-scroll">
+                    <div class="audience-content">
+                        <h3>Pesquisadores e Instituições</h3>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Valide hipóteses rapidamente.</li>
+                            <li><i class="fas fa-check-circle"></i> Base sólida para novos estudos.</li>
+                            <li><i class="fas fa-check-circle"></i> Fomente a pesquisa reprodutível.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="audience-card animate-on-scroll" style="transition-delay: 0.1s;">
+                    <div class="audience-content">
+                        <h3>Graduandos e Educadores</h3>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Material prático para aulas.</li>
+                            <li><i class="fas fa-check-circle"></i> Portfólio com projetos reais.</li>
+                            <li><i class="fas fa-check-circle"></i> Aprenda com código de qualidade.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="audience-card animate-on-scroll" style="transition-delay: 0.2s;">
+                    <div class="audience-content">
+                        <h3>Desenvolvedores e Startups</h3>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Integre IA em seus produtos.</li>
+                            <li><i class="fas fa-check-circle"></i> Reduza o tempo de "time-to-market".</li>
+                            <li><i class="fas fa-check-circle"></i> Escale soluções de forma eficiente.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>© 2025 Syra Vault. Um produto Syra DevOps. Todos os direitos reservados.</p>
+    </div>
+  </footer>
+
+  <script>
+    // --- JavaScript for animations and mobile menu ---
+
+    // Mobile Menu Toggle
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+
+    // Animate on Scroll
+    const scrollElements = document.querySelectorAll('.animate-on-scroll');
+
+    const elementInView = (el, dividend = 1) => {
+      const elementTop = el.getBoundingClientRect().top;
+      return (
+        elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend
+      );
+    };
+
+    const displayScrollElement = (element) => {
+      element.classList.add('is-visible');
+    };
+
+    const handleScrollAnimation = () => {
+      scrollElements.forEach((el) => {
+        if (elementInView(el, 1.25)) {
+          displayScrollElement(el);
+        }
+      });
+    };
+    
+    window.addEventListener('scroll', () => {
+      handleScrollAnimation();
+    });
+    
+    // Initial check on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        handleScrollAnimation();
+    });
+
+  </script>
+
+</body>
+</html>
