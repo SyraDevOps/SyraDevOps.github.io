@@ -1,200 +1,318 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-bs-theme="dark">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Luna AI - Chat Inteligente</title>
+    <title>Luna AI - Assistente Inteligente</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts: Poppins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --primary-bg: #0a0a0a;
-            --secondary-bg: #1a1a1a;
-            --accent: #2a2a2a;
-            --highlight: #3a3a3a;
-            --text-primary: #f8f9fa;
-            --text-secondary: #adb5bd;
+            --bg-dark-blue: #0d1b2a;
+            --bg-panel-blue: #1b263b;
+            --bg-accent-blue: #415a77;
+            --text-light: #e0e1dd;
+            --text-muted: #778da9;
+            --accent-cyan: #00b4d8;
+            --accent-green: #90ee90;
+            --accent-red: #f77f00;
         }
         
         body {
-            background-color: var(--primary-bg);
-            color: var(--text-primary);
-            min-height: 100vh;
+            background-color: var(--bg-dark-blue);
+            color: var(--text-light);
+            font-family: 'Poppins', sans-serif;
+            margin: 0;
             display: flex;
             flex-direction: column;
-        }
-        
-        .chat-container {
-            background: var(--secondary-bg);
-            border-radius: 15px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            height: 100vh;
             overflow: hidden;
-            height: 80vh;
+        }
+
+        /* --- Custom Scrollbar --- */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-panel-blue);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-accent-blue);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-cyan);
+        }
+
+        /* --- App Structure --- */
+        .app-wrapper {
             display: flex;
             flex-direction: column;
+            height: 100%;
         }
-        
-        .message-bubble {
-            max-width: 70%;
-            padding: 1.25rem 1.5rem;
-            border-radius: 1.5rem;
-            position: relative;
-            transition: transform 0.3s ease;
-        }
-        
-        .user-message {
-            background: var(--highlight);
-            border-bottom-right-radius: 0.5rem;
-        }
-        
-        .luna-message {
-            background: var(--accent);
-            border-bottom-left-radius: 0.5rem;
-        }
-        
-        .message-enter {
-            transform: translateY(20px);
-            opacity: 0;
-        }
-        
-        .message-enter-active {
-            transform: translateY(0);
-            opacity: 1;
-            transition: all 0.3s ease-out;
-        }
-        
-        .context-indicator {
-            font-size: 0.75rem;
-            background: rgba(255,255,255,0.1);
-            padding: 0.25rem 0.75rem;
-            border-radius: 1rem;
-        }
-        
-        #message-input {
-            background: var(--secondary-bg);
-            border: 1px solid var(--accent);
-            color: var(--text-primary);
+
+        .app-header {
+            background-color: var(--bg-panel-blue);
             padding: 1rem 1.5rem;
-            border-radius: 2rem;
-            transition: all 0.3s ease;
+            border-bottom: 1px solid var(--bg-accent-blue);
+            display: flex;
+            align-items: center;
+            flex-shrink: 0;
         }
-        
-        #message-input:focus {
-            border-color: var(--text-secondary);
-            box-shadow: 0 0 0 3px rgba(255,255,255,0.1);
+
+        .app-header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin: 0;
         }
-        
+        .app-header .logo {
+            color: var(--accent-cyan);
+        }
+
+        /* --- Connection Status --- */
+        #connection-status {
+            font-size: 0.8rem;
+            font-weight: 300;
+        }
         .status-indicator {
             width: 10px;
             height: 10px;
             border-radius: 50%;
             display: inline-block;
             margin-right: 0.5rem;
+            transition: all 0.3s ease;
         }
-        
         .connected {
-            background: #28a745;
-            box-shadow: 0 0 8px rgba(40,167,69,0.3);
+            background: var(--accent-green);
+            box-shadow: 0 0 10px 1px var(--accent-green);
+        }
+        .disconnected {
+            background: var(--accent-red);
+            box-shadow: 0 0 10px 1px var(--accent-red);
+        }
+
+        /* --- Chat Area --- */
+        #chat-window {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-bubble {
+            max-width: 65%;
+            padding: 1rem 1.5rem;
+            border-radius: 1.5rem;
+            margin-bottom: 1rem;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: slide-in 0.4s forwards ease-out;
+            line-height: 1.6;
+        }
+
+        .user-message {
+            background: var(--accent-cyan);
+            color: var(--bg-dark-blue);
+            border-bottom-right-radius: 0.5rem;
+            align-self: flex-end;
+            font-weight: 500;
+        }
+
+        .luna-message {
+            background: var(--bg-panel-blue);
+            border-bottom-left-radius: 0.5rem;
+            align-self: flex-start;
+        }
+
+        @keyframes slide-in {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- Typing Indicator --- */
+        .typing-indicator .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-muted);
+            margin: 0 2px;
+            animation: bounce 1.3s infinite ease-in-out;
+        }
+        .typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes bounce {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-8px); }
+        }
+
+
+        /* --- Message Input Area --- */
+        .chat-input-area {
+            padding: 1rem 1.5rem;
+            background: var(--bg-panel-blue);
+            border-top: 1px solid var(--bg-accent-blue);
+            flex-shrink: 0;
+        }
+
+        #message-form .input-group {
+            background-color: var(--bg-dark-blue);
+            border-radius: 2rem;
+            padding: 0.25rem;
+        }
+
+        #message-input {
+            background: transparent;
+            border: none;
+            color: var(--text-light);
+            font-size: 1rem;
+            padding: 0.75rem 1.5rem;
+        }
+
+        #message-input::placeholder {
+            color: var(--text-muted);
+        }
+        #message-input:focus {
+            box-shadow: none;
+        }
+
+        .send-btn {
+            background-color: var(--accent-cyan);
+            color: var(--bg-dark-blue);
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            border: none;
+            font-size: 1.2rem;
+            transition: all 0.2s ease;
+        }
+        .send-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 15px rgba(0, 180, 216, 0.5);
+        }
+        .send-btn:disabled {
+            background-color: var(--bg-accent-blue);
         }
         
-        .disconnected {
-            background: #dc3545;
-            box-shadow: 0 0 8px rgba(220,53,69,0.3);
+        /* --- Settings Offcanvas --- */
+        .offcanvas {
+            background-color: var(--bg-panel-blue);
+            color: var(--text-light);
+            border-left: 1px solid var(--bg-accent-blue);
+        }
+        .offcanvas-header {
+            border-bottom: 1px solid var(--bg-accent-blue);
+        }
+        .btn-close {
+            background-color: var(--accent-cyan);
+        }
+        .form-label {
+            color: var(--text-muted);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+        .form-control, .form-select {
+            background-color: var(--bg-dark-blue);
+            border: 1px solid var(--bg-accent-blue);
+            color: var(--text-light);
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: var(--bg-dark-blue);
+            color: var(--text-light);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 0 3px rgba(0, 180, 216, 0.25);
+        }
+        #set-context-btn {
+            background-color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            color: var(--bg-dark-blue);
         }
     </style>
 </head>
-<body class="bg-dark text-light">
-    <header class="py-3 border-bottom border-dark">
-        <div class="container">
-            <div class="d-flex justify-content-between align-items-center">
-                <h1 class="h3 mb-0 fw-bold">
-                    <i class="fas fa-moon me-2"></i>Luna AI
-                </h1>
-                <div id="connection-status" class="d-flex align-items-center">
-                    <span class="status-indicator disconnected"></span>
-                    <small>Conectando...</small>
-                </div>
-            </div>
-        </div>
-    </header>
+<body>
 
-    <main class="container my-4 flex-grow-1">
-        <div class="row g-4">
-            <!-- Settings Panel -->
-            <div class="col-lg-3">
-                <div class="card border-dark bg-secondary">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4">
-                            <i class="fas fa-cog me-2"></i>Configurações
-                        </h5>
-                        
-                        <div class="mb-4">
-                            <label class="form-label">Modelo AI</label>
-                            <select id="model-select" class="form-select bg-dark text-light border-dark" 
-                                    data-bs-toggle="tooltip" title="Selecione o modelo de IA">
-                                <option>Carregando modelos...</option>
-                            </select>
-                        </div>
-                        
-                        <div class="mb-4">
-                            <label class="form-label">Contexto da Conversa</label>
-                            <div class="input-group">
-                                <input type="text" id="context-select" 
-                                       class="form-control bg-dark text-light border-dark"
-                                       placeholder="Contexto global">
-                                <button id="set-context-btn" 
-                                        class="btn btn-dark border-dark"
-                                        data-bs-toggle="tooltip" 
-                                        title="Definir contexto da conversa">
-                                    <i class="fas fa-check"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div class="context-indicator">
-                            <small>
-                                <i class="fas fa-info-circle me-2"></i>
-                                <span id="current-context">Nenhum contexto definido</span>
-                            </small>
-                        </div>
-                    </div>
+    <!-- Settings Offcanvas -->
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="settings-offcanvas" aria-labelledby="settingsOffcanvasLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="settingsOffcanvasLabel"><i class="fas fa-sliders-h me-2"></i>Configurações</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="mb-4">
+                <label for="model-select" class="form-label">Modelo AI</label>
+                <select id="model-select" class="form-select" data-bs-toggle="tooltip" title="Selecione o modelo de IA para a conversa">
+                    <option>Carregando modelos...</option>
+                </select>
+            </div>
+            
+            <div class="mb-3">
+                <label for="context-select" class="form-label">Contexto da Conversa</label>
+                <div class="input-group">
+                    <input type="text" id="context-select" class="form-control" placeholder="Definir um contexto global">
+                    <button id="set-context-btn" class="btn" type="button" data-bs-toggle="tooltip" title="Salvar contexto">
+                        <i class="fas fa-check"></i>
+                    </button>
                 </div>
             </div>
 
-            <!-- Chat Container -->
-            <div class="col-lg-9">
-                <div class="chat-container">
-                    <div id="chat-messages" class="flex-grow-1 overflow-auto p-4">
-                        <div class="message-bubble luna-message mb-3">
-                            Olá! Sou a Luna, sua assistente AI. Como posso ajudá-lo hoje?
-                        </div>
-                    </div>
-                    
-                    <div class="border-top border-dark p-4">
-                        <form id="message-form" class="position-relative">
-                            <div class="input-group">
-                                <input type="text" id="message-input" 
-                                       class="form-control" 
-                                       placeholder="Digite sua mensagem..."
-                                       autocomplete="off">
-                                <button type="submit" 
-                                        class="btn btn-dark border-dark"
-                                        data-bs-toggle="tooltip" 
-                                        title="Enviar mensagem">
-                                    <i class="fas fa-paper-plane"></i>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+            <div class="alert alert-dark mt-4" role="alert" style="background-color: var(--bg-dark-blue); border-color: var(--bg-accent-blue);">
+                <i class="fas fa-info-circle me-2 text-muted"></i>
+                Contexto atual: <strong id="current-context">Nenhum</strong>
             </div>
         </div>
-    </main>
+    </div>
+
+
+    <!-- Main App Wrapper -->
+    <div class="app-wrapper">
+        <!-- Header -->
+        <header class="app-header">
+            <h1><i class="fas fa-moon logo me-2"></i>Luna AI</h1>
+            <div class="flex-grow-1"></div>
+            <div id="connection-status" class="d-flex align-items-center me-3">
+                <span class="status-indicator disconnected"></span>
+                <small>Conectando...</small>
+            </div>
+            <button class="btn btn-outline-secondary border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#settings-offcanvas" aria-controls="settings-offcanvas" title="Abrir Configurações">
+                <i class="fas fa-cog fs-5"></i>
+            </button>
+        </header>
+
+        <!-- Chat Messages -->
+        <main id="chat-window">
+            <div id="chat-messages" class="d-flex flex-column">
+                <div class="message-bubble luna-message">
+                    Olá! Sou a Luna, sua assistente de IA. Como posso te ajudar hoje?
+                </div>
+            </div>
+        </main>
+
+        <!-- Message Input -->
+        <footer class="chat-input-area">
+            <form id="message-form">
+                <div class="input-group">
+                    <input type="text" id="message-input" class="form-control" placeholder="Digite sua mensagem aqui..." autocomplete="off">
+                    <button type="submit" id="send-button" class="btn send-btn" title="Enviar mensagem">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+        </footer>
+    </div>
 
     <!-- Bootstrap 5 JS + Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -204,17 +322,20 @@
         let currentModel = '';
         let currentContext = null;
         
-        // Elementos DOM
+        // --- DOM Elements ---
         const modelSelect = document.getElementById('model-select');
         const contextInput = document.getElementById('context-select');
         const setContextBtn = document.getElementById('set-context-btn');
+        const currentContextEl = document.getElementById('current-context');
+        const chatWindow = document.getElementById('chat-window');
         const chatMessages = document.getElementById('chat-messages');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
         const statusIndicator = document.querySelector('.status-indicator');
         const connectionStatus = document.getElementById('connection-status');
 
-        // Inicializar tooltips
+        // --- Initializer ---
         const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
         const tooltips = tooltipTriggerList.map(el => new bootstrap.Tooltip(el));
 
@@ -231,81 +352,115 @@
             } catch (error) {
                 console.error('Erro de inicialização:', error);
                 updateConnectionStatus(false, error.message);
+                addMessage(`Falha na conexão com a API: ${error.message}`, 'luna');
             }
         }
 
+        // --- UI Functions ---
         function updateConnectionStatus(connected, message = '') {
-            if (connected) {
-                statusIndicator.classList.replace('disconnected', 'connected');
-                connectionStatus.innerHTML = `
-                    <span class="status-indicator connected"></span>
-                    <small>Conectado</small>
-                `;
-            } else {
-                statusIndicator.classList.replace('connected', 'disconnected');
-                connectionStatus.innerHTML = `
-                    <span class="status-indicator disconnected"></span>
-                    <small>${message || 'Desconectado'}</small>
-                `;
+            statusIndicator.classList.toggle('connected', connected);
+            statusIndicator.classList.toggle('disconnected', !connected);
+            connectionStatus.innerHTML = `
+                <span class="status-indicator ${connected ? 'connected' : 'disconnected'}"></span>
+                <small>${connected ? 'Online' : (message || 'Offline')}</small>
+            `;
+        }
+
+        function populateModelSelect(models) {
+            modelSelect.innerHTML = models.map(model => `
+                <option value="${model}">${model.charAt(0).toUpperCase() + model.slice(1)}</option>
+            `).join('');
+            
+            currentModel = models[0];
+            modelSelect.value = currentModel;
+        }
+        
+        function scrollToBottom() {
+            chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
+        }
+
+        function showTypingIndicator() {
+            hideTypingIndicator(); // Remove any previous indicator
+            const typingEl = document.createElement('div');
+            typingEl.id = 'typing-indicator';
+            typingEl.className = 'message-bubble luna-message';
+            typingEl.innerHTML = `
+                <div class="typing-indicator">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+            `;
+            chatMessages.appendChild(typingEl);
+            scrollToBottom();
+        }
+
+        function hideTypingIndicator() {
+            const typingEl = document.getElementById('typing-indicator');
+            if (typingEl) {
+                typingEl.remove();
             }
         }
 
+        function addMessage(text, sender) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `message-bubble ${sender}-message`;
+            messageEl.textContent = text;
+            chatMessages.appendChild(messageEl);
+            scrollToBottom();
+        }
+
+        // --- API Interaction ---
         async function fetchModels() {
             const response = await fetch(`${API_BASE}/models`);
             if (!response.ok) throw new Error('Falha ao carregar modelos');
             return await response.json();
         }
 
-        function populateModelSelect(models) {
-            modelSelect.innerHTML = models.map(model => `
-                <option value="${model}">${model.toUpperCase()}</option>
-            `).join('');
-            
-            currentModel = models[0];
-            modelSelect.value = currentModel;
-            modelSelect.addEventListener('change', () => currentModel = modelSelect.value);
-        }
-
         async function getContext() {
             try {
                 const response = await fetch(`${API_BASE}/context`);
-                if (!response.ok) throw new Error('Falha ao carregar contexto');
+                if (!response.ok) throw new Error('Falha ao obter contexto');
                 const data = await response.json();
                 currentContext = data.context;
-                document.getElementById('current-context').textContent = 
-                    currentContext || 'Contexto global';
+                currentContextEl.textContent = currentContext || 'Nenhum';
             } catch (error) {
                 console.error('Erro ao obter contexto:', error);
+                currentContextEl.textContent = 'Erro ao carregar';
             }
         }
 
         async function setContext() {
             try {
-                const newContext = contextInput.value.trim() || "null";
+                const newContext = contextInput.value.trim() || null; // Use null for empty
                 const response = await fetch(`${API_BASE}/context`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ context: newContext }),
                 });
-                
                 if (!response.ok) throw new Error('Falha ao definir contexto');
                 await getContext();
+                contextInput.value = ''; // Clear input on success
             } catch (error) {
                 console.error('Erro ao definir contexto:', error);
+                alert(`Erro: ${error.message}`);
             }
         }
 
         async function sendMessage(message) {
-            if (!message) return;
+            if (!message.trim()) return;
             
             addMessage(message, 'user');
+            messageInput.value = '';
             messageInput.disabled = true;
-            
+            sendButton.disabled = true;
+            showTypingIndicator();
+
             try {
                 const payload = {
                     message: message,
                     model_name: currentModel,
-                    context: contextInput.value.trim() || undefined
+                    context: currentContext // API uses its managed context
                 };
 
                 const response = await fetch(`${API_BASE}/chat`, {
@@ -314,61 +469,40 @@
                     body: JSON.stringify(payload),
                 });
 
-                if (!response.ok) throw new Error('Falha na resposta da API');
+                hideTypingIndicator();
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({ detail: 'Resposta inválida da API' }));
+                    throw new Error(errorData.detail || 'Falha na resposta da API');
+                }
                 
                 const data = await response.json();
                 addMessage(data.response, 'luna');
-                if (data.context !== currentContext) await getContext();
                 
             } catch (error) {
+                hideTypingIndicator();
                 console.error('Erro ao enviar mensagem:', error);
                 addMessage(`Desculpe, ocorreu um erro: ${error.message}`, 'luna');
             } finally {
                 messageInput.disabled = false;
+                sendButton.disabled = false;
                 messageInput.focus();
             }
         }
 
-        function addMessage(text, sender) {
-            const messageEl = document.createElement('div');
-            messageEl.className = `message-bubble ${sender}-message mb-3 
-                ${sender === 'user' ? 'ms-auto' : ''} message-enter`;
-            
-            messageEl.innerHTML = `
-                <div class="d-flex align-items-center gap-2 mb-2">
-                    <small class="text-muted">
-                        ${sender === 'user' ? 'Você' : 'Luna AI'}
-                    </small>
-                </div>
-                ${text}
-            `;
-
-            chatMessages.appendChild(messageEl);
-            chatMessages.scrollTo(0, chatMessages.scrollHeight);
-            
-            // Trigger animation
-            setTimeout(() => {
-                messageEl.classList.add('message-enter-active');
-            }, 10);
-        }
-
-        // Event Listeners
+        // --- Event Listeners ---
         messageForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const message = messageInput.value.trim();
-            if (message) {
-                sendMessage(message);
-                messageInput.value = '';
-            }
+            sendMessage(messageInput.value);
         });
 
-        setContextBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            setContext();
+        setContextBtn.addEventListener('click', setContext);
+        modelSelect.addEventListener('change', () => {
+            currentModel = modelSelect.value;
         });
 
-        // Inicialização
-        init();
+        // --- Start the App ---
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
