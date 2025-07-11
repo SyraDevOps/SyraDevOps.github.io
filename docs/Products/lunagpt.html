@@ -275,7 +275,7 @@
         function loadHistory() {
             const history = JSON.parse(localStorage.getItem('chatHistory') || '[]');
             if (history.length === 0) {
-                addMessage('Olá! Sou a Luna, sua assistente de IA. Como posso te ajudar hoje?', 'luna');
+                addMessage('Olá! Sou a Luna, no momento estou em manutenção, em breve estarei de volta! S2', 'luna');
             } else {
                 history.forEach(({ text, sender }) => addMessage(text, sender, false));
             }
