@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyraID - Autenticação Segura</title>
+    
+    <!-- Fontes e Ícones -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <style>
+        :root {
+            --dark-purple: #1F1C2C;
+            --lavender-gray: #928DAB;
+            --light-pearl: #F7F8F8;
+            --main-text: #EAEAEA;
+            --secondary-text: #B4B4B4;
+            --highlight: #C084FC;
+            --error: #FF6B6B;
+            --success: #2ECC71;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--dark-purple), var(--lavender-gray));
+            color: var(--main-text);
+        }
+        .container {
+            max-width: 420px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 28, 44, 0.37);
+        }
+        h1 {
+            font-size: 3em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, var(--highlight), var(--main-text));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h2 { font-weight: 600; margin-bottom: 25px; color: var(--main-text); }
+        .form-section { margin-bottom: 20px; }
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--secondary-text); transition: color 0.3s ease; }
+        input[type="text"] {
+            width: 100%;
+            padding: 15px 15px 15px 45px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid transparent;
+            border-radius: 8px;
+            color: var(--main-text);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+        input[type="text"]:focus { background: rgba(0, 0, 0, 0.3); outline: none; border-color: var(--highlight); }
+        input[type="text"]:focus + i { color: var(--highlight); }
+        input::placeholder { color: var(--secondary-text); }
+        button {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(to right, var(--highlight), #a164df);
+            color: var(--dark-purple);
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(192, 132, 252, 0.2);
+        }
+        button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(192, 132, 252, 0.4); }
+        .message-area { padding: 15px; margin-bottom: 20px; border-radius: 8px; display: none; text-align: left; border-left: 5px solid; }
+        .message-success { background-color: rgba(46, 204, 113, 0.15); color: #d7fff0; border-color: var(--success); display: block !important; }
+        .message-error { background-color: rgba(255, 107, 107, 0.15); color: #ffd1d1; border-color: var(--error); display: block !important; }
+        .toggle-container { margin-top: 25px; color: var(--secondary-text); }
+        .toggle-link { color: var(--highlight); font-weight: 600; text-decoration: none; cursor: pointer; transition: color 0.3s ease; }
+        .toggle-link:hover { color: var(--main-text); }
+        #qrcode-container { margin-top: 20px; padding: 20px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        #qrcode-image { max-width: 180px; border: 4px solid var(--highlight); padding: 5px; background: white; border-radius: 8px; }
+        #secret-key { display: inline-block; margin-top: 15px; padding: 8px 12px; background: rgba(0,0,0,0.4); border-radius: 4px; font-family: "Courier New", Courier, monospace; word-break: break-all; color: var(--main-text); }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>SyraID</h1>
+        
+        <div id="message-area"></div>
+
+        <!-- VISUALIZAÇÃO DE LOGIN (INICIAL) -->
+        <div id="login-view">
+            <h2>Login Seguro</h2>
+            <form id="login-form" class="form-section">
+                <div class="input-group">
+                    <input type="text" id="login-username" placeholder="Nome de Usuário" required autocomplete="username">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="login-totp" placeholder="Código 2FA" required maxlength="6" pattern="\d{6}" autocomplete="off">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <button type="submit">Entrar</button>
+            </form>
+            <div class="toggle-container">
+                <p>Não tem uma conta? <a href="#" id="show-register-link" class="toggle-link">Registre-se</a></p>
+            </div>
+        </div>
+
+        <!-- VISUALIZAÇÃO DE REGISTRO (ESCONDIDA) -->
+        <div id="register-view" style="display: none;">
+            <h2>Criar Conta</h2>
+            
+            <form id="register-form" class="form-section">
+                <div id="register-step1">
+                     <div class="input-group">
+                        <input type="text" id="register-username" placeholder="Escolha um nome de usuário" required autocomplete="username">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <button type="submit">Criar Conta</button>
+                </div>
+            </form>
+
+            <div id="register-step2" style="display: none;">
+                <div id="qrcode-container">
+                    <p>Escaneie o QR Code no seu app autenticador</p>
+                    <img id="qrcode-image" src="" alt="QR Code">
+                    <p><strong>Guarde esta chave de backup!</strong></p>
+                    <code id="secret-key"></code>
+                </div>
+                <form id="verify-form" class="form-section" style="margin-top: 20px;">
+                    <div class="input-group">
+                        <input type="text" id="verify-totp" placeholder="Digite o código de 6 dígitos" required maxlength="6" pattern="\d{6}" autocomplete="off">
+                        <i class="fa-solid fa-key"></i>
+                    </div>
+                    <button type="submit">Verificar e Ativar</button>
+                </form>
+            </div>
+
+            <div class="toggle-container">
+                 <p>Já tem uma conta? <a href="#" id="show-login-link" class="toggle-link">Faça Login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://191.252.218.175:5000/'; 
+
+        const loginView = document.getElementById('login-view');
+        const registerView = document.getElementById('register-view');
+        const messageArea = document.getElementById('message-area');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const verifyForm = document.getElementById('verify-form');
+        const showRegisterLink = document.getElementById('show-register-link');
+        const showLoginLink = document.getElementById('show-login-link');
+        const registerStep1 = document.getElementById('register-step1');
+        const registerStep2 = document.getElementById('register-step2');
+        const qrCodeImage = document.getElementById('qrcode-image');
+        const secretKeyEl = document.getElementById('secret-key');
+        
+        let pendingUsername = null;
+
+        function showLoginView() {
+            loginView.style.display = 'block';
+            registerView.style.display = 'none';
+            messageArea.style.display = 'none';
+        }
+
+        function showRegisterView() {
+            loginView.style.display = 'none';
+            registerView.style.display = 'block';
+            messageArea.style.display = 'none';
+            registerStep1.style.display = 'block';
+            registerStep2.style.display = 'none';
+            registerForm.reset();
+            verifyForm.reset();
+        }
+
+        showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterView(); });
+        showLoginLink.addEventListener('click', (e) => { e.preventDefault(); showLoginView(); });
+
+        function showMessage(message, type = 'error') {
+            messageArea.innerHTML = message;
+            messageArea.className = `message-area ${type === 'success' ? 'message-success' : 'message-error'}`;
+            window.scrollTo(0, 0);
+        }
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('register-username').value.trim();
+            if (!username) {
+                showMessage('Por favor, insira um nome de usuário.');
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erro ao registrar.');
+                
+                pendingUsername = username;
+                qrCodeImage.src = data.qr_code_image;
+                secretKeyEl.textContent = data.secret_backup_key;
+                registerStep1.style.display = 'none';
+                registerStep2.style.display = 'block';
+                document.getElementById('verify-totp').focus();
+                messageArea.style.display = 'none';
+
+            } catch (error) {
+                showMessage(`<b>Erro:</b> ${error.message}`);
+            }
+        });
+
+        verifyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const totp_code = document.getElementById('verify-totp').value.trim();
+            if (!pendingUsername) {
+                showMessage('Erro interno. Por favor, reinicie o processo de registro.');
+                return;
+            }
+            try {
+                const response = await fetch(`${API_URL}/verify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: pendingUsername, totp_code })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erro ao verificar o código.');
+                showLoginView();
+                showMessage(data.message, 'success');
+                document.getElementById('login-username').value = pendingUsername;
+                pendingUsername = null;
+            } catch (error) {
+                showMessage(`<b>Erro:</b> ${error.message}`);
+            }
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('login-username').value.trim();
+            const totp_code = document.getElementById('login-totp').value.trim();
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, totp_code })
+                });
+                const data = await response.json();
+                if (!response.ok) throw new Error(data.error || 'Erro no login.');
+
+                // --- PONTO CHAVE: Salvar o token e redirecionar ---
+                if (data.token) {
+                    localStorage.setItem('syra-auth-token', data.token);
+                    window.location.href = 'dashboard.html'; // Redireciona para a dashboard
+                } else {
+                    throw new Error('Não foi possível obter o token de autenticação.');
+                }
+            } catch (error) {
+                showMessage(`<b>Falha no login:</b> ${error.message}`);
+            }
+        });
+        
+        // Verifica se já existe um token e tenta redirecionar
+        if (localStorage.getItem('syra-auth-token')) {
+            window.location.href = 'dashboard.html';
+        } else {
+            showLoginView();
+        }
+    </script>
+</body>
+</html>

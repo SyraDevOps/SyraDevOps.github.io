@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SyraID</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <style>
+        :root {
+            --dark-purple: #1F1C2C;
+            --lavender-gray: #928DAB;
+            --main-text: #EAEAEA;
+            --secondary-text: #B4B4B4;
+            --highlight: #C084FC;
+            --success: #2ECC71;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Alinha no topo para melhor visualização */
+            min-height: 100vh;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, var(--dark-purple), var(--lavender-gray));
+            color: var(--main-text);
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 28, 44, 0.37);
+        }
+        h1 {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(to right, var(--highlight), var(--main-text));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        h2 {
+            font-weight: 600;
+            color: var(--highlight);
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(192, 132, 252, 0.3);
+            padding-bottom: 10px;
+        }
+        .section {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+        .p2p-id-container {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 20px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        #syra-p2p-id {
+            font-family: "Courier New", monospace;
+            font-size: 1.1em;
+            color: var(--success);
+            word-break: break-all;
+        }
+        #copy-id-btn {
+            background: none;
+            border: none;
+            color: var(--secondary-text);
+            cursor: pointer;
+            font-size: 1.2em;
+            transition: color 0.3s;
+        }
+        #copy-id-btn:hover { color: var(--highlight); }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            background: rgba(0,0,0,0.2);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-card .icon {
+            font-size: 2em;
+            color: var(--highlight);
+            margin-bottom: 10px;
+        }
+        .stat-card h3 {
+            font-size: 1em;
+            color: var(--secondary-text);
+            margin-bottom: 5px;
+            font-weight: 400;
+        }
+        .stat-card p {
+            font-size: 1.5em;
+            font-weight: 600;
+        }
+        #logout-button {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid var(--highlight);
+            background: transparent;
+            color: var(--highlight);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        #logout-button:hover {
+            background: var(--highlight);
+            color: var(--dark-purple);
+        }
+        ul { list-style: none; padding-left: 0; }
+        li { background: rgba(0,0,0,0.1); padding: 8px; border-radius: 4px; margin-bottom: 5px; }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="welcome-message">Carregando...</h1>
+
+        <div class="section">
+            <h2><i class="fa-solid fa-satellite-dish"></i> Seu ID de Relay P2P</h2>
+            <div class="p2p-id-container">
+                <code id="syra-p2p-id">Gerando...</code>
+                <button id="copy-id-btn" title="Copiar ID"><i class="fa-regular fa-copy"></i></button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2><i class="fa-solid fa-chart-simple"></i> Suas Estatísticas</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="icon"><i class="fa-solid fa-star"></i></div>
+                    <h3>Experiência (EXP)</h3>
+                    <p id="user-exp">0</p>
+                </div>
+                <div class="stat-card">
+                    <div class="icon"><i class="fa-solid fa-user-group"></i></div>
+                    <h3>Amigos</h3>
+                    <p id="user-friends-count">0</p>
+                </div>
+                <div class="stat-card">
+                    <div class="icon"><i class="fa-solid fa-trophy"></i></div>
+                    <h3>Conquistas</h3>
+                    <p id="user-achievements-count">0</p>
+                </div>
+            </div>
+        </div>
+
+        <button id="logout-button"><i class="fa-solid fa-right-from-bracket"></i> Sair</button>
+    </div>
+
+    <script>
+        const API_URL = 'http://191.252.218.175:5000/'; 
+        const token = localStorage.getItem('syra-auth-token');
+
+        // --- Guarda de Rota ---
+        // Se não houver token, redireciona para a página de login imediatamente.
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        // --- Elementos do DOM ---
+        const welcomeMessage = document.getElementById('welcome-message');
+        const p2pIdElement = document.getElementById('syra-p2p-id');
+        const copyBtn = document.getElementById('copy-id-btn');
+        const expElement = document.getElementById('user-exp');
+        const friendsCountElement = document.getElementById('user-friends-count');
+        const achievementsCountElement = document.getElementById('user-achievements-count');
+        const logoutButton = document.getElementById('logout-button');
+
+        // --- Funções ---
+        async function fetchProfile() {
+            try {
+                const response = await fetch(`${API_URL}/profile`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401) { // Token expirado ou inválido
+                    throw new Error('Sessão inválida. Por favor, faça login novamente.');
+                }
+                if (!response.ok) {
+                    throw new Error('Falha ao buscar dados do perfil.');
+                }
+
+                const user = await response.json();
+                populateDashboard(user);
+
+            } catch (error) {
+                console.error(error.message);
+                // Limpa o token inválido e redireciona
+                localStorage.removeItem('syra-auth-token');
+                window.location.href = 'index.html';
+            }
+        }
+
+        function populateDashboard(user) {
+            // Mensagem de boas-vindas
+            welcomeMessage.innerHTML = `<i class="fa-solid fa-hands-clapping"></i> Boas-vindas, <strong>${user.username}</strong>!`;
+
+            // Gera e exibe o ID de Relay P2P (simulado)
+            // Usamos uma parte de um UUID para dar um toque de aleatoriedade e unicidade
+            const randomPart = crypto.randomUUID().split('-')[0];
+            p2pIdElement.textContent = `syra-relay::${user.username}@${randomPart}`;
+
+            // Preenche as estatísticas
+            expElement.textContent = user.exp.toLocaleString('pt-BR');
+            friendsCountElement.textContent = user.friends.length;
+            achievementsCountElement.textContent = user.achievements.length;
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('syra-auth-token');
+            window.location.href = 'index.html';
+        }
+        
+        copyBtn.addEventListener('click', () => {
+            const idToCopy = p2pIdElement.textContent;
+            navigator.clipboard.writeText(idToCopy).then(() => {
+                const icon = copyBtn.querySelector('i');
+                icon.classList.remove('fa-copy');
+                icon.classList.add('fa-check');
+                copyBtn.title = "Copiado!";
+                setTimeout(() => {
+                    icon.classList.remove('fa-check');
+                    icon.classList.add('fa-copy');
+                    copyBtn.title = "Copiar ID";
+                }, 2000);
+            }).catch(err => {
+                console.error('Falha ao copiar: ', err);
+            });
+        });
+
+        // --- Execução ---
+        logoutButton.addEventListener('click', handleLogout);
+        document.addEventListener('DOMContentLoaded', fetchProfile);
+    </script>
+</body>
+</html>
