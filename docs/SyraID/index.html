@@ -57,7 +57,7 @@
         .form-section { margin-bottom: 20px; }
         .input-group { position: relative; margin-bottom: 20px; }
         .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--secondary-text); transition: color 0.3s ease; }
-        input[type="text"] {
+        input[type="text"], input[type="tel"] { /* MELHORIA: Adicionado type="tel" */
             width: 100%;
             padding: 15px 15px 15px 45px;
             background: rgba(0, 0, 0, 0.2);
@@ -68,8 +68,8 @@
             font-size: 1rem;
             transition: border-color 0.3s ease, background-color 0.3s ease;
         }
-        input[type="text"]:focus { background: rgba(0, 0, 0, 0.3); outline: none; border-color: var(--highlight); }
-        input[type="text"]:focus + i { color: var(--highlight); }
+        input[type="text"]:focus, input[type="tel"]:focus { background: rgba(0, 0, 0, 0.3); outline: none; border-color: var(--highlight); }
+        input[type="text"]:focus + i, input[type="tel"]:focus + i { color: var(--highlight); }
         input::placeholder { color: var(--secondary-text); }
         button {
             width: 100%;
@@ -84,7 +84,8 @@
             transition: all 0.3s ease;
             box-shadow: 0 4px 15px rgba(192, 132, 252, 0.2);
         }
-        button:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(192, 132, 252, 0.4); }
+        button:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(192, 132, 252, 0.4); }
+        button:disabled { background: var(--secondary-text); cursor: not-allowed; transform: none; box-shadow: none; }
         .message-area { padding: 15px; margin-bottom: 20px; border-radius: 8px; display: none; text-align: left; border-left: 5px solid; }
         .message-success { background-color: rgba(46, 204, 113, 0.15); color: #d7fff0; border-color: var(--success); display: block !important; }
         .message-error { background-color: rgba(255, 107, 107, 0.15); color: #ffd1d1; border-color: var(--error); display: block !important; }
@@ -108,11 +109,12 @@
             <h2>Login Seguro</h2>
             <form id="login-form" class="form-section">
                 <div class="input-group">
-                    <input type="text" id="login-username" placeholder="Nome de Usuário" required autocomplete="username">
+                    <input type="text" id="login-username" placeholder="Nome de Usuário" required autocomplete="username" autofocus>
                     <i class="fa-solid fa-user"></i>
                 </div>
                 <div class="input-group">
-                    <input type="text" id="login-totp" placeholder="Código 2FA" required maxlength="6" pattern="\d{6}" autocomplete="off">
+                    <!-- MELHORIA: Alterado para type="tel" e inputmode="numeric" para melhor UX mobile -->
+                    <input type="tel" id="login-totp" placeholder="Código 2FA" required maxlength="6" pattern="\d{6}" autocomplete="off" inputmode="numeric">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <button type="submit">Entrar</button>
@@ -129,7 +131,7 @@
             <form id="register-form" class="form-section">
                 <div id="register-step1">
                      <div class="input-group">
-                        <input type="text" id="register-username" placeholder="Escolha um nome de usuário" required autocomplete="username">
+                        <input type="text" id="register-username" placeholder="Escolha um nome de usuário" required autocomplete="username" autofocus>
                         <i class="fa-solid fa-user-plus"></i>
                     </div>
                     <button type="submit">Criar Conta</button>
@@ -145,7 +147,7 @@
                 </div>
                 <form id="verify-form" class="form-section" style="margin-top: 20px;">
                     <div class="input-group">
-                        <input type="text" id="verify-totp" placeholder="Digite o código de 6 dígitos" required maxlength="6" pattern="\d{6}" autocomplete="off">
+                        <input type="tel" id="verify-totp" placeholder="Digite o código de 6 dígitos" required maxlength="6" pattern="\d{6}" autocomplete="off" inputmode="numeric">
                         <i class="fa-solid fa-key"></i>
                     </div>
                     <button type="submit">Verificar e Ativar</button>
@@ -159,7 +161,7 @@
     </div>
 
     <script>
-        const API_URL = 'http://191.252.218.175:5000/'; 
+        const API_URL = 'http://localhost:5000'; // Ajuste o IP se necessário
 
         const loginView = document.getElementById('login-view');
         const registerView = document.getElementById('register-view');
@@ -173,13 +175,12 @@
         const registerStep2 = document.getElementById('register-step2');
         const qrCodeImage = document.getElementById('qrcode-image');
         const secretKeyEl = document.getElementById('secret-key');
-        
-        let pendingUsername = null;
 
         function showLoginView() {
             loginView.style.display = 'block';
             registerView.style.display = 'none';
             messageArea.style.display = 'none';
+            document.getElementById('login-username').focus();
         }
 
         function showRegisterView() {
@@ -190,6 +191,7 @@
             registerStep2.style.display = 'none';
             registerForm.reset();
             verifyForm.reset();
+            document.getElementById('register-username').focus();
         }
 
         showRegisterLink.addEventListener('click', (e) => { e.preventDefault(); showRegisterView(); });
@@ -201,15 +203,31 @@
             window.scrollTo(0, 0);
         }
 
+        // MELHORIA: Função para controlar o estado do botão (loading)
+        function toggleButtonState(button, isLoading, originalText) {
+            if (isLoading) {
+                button.disabled = true;
+                button.textContent = 'Carregando...';
+            } else {
+                button.disabled = false;
+                button.textContent = originalText;
+            }
+        }
+        
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const button = e.target.querySelector('button');
+            toggleButtonState(button, true);
+
             const username = document.getElementById('register-username').value.trim();
             if (!username) {
                 showMessage('Por favor, insira um nome de usuário.');
+                toggleButtonState(button, false, 'Criar Conta');
                 return;
             }
             try {
-                const response = await fetch(`${API_URL}/register`, {
+                // ALTERAÇÃO: Rota corrigida para /auth/register
+                const response = await fetch(`${API_URL}/auth/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username })
@@ -217,7 +235,9 @@
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Erro ao registrar.');
                 
-                pendingUsername = username;
+                // MELHORIA: Usar sessionStorage para persistir o username
+                sessionStorage.setItem('pendingUsername', username);
+
                 qrCodeImage.src = data.qr_code_image;
                 secretKeyEl.textContent = data.secret_backup_key;
                 registerStep1.style.display = 'none';
@@ -227,39 +247,61 @@
 
             } catch (error) {
                 showMessage(`<b>Erro:</b> ${error.message}`);
+            } finally {
+                toggleButtonState(button, false, 'Criar Conta');
             }
         });
 
         verifyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const button = e.target.querySelector('button');
+            toggleButtonState(button, true, 'Verificar e Ativar');
+            
+            // MELHORIA: Obter username do sessionStorage
+            const pendingUsername = sessionStorage.getItem('pendingUsername');
             const totp_code = document.getElementById('verify-totp').value.trim();
+
             if (!pendingUsername) {
                 showMessage('Erro interno. Por favor, reinicie o processo de registro.');
+                toggleButtonState(button, false, 'Verificar e Ativar');
                 return;
             }
+
             try {
-                const response = await fetch(`${API_URL}/verify`, {
+                // ALTERAÇÃO: Rota corrigida para /auth/verify
+                const response = await fetch(`${API_URL}/auth/verify`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: pendingUsername, totp_code })
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Erro ao verificar o código.');
+
                 showLoginView();
                 showMessage(data.message, 'success');
                 document.getElementById('login-username').value = pendingUsername;
-                pendingUsername = null;
+                
+                // MELHORIA: Limpar sessionStorage
+                sessionStorage.removeItem('pendingUsername');
+
             } catch (error) {
                 showMessage(`<b>Erro:</b> ${error.message}`);
+            } finally {
+                toggleButtonState(button, false, 'Verificar e Ativar');
             }
         });
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            const button = e.target.querySelector('button');
+            toggleButtonState(button, true, 'Entrar');
+            
             const username = document.getElementById('login-username').value.trim();
             const totp_code = document.getElementById('login-totp').value.trim();
+
             try {
-                const response = await fetch(`${API_URL}/login`, {
+                // ALTERAÇÃO: Rota corrigida para /auth/login
+                const response = await fetch(`${API_URL}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username, totp_code })
@@ -267,15 +309,16 @@
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.error || 'Erro no login.');
 
-                // --- PONTO CHAVE: Salvar o token e redirecionar ---
                 if (data.token) {
                     localStorage.setItem('syra-auth-token', data.token);
-                    window.location.href = 'dashboard.html'; // Redireciona para a dashboard
+                    window.location.href = 'dashboard.html'; // Supondo que você terá uma página de dashboard
                 } else {
                     throw new Error('Não foi possível obter o token de autenticação.');
                 }
             } catch (error) {
                 showMessage(`<b>Falha no login:</b> ${error.message}`);
+            } finally {
+                toggleButtonState(button, false, 'Entrar');
             }
         });
         
