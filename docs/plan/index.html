@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Planetário Itinerante</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+  <!-- Favicon gerado do logo -->
+  <link rel="icon" type="image/png" href="favicon.png">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container">
+      <div class="logo-container">
+        <img src="logo.png" alt="Planetário Itinerante" class="logo">
+        <img src="ufsj-logo.png" alt="UFSJ - Universidade Federal de São João del-Rei" class="logo ufsj-logo">
+      </div>
+      <nav class="main-nav">
+        <button class="menu-toggle" aria-label="Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <ul class="nav-menu">
+          <li><a href="#about"><i class="fas fa-info-circle"></i> Sobre</a></li>
+          <li><a href="posts.html"><i class="fab fa-instagram"></i> Posts</a></li>
+          <li><a href="#events"><i class="far fa-calendar-alt"></i> Eventos</a></li>
+          <li><a href="#workshops"><i class="fas fa-tools"></i> Oficinas</a></li>
+          <li><a href="convite.html"><i class="fas fa-handshake"></i> Convide</a></li>
+          <li><a href="#videos"><i class="fas fa-video"></i> Vídeos</a></li>
+          <li><a href="#contact"><i class="fas fa-envelope"></i> Contato</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    <div class="container">
+      <h2 class="animated-title">Leve o Universo para sua Cidade</h2>
+      <p>Uma experiência interativa de astronomia e ciências naturais, com oficinas, projeções e observações — levando conhecimento às comunidades do Campo das Vertentes/MG.</p>
+      <a class="btn primary-btn" href="#about">
+        <span>Saiba Mais</span>
+        <i class="fas fa-chevron-down"></i>
+      </a>
+    </div>
+  </section>
+
+  <section id="about" class="about">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-star"></i></span>
+        <h2>Sobre o Projeto</h2>
+      </div>
+      <div class="content-wrapper">
+        <div class="text-content">
+          <p>O Planetário Itinerante é uma proposta que visa divulgar as Ciências Naturais utilizando como norte a Astronomia, fazendo uso de temáticas ambientais para possibilitar a interdisciplinaridade.</p>
+          <p>Em suas visitas às comunidades da região do Campo das Vertentes/MG, o Planetário Itinerante oferece oficinas como forma de cumprir o seu objetivo de difusão científica e educação ambiental integrada.</p>
+        </div>
+        <div class="image-content">
+          <div class="planet-image">
+            <div class="orbit">
+              <div class="satellite"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="events" class="events">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-icon"><i class="far fa-calendar-alt"></i></span>
+        <h2>Próximos Eventos</h2>
+      </div>
+      <div class="events-grid">
+        <div class="event-card">
+          <div class="event-date">
+            <span class="day">05</span>
+            <span class="month">SET</span>
+            <span class="year">2025</span>
+          </div>
+          <div class="event-details">
+            <h3 class="event-title">Visita a São Paulo</h3>
+            <p class="event-location"><i class="fas fa-map-marker-alt"></i> Praça Central – São Paulo, SP</p>
+            <p class="event-info">Observação astronômica e oficinas interativas</p>
+          </div>
+        </div>
+        <div class="event-card">
+          <div class="event-date">
+            <span class="day">12</span>
+            <span class="month">SET</span>
+            <span class="year">2025</span>
+          </div>
+          <div class="event-details">
+            <h3 class="event-title">Visita ao Rio de Janeiro</h3>
+            <p class="event-location"><i class="fas fa-map-marker-alt"></i> Biblioteca Municipal – Rio de Janeiro, RJ</p>
+            <p class="event-info">Projeção do céu noturno e oficinas temáticas</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="workshops" class="workshops">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-tools"></i></span>
+        <h2>Nossas Oficinas</h2>
+      </div>
+      <p class="section-intro">Conheça as oficinas oferecidas pelo Planetário Itinerante. Clique em cada tema para conhecer a equipe responsável.</p>
+
+      <div class="workshops-grid">
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-meteor"></i>
+              <span>Meteoro</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho, Emerson Pereira Alves Ferreira, Raul Guilherme Batista Mendes e Pablo Parmezani Munhoz</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-cloud"></i>
+              <span>Atmosfera</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Emerson Pereira Alves Ferreira</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-leaf"></i>
+              <span>As Plantas do Campo das Vertentes</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Livia Lara Alves</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-recycle"></i>
+              <span>Reciclagem de Papéis</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Livia Lara Alves</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-telescope"></i>
+              <span>Observação Astronômica</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Emerson Pereira Alves Ferreira</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-seedling"></i>
+              <span>Mãos ao Solo</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Denilson Alves Araújo</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-water"></i>
+              <span>Planeta Água</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Denilson Alves Araújo</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-ruler"></i>
+              <span>Unidades de Medidas Astronômicas</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Emerson Pereira Alves Ferreira</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-microscope"></i>
+              <span>Vida Microscópica</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho, Raquel Alves Costa e Emerson Pereira Alves Ferreira</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-bug"></i>
+              <span>A Biodiversidade de Insetos</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Iara Freitas Lopes</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-theater-masks"></i>
+              <span>Peça Teatral: Protegendo a Mata</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Emerson Pereira Alves Ferreira</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-tree"></i>
+              <span>Planeta Plantas</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho, Denilson Alves Araújo e Livia Lara Alves</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-moon"></i>
+              <span>Fases da Lua</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Emerson Pereira Alves Ferreira</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-tint"></i>
+              <span>Água: Importância Biológica</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Iara Freitas Lopes</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-trash"></i>
+              <span>Resíduos Plásticos</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho, Honória Fátima Gorgulho e Emerson Pereira Alves Ferreira</div>
+            </div>
+          </details>
+        </div>
+        <div class="workshop-card">
+          <details>
+            <summary>
+              <i class="fas fa-cloud-sun"></i>
+              <span>Estados Atmosféricos</span>
+            </summary>
+            <div class="workshop-content">
+              <div class="workshop-authors">Fernando Otávio Coelho e Emerson Pereira Alves Ferreira</div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="invite" class="invite">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-handshake"></i></span>
+        <h2>Convide o Planetário</h2>
+      </div>
+      <p class="section-intro">
+        Levamos ciência de forma gratuita para sua comunidade. Nosso foco é a divulgação científica e a educação ambiental.
+      </p>
+      <div class="invite-cta">
+        <a class="btn primary-btn" target="_blank" rel="noopener"
+           href="https://docs.google.com/forms/d/e/1FAIpQLSdDq62VIQWZNp2MDPl3UpcX4QhpsX-HpisRbuXvdBJd2eLBbg/viewform?fbclid=PAZXh0bgNhZW0CMTEAAaeIBKFCy7f5VFm1nC-Lyx3uOlLqEN-4rCtQTvlOhoPJjb14YhLFx4YYEzcbMA_aem_5b9UGrppbN83iqlp-b2Nkg">
+          <i class="fas fa-file-pen"></i> Preencher formulário
+        </a>
+        <a class="btn" href="convite.html">
+          <i class="fas fa-circle-info"></i> Como funciona
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="videos" class="videos">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-video"></i></span>
+        <h2>Vídeos</h2>
+      </div>
+      <p class="section-intro">Acompanhe os vídeos do nosso canal <a href="https://www.youtube.com/@Planetariosj" target="_blank" rel="noopener">Planetariosj <i class="fab fa-youtube"></i></a></p>
+      
+      <div id="video-grid" class="video-grid">
+        <!-- Vídeos serão injetados aqui pelo main.js -->
+      </div>
+      <div id="videos-message" class="videos-message" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section id="contact" class="contact">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-icon"><i class="fas fa-envelope"></i></span>
+        <h2>Contato</h2>
+      </div>
+      
+      <div class="contact-cards">
+        <div class="contact-card">
+          <div class="contact-icon">
+            <i class="fas fa-phone-alt"></i>
+          </div>
+          <h3>Telefone</h3>
+          <a href="tel:+553233795163">(32) 3379-5163</a>
+        </div>
+        
+        <div class="contact-card">
+          <div class="contact-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <h3>E-mail</h3>
+          <a href="mailto:planetarioitinerante@ufsj.edu.br">planetarioitinerante@ufsj.edu.br</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-logo">
+          <img src="logo.png" alt="Planetário Itinerante" class="footer-img">
+          <img src="ufsj-logo.png" alt="UFSJ - Universidade Federal de São João del-Rei" class="footer-img ufsj-logo">
+        </div>
+        <div class="footer-links">
+          <ul>
+            <li><a href="#about">Sobre</a></li>
+            <li><a href="posts.html">Posts</a></li>
+            <li><a href="#events">Eventos</a></li>
+            <li><a href="#workshops">Oficinas</a></li>
+            <li><a href="convite.html">Convide</a></li>
+            <li><a href="#videos">Vídeos</a></li>
+            <li><a href="#contact">Contato</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="copyright">
+        <p>&copy; 2025 Projeto Planetário Itinerante - UFSJ</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
