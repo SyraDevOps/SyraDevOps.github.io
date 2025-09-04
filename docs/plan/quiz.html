@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Quiz — Planetário Itinerante</title>
+
+  <!-- Reaproveita as fontes e o style.css da pasta plan -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Regras específicas do quiz ajustadas: fundo branco, botões azuis, sem degradê de página */
+    :root{
+      --qb-light: var(--light-blue, #68d0f9);
+      --qb-mid: var(--mid-blue, #47b7e5);
+      --qb-dark: var(--dark-blue, #0b3d91);
+      --qb-white: #ffffff;
+      --qb-text: var(--text-dark, #111827);
+      --qb-muted: var(--text-light, #6b7c93);
+      --radius: 12px;
+    }
+
+    html,body{height:100%}
+    body{
+      font-family: var(--font-body, 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto), sans-serif;
+      background: var(--qb-white);
+      color: var(--qb-text);
+      margin:0;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:32px;
+    }
+
+    .wrap{
+      width:100%;
+      max-width:980px;
+      background: var(--qb-white);
+      border-radius:14px;
+      box-shadow: 0 10px 30px rgba(7,22,48,0.06);
+      overflow:hidden;
+      border:1px solid rgba(71,183,229,0.08);
+    }
+
+    .quiz-header{
+      display:flex;
+      align-items:center;
+      gap:16px;
+      padding:18px 22px;
+      background: transparent;
+    }
+    .quiz-header .logos{
+      display:flex;
+      gap:12px;
+      align-items:center;
+    }
+    .quiz-header img.logo{
+      height:56px;
+      object-fit:contain;
+    }
+    .quiz-header .title{
+      margin-left:auto;
+      text-align:right;
+    }
+    .quiz-header h1{
+      font-family: var(--font-heading, 'Space Grotesk', sans-serif);
+      font-weight:600;
+      font-size:20px;
+      margin:0;
+      color:var(--qb-dark);
+    }
+    .quiz-header p{margin:0;font-size:13px;color:var(--qb-muted);}
+
+    .quiz-body{
+      display:grid;
+      grid-template-columns: 1fr 320px;
+      gap:20px;
+      padding:18px 22px 26px 22px;
+    }
+
+    /* Left: perguntas */
+    .card{
+      background: var(--qb-white);
+      border-radius:10px;
+      padding:18px;
+      border:1px solid rgba(71,183,229,0.06);
+      box-shadow: 0 6px 18px rgba(11,61,145,0.03);
+    }
+
+    .question-meta{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .question-meta .q-index{font-weight:700;color:var(--qb-mid)}
+    .progress{
+      height:10px;
+      background:#f1f7fb;
+      border-radius:999px;
+      overflow:hidden;
+      flex:1;margin-left:12px;
+    }
+    .progress > i{display:block;height:100%;background:var(--qb-mid);width:0%;transition:width .35s ease}
+
+    .question{
+      font-size:20px;
+      margin:0 0 14px 0;
+      line-height:1.25;
+      color:var(--qb-dark);
+      font-weight:700;
+      min-height:62px;
+    }
+
+    .options{
+      display:grid;
+      gap:12px;
+    }
+    .option{
+      background:#f8fbff;
+      border:1px solid rgba(71,183,229,0.06);
+      padding:14px 16px;
+      border-radius:10px;
+      cursor:pointer;
+      color:var(--qb-dark);
+      display:flex;
+      align-items:center;
+      gap:12px;
+      transition:transform 0.12s ease, box-shadow 0.12s ease;
+      user-select:none;
+    }
+    .option:hover{transform:translateY(-3px); box-shadow: 0 8px 20px rgba(7,22,48,0.06)}
+    .option.disabled{opacity:0.65;cursor:default;transform:none}
+    .option .letter{
+      min-width:36px;height:36px;border-radius:8px;background:var(--qb-mid);display:grid;place-items:center;font-weight:700;color:var(--qb-white)
+    }
+    .option.correct{background:#e9fff6;border-color:rgba(79,224,182,0.22);color:var(--qb-dark)}
+    .option.incorrect{background:#fff0f0;border-color:rgba(255,98,98,0.14);color:var(--qb-dark)}
+
+    .controls{
+      display:flex;
+      gap:12px;
+      margin-top:16px;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .btn-ghost{
+      background:transparent;border:1px solid rgba(71,183,229,0.08);color:var(--qb-mid);padding:10px 14px;border-radius:10px;cursor:pointer;
+    }
+    .btn-primary{
+      background:var(--qb-mid);border:none;color:var(--qb-white);padding:10px 16px;border-radius:10px;font-weight:700;cursor:pointer;
+      box-shadow: 0 8px 20px rgba(71,183,229,0.12);
+    }
+    .btn-primary:disabled{opacity:0.6;cursor:default;transform:none}
+
+    /* Right: painel lateral */
+    .side{
+      display:flex;
+      flex-direction:column;
+      gap:16px;
+    }
+    .side .summary{
+      background: var(--qb-white);
+      padding:16px;border-radius:10px;border:1px solid rgba(71,183,229,0.06);
+      box-shadow: 0 6px 16px rgba(7,22,48,0.03);
+    }
+    .summary h3{margin:0 0 8px 0;color:var(--qb-dark)}
+    .score-big{
+      font-size:36px;font-weight:800;color:var(--qb-mid);
+      margin:6px 0;
+    }
+    .small{color:var(--qb-muted);font-size:13px}
+
+    .footer-note{font-size:13px;color:var(--qb-muted);text-align:center;padding:16px 18px}
+
+    /* Resultado final */
+    .result{
+      padding:26px;text-align:center;
+      background: transparent;
+    }
+    .medal{font-size:44px;margin-bottom:8px}
+    .restart{margin-top:16px}
+
+    @media (max-width:980px){
+      .quiz-body{grid-template-columns:1fr; padding:16px}
+      .quiz-header .title{text-align:left;margin-left:auto}
+      .quiz-header img.logo{height:48px}
+      .quiz-header{padding:14px}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap" role="main" aria-labelledby="quiz-title">
+    <header class="quiz-header">
+      <div class="logos">
+        <img src="logo.png" alt="Planetário Itinerante" class="logo">
+        <!-- UFSJ logo removida conforme solicitado -->
+      </div>
+      <div class="title" id="quiz-title">
+        <h1>Quiz: Espaço & Astronomia</h1>
+        <p>Teste seus conhecimentos — responda e veja sua pontuação em tempo real</p>
+      </div>
+    </header>
+
+    <div class="quiz-body">
+      <section class="card" aria-labelledby="q-meta">
+        <div class="question-meta" id="q-meta">
+          <div class="q-index"><span id="current">1</span> / <span id="total">10</span></div>
+          <div class="progress" aria-hidden="true"><i id="progress-bar" style="width:0%"></i></div>
+        </div>
+
+        <h2 class="question" id="question">Carregando...</h2>
+
+        <div class="options" id="options" role="list"></div>
+
+        <div class="controls">
+          <button id="btn-skip" class="btn-ghost" type="button">Pular</button>
+          <button id="btn-next" class="btn-primary" type="button" disabled>Próxima</button>
+        </div>
+      </section>
+
+      <aside class="side">
+        <div class="summary card" aria-live="polite">
+          <h3>Progresso</h3>
+          <div class="small">Pontuação atual</div>
+          <div class="score-big" id="score">0</div>
+          <div class="small">Perguntas corretas: <strong id="correct-count">0</strong></div>
+          <div class="small">Perguntas respondidas: <strong id="answered-count">0</strong></div>
+        </div>
+
+        <div class="card">
+          <h3>Dica</h3>
+          <p class="small">Leia cada pergunta com calma. As alternativas podem ser parecidas — escolha a melhor resposta.</p>
+        </div>
+
+        <div class="card small">
+          <strong>Tempo sugerido:</strong> 5–10 minutos<br>
+          <strong>Nível:</strong> Geral (iniciante / intermédio)
+        </div>
+      </aside>
+    </div>
+
+    <div class="footer-note">
+      <small>Feito pelo Planetário Itinerante — <button id="btn-restart" class="btn-ghost" style="margin-left:8px">Reiniciar</button></small>
+    </div>
+  </main>
+
+  <script>
+    // Perguntas (10)
+    const QUESTIONS = [
+      { q: "Qual é o planeta mais próximo do Sol?", choices: ["Vênus","Marte","Mercúrio","Terra"], a: 2 },
+      { q: "Qual é o maior planeta do Sistema Solar?", choices: ["Saturno","Júpiter","Netuno","Urano"], a: 1 },
+      { q: "Como chamamos uma estrela que explode no fim de sua vida?", choices: ["Pulsar","Buraco negro","Supernova","Quasar"], a: 2 },
+      { q: "Qual a unidade usada para medir distâncias interplanetárias dentro do Sistema Solar?", choices: ["Ano-luz","Parsec","Unidade Astronômica (UA)","Quilômetro"], a: 2 },
+      { q: "Qual desses objetos é uma galáxia vizinha da Via Láctea?", choices: ["Andrômeda","Órion","Polaris","Centauro A"], a: 0 },
+      { q: "Qual planeta tem um rastro de anéis visíveis?", choices: ["Marte","Vênus","Saturno","Mercúrio"], a: 2 },
+      { q: "O que é uma 'estrela cadente' na verdade?", choices: ["Um cometa passando","Um meteoro entrando na atmosfera","Uma supernova","Um satélite artificial"], a: 1 },
+      { q: "Qual foi o primeiro satélite artificial lançado ao espaço?", choices: ["Sputnik 1","Apollo 11","Vostok 1","Explorer 1"], a: 0 },
+      { q: "Qual elemento é o mais abundante nas estrelas (incluindo o Sol)?", choices: ["Oxigênio","Hélio","Hidrogênio","Carbono"], a: 2 },
+      { q: "Como chamamos o ponto mais próximo da Terra no caminho elíptico da Lua?", choices: ["Apogeu","Perigeu","Periélio","Afélio"], a: 1 }
+    ];
+
+    // Estado
+    let current = 0;
+    let score = 0;
+    let answered = 0;
+    let correctCount = 0;
+    const total = QUESTIONS.length;
+
+    // Elementos
+    const elQuestion = document.getElementById('question');
+    const elOptions = document.getElementById('options');
+    const elCurrent = document.getElementById('current');
+    const elTotal = document.getElementById('total');
+    const elProgressBar = document.getElementById('progress-bar');
+    const elNext = document.getElementById('btn-next');
+    const elSkip = document.getElementById('btn-skip');
+    const elScore = document.getElementById('score');
+    const elCorrect = document.getElementById('correct-count');
+    const elAnswered = document.getElementById('answered-count');
+    const elRestart = document.getElementById('btn-restart');
+
+    elTotal.textContent = total;
+
+    function renderQuestion() {
+      if (current >= total) return showResult();
+
+      const item = QUESTIONS[current];
+      elCurrent.textContent = current + 1;
+      elQuestion.textContent = item.q;
+      elOptions.innerHTML = '';
+      elNext.disabled = true;
+
+      item.choices.forEach((ch, idx) => {
+        const btn = document.createElement('button');
+        btn.className = 'option';
+        btn.type = 'button';
+        btn.setAttribute('data-index', idx);
+        btn.setAttribute('role','listitem');
+        btn.innerHTML = `<span class="letter">${String.fromCharCode(65+idx)}</span><span>${ch}</span>`;
+        btn.addEventListener('click', () => selectOption(btn, idx));
+        elOptions.appendChild(btn);
+      });
+
+      updateProgress();
+    }
+
+    function selectOption(btn, idx) {
+      // ignore if already disabled
+      if (btn.classList.contains('disabled')) return;
+
+      // disable all
+      document.querySelectorAll('.option').forEach(o => o.classList.add('disabled'));
+
+      const correctIdx = QUESTIONS[current].a;
+      const isCorrect = idx === correctIdx;
+
+      // mark selected
+      if (isCorrect) {
+        btn.classList.add('correct');
+        score += 10; // pontos por acerto
+        correctCount++;
+      } else {
+        btn.classList.add('incorrect');
+        // destacar resposta correta
+        const correctBtn = Array.from(document.querySelectorAll('.option')).find(b => +b.dataset.index === correctIdx);
+        if (correctBtn) correctBtn.classList.add('correct');
+      }
+
+      answered++;
+      elScore.textContent = score;
+      elCorrect.textContent = correctCount;
+      elAnswered.textContent = answered;
+
+      elNext.disabled = false;
+      // opção: pular não disponível após escolher
+      elSkip.disabled = true;
+    }
+
+    function nextQuestion() {
+      current++;
+      elSkip.disabled = false;
+      if (current < total) renderQuestion(); else showResult();
+    }
+
+    function skipQuestion() {
+      // conta como respondida sem pontuar
+      answered++;
+      elAnswered.textContent = answered;
+      current++;
+      if (current < total) renderQuestion(); else showResult();
+    }
+
+    function updateProgress() {
+      const pct = Math.round((current / total) * 100);
+      elProgressBar.style.width = pct + '%';
+    }
+
+    function showResult() {
+      // substituir conteúdo do card principal por resultado
+      const card = document.querySelector('.card');
+      card.innerHTML = `
+        <div class="result">
+          <div class="medal">${medalForScore(score)}</div>
+          <h2>Resultado</h2>
+          <p style="color:var(--qb-dark);font-weight:600;font-size:18px;margin:6px 0">${correctCount} de ${total} corretas</p>
+          <p class="small" style="color:var(--qb-muted)">Pontuação: <strong>${score}</strong></p>
+          <div style="margin-top:14px">
+            <button id="btn-replay" class="btn-primary">Jogar Novamente</button>
+            <button id="btn-review" class="btn-ghost" style="margin-left:10px">Ver respostas</button>
+          </div>
+        </div>
+      `;
+      // atualizar barra final
+      elProgressBar.style.width = '100%';
+
+      // handlers
+      document.getElementById('btn-replay').addEventListener('click', resetQuiz);
+      document.getElementById('btn-review').addEventListener('click', renderReview);
+    }
+
+    function medalForScore(sc) {
+      const pct = (sc / (total*10)) * 100;
+      if (pct >= 90) return "🏆 Excelente!";
+      if (pct >= 70) return "🥈 Muito bom!";
+      if (pct >= 50) return "🥉 Bom esforço!";
+      return "✨ Continue estudando!";
+    }
+
+    function renderReview() {
+      // mostra todas as perguntas com a resposta correta destacada
+      const card = document.querySelector('.card');
+      card.innerHTML = `<div style="padding:14px;max-height:480px;overflow:auto">` +
+        QUESTIONS.map((it, i) => {
+          return `<div style="margin-bottom:14px">
+            <div style="font-weight:700;color:var(--qb-mid)">Q${i+1}. ${it.q}</div>
+            <ul style="margin:8px 0 0 18px;color:var(--qb-text)">
+              ${it.choices.map((c,j) => `<li style="${j===it.a ? 'color: #0b7f5b;font-weight:700' : 'color: #0b3d91;opacity:0.9'}">${String.fromCharCode(65+j)}. ${c}</li>`).join('')}
+            </ul>
+          </div>`;
+        }).join('') +
+        `</div>
+        <div style="padding:12px;text-align:center"><button id="btn-back" class="btn-primary">Voltar</button></div>`;
+      document.getElementById('btn-back').addEventListener('click', () => { current = total; showResult(); });
+    }
+
+    function resetQuiz() {
+      current = 0; score = 0; answered = 0; correctCount = 0;
+      elScore.textContent = score;
+      elCorrect.textContent = correctCount;
+      elAnswered.textContent = answered;
+      renderQuestion();
+    }
+
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      elNext.addEventListener('click', nextQuestion);
+      elSkip.addEventListener('click', skipQuestion);
+      elRestart.addEventListener('click', resetQuiz);
+      // Preenchimento inicial
+      renderQuestion();
+    });
+  </script>
+</body>
+</html>
