@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SyraX — Projetos Comunitários</title>
+    <meta name="color-scheme" content="light dark" />
+    <link rel="stylesheet" href="../assets/css/mono.css" />
+
+    <!-- Página-specific styles: jovem, chamativa, mas compatível com o tema existente -->
+    <style>
+      /* SyraX — refined light theme + smooth surfaces */
+      :root{
+        /* Accent kept (badge blue) */
+        --sx-badge-color: #47b7e5;
+
+        /* Text and muted tones — off‑black and desaturated greys */
+        --sx-text: #24343c;       /* darker, but not pure black */
+        --sx-muted: #5f7380;      /* softer muted */
+        
+        /* Page / surfaces */
+        --sx-bg: #f4f6f8;         /* gentle page background (not stark white) */
+        --sx-bg-card: #fbfdfe;    /* very soft off‑white for cards */
+        --sx-border: #e6eef4;     /* subtle border */
+        --sx-shadow: 0 8px 24px rgba(15,22,28,0.04);
+
+        /* Buttons */
+        --sx-btn-bg: transparent; /* default buttons are subtle outlines */
+        --sx-btn-border: rgba(34,47,60,0.06);
+
+        /* Primary CTA */
+        --sx-primary-grad: linear-gradient(90deg,#47b7e5,#2aa7d8);
+        --sx-primary-text: #011f25;
+      }
+
+      /* Layout basics */
+      .wrapper { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin: 2rem 0; }
+
+      /* Typography */
+      .sx-title { font-size: 2rem; color: var(--sx-text); margin-bottom: 1rem; line-height: 1.2; font-weight:700; }
+      .section-title { font-size: 1.5rem; color: var(--sx-text); margin: 2.5rem 0 1rem; }
+      .sx-desc, .section-desc { color: var(--sx-muted); line-height: 1.6; margin-bottom: 2rem; }
+
+      /* Cards — reduce "white block" feeling with soft background, border and subtle shadow */
+      .card {
+        background: var(--sx-bg-card);
+        border: 1px solid var(--sx-border);
+        border-radius: 12px;
+        padding: 1.25rem;
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        box-shadow: var(--sx-shadow);
+        color: var(--sx-text);
+      }
+      .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 14px 34px rgba(15,22,28,0.06);
+      }
+      .card h3 { margin: 0 0 0.45rem 0; font-size:1.05rem; color:var(--sx-text); }
+      .card p { margin: 0 0 0.8rem 0; color:var(--sx-muted); font-size:0.98rem; }
+
+      /* Buttons: default as subtle outline (no harsh white fills) */
+      .button, .sx-btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.7rem 1.1rem;
+        border-radius: 8px;
+        background: var(--sx-btn-bg);
+        border: 1px solid var(--sx-btn-border);
+        color: var(--sx-text);
+        text-decoration: none;
+        font-weight: 600;
+        transition: transform .12s ease, background .12s ease, border-color .12s ease;
+      }
+      .button:hover, .sx-btn:hover {
+        transform: translateY(-2px);
+        background: rgba(2,6,23,0.02); /* tiny tint on hover for affordance */
+        border-color: rgba(34,47,60,0.08);
+      }
+
+      /* Primary CTA: colored, but with a tasteful gradient and readable text */
+      .sx-btn.primary, .button.primary {
+        background: var(--sx-primary-grad);
+        color: var(--sx-primary-text);
+        border: none;
+        box-shadow: 0 10px 28px rgba(42,120,150,0.08);
+      }
+      .sx-btn.primary:hover, .button.primary:hover {
+        filter: brightness(1.03);
+      }
+
+      /* Badge */
+      .sx-badge {
+        display: inline-block;
+        background: var(--sx-badge-color);
+        color: #fff;
+        font-weight: 600;
+        padding: 0.45rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 6px 18px rgba(36,96,120,0.06);
+      }
+
+      /* small "right card" area: use same soft surface but slightly elevated */
+      .sx-intro-right > div {
+        background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,252,253,0.95));
+        border: 1px solid var(--sx-border);
+        padding: 12px;
+        border-radius: 10px;
+        color: var(--sx-text);
+      }
+      .sx-intro-right ul li { color: var(--sx-muted); }
+
+      /* link-list buttons */
+      #hand-tracking-list a.button.small,
+      #interactive-3d-list a.button.small {
+        padding: 0.4rem 0.7rem;
+        background: transparent;
+        border: 1px solid rgba(34,47,60,0.05);
+        color: var(--sx-text);
+      }
+
+      /* Responsiveness tweaks */
+      @media (max-width: 768px) {
+        .sx-title { font-size:1.75rem; }
+        .card { padding: 1rem; }
+        .sx-intro-right > div { background: #fff; border-color: rgba(0,0,0,0.04); }
+      }
+
+      /* keep existing dark-mode overrides below (if present) — they will still apply */
+      /* dark-mode overrides: cole logo após o <style> existente no <head> */
+      @media (prefers-color-scheme: dark) {
+        :root{
+          --sx-badge-color: #47b7e5;
+          --sx-text: #eaf6fb;
+          --sx-muted: #a8bfd0;
+          --sx-bg: #071022;            /* fundo da página */
+          --sx-surface: #081828;       /* superfície dos cards */
+          --sx-card-bg: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+          --sx-border: rgba(255,255,255,0.06);
+          --sx-elevation: 0 8px 30px rgba(3,9,16,0.6);
+          --sx-accent-strong: linear-gradient(90deg,#47b7e5,#2aa7d8);
+        }
+
+        html, body {
+          background: var(--sx-bg);
+          color: var(--sx-text);
+        }
+
+        /* Header */
+        header {
+          background: transparent;
+          border-bottom: 1px solid rgba(255,255,255,0.04);
+        }
+        .brand, .menu a { color: var(--sx-text); }
+        .menu a { opacity: 0.95; }
+        .right .button.small {
+          background: rgba(255,255,255,0.02);
+          border: 1px solid rgba(255,255,255,0.04);
+          color: var(--sx-text);
+        }
+
+        /* Hero / intro */
+        .sx-badge {
+          background: var(--sx-accent-strong);
+          color:#01222b;
+          box-shadow: 0 8px 28px rgba(34,122,155,0.18);
+          padding:0.45rem 0.9rem;
+        }
+        .sx-title {
+          color: var(--sx-text);
+          font-weight:700;
+          font-size: clamp(1.6rem, 3.2vw, 2rem);
+          letter-spacing: -0.01em;
+        }
+        .sx-desc { color: var(--sx-muted); font-size:1rem; line-height:1.6; }
+
+        /* Cards layout */
+        .grid { gap: 1.25rem; }
+        .card {
+          background: var(--sx-surface);
+          background-image: var(--sx-card-bg);
+          border: 1px solid var(--sx-border);
+          border-radius: 12px;
+          padding: 1.25rem;
+          box-shadow: var(--sx-elevation);
+          transition: transform .16s ease, box-shadow .16s ease;
+          color: var(--sx-text);
+        }
+        .card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 16px 40px rgba(3,9,16,0.7);
+        }
+
+        .card h3 { color: var(--sx-text); margin:0 0 0.45rem 0; font-size:1.05rem; }
+        .card p { color: var(--sx-muted); margin:0 0 0.75rem 0; font-size:0.96rem; }
+
+        /* Buttons */
+        .button, .sx-btn {
+          background: transparent;
+          border: 1px solid rgba(255,255,255,0.05);
+          color: var(--sx-text);
+          padding: 0.6rem 1rem;
+          border-radius:8px;
+          font-weight:600;
+        }
+        .button:hover, .sx-btn:hover {
+          background: rgba(255,255,255,0.02);
+          transform: translateY(-2px);
+        }
+
+        /* primary CTA */
+        .sx-btn.primary, .button.primary {
+          background: var(--sx-accent-strong);
+          color: #01222b;
+          border: none;
+          box-shadow: 0 12px 30px rgba(38,140,170,0.12);
+        }
+        .sx-btn.primary:hover, .button.primary:hover {
+          filter: brightness(1.04);
+        }
+
+        /* link-buttons inside lists */
+        #hand-tracking-list a.button.small,
+        #interactive-3d-list a.button.small {
+          background: rgba(255,255,255,0.015);
+          border: 1px solid rgba(255,255,255,0.04);
+          color: var(--sx-text);
+          padding: 0.45rem 0.7rem;
+        }
+
+        /* right-side small card */
+        .sx-intro-right > div {
+          background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));
+          border: 1px solid rgba(255,255,255,0.04);
+          color: var(--sx-text);
+        }
+        .sx-intro-right ul li { color: var(--sx-muted); }
+
+        /* SVGs and icons */
+        svg { color: inherit; fill: currentColor; stroke: currentColor; opacity:0.95; }
+
+        /* responsiveness tweaks */
+        @media (max-width: 768px) {
+          .sx-badge { box-shadow: none; }
+          .card { padding: 1rem; }
+          .sx-desc { font-size:0.98rem; }
+        }
+
+        /* small readability tweaks */
+        .section-title { color: var(--sx-text); font-weight:700; margin-top:2.2rem; }
+        .sx-cta .sx-btn.ghost { background: transparent; border: 1px solid rgba(255,255,255,0.04); color:var(--sx-text); }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container nav">
+        <div class="left">
+          <a class="brand" href="../index.html">@SyraDevOps</a>
+        </div>
+        <nav>
+          <ul class="menu">
+            <li><a href="../index.html">Início</a></li>
+            <li><a href="../#products">Produtos</a></li>
+            <!-- keep link but change label to SyraX -->
+            <li class="active"><a href="Syrasci.html">SyraX</a></li>
+            <li><a href="../#contato">Contato</a></li>
+          </ul>
+        </nav>
+        <div class="right">
+          <a class="button small" href="../SyraID/">Login SyraID</a>
+          <button id="theme-toggle" class="toggle" aria-pressed="false" aria-label="Alternar tema">Escuro</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="wrapper sx-hero">
+        <div class="container">
+          <!-- Intro: new youthful, community-oriented copy -->
+          <div class="intro">
+            <div class="sx-intro-left">
+              <div class="sx-badge">SyraX • Open & Community</div>
+
+              <h1 class="sx-title">SyraX — projetos para a comunidade</h1>
+
+              <p class="sx-desc">
+                SyraX reúne projetos abertos desenvolvidos pela comunidade e para a comunidade.
+                São ferramentas, experimentos e kits pensados para educação, pesquisa e integração com seus próprios projetos.
+                Todos os repositórios estão hospedados em nosso GitHub — venha ver, usar e, se quiser, contribuir!
+              </p>
+
+              <div class="sx-cta" role="group" aria-label="Ações SyraX">
+                <a class="sx-btn primary" href="https://github.com/SyraDevOps" target="_blank" rel="noopener">
+                  Ver no GitHub
+                </a>
+                <a class="sx-btn ghost" href="https://github.com/SyraDevOps" target="_blank" rel="noopener">
+                  Como contribuir
+                </a>
+              </div>
+            </div>
+
+            <div class="sx-intro-right" style="flex:0 1 280px; min-width:220px;">
+              <!-- quick highlights -->
+              <div style="background:var(--sx-card-bg); padding:12px; border-radius:10px; border:1px solid rgba(0,0,0,0.04)">
+                <strong style="display:block; margin-bottom:6px;">Por que participar?</strong>
+                <ul style="margin:0; padding-left:18px; color:var(--sx-muted);">
+                  <li>Aprendizado prático com código aberto.</li>
+                  <li>Projetos reutilizáveis para escolas e pesquisas.</li>
+                  <li>Comunidade ativa: issues, PRs e discussões.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- keep the original sections but with friendlier copy -->
+          <h2 class="section-title">Simulações Individuais</h2>
+          <p class="section-desc">Pequenos experimentos prontos para rodar no navegador — ideais para demonstrações em sala e protótipos.</p>
+
+          <div class="grid">
+            <article class="card">
+              <h3>Face Tracking</h3>
+              <p>Rastreamento facial em tempo real — plug & play para demonstração e estudo.</p>
+              <a class="button" href="Tools/face_tracking.html">Ver Simulação</a>
+            </article>
+            <article class="card">
+              <h3>Iris Tracking</h3>
+              <p>Detecção de movimento ocular e rastreamento de íris, leve e acessível.</p>
+              <a class="button" href="Tools/iris_tracking.html">Ver Simulação</a>
+            </article>
+            <article class="card">
+              <h3>Reconhecimento de Voz (PT-BR)</h3>
+              <p>Comandos por voz em português, pronto para integrar projetos educacionais.</p>
+              <a class="button" href="Tools/reconhecimento_voz_portugues.html">Ver Reconhecimento</a>
+            </article>
+            <article class="card">
+              <h3>Speech Recognition (Inglês)</h3>
+              <p>Exemplos e demos usando Web Speech APIs para controle por voz.</p>
+              <a class="button" href="Tools/speech_recognition.html">Ver Reconhecimento</a>
+            </article>
+          </div>
+
+          <h2 class="section-title">Hand Tracking</h2>
+          <p class="section-desc">Projetos que usam rastreamento de mãos para interação, arte e jogos — contribuições são bem-vindas.</p>
+
+          <div class="grid">
+            <article class="card">
+              <h3>Experimentos de Rastreamento de Mãos</h3>
+              <div id="hand-tracking-list">
+                <!-- Conteúdo será inserido por JavaScript -->
+              </div>
+            </article>
+          </div>
+
+          <h2 class="section-title">3D Interactive</h2>
+          <p class="section-desc">Cenas interativas 3D para explorar conceitos e visualização — abra, modifique e aprenda.</p>
+
+          <div class="grid">
+            <article class="card">
+              <h3>Exploração de Ambientes 3D</h3>
+              <div id="interactive-3d-list">
+                <!-- Conteúdo será inserido por JavaScript -->
+              </div>
+            </article>
+          </div>
+
+          <h2 class="section-title">Projetos Completos</h2>
+          <p class="section-desc">Soluções mais maduras que suportam casos reais — também open source e prontas para colaboração.</p>
+
+          <div class="grid">
+            <article class="card">
+              <h3>RecGestor</h3>
+              <p>Gestão de dados para reconhecimento e armazenamento inteligente — ideal para experimentos aplicados.</p>
+              <a class="button" href="Tools/Rec&Miss_Gstor/index.html">Acessar RecGestor</a>
+            </article>
+            <article class="card">
+              <h3>Object Trainer</h3>
+              <p>Treinamento de reconhecimento de objetos através da Web — pronto para usar e adaptar.</p>
+              <a class="button" href="Tools/object_trainer/index.html">Acessar Object Trainer</a>
+            </article>
+          </div>
+
+          <div class="actions" style="margin-top:18px">
+            <a class="button" href="../index.html">Voltar para Home</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <small>&copy; SyraDevOps. Preto e branco. Simples e direto.</small>
+      </div>
+    </footer>
+
+    <script src="../assets/js/mono.js" defer></script>
+
+    <!-- Script para carregar arquivos dinamicamente (mantido) -->
+    <script>
+      // Arquivos de Hand Tracking
+      const handTrackingFiles = [
+        "hand_tracking_3d.html",
+        "hand_tracking_game.html",
+        "hand_tracking_line.html",
+        "hand_tracking_mediapipe_ml5_art.html",
+        "hand_tracking_ml5_threejs.html",
+        "hand_tracking_wave.html",
+        "instrumento_virtual.html"
+      ];
+
+      const handTrackingList = document.getElementById('hand-tracking-list');
+      handTrackingFiles.forEach(file => {
+        const a = document.createElement('a');
+        a.href = `Tools/Hand_Tracking/${file}`;
+        a.className = 'button small';
+        a.textContent = file.replace('.html', '').replace(/_/g, ' ').replace('hand tracking ', '');
+        handTrackingList.appendChild(a);
+      });
+
+      // Arquivos de 3D Interactive
+      const interactive3dFiles = [
+        "Planets_hand.html",
+        "Esph_cub.html",
+        "Esph_Cub_Ring.html",
+        "Esph_Cub_Ring_Fire.html",
+        "AllGst_Flower.html"
+      ];
+
+      const interactive3dList = document.getElementById('interactive-3d-list');
+      interactive3dFiles.forEach(file => {
+        const a = document.createElement('a');
+        a.href = `Tools/3D_Interactive/${file}`;
+        a.className = 'button small';
+        a.textContent = file.replace('.html', '').replace(/_/g, ' ');
+        interactive3dList.appendChild(a);
+      });
+    </script>
+    <script>
+(function(){
+  const API_URL = 'https://syraid.onrender.com';
+  const TOKEN_KEY = 'syra-auth-token';
+  const links = Array.from(document.querySelectorAll('a[href*="SyraID"]'));
+  if (!links.length) return;
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) return;
+  async function fetchProfile() {
+    const res = await fetch(API_URL + '/me/profile', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    return res.json();
+  }
+  fetchProfile().then(user => {
+    const name = user.name || user.username || user.email || 'Usuário';
+    links.forEach(a => {
+      const orig = a.getAttribute('href') || '../SyraID/';
+      const base = orig.endsWith('/') ? orig.slice(0, -1) : orig;
+      a.textContent = name;
+      a.setAttribute('href', base + '/dashboard.html');
+      a.classList.add('user-link');
+    });
+  }).catch(err => {
+    console.debug('SyraID profile not loaded:', err);
+  });
+})();
+</script>
+  </body>
+</html>

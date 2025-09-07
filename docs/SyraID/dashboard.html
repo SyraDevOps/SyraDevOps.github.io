@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Dashboard — SyraID</title>
+
+    <!-- site styles (keeps theme consistent) -->
+    <link rel="stylesheet" href="../assets/css/mono.css" />
+    <link rel="stylesheet" href="../assets/css/fontawesome-all.min.css" />
+
+    <style>
+      /* small dashboard-specific tidy up (keeps look consistent with mono.css) */
+      .dash-wrapper { max-width:1100px; margin: 28px auto; padding: 0 18px; }
+      .dash-hero { display:flex; justify-content:space-between; gap:18px; align-items:center; margin-bottom:18px; }
+      .welcome { margin:0; font-size:20px; color:var(--text); font-weight:700; }
+      .welcome-sub { margin:4px 0 0; color:var(--muted); }
+      .grid-2 { display:grid; grid-template-columns: 1fr 340px; gap:16px; }
+      .cards { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-bottom: 14px; }
+      .stat-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; box-shadow: 0 6px 18px rgba(0,0,0,0.03); }
+      .section { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:12px; box-shadow: 0 6px 18px rgba(0,0,0,0.03); }
+      .list { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:8px; max-height:300px; overflow:auto; }
+      .list li { padding:10px; border-radius:8px; background:transparent; display:flex; justify-content:space-between; gap:12px; align-items:flex-start; border:1px dashed transparent; }
+      .list li:hover { background: color-mix(in oklab, var(--card) 88%, transparent); }
+      .muted { color:var(--muted); font-size:0.95rem; }
+      .label { font-weight:700; color:var(--text); }
+      .small { font-size:0.9rem; color:var(--muted); }
+      .actions-inline { display:flex; gap:8px; }
+      .panel-compact { display:flex; flex-direction:column; gap:8px; }
+      .btn-ghost { background:transparent; border:1px solid var(--border); padding:6px 8px; border-radius:8px; cursor:pointer; }
+      .btn-primary { background:var(--text); color:var(--bg); border:none; padding:8px 10px; border-radius:8px; cursor:pointer; font-weight:700; }
+      .name-pill { font-weight:700; padding:6px 10px; border-radius:999px; background:var(--card); border:1px solid var(--border); color:var(--text); }
+      @media (max-width:920px){ .grid-2 { grid-template-columns: 1fr; } .cards { grid-template-columns: repeat(2,1fr); } }
+      @media (max-width:560px){ .cards { grid-template-columns: 1fr; } }
+      /* modal */
+      .modal { position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(0,0,0,0.5); z-index:1200; }
+      .modal .box { background:var(--card); padding:16px; border-radius:12px; width:clamp(280px, 90%, 560px); border:1px solid var(--border); }
+    </style>
+  </head>
+
+  <body>
+    <!-- site header (keeps global menu and theme toggle) -->
+    <header>
+      <div class="container nav">
+        <div class="left">
+          <a class="brand" href="../index.html">@SyraDevOps</a>
+        </div>
+        <nav>
+          <ul class="menu">
+            <li><a href="../index.html#intro">Início</a></li>
+            <li><a href="../index.html#products">Produtos</a></li>
+            <li><a href="../SyraX/SyraX.html">SyraX</a></li>
+            <li><a href="../index.html#contato">Contato</a></li>
+          </ul>
+        </nav>
+        <div class="right" id="header-right">
+          <!-- this area will be replaced by JS with username or login -->
+          <a id="login-link" class="button small" href="../SyraID/">Login SyraID</a>
+          <button id="theme-toggle" class="toggle" aria-pressed="false" aria-label="Alternar tema">Tema</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="dash-wrapper">
+      <section class="dash-hero">
+        <div>
+          <h1 id="welcome" class="welcome">Carregando...</h1>
+          <div id="welcome-sub" class="welcome-sub muted">Carregando informações do dashboard...</div>
+        </div>
+
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div id="user-pill" class="name-pill" style="display:none"></div>
+          <button id="logout" class="btn-ghost" style="display:none">Sair</button>
+        </div>
+      </section>
+
+      <div class="grid-2">
+        <div>
+          <!-- top stats -->
+          <div class="cards" aria-hidden="false">
+            <div class="stat-card">
+              <div class="label">Notificações</div>
+              <div id="stat-notifs" style="font-size:1.25rem; font-weight:700">—</div>
+              <div class="small muted">Novas / não lidas</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Amigos</div>
+              <div id="stat-friends" style="font-size:1.25rem; font-weight:700">—</div>
+              <div class="small muted">Conexões</div>
+            </div>
+            <div class="stat-card">
+              <div class="label">Nós</div>
+              <div id="stat-nodes" style="font-size:1.25rem; font-weight:700">—</div>
+              <div class="small muted">Nós registrados</div>
+            </div>
+          </div>
+
+          <!-- Notifications -->
+          <div class="section" id="section-notifications">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div class="label">Notificações</div>
+              <div class="small muted" id="notifs-updated-at"></div>
+            </div>
+            <ul id="notifications-list" class="list">
+              <li class="muted">Carregando notificações...</li>
+            </ul>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+              <button id="mark-all-read" class="btn-ghost">Marcar todas como lidas</button>
+              <button id="refresh-notifs" class="btn-ghost">Atualizar</button>
+            </div>
+          </div>
+
+          <!-- friends -->
+          <div class="section" id="section-friends">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div class="label">Amigos</div>
+              <div class="small muted">Conexões</div>
+            </div>
+
+            <ul id="friends-list" class="list">
+              <li class="muted">Carregando amigos...</li>
+            </ul>
+
+            <form id="add-friend-form" style="display:flex; gap:8px; margin-top:8px;">
+              <input id="friend-username" type="text" placeholder="nome de usuário" style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border)" />
+              <button class="btn-primary" type="submit">Adicionar</button>
+            </form>
+          </div>
+
+          <!-- nodes (API não fornece rotas de *nodes* neste backend, mostra mensagem) -->
+          <div class="section" id="section-nodes">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+              <div class="label">Nós</div>
+              <div class="small muted">Infra</div>
+            </div>
+
+            <ul id="nodes-list" class="list">
+              <li class="muted">Não há rotas de "nós" nesta API.</li>
+            </ul>
+
+            <form id="add-node-form" style="display:flex; gap:8px; margin-top:8px;">
+              <input id="node-name" type="text" placeholder="nome do nó" style="flex:1; padding:8px; border-radius:8px; border:1px solid var(--border)" disabled />
+              <button class="btn-primary" type="submit" disabled>Adicionar nó</button>
+            </form>
+          </div>
+        </div>
+
+        <aside>
+          <!-- quick actions / achievements -->
+          <div class="section panel-compact" id="section-quick">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <div class="label">Ações rápidas</div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+              <a class="button" href="../Products/featured_two.html">Produtos em destaque</a>
+              <a class="button" href="../SyraX/SyraX.html">Ir para SyraX</a>
+              <a class="button" href="../index.html#contato">Contato</a>
+            </div>
+          </div>
+
+          <div class="section" id="section-achievements">
+            <div class="label">Conquistas</div>
+            <ul id="achievements-list" class="list" style="max-height:220px;">
+              <li class="muted">Conquistas não disponíveis nesta API.</li>
+            </ul>
+          </div>
+
+          <div class="section" id="section-messages">
+            <div class="label">Mensagens</div>
+            <div class="small muted" style="margin-bottom:8px;">Enviar mensagem rápida</div>
+            <button id="open-message" class="btn-primary">Enviar Mensagem</button>
+          </div>
+        </aside>
+      </div>
+
+      <div style="margin-top:12px; display:flex; gap:8px;">
+        <a class="button" href="../index.html">Voltar para home</a>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container" style="padding:20px 0;">
+        <small>&copy; SyraDevOps. Preto e branco. Simples e direto.</small>
+      </div>
+    </footer>
+
+    <!-- message modal -->
+    <div id="message-modal" class="modal" aria-hidden="true">
+      <div class="box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+          <div class="label">Enviar Mensagem</div>
+          <button id="close-modal" class="btn-ghost">Fechar</button>
+        </div>
+        <form id="send-message-form">
+          <label class="small">Para (username)</label>
+          <input id="msg-to" type="text" placeholder="username" style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--border)" />
+          <label class="small" style="margin-top:8px;">Mensagem</label>
+          <textarea id="msg-body" rows="5" style="width:100%; padding:8px; border-radius:8px; border:1px solid var(--border)"></textarea>
+          <div style="display:flex; gap:8px; margin-top:10px; justify-content:flex-end;">
+            <button type="submit" class="btn-primary">Enviar</button>
+            <button type="button" id="cancel-modal" class="btn-ghost">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      // ---------- Config ----------
+      const API_URL = 'https://syraid.onrender.com'; // ajuste se necessário
+      const TOKEN_KEY = 'syra-auth-token';
+
+      // read token at call time (so logout/login updates are respected)
+      function getToken() { return localStorage.getItem(TOKEN_KEY); }
+
+      // API helper with centralized error handling
+      async function apiRequest(path, method = 'GET', body = null) {
+        const url = API_URL + path;
+        const token = getToken();
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) headers['Authorization'] = 'Bearer ' + token;
+
+        const opts = {
+          method,
+          headers,
+          body: body ? JSON.stringify(body) : null,
+        };
+        try {
+          const res = await fetch(url, opts);
+          if (res.status === 401) {
+            // unauthorized — clear token and show login link
+            localStorage.removeItem(TOKEN_KEY);
+            // do not force redirect; let UI update
+            throw new Error('Unauthorized');
+          }
+          const text = await res.text();
+          try { return JSON.parse(text); } catch { return text; }
+        } catch (err) {
+          console.error('API error', path, err);
+          throw err;
+        }
+      }
+
+      // Try multiple possible "me" endpoints for compatibility (this API exposes /me/profile)
+      async function fetchUser() {
+        const candidates = ['/me/profile', '/me', '/users/me', '/api/me'];
+        for (const p of candidates) {
+          try {
+            const data = await apiRequest(p, 'GET');
+            if (data && (data.name || data.username || data.email)) return data;
+            // if /me/profile returns a dict (with username), return it
+            if (data && data.username) return data;
+          } catch (e) {
+            // try next
+          }
+        }
+        return null;
+      }
+
+      // ---------- DOM refs ----------
+      const EL = {
+        welcome: document.getElementById('welcome'),
+        welcomeSub: document.getElementById('welcome-sub'),
+        userPill: document.getElementById('user-pill'),
+        logoutBtn: document.getElementById('logout'),
+        headerRight: document.getElementById('header-right'),
+
+        statNotifs: document.getElementById('stat-notifs'),
+        statFriends: document.getElementById('stat-friends'),
+        statNodes: document.getElementById('stat-nodes'),
+
+        notificationsList: document.getElementById('notifications-list'),
+        notifsUpdatedAt: document.getElementById('notifs-updated-at'),
+        refreshNotifsBtn: document.getElementById('refresh-notifs'),
+        markAllReadBtn: document.getElementById('mark-all-read'),
+
+        friendsList: document.getElementById('friends-list'),
+        addFriendForm: document.getElementById('add-friend-form'),
+        friendUsernameInput: document.getElementById('friend-username'),
+
+        nodesList: document.getElementById('nodes-list'),
+        addNodeForm: document.getElementById('add-node-form'),
+        nodeNameInput: document.getElementById('node-name'),
+
+        achievementsList: document.getElementById('achievements-list'),
+
+        messageModal: document.getElementById('message-modal'),
+        openMessageBtn: document.getElementById('open-message'),
+        closeModalBtn: document.getElementById('close-modal'),
+        cancelModalBtn: document.getElementById('cancel-modal'),
+        sendMessageForm: document.getElementById('send-message-form'),
+        msgTo: document.getElementById('msg-to'),
+        msgBody: document.getElementById('msg-body'),
+      };
+
+      // ---------- API paths used by the dashboard (adapted to your API) ----------
+      const API_PATHS = {
+        notifications: '/me/notifications',
+        friends: '/me/friends',
+        users: '/users', // GET /users, and POST /users/<username>/friend-request
+        messages_send: '/messages/send',
+        messages_get_base: '/messages', // GET /messages/<other_username>
+        nodes: null, // not present in API
+        achievements: null
+      };
+
+      // ---------- Render helpers ----------
+      function el(tag, attrs = {}, ...children) {
+        const e = document.createElement(tag);
+        for (const k in attrs) {
+          if (k === 'class') e.className = attrs[k];
+          else if (k === 'text') e.textContent = attrs[k];
+          else if (k === 'onclick') e.onclick = attrs[k];
+          else e.setAttribute(k, attrs[k]);
+        }
+        children.flat().forEach(c => { if (typeof c === 'string') e.appendChild(document.createTextNode(c)); else if (c) e.appendChild(c); });
+        return e;
+      }
+
+      // Render lists
+      function renderNotifications(items = []) {
+        EL.notificationsList.innerHTML = '';
+        if (!items.length) {
+          EL.notificationsList.appendChild(el('li', { class: 'muted' }, 'Nenhuma notificação.'));
+          EL.statNotifs.textContent = '0';
+          EL.notifsUpdatedAt.textContent = '';
+          return;
+        }
+        EL.statNotifs.textContent = items.length;
+        EL.notifsUpdatedAt.textContent = new Date().toLocaleString();
+        items.forEach(n => {
+          const title = n.type || n.title || 'Notificação';
+          const body = n.content || n.message || '';
+          const li = el('li', {},
+            el('div', {},
+              el('div', { class: 'label', text: title }),
+              el('div', { class: 'small muted', text: (body && body.length>120) ? (body.slice(0,120)+'…') : body })
+            )
+          );
+          EL.notificationsList.appendChild(li);
+        });
+      }
+
+      function renderFriends(items = []) {
+        EL.friendsList.innerHTML = '';
+        if (!items.length) {
+          EL.friendsList.appendChild(el('li', { class: 'muted' }, 'Nenhuma conexão ainda.'));
+          EL.statFriends.textContent = '0';
+          return;
+        }
+        // items may be an array of usernames (strings) or objects
+        const normalized = items.map(i => typeof i === 'string' ? { username: i } : (i.username ? i : { username: i }));
+        EL.statFriends.textContent = normalized.length;
+        normalized.forEach(f => {
+          const uname = f.username || f.name || f;
+          const li = el('li', {},
+            el('div', {},
+              el('div', { class: 'label', text: uname }),
+              el('div', { class: 'small muted', text: f.email || '' })
+            ),
+            el('div', { class: 'actions-inline' },
+              el('button', { class: 'btn-ghost', onclick: () => openMessageTo(uname) }, 'Mensagem'),
+              el('button', { class: 'btn-ghost', onclick: async () => { if (!confirm("Remover amizade com " + uname + "?")) return; try { await removeFriend(uname); await loadFriends(); } catch(e){ alert("Erro ao remover amigo."); } } }, 'Remover')
+            )
+          );
+          EL.friendsList.appendChild(li);
+        });
+      }
+
+      function renderNodes(items = []) {
+        EL.nodesList.innerHTML = '';
+        EL.nodesList.appendChild(el('li', { class: 'muted' }, 'Função de nós não implementada nesta API.'));
+        EL.statNodes.textContent = '—';
+      }
+
+      function renderAchievements(items = []) {
+        EL.achievementsList.innerHTML = '';
+        EL.achievementsList.appendChild(el('li', { class: 'muted' }, 'Conquistas não disponíveis nesta API.'));
+      }
+
+      // ---------- API actions for lists (adapted to your API) ----------
+      async function loadNotifications() {
+        try {
+          const data = await apiRequest(API_PATHS.notifications, 'GET');
+          // API returns an array of notifications
+          renderNotifications(Array.isArray(data) ? data : (data.notifications || []));
+        } catch (e) {
+          EL.notificationsList.innerHTML = '';
+          EL.notificationsList.appendChild(el('li', { class: 'muted' }, 'Erro ao carregar notificações.'));
+          EL.statNotifs.textContent = '0';
+          console.error(e);
+        }
+      }
+
+      // friends
+      async function loadFriends() {
+        try {
+          const data = await apiRequest(API_PATHS.friends, 'GET');
+          // API returns { friends: [...] }
+          const items = Array.isArray(data) ? data : (data.friends || []);
+          renderFriends(items);
+        } catch (e) {
+          EL.friendsList.innerHTML = '';
+          EL.friendsList.appendChild(el('li', { class: 'muted' }, 'Erro ao carregar amigos.'));
+          EL.statFriends.textContent = '0';
+          console.error(e);
+        }
+      }
+      // send friend request -> POST /users/<username>/friend-request
+      async function addFriend(username) {
+        try {
+          await apiRequest(`/users/${encodeURIComponent(username)}/friend-request`, 'POST');
+        } catch (e) {
+          throw e;
+        }
+      }
+      // remove friend -> DELETE /users/<friend_username>/friends
+      async function removeFriend(friendUsername) {
+        try {
+          await apiRequest(`/users/${encodeURIComponent(friendUsername)}/friends`, 'DELETE');
+        } catch (e) {
+          throw e;
+        }
+      }
+
+      // nodes (no-op / informative)
+      async function loadNodes() { renderNodes([]); }
+      async function addNode(name) { throw new Error('Not supported'); }
+      async function deleteNode(id) { throw new Error('Not supported'); }
+      async function toggleNode(id) { throw new Error('Not supported'); }
+
+      async function loadAchievements() { renderAchievements([]); }
+
+      // ---------- message actions ----------
+      async function openMessageTo(username) {
+        EL.messageModal.style.display = 'flex';
+        EL.msgTo.value = username || '';
+        EL.msgBody.focus();
+      }
+      async function sendMessage(to, body) {
+        try {
+          await apiRequest(API_PATHS.messages_send, 'POST', { to_username: to, content: body });
+          alert('Mensagem enviada.');
+        } catch (e) {
+          alert('Erro ao enviar mensagem.');
+          console.error(e);
+        }
+      }
+
+      // ---------- initialize / populate user and UI ----------
+      async function initDashboard() {
+        try {
+          const token = getToken();
+          if (!token) {
+            // no token: leave login link visible and show visitor message
+            EL.welcome.textContent = 'Olá, visitante';
+            EL.welcomeSub.textContent = 'Faça login com SyraID para ver o seu painel.';
+            // set stats placeholders
+            EL.statNotifs.textContent = '—';
+            EL.statFriends.textContent = '—';
+            EL.statNodes.textContent = '—';
+            // wire refresh to just attempt load (will fail without token)
+            EL.refreshNotifsBtn.addEventListener('click', () => { alert('Faça login para ver notificações.'); });
+            EL.markAllReadBtn.addEventListener('click', () => { alert('Faça login para marcar notificações.'); });
+            return;
+          }
+
+          // token exists: fetch user profile
+          let user = await fetchUser();
+          if (!user) {
+            // fallback: try decode JWT payload minimally
+            try {
+              const payload = JSON.parse(atob(token.split('.')[1]));
+              user = payload;
+            } catch(e){}
+          }
+          const name = (user && (user.name || user.username || user.email)) || 'Usuário';
+
+          // Update header area: replace login link with user name + logout
+          const loginLink = document.getElementById('login-link');
+          if (loginLink) loginLink.remove();
+
+          EL.userPill.style.display = 'inline-block';
+          EL.userPill.textContent = name;
+          EL.logoutBtn.style.display = 'inline-block';
+          EL.welcome.textContent = `Olá, ${name}`;
+          EL.welcomeSub.textContent = 'Bem-vindo ao seu painel — ações recentes e status rápidos.';
+
+          // wire logout
+          EL.logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem(TOKEN_KEY);
+            window.location.href = '../index.html';
+          });
+
+          // load lists
+          await Promise.all([ loadNotifications(), loadFriends(), loadNodes(), loadAchievements() ]);
+
+          // wire UI events
+          EL.refreshNotifsBtn.addEventListener('click', loadNotifications);
+          EL.markAllReadBtn.addEventListener('click', async () => {
+            // calling GET /me/notifications will mark them as read in this API implementation
+            try { await loadNotifications(); alert('Notificações atualizadas (marcadas como lidas).'); } catch (e) { console.warn(e); alert('Erro ao atualizar.'); }
+          });
+
+          EL.addFriendForm.addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            const u = EL.friendUsernameInput.value.trim();
+            if (!u) return alert('Informe um usuário.');
+            try {
+              await addFriend(u);
+              EL.friendUsernameInput.value = '';
+              await loadFriends();
+              alert('Pedido de amizade enviado.');
+            } catch (e) {
+              alert('Erro ao enviar pedido de amizade.');
+              console.error(e);
+            }
+          });
+
+          EL.addNodeForm.addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            alert('Função de nós não disponível na API.');
+          });
+
+          // messages modal
+          EL.openMessageBtn.addEventListener('click', () => { EL.messageModal.style.display = 'flex'; });
+          EL.closeModalBtn.addEventListener('click', () => { EL.messageModal.style.display = 'none'; });
+          EL.cancelModalBtn.addEventListener('click', () => { EL.messageModal.style.display = 'none'; });
+          EL.sendMessageForm.addEventListener('submit', async (ev) => {
+            ev.preventDefault();
+            const to = EL.msgTo.value.trim(); const body = EL.msgBody.value.trim();
+            if (!to || !body) return alert('Preencha destinatário e mensagem.');
+            await sendMessage(to, body);
+            EL.msgTo.value = ''; EL.msgBody.value = '';
+            EL.messageModal.style.display = 'none';
+          });
+
+        } catch (err) {
+          console.error('Erro inicializando dashboard', err);
+          document.getElementById('welcome').textContent = 'Erro ao carregar painel';
+          document.getElementById('welcome-sub').textContent = 'Verifique sua conexão ou token.';
+        }
+      }
+
+      // run
+      document.addEventListener('DOMContentLoaded', initDashboard);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Planetas Orbitando as Mãos</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #000;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+        .camera-container {
+            position: relative;
+            width: 90%;
+            max-width: 1280px;
+            height: 720px;
+            border: 3px solid #4caf50;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #000;
+        }
+        video, canvas {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            object-fit: cover;
+        }
+        #distanceInfo {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
+            width: 90%;
+            text-align: center;
+            font-size: 1.2em;
+        }
+        .planet-info {
+            color: white;
+            margin-top: 20px;
+            font-size: 1.1em;
+            width: 90%;
+            text-align: center;
+        }
+        .planet-info span {
+            display: inline-block;
+            margin: 5px 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🪐 Planetas Orbitando suas Mãos</h1>
+    <div class="camera-container">
+        <video id="video" playsinline></video>
+        <canvas id="output_canvas"></canvas>
+    </div>
+    <div id="distanceInfo">Distância entre dedos: 0 pixels</div>
+    <div class="planet-info" id="planetSpeedInfo">
+        <span id="planet1Speed">Planeta 1: 0.00 u/s</span>
+        <span id="planet2Speed">Planeta 2: 0.00 u/s</span>
+    </div>
+
+    <!-- Bibliotecas -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/handpose/handpose.js"></script>
+
+    <script>
+        // Elementos DOM
+        const videoElement = document.getElementById('video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const distanceInfo = document.getElementById('distanceInfo');
+        const planet1Speed = document.getElementById('planet1Speed');
+        const planet2Speed = document.getElementById('planet2Speed');
+
+        // Estados para os planetas
+        const planetStates = [
+            { angle: 0, speed: 0.05, orbitRadius: 150, active: false, color: '#6cf' },
+            { angle: Math.PI, speed: 0.05, orbitRadius: 150, active: false, color: '#f66' }
+        ];
+
+        // Configurações de detecção
+        const hands = new Hands({
+            locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        hands.setOptions({
+            maxNumHands: 2,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.7,
+            minTrackingConfidence: 0.7,
+            selfieMode: true
+        });
+
+        // Ajusta o canvas para manter proporção
+        function resizeCanvas() {
+            const container = document.querySelector('.camera-container');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            
+            canvasElement.width = width;
+            canvasElement.height = height;
+            videoElement.width = width;
+            videoElement.height = height;
+        }
+
+        window.addEventListener('load', resizeCanvas);
+        window.addEventListener('resize', resizeCanvas);
+
+        // Calcula distância entre pontos
+        function calculateDistance(p1, p2) {
+            return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+        }
+
+        // Desenha a órbita e o planeta
+        function drawOrbit(center, index) {
+            const state = planetStates[index];
+            
+            // Converte coordenadas normalizadas para pixels
+            const centerX = center.x * canvasElement.width;
+            const centerY = center.y * canvasElement.height;
+            
+            // Atualiza ângulo
+            state.angle += state.speed;
+            
+            // Calcula posição do planeta
+            const planetX = centerX + state.orbitRadius * Math.cos(state.angle);
+            const planetY = centerY + state.orbitRadius * Math.sin(state.angle);
+            
+            // Desenha órbita
+            canvasCtx.beginPath();
+            canvasCtx.arc(centerX, centerY, state.orbitRadius, 0, Math.PI * 2);
+            canvasCtx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            canvasCtx.lineWidth = 2;
+            canvasCtx.stroke();
+            
+            // Desenha planeta com efeitos de brilho
+            canvasCtx.beginPath();
+            const gradient = canvasCtx.createRadialGradient(planetX, planetY, 5, planetX, planetY, 15);
+            gradient.addColorStop(0, state.color);
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            canvasCtx.arc(planetX, planetY, 15, 0, Math.PI * 2);
+            canvasCtx.fillStyle = gradient;
+            canvasCtx.fill();
+        }
+
+        // Manipulador de resultados
+        hands.onResults(results => {
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            
+            if (results.image && results.multiHandLandmarks) {
+                // Desenha vídeo com correção de proporção
+                canvasCtx.save();
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+                canvasCtx.restore();
+                
+                let distances = [];
+                let speeds = [0, 0];
+
+                results.multiHandLandmarks.forEach((landmarks, index) => {
+                    if (index >= 2) return; // Máximo 2 mãos
+                    
+                    // Pontos importantes
+                    const thumbTip = landmarks[4];
+                    const indexTip = landmarks[8];
+                    const palmCenter = landmarks[9];
+                    
+                    // Calcula distância entre pontas dos dedos
+                    const distance = calculateDistance(
+                        { x: thumbTip.x, y: thumbTip.y },
+                        { x: indexTip.x, y: indexTip.y }
+                    );
+                    
+                    distances.push(distance.toFixed(2));
+                    
+                    // Calcula velocidade do planeta
+                    const normalizedDistance = Math.max(0, Math.min(1, distance));
+                    const speed = 0.02 + normalizedDistance * 0.4; // Sensibilidade aumentada
+                    
+                    planetStates[index].speed = speed;
+                    planetStates[index].active = true;
+                    speeds[index] = speed.toFixed(2);
+                    
+                    // Desenha órbita e planeta
+                    drawOrbit(palmCenter, index);
+                });
+                
+                // Atualiza informação de distância
+                distanceInfo.textContent = `Distância entre dedos: ${distances.join(', ')} u`;
+                
+                // Atualiza velocidade dos planetas
+                planet1Speed.textContent = `Planeta 1: ${speeds[0]} u/s`;
+                planet2Speed.textContent = `Planeta 2: ${speeds[1]} u/s`;
+            } else {
+                distanceInfo.textContent = 'Nenhuma mão detectada';
+                
+                // Oculta planetas quando mãos não estão presentes
+                planetStates.forEach(state => {
+                    state.active = false;
+                });
+            }
+        });
+
+        // Configura e inicia a câmera
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({ image: videoElement });
+            },
+            width: 1280,
+            height: 720
+        });
+        
+        camera.start();
+    </script>
+</body>
+</html>
