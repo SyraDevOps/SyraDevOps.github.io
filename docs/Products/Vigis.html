@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <title>Face Points - Vigis</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+        :root{
+            --bg:#000;
+            --left-color: #33ffcc;
+            --right-color: #ff66cc;
+            --chat-bg: rgba(20,20,20,0.85);
+            --chat-accent: #3daee9;
+        }
+        html,body{
+            height:100%;
+            margin:0;
+            background:var(--bg);
+            color:#fff;
+            font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, monospace;
+        }
+
+        .wrap{
+            display:flex;
+            flex-direction:column;
+            height:100vh;
+            box-sizing:border-box;
+            padding:16px;
+        }
+
+        .display-row{
+            display:flex;
+            flex:1 1 auto;
+            gap:16px;
+            align-items:stretch;
+        }
+
+        .panel{
+            position:relative;
+            flex:1 1 0;
+            border-radius:8px;
+            overflow:hidden;
+            background:#000;
+            border:1px solid rgba(255,255,255,0.06);
+            min-height:200px;
+        }
+
+        canvas{
+            display:block;
+            width:100%;
+            height:100%;
+            background:#000;
+        }
+
+        .label{
+            position:absolute;
+            left:10px;
+            top:10px;
+            z-index:10;
+            padding:6px 10px;
+            background:rgba(255,255,255,0.06);
+            color: #fff;
+            font-weight:600;
+            border-radius:6px;
+            font-size:13px;
+            pointer-events:none;
+        }
+
+        /* status banner */
+        .status {
+            position:fixed;
+            right:16px;
+            bottom:16px;
+            padding:8px 12px;
+            background:rgba(255,255,255,0.03);
+            color:#ddd;
+            border-radius:8px;
+            font-family:monospace;
+            z-index:50;
+            font-size:13px;
+        }
+
+        /* Chat (estilo IRC) */
+        .chat {
+            position:fixed;
+            left:16px;
+            bottom:16px;
+            width:360px;
+            max-width:45vw;
+            height:260px;
+            background:var(--chat-bg);
+            border:1px solid rgba(255,255,255,0.06);
+            border-radius:8px;
+            display:flex;
+            flex-direction:column;
+            overflow:hidden;
+            box-shadow:0 6px 20px rgba(0,0,0,0.6);
+            z-index:40;
+        }
+        .chat .header{
+            padding:8px 10px;
+            background:rgba(255,255,255,0.02);
+            border-bottom:1px solid rgba(255,255,255,0.03);
+            font-weight:700;
+            font-size:13px;
+            color:var(--chat-accent);
+        }
+        .chat .messages{
+            padding:8px 10px;
+            flex:1 1 auto;
+            overflow:auto;
+            color:#ddd;
+            font-size:13px;
+            line-height:1.4;
+            font-family: "Courier New", monospace;
+            background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+        }
+        .chat .messages .msg{
+            margin-bottom:8px;
+        }
+        .chat .messages .nick{
+            color: #8ad6ff;
+            font-weight:700;
+            margin-right:6px;
+        }
+        .chat .messages .time{
+            color:#888;
+            font-size:11px;
+            margin-left:6px;
+        }
+        .chat .input-row{
+            display:flex;
+            gap:8px;
+            padding:8px;
+            border-top:1px solid rgba(255,255,255,0.03);
+            background:rgba(0,0,0,0.06);
+        }
+        .chat input[type="text"]{
+            flex:1 1 auto;
+            padding:8px 10px;
+            border-radius:6px;
+            border:1px solid rgba(255,255,255,0.03);
+            background:rgba(0,0,0,0.2);
+            color:#fff;
+            outline:none;
+            font-family:inherit;
+        }
+        .chat button{
+            padding:8px 12px;
+            border-radius:6px;
+            border:none;
+            background:var(--chat-accent);
+            color:#000;
+            font-weight:700;
+            cursor:pointer;
+        }
+        .small-note{
+            margin-top:12px;
+            font-size:13px;
+            color:#ccc;
+        }
+
+        /* Responsive: on small screens stack vertically */
+        @media (max-width:720px){
+            .display-row{
+                flex-direction:column;
+            }
+            .chat{
+                left:8px;
+                right:8px;
+                width:auto;
+                max-width:none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <h2 style="margin:0 0 12px 0; color:#fff;">Face Points - Visualização</h2>
+
+        <div class="display-row" id="displayRow">
+            <div class="panel">
+                <div class="label">Face - Esquerda (cor 1)</div>
+                <canvas id="leftCanvas"></canvas>
+            </div>
+            <div class="panel">
+                <div class="label">Face - Direita (espelhada, cor 2)</div>
+                <canvas id="rightCanvas"></canvas>
+            </div>
+        </div>
+
+        <div class="small-note">Somente os pontos dos landmarks são desenhados; fundo preto. Permita acesso à câmera.</div>
+    </div>
+
+    <!-- Chat estilo IRC -->
+    <div class="chat" id="chat">
+        <div class="header">#vigis</div>
+        <div class="messages" id="messages" aria-live="polite"></div>
+        <div class="input-row">
+            <input id="chatInput" type="text" placeholder="Digite uma mensagem e pressione Enter..." />
+            <button id="sendBtn">Enviar</button>
+        </div>
+    </div>
+
+    <div class="status" id="status">status: inicializando...</div>
+
+    <!-- Hidden video (necessário para o mediapipe Camera) -->
+    <video id="video" playsinline muted autoplay style="display:none;"></video>
+
+    <!-- MediaPipe scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+
+    <script>
+        // Elementos
+        const statusEl = document.getElementById('status');
+        const videoElement = document.getElementById('video');
+        const leftCanvas = document.getElementById('leftCanvas');
+        const rightCanvas = document.getElementById('rightCanvas');
+        const leftCtx = leftCanvas.getContext('2d');
+        const rightCtx = rightCanvas.getContext('2d');
+
+        // Chat elementos
+        const messagesEl = document.getElementById('messages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+
+        // Cores
+        const leftColor = getComputedStyle(document.documentElement).getPropertyValue('--left-color').trim() || '#33ffcc';
+        const rightColor = getComputedStyle(document.documentElement).getPropertyValue('--right-color').trim() || '#ff66cc';
+
+        // Small util logs
+        function setStatus(text) {
+            statusEl.textContent = 'status: ' + text;
+            console.log('[Vigis]', text);
+        }
+
+        // Ajusta tamanho do canvas com devicePixelRatio para ficar nítido
+        function resizeCanvasToDisplaySize(canvas, ctx) {
+            const rect = canvas.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            const w = Math.max(1, Math.floor(rect.width * dpr));
+            const h = Math.max(1, Math.floor(rect.height * dpr));
+            if (canvas.width !== w || canvas.height !== h) {
+                canvas.width = w;
+                canvas.height = h;
+            }
+            // Escala contexto para coordenadas CSS -> pixels do canvas
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+
+        function resizeAll() {
+            resizeCanvasToDisplaySize(leftCanvas, leftCtx);
+            resizeCanvasToDisplaySize(rightCanvas, rightCtx);
+            // Clear to black background (use CSS size for drawing)
+            const rectL = leftCanvas.getBoundingClientRect();
+            leftCtx.fillStyle = '#000';
+            leftCtx.fillRect(0,0,rectL.width, rectL.height);
+            const rectR = rightCanvas.getBoundingClientRect();
+            rightCtx.fillStyle = '#000';
+            rightCtx.fillRect(0,0,rectR.width, rectR.height);
+        }
+
+        window.addEventListener('resize', resizeAll);
+        window.addEventListener('load', resizeAll);
+
+        // Desenha apenas pontos dos landmarks
+        function drawLandmarksOnly(ctx, landmarks, color, mirror=false) {
+            const rect = ctx.canvas.getBoundingClientRect();
+            const cssW = rect.width;
+            const cssH = rect.height;
+
+            // Limpa e preenche preto
+            ctx.clearRect(0,0,ctx.canvas.width, ctx.canvas.height);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0,0,cssW,cssH);
+
+            ctx.fillStyle = color;
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 1;
+
+            for (let i=0;i<landmarks.length;i++){
+                const lm = landmarks[i];
+                if (lm && typeof lm.x === 'number' && typeof lm.y === 'number') {
+                    let x = lm.x;
+                    let y = lm.y;
+                    if (mirror) x = 1 - x;
+
+                    let z = (typeof lm.z === 'number') ? lm.z : 0;
+                    let zClamped = Math.max(-0.6, Math.min(0.6, z));
+                    let size = Math.max(1.2, 4 - (zClamped * -3)); // heuristic
+
+                    const cx = x * cssW;
+                    const cy = y * cssH;
+
+                    ctx.beginPath();
+                    ctx.arc(cx, cy, size, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+        }
+
+        // Results handler do FaceMesh
+        function onResults(results) {
+            resizeAll();
+
+            if (!results.multiFaceLandmarks || results.multiFaceLandmarks.length === 0) {
+                // limpa
+                leftCtx.fillStyle = '#000';
+                leftCtx.fillRect(0,0,leftCanvas.width,leftCanvas.height);
+                rightCtx.fillStyle = '#000';
+                rightCtx.fillRect(0,0,rightCanvas.width,rightCanvas.height);
+                setStatus('Aguardando detecção...');
+                return;
+            }
+
+            setStatus('Face detectada');
+
+            const landmarks = results.multiFaceLandmarks[0];
+
+            // Desenha no canvas esquerdo (sem espelho) usando leftColor
+            drawLandmarksOnly(leftCtx, landmarks, leftColor, false);
+
+            // Desenha no canvas direito com espelhamento horizontal e cor diferente
+            drawLandmarksOnly(rightCtx, landmarks, rightColor, true);
+        }
+
+        // Inicializa FaceMesh (CORREÇÃO: usar "new FaceMesh(...)" - FaceMesh é exportado como função global)
+        let faceMesh;
+        try {
+            faceMesh = new FaceMesh({
+                locateFile: (file) => {
+                    return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+                }
+            });
+        } catch (err) {
+            console.error('Erro ao criar FaceMesh:', err);
+            setStatus('Erro ao inicializar FaceMesh (veja console)');
+        }
+
+        if (faceMesh) {
+            faceMesh.setOptions({
+                maxNumFaces: 1,
+                refineLandmarks: true,
+                minDetectionConfidence: 0.5,
+                minTrackingConfidence: 0.5
+            });
+
+            faceMesh.onResults(onResults);
+        }
+
+        // Inicia a câmera (CORREÇÃO: usar "new Camera(...)", Camera é global do camera_utils)
+        let camera;
+        async function startCameraAndProcessing() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                setStatus('API de câmera não suportada neste navegador');
+                console.warn('navigator.mediaDevices.getUserMedia não suportado');
+                return;
+            }
+
+            try {
+                // Garantir video settings; 'muted' e 'autoplay' ajudam com autoplay em navegadores
+                videoElement.muted = true;
+                videoElement.playsInline = true;
+                videoElement.autoplay = true;
+
+                // Cria Camera only once
+                camera = new Camera(videoElement, {
+                    onFrame: async () => {
+                        if (faceMesh) {
+                            await faceMesh.send({image: videoElement});
+                        }
+                    },
+                    width: 640,
+                    height: 480
+                });
+
+                await camera.start();
+                setStatus('Câmera iniciada');
+                console.log('Camera started');
+            } catch (e) {
+                console.error('Erro iniciando câmera:', e);
+                setStatus('Erro ao iniciar câmera (consulte console)');
+            }
+        }
+
+        // Executa a inicialização depois que as libs do mediapipe carregarem
+        // As tags <script> são síncronas aqui, então podemos iniciar direto
+        startCameraAndProcessing();
+
+        // ---------- Chat simples estilo IRC ----------
+        function addMessage(nick, text, timeStr) {
+            const msgEl = document.createElement('div');
+            msgEl.className = 'msg';
+            const nickEl = document.createElement('span');
+            nickEl.className = 'nick';
+            nickEl.textContent = nick;
+            const textEl = document.createElement('span');
+            textEl.className = 'text';
+            textEl.textContent = ' ' + text;
+            const timeEl = document.createElement('span');
+            timeEl.className = 'time';
+            timeEl.textContent = timeStr || new Date().toLocaleTimeString();
+
+            msgEl.appendChild(nickEl);
+            msgEl.appendChild(textEl);
+            msgEl.appendChild(timeEl);
+            messagesEl.appendChild(msgEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+
+        function sendChat() {
+            const txt = chatInput.value.trim();
+            if (!txt) return;
+            addMessage('Você', txt);
+            chatInput.value = '';
+            // Resposta automática de demo (simula IRC)
+            setTimeout(()=> addMessage('bot', 'Recebido: ' + txt), 500 + Math.random()*800);
+        }
+
+        sendBtn.addEventListener('click', sendChat);
+        chatInput.addEventListener('keydown', (e)=> {
+            if (e.key === 'Enter') {
+                sendChat();
+            }
+        });
+
+        // Mensagens iniciais
+        addMessage('sistema', 'Bem-vindo ao canal #vigis');
+        addMessage('sistema', 'Permita o acesso à câmera para visualizar os pontos faciais.');
+
+        // Tenta garantir que redimensiona após carregamento dos estilos
+        setTimeout(resizeAll, 300);
+    </script>
+</body>
+</html>
