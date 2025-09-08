@@ -1,0 +1,115 @@
+/* Mobile-first responsiveness and Android-friendly touch improvements */
+
+:root {
+  --touch-pad: 14px;
+  --max-content-width: 1200px;
+}
+
+/* make body fluid and comfortable on small screens */
+html, body {
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  text-size-adjust:100%;
+  font-size: 16px;
+  line-height: 1.35;
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+/* global container helper */
+.container, .wrap, .wrapper {
+  width: 100%;
+  max-width: var(--max-content-width);
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 16px;
+  padding-right: 16px;
+  box-sizing: border-box;
+}
+
+/* make menus and grids flexible */
+.display-row, .chat-container, .products-row, .grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ensure panels stack naturally on small screens */
+.panel, .product-panel, .card {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Canvas friendly sizing: respect aspect ratio and not overflow */
+canvas {
+  width: 100% !important;
+  height: auto !important;
+  display: block;
+  background: #000;
+  image-rendering: optimizeSpeed;
+  touch-action: none; /* better touch behaviour for interactive canvases */
+}
+
+/* Specific: Vigis canvases - allow stacked layout on small screens */
+.display-row { align-items: stretch; }
+@media (max-width: 900px) {
+  .display-row { flex-direction: column; }
+  .panel { min-height: 200px; }
+}
+
+/* Chat: move to bottom center on small screens and enlarge touch targets */
+.chat {
+  transition: all 180ms ease;
+}
+@media (max-width: 720px) {
+  .chat {
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: 12px !important;
+    width: calc(100% - 28px) !important;
+    max-width: none !important;
+    height: 220px !important;
+    border-radius: 10px !important;
+  }
+  .chat .messages { font-size: 14px; padding: 8px; }
+  .chat .input-row { padding: 8px; gap: 8px; }
+  .chat input[type="text"] { padding: 12px; font-size: 15px; }
+  .chat button { padding: 10px 14px; font-size: 15px; }
+}
+
+/* Lunagpt: stack chat and sidebar on small screens */
+.chat-container { align-items: flex-start; }
+@media (max-width: 900px) {
+  .chat-container { flex-direction: column; }
+  .sidebar { display: none !important; } /* hide sidebar on mobile */
+  .chat-panel { width: 100% !important; max-height: 60vh !important; }
+}
+
+/* Navigation: simple hamburger helper (requires JS toggle class) */
+.menu { display:flex; gap:12px; align-items:center; }
+.menu-toggle { display:none; background:transparent; border:0; font-size:20px; padding:10px; }
+@media (max-width: 860px) {
+  .menu { display:none; } /* hide default menu */
+  .menu-toggle { display:inline-flex; align-items:center; gap:8px; }
+  .menu.open { display:flex; flex-direction:column; position:absolute; left:16px; right:16px; top:60px; background:rgba(0,0,0,0.9); padding:12px; border-radius:8px; z-index:1000; }
+  .menu a { padding:10px 12px; display:block; border-bottom:1px solid rgba(255,255,255,0.03); }
+}
+
+/* Improve buttons for touch */
+button, .button, .sx-btn {
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  touch-action: manipulation;
+}
+
+/* Text scaling for small screens */
+@media (max-width:420px) {
+  html { font-size: 15px; }
+  h1 { font-size: 1.2rem; }
+  .small-note { font-size: 13px; }
+}
+
+/* small helper for content spacing */
+.spaced { margin-top: 12px; margin-bottom: 12px; }
