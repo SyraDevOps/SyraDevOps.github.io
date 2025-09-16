@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Colabore - Centro Cultural Quilombo Urbano</title>
+  <meta name="theme-color" content="#0b0b0b">
+  <meta name="description" content="Colabore com o Centro Cultural Quilombo Urbano - Faça parte da nossa comunidade">
+  
+  <!-- Fontes refinadas: Playfair Display para títulos e Inter para corpo -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+  
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <!-- Ícones -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Pular para o conteúdo</a>
+  
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo" aria-label="Quilombo Urbano">
+        <img src="assets/logo.png" alt="Logo Quilombo Urbano" class="logo-img">
+      </a>
+      
+      <nav class="main-nav" aria-label="Navegação principal">
+        <a href="index.html#sobre" class="nav-link">Sobre</a>
+        <a href="index.html#historia" class="nav-link">História</a>
+        <a href="index.html#galeria" class="nav-link">Galeria</a>
+        <a href="index.html#posts" class="nav-link">Posts</a>
+        <a href="index.html#eventos" class="nav-link">Eventos</a>
+        <a href="index.html#contato" class="nav-link">Contato</a>
+        <a href="colabore.html" class="btn-colabore active">
+          <span class="syl syl--y">Co</span><span class="syl syl--r">la</span><span class="syl syl--g">bo</span><span class="syl syl--y">re</span>
+        </a>
+      </nav>
+      
+      <button class="menu-toggle" aria-label="Abrir menu" aria-expanded="false">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero Section -->
+    <section class="hero-colabore">
+      <div class="hero-overlay"></div>
+      <div class="container hero-inner">
+        <div class="hero-text">
+          <h1 class="hero-title">Colabore Conosco</h1>
+          <p class="hero-description">Sua participação fortalece nossa comunidade e constrói um futuro melhor para todos.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formas de Colaborar -->
+    <section class="formas-colaborar">
+      <div class="container">
+        <div class="section-header">
+          <h2>Como Você Pode Colaborar</h2>
+          <p>Existem diversas maneiras de fazer parte da nossa missão de transformação social e cultural.</p>
+        </div>
+        
+        <div class="colaboracao-grid">
+          <div class="colaboracao-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="card-icon">
+              <i class="fas fa-hand-holding-heart"></i>
+            </div>
+            <h3>Voluntariado</h3>
+            <p>Dedique seu tempo e habilidades para apoiar nossas atividades educativas, culturais e comunitárias.</p>
+            <ul class="beneficios-lista">
+              <li>Oficinas e workshops</li>
+              <li>Eventos culturais</li>
+              <li>Atividades educativas</li>
+              <li>Apoio administrativo</li>
+            </ul>
+            <a href="#voluntario-form" class="btn-card">Seja Voluntário</a>
+          </div>
+          
+          <div class="colaboracao-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="card-icon">
+              <i class="fas fa-donate"></i>
+            </div>
+            <h3>Doações</h3>
+            <p>Contribua financeiramente ou com materiais para manter nossos projetos e expandir nosso impacto.</p>
+            <ul class="beneficios-lista">
+              <li>Doações financeiras</li>
+              <li>Materiais educativos</li>
+              <li>Equipamentos</li>
+              <li>Alimentos e suprimentos</li>
+            </ul>
+            <a href="#doacao-form" class="btn-card">Fazer Doação</a>
+          </div>
+          
+          <div class="colaboracao-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="card-icon">
+              <i class="fas fa-handshake"></i>
+            </div>
+            <h3>Parcerias</h3>
+            <p>Estabeleça parcerias institucionais para amplificar nosso alcance e impacto na comunidade.</p>
+            <ul class="beneficios-lista">
+              <li>Empresas e organizações</li>
+              <li>Instituições de ensino</li>
+              <li>Órgãos públicos</li>
+              <li>ONGs e coletivos</li>
+            </ul>
+            <a href="#parceria-form" class="btn-card">Ser Parceiro</a>
+          </div>
+          
+          <div class="colaboracao-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="card-icon">
+              <i class="fas fa-bullhorn"></i>
+            </div>
+            <h3>Divulgação</h3>
+            <p>Ajude a espalhar nossa missão compartilhando nosso trabalho em suas redes e comunidades.</p>
+            <ul class="beneficios-lista">
+              <li>Redes sociais</li>
+              <li>Boca a boca</li>
+              <li>Eventos e palestras</li>
+              <li>Mídia local</li>
+            </ul>
+            <a href="#divulgacao-form" class="btn-card">Divulgar</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formulário de Voluntariado -->
+    <section class="form-section" id="voluntario-form">
+      <div class="container">
+        <div class="form-container">
+          <div class="form-header">
+            <h2>Formulário de Voluntariado</h2>
+            <p>Preencha os dados abaixo para se cadastrar como voluntário.</p>
+          </div>
+          
+          <form id="voluntarioForm" class="form-elegant">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="vol-nome">Nome Completo *</label>
+                <input type="text" id="vol-nome" name="nome" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="vol-email">Email *</label>
+                <input type="email" id="vol-email" name="email" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="vol-telefone">Telefone *</label>
+                <input type="tel" id="vol-telefone" name="telefone" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="vol-idade">Idade</label>
+                <input type="number" id="vol-idade" name="idade" min="16" max="100">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="vol-endereco">Endereço</label>
+              <input type="text" id="vol-endereco" name="endereco" placeholder="Rua, número, bairro, cidade">
+            </div>
+            
+            <div class="form-group">
+              <label for="vol-areas">Áreas de Interesse *</label>
+              <select id="vol-areas" name="areas" required multiple>
+                <option value="educacao">Educação</option>
+                <option value="cultura">Cultura</option>
+                <option value="arte">Arte</option>
+                <option value="esporte">Esporte</option>
+                <option value="tecnologia">Tecnologia</option>
+                <option value="saude">Saúde</option>
+                <option value="meio-ambiente">Meio Ambiente</option>
+                <option value="administrativo">Administrativo</option>
+              </select>
+              <small>Segure Ctrl (ou Cmd) para selecionar múltiplas opções</small>
+            </div>
+            
+            <div class="form-group">
+              <label for="vol-experiencia">Experiência e Habilidades</label>
+              <textarea id="vol-experiencia" name="experiencia" rows="4" placeholder="Conte-nos sobre sua experiência, habilidades e o que você gostaria de contribuir..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="vol-disponibilidade">Disponibilidade</label>
+              <textarea id="vol-disponibilidade" name="disponibilidade" rows="3" placeholder="Dias da semana e horários em que você pode colaborar..."></textarea>
+            </div>
+            
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="termos" required>
+                <span class="checkmark"></span>
+                Concordo com os termos de voluntariado e autorizo o uso dos meus dados para fins de contato.
+              </label>
+            </div>
+            
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-heart"></i>
+              Cadastrar como Voluntário
+            </button>
+            
+            <p id="voluntarioStatus" class="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formulário de Doação -->
+    <section class="form-section" id="doacao-form">
+      <div class="container">
+        <div class="form-container">
+          <div class="form-header">
+            <h2>Formulário de Doação</h2>
+            <p>Sua doação faz a diferença na vida de muitas pessoas.</p>
+          </div>
+          
+          <form id="doacaoForm" class="form-elegant">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="doacao-nome">Nome Completo *</label>
+                <input type="text" id="doacao-nome" name="nome" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="doacao-email">Email *</label>
+                <input type="email" id="doacao-email" name="email" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="doacao-telefone">Telefone</label>
+                <input type="tel" id="doacao-telefone" name="telefone">
+              </div>
+              
+              <div class="form-group">
+                <label for="doacao-tipo">Tipo de Doação *</label>
+                <select id="doacao-tipo" name="tipo" required>
+                  <option value="">Selecione o tipo</option>
+                  <option value="financeira">Doação Financeira</option>
+                  <option value="materiais">Materiais Educativos</option>
+                  <option value="equipamentos">Equipamentos</option>
+                  <option value="alimentos">Alimentos</option>
+                  <option value="roupas">Roupas</option>
+                  <option value="outros">Outros</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group" id="valor-group" style="display: none;">
+              <label for="doacao-valor">Valor da Doação (R$)</label>
+              <input type="number" id="doacao-valor" name="valor" min="1" step="0.01" placeholder="0,00">
+            </div>
+            
+            <div class="form-group">
+              <label for="doacao-descricao">Descrição da Doação</label>
+              <textarea id="doacao-descricao" name="descricao" rows="4" placeholder="Descreva o que você gostaria de doar, quantidade, estado de conservação, etc."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="doacao-frequencia">Frequência</label>
+              <select id="doacao-frequencia" name="frequencia">
+                <option value="unica">Doação Única</option>
+                <option value="mensal">Mensal</option>
+                <option value="trimestral">Trimestral</option>
+                <option value="semestral">Semestral</option>
+                <option value="anual">Anual</option>
+              </select>
+            </div>
+            
+            <div class="form-group checkbox-group">
+              <label class="checkbox-label">
+                <input type="checkbox" name="anonima">
+                <span class="checkmark"></span>
+                Prefiro fazer uma doação anônima
+              </label>
+            </div>
+            
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-gift"></i>
+              Confirmar Doação
+            </button>
+            
+            <p id="doacaoStatus" class="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Formulário de Parceria -->
+    <section class="form-section" id="parceria-form">
+      <div class="container">
+        <div class="form-container">
+          <div class="form-header">
+            <h2>Formulário de Parceria</h2>
+            <p>Vamos construir juntos um futuro melhor para nossa comunidade.</p>
+          </div>
+          
+          <form id="parceriaForm" class="form-elegant">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="parceria-organizacao">Nome da Organização *</label>
+                <input type="text" id="parceria-organizacao" name="organizacao" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="parceria-tipo">Tipo de Organização *</label>
+                <select id="parceria-tipo" name="tipo" required>
+                  <option value="">Selecione o tipo</option>
+                  <option value="empresa">Empresa Privada</option>
+                  <option value="ong">ONG</option>
+                  <option value="escola">Instituição de Ensino</option>
+                  <option value="governo">Órgão Público</option>
+                  <option value="coletivo">Coletivo/Movimento</option>
+                  <option value="outros">Outros</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="parceria-responsavel">Nome do Responsável *</label>
+                <input type="text" id="parceria-responsavel" name="responsavel" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="parceria-cargo">Cargo *</label>
+                <input type="text" id="parceria-cargo" name="cargo" required>
+              </div>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="parceria-email">Email *</label>
+                <input type="email" id="parceria-email" name="email" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="parceria-telefone">Telefone *</label>
+                <input type="tel" id="parceria-telefone" name="telefone" required>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="parceria-website">Website/Redes Sociais</label>
+              <input type="url" id="parceria-website" name="website" placeholder="https://">
+            </div>
+            
+            <div class="form-group">
+              <label for="parceria-areas">Áreas de Interesse para Parceria *</label>
+              <select id="parceria-areas" name="areas" required multiple>
+                <option value="educacao">Educação</option>
+                <option value="cultura">Cultura</option>
+                <option value="arte">Arte</option>
+                <option value="tecnologia">Tecnologia</option>
+                <option value="capacitacao">Capacitação Profissional</option>
+                <option value="eventos">Eventos</option>
+                <option value="patrocinio">Patrocínio</option>
+                <option value="infraestrutura">Infraestrutura</option>
+              </select>
+              <small>Segure Ctrl (ou Cmd) para selecionar múltiplas opções</small>
+            </div>
+            
+            <div class="form-group">
+              <label for="parceria-proposta">Proposta de Parceria *</label>
+              <textarea id="parceria-proposta" name="proposta" rows="5" required placeholder="Descreva sua proposta de parceria, objetivos, recursos disponíveis e como podemos colaborar..."></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="parceria-recursos">Recursos que Pode Oferecer</label>
+              <textarea id="parceria-recursos" name="recursos" rows="3" placeholder="Recursos financeiros, humanos, materiais, espaço físico, conhecimento técnico, etc."></textarea>
+            </div>
+            
+            <button type="submit" class="btn-primary">
+              <i class="fas fa-handshake"></i>
+              Propor Parceria
+            </button>
+            
+            <p id="parceriaStatus" class="form-status" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção de Impacto -->
+    <section class="impacto-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Nosso Impacto</h2>
+          <p>Veja como sua colaboração faz a diferença na nossa comunidade.</p>
+        </div>
+        
+        <div class="impacto-stats">
+          <div class="stat-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">Pessoas Impactadas</div>
+          </div>
+          
+          <div class="stat-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="stat-number">50+</div>
+            <div class="stat-label">Oficinas Realizadas</div>
+          </div>
+          
+          <div class="stat-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="stat-number">25+</div>
+            <div class="stat-label">Voluntários Ativos</div>
+          </div>
+          
+          <div class="stat-card" data-aos="fade-up" data-aos-delay="400">
+            <div class="stat-number">10+</div>
+            <div class="stat-label">Parcerias Ativas</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Testemunhos -->
+    <section class="testemunhos-section">
+      <div class="container">
+        <div class="section-header">
+          <h2>Testemunhos</h2>
+          <p>Histórias de quem já faz parte da nossa família.</p>
+        </div>
+        
+        <div class="testemunhos-grid">
+          <div class="testemunho-card" data-aos="fade-up" data-aos-delay="100">
+            <div class="testemunho-content">
+              <p>"Ser voluntário no Quilombo Urbano mudou minha perspectiva sobre comunidade. Aqui encontrei propósito e amizades verdadeiras."</p>
+            </div>
+            <div class="testemunho-author">
+              <div class="author-info">
+                <h4>Maria Silva</h4>
+                <span>Voluntária há 2 anos</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="testemunho-card" data-aos="fade-up" data-aos-delay="200">
+            <div class="testemunho-content">
+              <p>"Nossa empresa encontrou no Quilombo Urbano o parceiro ideal para nossos projetos de responsabilidade social. O impacto é real e transformador."</p>
+            </div>
+            <div class="testemunho-author">
+              <div class="author-info">
+                <h4>João Santos</h4>
+                <span>Diretor de RSE</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="testemunho-card" data-aos="fade-up" data-aos-delay="300">
+            <div class="testemunho-content">
+              <p>"As oficinas do centro cultural despertaram em mim talentos que nem sabia que tinha. Hoje sou multiplicadora na minha comunidade."</p>
+            </div>
+            <div class="testemunho-author">
+              <div class="author-info">
+                <h4>Ana Costa</h4>
+                <span>Participante e Educadora</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-content">
+        <div class="footer-info">
+          <img src="img/mov.png" alt="Logo Movimento Negro" class="footer-logo">
+          <p>&copy; <span id="year"></span> Centro Cultural Quilombo Urbano</p>
+          <p>Todos os direitos reservados</p>
+        </div>
+        
+        <div class="footer-links">
+          <div class="footer-section">
+            <h4>Navegação</h4>
+            <nav class="footer-nav">
+              <a href="index.html#sobre">Sobre</a>
+              <a href="index.html#historia">História</a>
+              <a href="index.html#galeria">Galeria</a>
+              <a href="index.html#posts">Posts</a>
+            </nav>
+          </div>
+          
+          <div class="footer-section">
+            <h4>Colaboração</h4>
+            <nav class="footer-nav">
+              <a href="#voluntario-form">Voluntariado</a>
+              <a href="#doacao-form">Doações</a>
+              <a href="#parceria-form">Parcerias</a>
+              <a href="index.html#sugestoes">Sugestões</a>
+            </nav>
+          </div>
+          
+          <div class="footer-section">
+            <h4>Redes Sociais</h4>
+            <div class="social-links">
+              <a href="https://instagram.com/quilombourbanosaojoaodelrei" target="_blank" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+              </a>
+              <a href="https://facebook.com/quilombourbanosaojoaodelrei" target="_blank" aria-label="Facebook">
+                <i class="fab fa-facebook"></i>
+              </a>
+              <a href="https://youtube.com/quilombourbanosaojoaodelrei" target="_blank" aria-label="YouTube">
+                <i class="fab fa-youtube"></i>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/scripts.js"></script>
+  <script src="js/colabore.js"></script>
+</body>
+</html>
