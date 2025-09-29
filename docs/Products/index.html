@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syra Web Miner</title>
+    <!-- Incluindo a biblioteca para gerar QR Code -->
+    <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: 'Raleway', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #070707;
+            color: #ffffff;
+        }
+        .container {
+            text-align: center;
+            background: #0d0d0d;
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+            width: 500px;
+            max-width: 90%;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-weight: 900;
+        }
+        #mineButton {
+            background-color: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #mineButton:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+        }
+        #mineButton:disabled {
+            background-color: #555;
+            color: #aaa;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 16px;
+            min-height: 25px;
+            color: #b3f0ff; /* --accent color */
+        }
+        #results {
+            margin-top: 20px;
+            text-align: left;
+            word-break: break-all;
+            display: none; /* Começa escondido */
+        }
+        #qrcode {
+            margin: 20px auto 0 auto;
+            display: flex;
+            justify-content: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+        }
+        code {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Syra Miner</h1>
+    <p>Clique para encontrar um bloco que contenha "Syra".</p>
+    <button id="mineButton">Iniciar Mineração</button>
+    <div id="status">Pronto para minerar.</div>
+    
+    <div id="results">
+        <h3>🎉 Bloco Encontrado!</h3>
+        <p><strong>Hash Final:</strong> <code id="finalHash"></code></p>
+        <p>Escaneie o QR Code abaixo com o app SmartSyra.</p>
+        <div id="qrcode"></div>
+    </div>
+</div>
+
+<script>
+    // --- Início do Código do Web Worker ---
+    // O worker é o minerador que roda em segundo plano.
+    const workerCode = () => {
+        // Funções auxiliares dentro do worker
+        const encoder = new TextEncoder();
+        function toBase64(buf) {
+            let s = '';
+            const arr = new Uint8Array(buf);
+            for (let i = 0; i < arr.length; i++) s += String.fromCharCode(arr[i]);
+            return btoa(s);
+        }
+        function randHex(bytes) {
+            const arr = new Uint8Array(bytes);
+            crypto.getRandomValues(arr);
+            return Array.from(arr).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+        async function sha256(input) {
+            const data = typeof input === 'string' ? encoder.encode(input) : input;
+            return await crypto.subtle.digest('SHA-256', data);
+        }
+
+        let running = false;
+        // Ouve mensagens da página principal
+        self.onmessage = async (e) => {
+            if (e.data.cmd === 'start') {
+                running = true;
+                const target = e.data.target || 'Syra';
+                let attempts = 0;
+
+                while (running) {
+                    attempts++;
+                    // 1. Gera 4 "partes" baseadas no algoritmo do seu exemplo
+                    let combinedPartsHash = '';
+                    const parts = [];
+                    for (let j = 0; j < 4; j++) {
+                        const randomPart = randHex(8);
+                        const input = randomPart + 'SYRA2025'; // Lógica do seu exemplo
+                        const hashBuffer = await sha256(input);
+                        const hashBase64 = toBase64(hashBuffer);
+                        parts.push(hashBase64);
+                        combinedPartsHash += hashBase64;
+                    }
+                    
+                    // 2. Cria o hash final a partir da combinação das partes
+                    const finalHashBuffer = await sha256(combinedPartsHash);
+                    const finalHashBase64 = toBase64(finalHashBuffer);
+
+                    // Atualiza a página principal a cada 500 tentativas
+                    if ((attempts % 500) === 0) {
+                        self.postMessage({ type: 'status', attempts: attempts });
+                    }
+
+                    // 3. Verifica se o hash final contém o alvo
+                    if (finalHashBase64.toLowerCase().includes(target.toLowerCase())) {
+                        running = false;
+                        const blockData = {
+                            hash: finalHashBase64,
+                            parts: parts // As 4 partes intermediárias, para validação no app
+                        };
+                        // Envia o bloco encontrado de volta para a página principal
+                        self.postMessage({ type: 'found', block: blockData });
+                        break;
+                    }
+                }
+            } else if (e.data.cmd === 'stop') {
+                running = false;
+            }
+        };
+    };
+    // --- Fim do Código do Web Worker ---
+
+    // Elementos da página
+    const mineButton = document.getElementById('mineButton');
+    const statusDiv = document.getElementById('status');
+    const resultsDiv = document.getElementById('results');
+    const finalHashSpan = document.getElementById('finalHash');
+    const qrcodeDiv = document.getElementById('qrcode');
+
+    let minerWorker = null;
+    let qrcodeInstance = null;
+
+    // Função para iniciar a mineração
+    function startMining() {
+        // Cria um "arquivo virtual" para o worker
+        const blob = new Blob(['(' + workerCode.toString() + ')()'], { type: 'application/javascript' });
+        minerWorker = new Worker(URL.createObjectURL(blob));
+
+        // UI Updates
+        mineButton.disabled = true;
+        mineButton.innerText = 'Minerando...';
+        resultsDiv.style.display = 'none';
+        qrcodeDiv.innerHTML = '';
+        statusDiv.innerText = 'Iniciando minerador...';
+
+        // O que fazer quando o worker mandar uma mensagem
+        minerWorker.onmessage = (e) => {
+            const msg = e.data;
+            if (msg.type === 'status') {
+                statusDiv.innerText = `Procurando... Tentativas: ${msg.attempts.toLocaleString('pt-BR')}`;
+            } else if (msg.type === 'found') {
+                // Bloco encontrado!
+                statusDiv.innerText = 'Bloco Válido Encontrado!';
+                finalHashSpan.innerText = msg.block.hash;
+                resultsDiv.style.display = 'block';
+
+                // Gera o QR Code com os dados do bloco (hash final + 4 partes)
+                const qrCodeData = JSON.stringify(msg.block);
+                
+                if (!qrcodeInstance) {
+                    qrcodeInstance = new QRCode(qrcodeDiv, {
+                        text: qrCodeData,
+                        width: 220,
+                        height: 220,
+                    });
+                } else {
+                    qrcodeInstance.clear();
+                    qrcodeInstance.makeCode(qrCodeData);
+                }
+
+                // Para o worker e reseta o botão
+                minerWorker.terminate();
+                minerWorker = null;
+                mineButton.disabled = false;
+                mineButton.innerText = 'Iniciar Mineração';
+            }
+        };
+
+        // Envia o comando para o worker começar
+        minerWorker.postMessage({ cmd: 'start', target: 'Syra' });
+    }
+
+    mineButton.addEventListener('click', () => {
+        if (minerWorker) { // Se já estiver minerando, para
+            minerWorker.terminate();
+            minerWorker = null;
+            mineButton.disabled = false;
+            mineButton.innerText = 'Iniciar Mineração';
+            statusDiv.innerText = 'Minerador parado pelo usuário.';
+        } else { // Se não, começa
+            startMining();
+            mineButton.innerText = 'Parar'; // Muda o texto para permitir parar
+            mineButton.disabled = false;
+        }
+    });
+
+</script>
+
+</body>
+</html>
