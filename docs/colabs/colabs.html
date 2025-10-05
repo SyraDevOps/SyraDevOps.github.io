@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Colabs - SyraDevOps</title>
+	<link rel="stylesheet" href="../style.css">
+	<style>
+		body {
+			background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 45%, #ffffff 100%);
+			color: #0f172a;
+			min-height: 100vh;
+			display: block;
+			overflow-x: hidden;
+		}
+
+		.timeline-wrapper {
+			max-width: 1040px;
+			margin: 0 auto;
+			padding: 6rem 1.75rem 4rem;
+		}
+
+		.timeline-header {
+			margin-bottom: 3rem;
+		}
+
+		.timeline-title {
+			font-size: 2.6rem;
+			letter-spacing: -0.03em;
+			margin-bottom: 0.75rem;
+		}
+
+		.timeline-lead {
+			max-width: 720px;
+			font-size: 1.05rem;
+			line-height: 1.75;
+			color: #1f2937;
+		}
+
+		.timeline {
+			position: relative;
+			margin-left: 1.5rem;
+			padding-left: 2rem;
+		}
+
+		.timeline::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0.4rem;
+			width: 4px;
+			background: linear-gradient(180deg, rgba(59, 130, 246, 0.5) 0%, rgba(37, 99, 235, 0.2) 60%, rgba(37, 99, 235, 0) 100%);
+		}
+
+		.timeline-entry {
+			position: relative;
+			margin-bottom: 2.8rem;
+			padding-left: 1.5rem;
+			display: grid;
+			gap: 0.75rem;
+		}
+
+		.timeline-marker {
+			position: absolute;
+			left: -2.4rem;
+			top: 0.15rem;
+			width: 1.35rem;
+			height: 1.35rem;
+			border-radius: 50%;
+			border: 3px solid #1d4ed8;
+			background: #eff6ff;
+			box-shadow: 0 0 0 6px rgba(59, 130, 246, 0.12);
+		}
+
+		.timeline-badge {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0.45rem 1rem;
+			border-radius: 999px;
+			font-size: 0.82rem;
+			letter-spacing: 0.12em;
+			text-transform: uppercase;
+			color: #1e3a8a;
+			background: rgba(59, 130, 246, 0.12);
+			font-weight: 600;
+		}
+
+		.timeline-card {
+			background: rgba(255, 255, 255, 0.95);
+			border-radius: 20px;
+			border: 1px solid rgba(15, 23, 42, 0.08);
+			box-shadow: 0 24px 48px rgba(30, 64, 175, 0.15);
+			padding: 1.75rem 2rem;
+			display: grid;
+			gap: 1rem;
+		}
+
+		.timeline-card h3 {
+			margin: 0;
+			font-size: 1.35rem;
+			color: #0f172a;
+			letter-spacing: -0.01em;
+		}
+
+		.timeline-meta {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 0.6rem;
+			font-size: 0.9rem;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: #64748b;
+		}
+
+		.timeline-description {
+			font-size: 0.98rem;
+			line-height: 1.7;
+			color: #1f2937;
+			margin: 0;
+		}
+
+		.timeline-tags {
+			display: inline-flex;
+			flex-wrap: wrap;
+			gap: 0.6rem;
+		}
+
+		.timeline-tag {
+			display: inline-flex;
+			align-items: center;
+			padding: 0.35rem 0.85rem;
+			border-radius: 999px;
+			background: rgba(14, 165, 233, 0.15);
+			color: #0e7490;
+			font-size: 0.82rem;
+			font-weight: 600;
+			letter-spacing: 0.06em;
+		}
+
+		@media (max-width: 768px) {
+			.timeline-wrapper {
+				padding-top: 5.5rem;
+			}
+
+			.timeline-title {
+				font-size: 2.2rem;
+			}
+
+			.timeline {
+				margin-left: 1rem;
+				padding-left: 1.6rem;
+			}
+
+			.timeline-marker {
+				left: -2rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="hamburger" onclick="toggleMenu()">
+		<span></span>
+		<span></span>
+		<span></span>
+	</div>
+
+	<div class="overlay" onclick="closeMenu()"></div>
+
+	<nav class="sidebar">
+		<a href="../index.html" class="menu-item">Início</a>
+		<a href="../syrax.html" class="menu-item">SyraX</a>
+		<a href="../lunagpt.html" class="menu-item">LunaGPT</a>
+		<a href="../sobre.html" class="menu-item">Sobre</a>
+		<a href="../contato.html" class="menu-item">Contato</a>
+		<a href="colabs.html" class="menu-item">Colabs</a>
+		<div class="menu-footer">
+			Desenvolvido pela @SyraDevOps
+		</div>
+	</nav>
+
+	<main class="timeline-wrapper">
+		<header class="timeline-header">
+			<h1 class="timeline-title">Linha do Tempo de Colaborações</h1>
+			<p class="timeline-lead">Acompanhe os marcos das nossas parcerias estratégicas, clientes e iniciativas colaborativas. Conforme novas alianças são firmadas, este histórico é atualizado do presente para o passado, evidenciando a jornada que construímos ao lado de cada parceiro.</p>
+		</header>
+
+		<section class="timeline">
+			<article class="timeline-entry">
+				<span class="timeline-marker" aria-hidden="true"></span>
+				<span class="timeline-badge">2025 · Atual</span>
+				<div class="timeline-card">
+					<h3>Programa SyraX Alliance</h3>
+					<div class="timeline-meta">
+						<span>Cliente estratégico</span>
+						<span>São Paulo · Brasil</span>
+					</div>
+					<p class="timeline-description">Firmamos um hub exclusivo com a Vector Labs para desenvolver fluxos de IA aplicados a operações críticas em nuvem, integrando telemetria SyraX, LunaGPT e monitoramento proativo.</p>
+					<div class="timeline-tags">
+						<span class="timeline-tag">IA aplicada</span>
+						<span class="timeline-tag">SyraX Core</span>
+						<span class="timeline-tag">Programa Enterprise</span>
+					</div>
+				</div>
+			</article>
+
+			<article class="timeline-entry">
+				<span class="timeline-marker" aria-hidden="true"></span>
+				<span class="timeline-badge">2024</span>
+				<div class="timeline-card">
+					<h3>Parceria GovTech · Prefeitura de Curitiba</h3>
+					<div class="timeline-meta">
+						<span>Parceria pública</span>
+						<span>Curitiba · Brasil</span>
+					</div>
+					<p class="timeline-description">Implementação da plataforma Vigis para monitoramento urbano inteligente e resposta tática em tempo real, com dashboards personalizados para secretarias municipais.</p>
+					<div class="timeline-tags">
+						<span class="timeline-tag">GovTech</span>
+						<span class="timeline-tag">Vigis</span>
+						<span class="timeline-tag">Segurança urbana</span>
+					</div>
+				</div>
+			</article>
+
+			<article class="timeline-entry">
+				<span class="timeline-marker" aria-hidden="true"></span>
+				<span class="timeline-badge">2023</span>
+				<div class="timeline-card">
+					<h3>Cliente Enterprise · Orbis Telecom</h3>
+					<div class="timeline-meta">
+						<span>Cliente</span>
+						<span>Lisboa · Portugal</span>
+					</div>
+					<p class="timeline-description">Desenvolvimento de camada conversacional com LunaGPT integrada aos protocolos de atendimento da Orbis, elevando indicadores NPS e otimizando rotinas de suporte.</p>
+					<div class="timeline-tags">
+						<span class="timeline-tag">LunaGPT</span>
+						<span class="timeline-tag">Atendimento</span>
+						<span class="timeline-tag">Customer Experience</span>
+					</div>
+				</div>
+			</article>
+
+			<article class="timeline-entry">
+				<span class="timeline-marker" aria-hidden="true"></span>
+				<span class="timeline-badge">2022</span>
+				<div class="timeline-card">
+					<h3>Programa de Inovação · Aurora Ventures</h3>
+					<div class="timeline-meta">
+						<span>Fundo parceiro</span>
+						<span>Florianópolis · Brasil</span>
+					</div>
+					<p class="timeline-description">Co-criação de squads de pesquisa aplicada para acelerar startups de defesa cibernética utilizando o ecossistema SyraDevOps como base tecnológica.</p>
+					<div class="timeline-tags">
+						<span class="timeline-tag">Open Innovation</span>
+						<span class="timeline-tag">Cyber</span>
+						<span class="timeline-tag">Mentoria técnica</span>
+					</div>
+				</div>
+			</article>
+
+			<article class="timeline-entry">
+				<span class="timeline-marker" aria-hidden="true"></span>
+				<span class="timeline-badge">2021</span>
+				<div class="timeline-card">
+					<h3>Lançamento · Programa Beta Colabs</h3>
+					<div class="timeline-meta">
+						<span>Marco interno</span>
+						<span>Remoto · Global</span>
+					</div>
+					<p class="timeline-description">Inauguramos a iniciativa Colabs conectando equipes da SyraDevOps com parceiros multidisciplinares, estabelecendo os ritos de documentação e a governança colaborativa que seguimos até hoje.</p>
+					<div class="timeline-tags">
+						<span class="timeline-tag">Onboarding</span>
+						<span class="timeline-tag">Comunidade</span>
+						<span class="timeline-tag">Processos</span>
+					</div>
+				</div>
+			</article>
+		</section>
+	</main>
+
+	<script src="../script.js"></script>
+</body>
+</html>
