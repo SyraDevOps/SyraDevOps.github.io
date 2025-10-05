@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Luna App - Download Android</title>
+	<link rel="stylesheet" href="../style.css">
+	<style>
+		body {
+			background-color: #ffffff;
+			color: #111827;
+			min-height: 100vh;
+			display: block;
+			overflow-x: hidden;
+		}
+
+		.download-stage {
+			position: relative;
+			min-height: 100vh;
+			padding: 7rem 1.75rem 4rem;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.download-card {
+			width: 100%;
+			max-width: 880px;
+			background: #ffffff;
+			border: 1px solid rgba(17, 24, 39, 0.08);
+			border-radius: 28px;
+			padding: 3rem 3.5rem;
+			display: grid;
+			gap: 2.25rem;
+			grid-template-columns: minmax(0, 1fr);
+			box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+		}
+
+		.download-header {
+			display: flex;
+			align-items: center;
+			gap: 1.75rem;
+			flex-wrap: wrap;
+		}
+
+		.luna-icon {
+			width: 150px;
+			height: 150px;
+			border-radius: 32px;
+			background: #ffffff;
+			border: 1px solid rgba(17, 24, 39, 0.08);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: 0 12px 28px rgba(17, 24, 39, 0.1);
+		}
+
+		.luna-icon img {
+			width: 110px;
+			height: 110px;
+			object-fit: contain;
+		}
+
+		.download-content {
+			display: flex;
+			flex-direction: column;
+			gap: 1.5rem;
+		}
+
+		.download-content h1 {
+			font-size: 2.25rem;
+			letter-spacing: -0.02em;
+			margin: 0;
+		}
+
+		.download-content p {
+			font-size: 1.02rem;
+			line-height: 1.7;
+			color: #374151;
+			margin: 0;
+		}
+
+		.download-actions {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.download-button {
+			display: inline-flex;
+			align-items: center;
+			gap: 0.6rem;
+			padding: 0.9rem 1.75rem;
+			border-radius: 999px;
+			background: #111827;
+			color: #ffffff;
+			font-weight: 600;
+			letter-spacing: 0.05em;
+			text-decoration: none;
+			transition: transform 0.2s ease, box-shadow 0.2s ease;
+			box-shadow: 0 12px 28px rgba(17, 24, 39, 0.15);
+		}
+
+		.download-button:hover,
+		.download-button:focus-visible {
+			transform: translateY(-2px);
+			box-shadow: 0 16px 32px rgba(17, 24, 39, 0.18);
+		}
+
+		.download-button svg {
+			width: 16px;
+			height: 16px;
+		}
+
+		.meta-info {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 1.25rem;
+			font-size: 0.85rem;
+			letter-spacing: 0.08em;
+			text-transform: uppercase;
+			color: #6b7280;
+		}
+
+		.feature-highlights {
+			display: grid;
+			gap: 1.25rem;
+			grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+		}
+
+		.highlight-card {
+			background: #fafafa;
+			border-radius: 16px;
+			padding: 1.35rem;
+			border: 1px solid rgba(17, 24, 39, 0.06);
+		}
+
+		.highlight-card h3 {
+			margin: 0 0 0.6rem 0;
+			font-size: 1.05rem;
+			color: #111827;
+		}
+
+		.highlight-card p {
+			margin: 0;
+			font-size: 0.95rem;
+			line-height: 1.55;
+			color: #4b5563;
+		}
+
+		@media (max-width: 980px) {
+			.download-card {
+				grid-template-columns: 1fr;
+				padding: 2.75rem;
+			}
+
+			.luna-icon-wrapper {
+				justify-content: flex-start;
+			}
+		}
+
+		@media (max-width: 600px) {
+			.download-card {
+				padding: 2.5rem 2rem;
+			}
+
+			.download-content h1 {
+				font-size: 2rem;
+			}
+
+			.download-button {
+				width: 100%;
+				justify-content: center;
+			}
+
+			.meta-info {
+				gap: 1rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="hamburger" onclick="toggleMenu()">
+		<span></span>
+		<span></span>
+		<span></span>
+	</div>
+
+	<div class="overlay" onclick="closeMenu()"></div>
+
+	<nav class="sidebar">
+		<a href="../index.html" class="menu-item">Início</a>
+		<a href="../lunagpt.html" class="menu-item">LunaGPT</a>
+		<a href="../sobre.html" class="menu-item">Sobre</a>
+		<a href="../syrax.html" class="menu-item">SyraX</a>
+		<a href="../contato.html" class="menu-item">Contato</a>
+		<div class="menu-footer">
+			Desenvolvido pela @SyraDevOps
+		</div>
+	</nav>
+
+	<main class="download-stage">
+		<section class="download-card">
+			<div class="luna-icon-wrapper">
+				<div class="luna-icon">
+					<img src="../img/icon-luna.png" alt="Ícone da Luna" loading="lazy">
+				</div>
+			</div>
+
+			<div class="download-content">
+				<h1>Luna App para Android</h1>
+				<p>Leve a inteligência da Luna com você. A experiência móvel do ecossistema Syra conecta notificações, respostas contextuais, visão de projetos e controle dos serviços SyraX em uma interface pensada para mobilidade.</p>
+
+				<div class="download-actions">
+					<a class="download-button" href="../apps/Luna.apk" download>
+						<svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M10 3V13" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M6 9L10 13L14 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+							<path d="M4 15H16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+						</svg>
+						Baixar APK
+					</a>
+				</div>
+
+				<div class="meta-info">
+					<span>Versão Beta</span>
+					<span>Android 10+</span>
+					<span>Atualizado em 2025</span>
+				</div>
+
+				<div class="feature-highlights">
+					<div class="highlight-card">
+						<h3>Ecossistema Syra</h3>
+						<p>Integrações nativas com SyraID, Vox e Vigis para notificações instantâneas, autenticação segura e insights operacionais.</p>
+					</div>
+					<div class="highlight-card">
+						<h3>Assistente Pessoal</h3>
+						<p>Acesso rápido à Luna para consultas, automações e acompanhamento de tarefas em linguagem natural.</p>
+					</div>
+					<div class="highlight-card">
+						<h3>Design Responsivo</h3>
+						<p>Interface escura otimizada para uso contínuo, com feedback tátil e fluxo intuitivo para equipes Syra.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+	</main>
+
+	<script src="../script.js"></script>
+</body>
+</html>

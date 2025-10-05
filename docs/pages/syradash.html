@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyraDash</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body class="dashboard-body">
+    <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="overlay" onclick="closeMenu()"></div>
+
+    <nav class="sidebar">
+        <a href="../index.html" class="menu-item">Início</a>
+        <a href="../lunagpt.html" class="menu-item">LunaGPT</a>
+        <a href="../sobre.html" class="menu-item">Sobre</a>
+        <a href="../syrax.html" class="menu-item">SyraX</a>
+        <a href="./SyraID.html" class="menu-item">SyraID</a>
+        <a href="./syradash.html" class="menu-item">SyraDash</a>
+        <a href="../contato.html" class="menu-item">Contato</a>
+        <div class="menu-footer">
+            Desenvolvido pela @SyraDevOps
+        </div>
+    </nav>
+
+    <main class="dashboard-container">
+        <header class="dash-header">
+            <div>
+                <h1 class="dash-title" id="userHandle">@usuario</h1>
+            </div>
+            <div class="dash-actions">
+                <button class="dash-button ghost" id="refreshDashboard">Atualizar</button>
+                <button class="dash-button primary" id="logoutDashboard">Encerrar sessão</button>
+            </div>
+        </header>
+
+        <section class="dash-grid">
+            <article class="dash-card highlight" id="networkCard">
+                <div class="dash-card-header">
+                    <h2 class="dash-card-title">Rede Syra</h2>
+                    <span class="dash-badge" id="networkUpdated">Atualizando...</span>
+                </div>
+                <div class="dash-network">
+                    <div class="network-item">
+                        <span class="network-label">Seguidores</span>
+                        <span class="network-value" id="followersMetric">--</span>
+                    </div>
+                    <div class="network-divider"></div>
+                    <div class="network-item">
+                        <span class="network-label">Seguindo</span>
+                        <span class="network-value" id="followingMetric">--</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dash-card" id="walletCard">
+                <div class="dash-card-header">
+                    <h3 class="dash-card-title">Syra Wallet</h3>
+                </div>
+                <p class="wallet-cta-copy">
+                    Acompanhe saldo, blocos minerados e movimente seus $YRA com segurança na Syra Wallet.
+                </p>
+                <button type="button" class="wallet-cta-button" id="openWallet">Acessar minha carteira</button>
+            </article>
+
+            <article class="dash-card" id="profileCard">
+                <div class="dash-card-header">
+                    <h3 class="dash-card-title">Identidade Syra</h3>
+                </div>
+                <p class="profile-bio" id="profileBio">Bio não informada.</p>
+                <hr class="profile-divider">
+                <div class="profile-qr">
+                    <img id="profileQr" alt="QR Code do perfil" />
+                    <p>Compartilhe seu perfil Syra rapidamente com o QR Code.</p>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <div class="dash-toast" id="dashToast"></div>
+
+    <script src="../script.js"></script>
+    <script src="../dashboard.js"></script>
+</body>
+</html>

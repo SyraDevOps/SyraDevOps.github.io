@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vox - SyraDevOps</title>
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        body {
+            background-color: #e8f9f0;
+            display: block;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Estilos específicos para a página Vox */
+        .wave-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .sine-wave {
+            position: absolute;
+            bottom: 20%;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            opacity: 0.6;
+        }
+
+        .sine-wave svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .sine-wave path {
+            stroke: #90EE90;
+            stroke-width: 3;
+            fill: none;
+            filter: drop-shadow(0 0 10px rgba(144, 238, 144, 0.3));
+        }
+
+        /* Animação da onda */
+        @keyframes waveFlow {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(-100px);
+            }
+        }
+
+        .sine-wave path {
+            animation: waveFlow 3s linear infinite;
+        }
+
+        /* Container principal com z-index para ficar acima da onda */
+        .vox-container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        /* Botão do microfone */
+        .mic-button {
+            background: linear-gradient(135deg, #90EE90, #32CD32);
+            border: none;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(144, 238, 144, 0.3);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .mic-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(144, 238, 144, 0.4);
+        }
+
+        .mic-button:active {
+            transform: scale(0.95);
+        }
+
+        .mic-button.recording {
+            background: linear-gradient(135deg, #FF6B6B, #FF4757);
+            animation: pulse 1.5s infinite;
+        }
+
+        .mic-icon {
+            width: 32px;
+            height: 32px;
+            transition: all 0.3s ease;
+        }
+
+        .mic-button:hover .mic-icon {
+            transform: scale(1.1);
+        }
+
+        /* Interface de transcrição */
+        .transcription-display {
+            position: fixed;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .transcription-lines {
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #333;
+            padding: 20px 25px;
+            border-radius: 15px;
+            font-size: 1rem;
+            font-weight: 400;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            margin-bottom: 15px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+            max-height: 200px;
+            overflow-y: auto;
+            min-width: 300px;
+        }
+
+        .transcription-lines.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .transcription-line {
+            margin-bottom: 8px;
+            padding: 8px 12px;
+            background-color: rgba(248, 248, 248, 0.7);
+            border-radius: 10px;
+            border-left: 3px solid #90EE90;
+            animation: slideInLeft 0.5s ease-out;
+            line-height: 1.4;
+        }
+
+        .transcription-line:last-child {
+            margin-bottom: 0;
+        }
+
+        .transcription-line.interim {
+            opacity: 0.7;
+            font-style: italic;
+            background-color: rgba(144, 238, 144, 0.1);
+            border-left-color: #66BB6A;
+        }
+
+        .empty-state {
+            color: #888;
+            font-style: italic;
+            padding: 20px;
+            text-align: center;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .save-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .save-button, .clear-button {
+            background: linear-gradient(135deg, #90EE90, #32CD32);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 12px rgba(144, 238, 144, 0.3);
+        }
+
+        .clear-button {
+            background: linear-gradient(135deg, #ff6b6b, #ff5252);
+            box-shadow: 0 3px 12px rgba(255, 107, 107, 0.3);
+        }
+
+        .save-button:hover, .clear-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 16px rgba(144, 238, 144, 0.4);
+        }
+
+        .clear-button:hover {
+            box-shadow: 0 5px 16px rgba(255, 107, 107, 0.4);
+        }
+
+        .status-indicator {
+            height: 8px;
+            width: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            background-color: #ccc;
+            margin-right: 8px;
+            transition: all 0.3s ease;
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            z-index: 1002;
+        }
+
+        .status-indicator.active {
+            background-color: #4CAF50;
+            box-shadow: 0 0 12px #4CAF50;
+            animation: statusPulse 2s infinite;
+        }
+
+        .highlight {
+            background-color: #90EE90;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        /* Animação de pulso quando gravando */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            }
+            50% {
+                box-shadow: 0 4px 25px rgba(255, 107, 107, 0.6);
+            }
+            100% {
+                box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+            }
+        }
+
+        /* Animação do indicador de status */
+        @keyframes statusPulse {
+            0% {
+                box-shadow: 0 0 12px #4CAF50;
+            }
+            50% {
+                box-shadow: 0 0 20px #4CAF50, 0 0 30px #4CAF50;
+            }
+            100% {
+                box-shadow: 0 0 12px #4CAF50;
+            }
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .vox-container {
+                padding: 1rem;
+            }
+
+            .mic-button {
+                width: 70px;
+                height: 70px;
+            }
+
+            .mic-icon {
+                width: 28px;
+                height: 28px;
+            }
+
+            .transcription-display {
+                max-width: 95%;
+                bottom: 8%;
+            }
+
+            .transcription-lines {
+                font-size: 0.9rem;
+                padding: 15px 20px;
+                min-width: 250px;
+                max-height: 150px;
+            }
+
+            .transcription-line {
+                padding: 6px 10px;
+                margin-bottom: 6px;
+            }
+
+            .save-controls {
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .save-button, .clear-button {
+                width: 140px;
+            }
+
+            .status-indicator {
+                top: 20px;
+                right: 20px;
+            }
+
+            .sine-wave {
+                height: 150px;
+                bottom: 15%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .mic-button {
+                width: 60px;
+                height: 60px;
+            }
+
+            .mic-icon {
+                width: 24px;
+                height: 24px;
+            }
+
+            .transcription-display {
+                bottom: 5%;
+            }
+
+            .transcription-lines {
+                font-size: 0.85rem;
+                padding: 12px 15px;
+                min-width: 200px;
+                max-height: 120px;
+            }
+
+            .transcription-line {
+                padding: 5px 8px;
+                margin-bottom: 5px;
+            }
+
+            .save-button, .clear-button {
+                font-size: 0.8rem;
+                padding: 8px 16px;
+                width: 120px;
+            }
+
+            .sine-wave {
+                height: 120px;
+                bottom: 10%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ícone hambúrguer -->
+    <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="closeMenu()"></div>
+
+    <!-- Menu lateral -->
+    <nav class="sidebar">
+        <a href="../index.html" class="menu-item">Início</a>
+        <a href="../lunagpt.html" class="menu-item">LunaGPT</a>
+        <a href="../sobre.html" class="menu-item">Sobre</a>
+        <a href="../syrax.html" class="menu-item">SyraX</a>
+        <a href="../contato.html" class="menu-item">Contato</a>
+        <div class="menu-footer">
+            Desenvolvido pela @SyraDevOps
+        </div>
+    </nav>
+
+    <!-- Onda senoide animada -->
+    <div class="wave-container">
+        <div class="sine-wave">
+            <svg viewBox="0 0 1200 200" xmlns="http://www.w3.org/2000/svg">
+                <path d="M0,100 Q150,50 300,100 T600,100 T900,100 T1200,100 T1500,100 T1800,100 T2100,100 T2400,100 T2700,100 T3000,100"
+                      stroke-linecap="round"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="vox-container">
+        <!-- Botão do microfone -->
+        <button class="mic-button" onclick="toggleVoiceRecording()">
+            <svg class="mic-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 1C10.3431 1 9 2.34315 9 4V12C9 13.6569 10.3431 15 12 15C13.6569 15 15 13.6569 15 12V4C15 2.34315 13.6569 1 12 1Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 10V12C19 16.4183 15.4183 20 11 20C6.58172 20 3 16.4183 3 12V10" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 20V23" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 23H16" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Indicador de status -->
+    <div class="status-indicator" id="statusIndicator"></div>
+
+    <!-- Display de transcrição -->
+    <div class="transcription-display" id="transcriptionDisplay">
+        <div class="transcription-lines" id="transcriptionLines">
+            <div class="empty-state">Clique no microfone para começar a falar...</div>
+        </div>
+        <div class="save-controls" id="saveControls" style="display: none;">
+            <button class="save-button" onclick="saveTranscription()">💾 Salvar TXT</button>
+            <button class="clear-button" onclick="clearTranscription()">🗑️ Limpar</button>
+        </div>
+    </div>
+
+    <script src="../script.js"></script>
+    <script>
+        // Elementos DOM
+        const micButton = document.querySelector('.mic-button');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const transcriptionLines = document.getElementById('transcriptionLines');
+        const transcriptionDisplay = document.getElementById('transcriptionDisplay');
+        const saveControls = document.getElementById('saveControls');
+
+        // Configuração do reconhecimento de voz
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+        let allTranscriptions = [];
+        let interimElement = null;
+
+        // Inicializar reconhecimento de voz
+        function initializeSpeechRecognition() {
+            if (!SpeechRecognition) {
+                console.error('Reconhecimento de voz não suportado neste navegador');
+                transcriptionLines.innerHTML = '<div class="empty-state" style="color: #ff6b6b;">Reconhecimento de voz não suportado neste navegador</div>';
+                return false;
+            }
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'pt-BR';
+
+            // Event handlers
+            recognition.onstart = function() {
+                console.log('Reconhecimento de voz iniciado');
+                statusIndicator.classList.add('active');
+                
+                // Remover estado vazio e mostrar "Escutando..."
+                if (allTranscriptions.length === 0) {
+                    transcriptionLines.innerHTML = '<div class="empty-state">Escutando...</div>';
+                }
+                transcriptionLines.classList.add('visible');
+            };
+
+            recognition.onresult = function(event) {
+                let interimTranscript = '';
+                let finalTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+
+                // Mostrar resultado final
+                if (finalTranscript.trim()) {
+                    // Remover elemento interim se existir
+                    if (interimElement) {
+                        interimElement.remove();
+                        interimElement = null;
+                    }
+                    
+                    // Remover estado vazio se for a primeira transcrição
+                    if (allTranscriptions.length === 0) {
+                        transcriptionLines.innerHTML = '';
+                    }
+                    
+                    // Adicionar nova linha final
+                    allTranscriptions.push(finalTranscript.trim());
+                    const lineDiv = document.createElement('div');
+                    lineDiv.className = 'transcription-line';
+                    lineDiv.innerHTML = highlightKeywords(finalTranscript.trim());
+                    transcriptionLines.appendChild(lineDiv);
+                    
+                    // Auto scroll para o final
+                    transcriptionLines.scrollTop = transcriptionLines.scrollHeight;
+                    
+                    // Mostrar controles de salvar
+                    saveControls.style.display = 'flex';
+                }
+
+                // Mostrar resultados interinos
+                if (interimTranscript.trim()) {
+                    // Remover elemento interim anterior
+                    if (interimElement) {
+                        interimElement.remove();
+                    }
+                    
+                    // Remover estado vazio se for a primeira interação
+                    if (allTranscriptions.length === 0 && transcriptionLines.querySelector('.empty-state')) {
+                        transcriptionLines.innerHTML = '';
+                    }
+                    
+                    // Criar novo elemento interim
+                    interimElement = document.createElement('div');
+                    interimElement.className = 'transcription-line interim';
+                    interimElement.innerHTML = highlightKeywords(interimTranscript.trim());
+                    transcriptionLines.appendChild(interimElement);
+                    
+                    // Auto scroll para o final
+                    transcriptionLines.scrollTop = transcriptionLines.scrollHeight;
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Erro no reconhecimento de voz:', event.error);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'transcription-line';
+                errorDiv.style.color = '#ff6b6b';
+                errorDiv.style.borderLeftColor = '#ff6b6b';
+                errorDiv.textContent = `Erro: ${event.error}`;
+                transcriptionLines.appendChild(errorDiv);
+                
+                stopRecognition();
+            };
+
+            recognition.onend = function() {
+                console.log('Reconhecimento de voz finalizado');
+                
+                // Remover elemento interim
+                if (interimElement) {
+                    interimElement.remove();
+                    interimElement = null;
+                }
+                
+                if (isListening) {
+                    // Reiniciar se ainda estiver escutando
+                    setTimeout(() => {
+                        if (isListening) {
+                            recognition.start();
+                        }
+                    }, 100);
+                }
+            };
+
+            return true;
+        }
+
+        // Destacar palavras-chave
+        function highlightKeywords(text) {
+            const keywords = ['olá', 'teste', 'português', 'reconhecimento', 'voz', 'syra', 'tecnologia', 'inteligência', 'artificial'];
+            let highlightedText = text;
+            
+            keywords.forEach(keyword => {
+                const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
+                highlightedText = highlightedText.replace(regex, match => 
+                    `<span class="highlight">${match}</span>`
+                );
+            });
+            
+            return highlightedText;
+        }
+
+        // Iniciar reconhecimento
+        function startRecognition() {
+            if (!recognition && !initializeSpeechRecognition()) {
+                return;
+            }
+
+            isListening = true;
+            recognition.start();
+            
+            micButton.classList.add('recording');
+        }
+
+        // Parar reconhecimento
+        function stopRecognition() {
+            isListening = false;
+            if (recognition) {
+                recognition.stop();
+            }
+            
+            micButton.classList.remove('recording');
+            statusIndicator.classList.remove('active');
+            
+            // Remover elemento interim
+            if (interimElement) {
+                interimElement.remove();
+                interimElement = null;
+            }
+            
+            if (allTranscriptions.length === 0) {
+                transcriptionLines.innerHTML = '<div class="empty-state">Clique no microfone para começar a falar...</div>';
+                transcriptionLines.classList.remove('visible');
+            }
+        }
+
+        // Toggle do reconhecimento de voz
+        function toggleVoiceRecording() {
+            if (isListening) {
+                stopRecognition();
+            } else {
+                startRecognition();
+            }
+        }
+
+        // Salvar transcrição como TXT
+        function saveTranscription() {
+            if (allTranscriptions.length === 0) {
+                alert('Não há transcrições para salvar');
+                return;
+            }
+
+            const now = new Date();
+            const timestamp = now.toLocaleString('pt-BR').replace(/[/:]/g, '-');
+            const filename = `transcricao-vox-${timestamp}.txt`;
+            
+            const content = `Transcrição Vox - SyraDevOps\n`;
+            const separator = `Data: ${now.toLocaleString('pt-BR')}\n`;
+            const divider = `${'='.repeat(50)}\n\n`;
+            
+            // Numerar as linhas
+            const numberedTranscriptions = allTranscriptions.map((line, index) => 
+                `${index + 1}. ${line}`
+            ).join('\n\n');
+            
+            const fullContent = content + separator + divider + numberedTranscriptions;
+            
+            const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            
+            // Feedback visual
+            const successDiv = document.createElement('div');
+            successDiv.className = 'transcription-line';
+            successDiv.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+            successDiv.style.borderLeftColor = '#4CAF50';
+            successDiv.style.color = '#4CAF50';
+            successDiv.textContent = '💾 Arquivo salvo com sucesso!';
+            transcriptionLines.appendChild(successDiv);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        }
+
+        // Limpar transcrições
+        function clearTranscription() {
+            allTranscriptions = [];
+            interimElement = null;
+            transcriptionLines.innerHTML = '<div class="empty-state">Clique no microfone para começar a falar...</div>';
+            saveControls.style.display = 'none';
+            transcriptionLines.classList.remove('visible');
+        }
+
+        // Solicitar permissão de microfone ao carregar a página
+        window.addEventListener('load', function() {
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(function(stream) {
+                        console.log('Permissão de microfone concedida');
+                        stream.getTracks().forEach(track => track.stop());
+                    })
+                    .catch(function(err) {
+                        console.log('Permissão de microfone negada:', err);
+                        transcriptionLines.innerHTML = '<div class="empty-state" style="color: #ff6b6b;">Permissão de microfone necessária</div>';
+                    });
+            }
+        });
+    </script>
+</body>
+</html>
