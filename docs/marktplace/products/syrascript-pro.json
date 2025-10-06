@@ -1,0 +1,33 @@
+{
+    "nome": "SyraScript Pro",
+    "codigo": "SYRA-001",
+    "preco": 99.90,
+    "descricao": "Linguagem de programação revolucionária desenvolvida pela SyraDevOps. Inclui compilador completo, IDE integrada, documentação extensiva e suporte técnico premium.",
+    "categoria": "Desenvolvimento",
+    "caracteristicas": [
+        "Compilador SyraScript completo",
+        "IDE SyraDev integrada",
+        "Documentação técnica completa", 
+        "100+ exemplos de código",
+        "Suporte técnico por 1 ano",
+        "Atualizações gratuitas",
+        "Licença comercial incluída",
+        "Biblioteca de funções avançadas"
+    ],
+    "requisitos": [
+        "Windows 10/11 ou Linux",
+        "4GB de RAM mínimo",
+        "500MB de espaço em disco",
+        "Conexão com internet"
+    ],
+    "tipo": "software",
+    "formato": "Download digital",
+    "entrega": "Link de download via email",
+    "suporte": "Email e Discord premium",
+    "versao": "1.0.0",
+    "compatibilidade": ["Windows", "Linux", "macOS"],
+    "licenca": "Comercial",
+    "idiomas": ["Português", "Inglês"],
+    "atualizacoes": "Gratuitas por 1 ano",
+    "garantia": "30 dias"
+}

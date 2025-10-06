@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syra Wallet</title>
+    <link rel="stylesheet" href="../../style.css">
+    <style>
+        .wallet-page-body {
+            background: linear-gradient(130deg, #f8fafc, #e2e8f0);
+        }
+        .wallet-dashboard {
+            gap: 2rem;
+            max-width: 1080px;
+            margin: 0 auto;
+        }
+        .wallet-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+        .wallet-card-copy {
+            margin: 0.2rem 0 1.2rem;
+            color: #475569;
+            font-size: 0.95rem;
+            line-height: 1.55;
+        }
+        .wallet-card-actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.9rem;
+            margin-bottom: 1.1rem;
+        }
+        .wallet-action-button {
+            border: none;
+            border-radius: 0;
+            padding: 0.85rem 1.6rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            background: linear-gradient(120deg, #0ea5e9, #6366f1);
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 16px 36px rgba(14, 165, 233, 0.32);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        .wallet-action-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 20px 46px rgba(99, 102, 241, 0.35);
+        }
+        .wallet-action-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+            box-shadow: none;
+        }
+        .wallet-summary-label {
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            color: #64748b;
+            font-weight: 600;
+        }
+        .wallet-balance-shell {
+            position: relative;
+            padding: 0.35rem;
+            border-radius: 18px;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.22), rgba(14, 165, 233, 0.18));
+            overflow: hidden;
+        }
+        .wallet-balance-glass {
+            position: relative;
+            padding: 1.9rem;
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.78);
+            backdrop-filter: blur(16px);
+            box-shadow: 0 26px 52px rgba(79, 70, 229, 0.18);
+            border: 1px solid rgba(148, 163, 184, 0.22);
+        }
+        .wallet-balance-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .wallet-balance-pulse {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #22d3ee;
+            box-shadow: 0 0 0 rgba(34, 211, 238, 0.55);
+            animation: walletPulse 2.4s ease-in-out infinite;
+        }
+        .wallet-balance-amount {
+            margin-top: 1.2rem;
+            display: flex;
+            align-items: baseline;
+            gap: 0.8rem;
+        }
+        .wallet-balance-currency {
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: #6366f1;
+        }
+        .wallet-balance-value {
+            font-size: 3.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            line-height: 1;
+        }
+        .wallet-balance-sub {
+            margin-top: 0.9rem;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        .wallet-perfect-line {
+            margin: 1.6rem 0;
+            height: 1px;
+            width: 100%;
+            background: linear-gradient(90deg, rgba(148, 163, 184, 0), rgba(148, 163, 184, 0.65), rgba(148, 163, 184, 0));
+        }
+        .wallet-code-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+        .wallet-code-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .wallet-code-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.75rem 1.1rem;
+            border: 1px dashed rgba(79, 70, 229, 0.45);
+            background: rgba(129, 140, 248, 0.12);
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #312e81;
+        }
+        .wallet-copy-button {
+            border: none;
+            border-radius: 0;
+            padding: 0.75rem 1.2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            background: linear-gradient(120deg, #6366f1, #22d3ee);
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+            box-shadow: 0 18px 42px rgba(99, 102, 241, 0.32);
+        }
+        .wallet-copy-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            filter: brightness(1.05);
+            box-shadow: 0 22px 52px rgba(34, 211, 238, 0.35);
+        }
+        .wallet-copy-button:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+            box-shadow: none;
+        }
+        .wallet-summary-stats {
+            margin-top: 1.4rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.4rem;
+        }
+        .wallet-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .wallet-stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.18em;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+        .wallet-stat-value {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .wallet-create-card {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+        .wallet-create-card ul {
+            list-style: none;
+            padding-left: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            color: #475569;
+        }
+        .wallet-create-card li::before {
+            content: '\2192';
+            margin-right: 0.6rem;
+            color: #4338ca;
+        }
+        .wallet-create-btn {
+            border: none;
+            border-radius: 0;
+            padding: 1rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(130deg, #22d3ee, #6366f1);
+            color: #fff;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            box-shadow: 0 22px 48px rgba(34, 211, 238, 0.35);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        .wallet-create-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 26px 58px rgba(99, 102, 241, 0.38);
+            filter: brightness(1.05);
+        }
+        .wallet-transfer-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .wallet-transfer-form label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #475569;
+        }
+        .wallet-transfer-form input,
+        .wallet-transfer-form textarea {
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            border-radius: 0;
+            padding: 0.9rem 1rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(255, 255, 255, 0.92);
+            color: #0f172a;
+        }
+        .wallet-transfer-form input:focus,
+        .wallet-transfer-form textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+        }
+        .wallet-transfer-submit {
+            border: none;
+            border-radius: 0;
+            padding: 0.95rem 1.3rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(130deg, #4338ca, #0ea5e9);
+            color: #fff;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            box-shadow: 0 20px 45px rgba(14, 165, 233, 0.32);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        .wallet-transfer-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 26px 58px rgba(67, 56, 202, 0.38);
+            filter: brightness(1.05);
+        }
+        .wallet-section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1f2937;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            margin-bottom: 1rem;
+        }
+        .wallet-note {
+            font-size: 0.9rem;
+            color: #475569;
+            padding: 0.85rem 1rem;
+            background: rgba(148, 163, 184, 0.12);
+            border-left: 3px solid rgba(79, 70, 229, 0.38);
+        }
+        .wallet-empty {
+            padding: 1.4rem;
+            border-radius: 0;
+            background: rgba(148, 163, 184, 0.12);
+            color: #475569;
+            font-size: 0.95rem;
+            text-align: center;
+            border: 1px dashed rgba(148, 163, 184, 0.35);
+        }
+        .wallet-block-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .wallet-block-form label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: #475569;
+        }
+        .wallet-block-form input,
+        .wallet-block-form textarea {
+            border: 1px solid rgba(148, 163, 184, 0.45);
+            border-radius: 0;
+            padding: 0.9rem 1rem;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            background: rgba(255, 255, 255, 0.94);
+            color: #0f172a;
+        }
+        .wallet-block-form input:focus,
+        .wallet-block-form textarea:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
+        }
+        .wallet-block-form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.8rem;
+        }
+        .wallet-block-parts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 0.8rem;
+        }
+        .wallet-block-hint {
+            font-size: 0.75rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: #64748b;
+        }
+        .wallet-block-submit {
+            border: none;
+            border-radius: 0;
+            padding: 0.95rem 1.3rem;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(130deg, #6366f1, #22d3ee);
+            color: #fff;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            box-shadow: 0 20px 45px rgba(99, 102, 241, 0.32);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        .wallet-block-submit:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 26px 58px rgba(34, 211, 238, 0.35);
+            filter: brightness(1.05);
+        }
+        .wallet-block-submit:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+            box-shadow: none;
+        }
+        .wallet-blocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.4rem;
+        }
+        .wallet-block-card {
+            position: relative;
+            padding: 1.4rem;
+            border: 1px solid rgba(148, 163, 184, 0.32);
+            background: #fff;
+            box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+        }
+        .wallet-block-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 24px 52px rgba(79, 70, 229, 0.22);
+            filter: brightness(1.02);
+        }
+        .wallet-block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 0.8rem;
+        }
+        .wallet-block-index {
+            font-size: 0.9rem;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #4338ca;
+            font-weight: 600;
+        }
+        .wallet-block-date {
+            font-size: 0.85rem;
+            color: #475569;
+        }
+        .wallet-block-hash {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 0.78rem;
+            color: #0f172a;
+            word-break: break-word;
+        }
+        .wallet-block-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.6rem;
+            margin-top: 0.8rem;
+        }
+        .wallet-block-tag {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.45rem 0.75rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            background: rgba(34, 211, 238, 0.14);
+            color: #0f766e;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+        }
+        .wallet-block-qr-button {
+            margin-top: 1.1rem;
+            width: 100%;
+            border: none;
+            border-radius: 0;
+            padding: 0.85rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            background: linear-gradient(130deg, #4338ca, #22d3ee);
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: 0 16px 36px rgba(67, 56, 202, 0.32);
+        }
+        .wallet-block-qr-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 44px rgba(34, 211, 238, 0.3);
+        }
+        .wallet-block-qr {
+            margin-top: 1rem;
+            padding: 1.1rem;
+            border: 1px dashed rgba(79, 70, 229, 0.35);
+            background: rgba(99, 102, 241, 0.08);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .wallet-block-qr.open {
+            display: flex;
+        }
+        .wallet-block-qr img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+        }
+        .wallet-block-qr-close {
+            border: none;
+            border-radius: 0;
+            padding: 0.55rem 1.1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            background: #1e293b;
+            color: #fff;
+            cursor: pointer;
+        }
+        .wallet-alert {
+            padding: 1.2rem 1.6rem;
+            border-radius: 0;
+            border: 1px solid rgba(250, 204, 21, 0.6);
+            background: linear-gradient(115deg, rgba(253, 224, 71, 0.25), rgba(234, 179, 8, 0.35));
+            color: #78350f;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            box-shadow: 0 18px 40px rgba(202, 138, 4, 0.18);
+            margin-bottom: 1.6rem;
+        }
+        .wallet-card-muted {
+            opacity: 0.6;
+        }
+        .hidden {
+            display: none !important;
+        }
+        @keyframes walletPulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(34, 211, 238, 0.5);
+            }
+            70% {
+                box-shadow: 0 0 0 12px rgba(34, 211, 238, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(34, 211, 238, 0);
+            }
+        }
+        @media (max-width: 768px) {
+            .wallet-dashboard {
+                padding: 80px 20px 50px 20px;
+            }
+            .wallet-card-actions {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body class="dashboard-body wallet-page-body">
+    <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="overlay" onclick="closeMenu()"></div>
+
+    <nav class="sidebar">
+        <a href="../../index.html" class="menu-item">Início</a>
+        <a href="../../syrax.html" class="menu-item">SyraX</a>
+        <a href="../../lunagpt.html" class="menu-item">LunaGPT</a>
+        <a href="../../sobre.html" class="menu-item">Sobre</a>
+        <a href="../../contato.html" class="menu-item">Contato</a>
+        <a href="../../colabs/colabs.html" class="menu-item">Colabs</a>
+        <a href="../SyraID.html" class="menu-item">SyraID</a>
+        <a href="../syradash.html" class="menu-item">SyraDash</a>
+        <div class="menu-footer">
+            Desenvolvido pela @SyraDevOps
+        </div>
+    </nav>
+
+    <main class="dashboard-container wallet-dashboard">
+        <header class="dash-header">
+            <div>
+                <h1 class="dash-title" id="walletUserHandle">@usuario</h1>
+                <p class="dash-subtitle">Minha carteira $YRA em tempo real</p>
+            </div>
+            <div class="dash-actions">
+                <button class="dash-button ghost" id="walletReload">Atualizar</button>
+                <button class="dash-button primary" id="walletBack">Voltar ao dashboard</button>
+            </div>
+        </header>
+
+        <div class="wallet-alert hidden" id="walletSecurityAlert"></div>
+
+        <section class="wallet-grid">
+            <article class="dash-card" id="walletSummaryCard">
+                <div class="dash-card-header">
+                    <h3 class="dash-card-title">Visão geral</h3>
+                </div>
+                <div class="wallet-balance-shell">
+                    <div class="wallet-balance-glass">
+                        <div class="wallet-balance-header">
+                            <span class="wallet-summary-label">Saldo disponível</span>
+                            <span class="wallet-balance-pulse" aria-hidden="true"></span>
+                        </div>
+                        <div class="wallet-balance-amount">
+                            <span class="wallet-balance-currency">$YRA</span>
+                            <span class="wallet-balance-value" id="walletSummaryBalance">--</span>
+                        </div>
+                        <p class="wallet-balance-sub">Continue minerando para elevar seu patrimônio.</p>
+                    </div>
+                </div>
+                <div class="wallet-perfect-line"></div>
+                <div class="wallet-code-meta">
+                    <span class="wallet-summary-label">Código da carteira</span>
+                    <div class="wallet-code-group">
+                        <span class="wallet-code-pill" id="walletSummaryCode">Carteira não localizada</span>
+                        <button class="wallet-copy-button" id="walletCopyButton" type="button" disabled>Copiar</button>
+                    </div>
+                </div>
+                <div class="wallet-summary-stats">
+                    <div class="wallet-stat">
+                        <span class="wallet-stat-label">Blocos validados</span>
+                        <span class="wallet-stat-value" id="walletTotalBlocks">0</span>
+                    </div>
+                    <div class="wallet-stat">
+                        <span class="wallet-stat-label">Atualização</span>
+                        <span class="wallet-stat-value" id="walletUpdated">--</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dash-card wallet-create-card" id="walletCreateCard">
+                <div class="dash-card-header">
+                    <h3 class="dash-card-title">Ainda sem carteira?</h3>
+                </div>
+                <p class="wallet-cta-copy">Crie sua carteira Syra para receber recompensas, minerar blocos e movimentar seus $YRA com segurança.</p>
+                <ul>
+                    <li>Código de segurança único exibido uma única vez.</li>
+                    <li>Integração automática com o SyraDash.</li>
+                    <li>Pronta para transferências instantâneas.</li>
+                </ul>
+                <button class="wallet-create-btn" id="walletCreateButton">Criar minha carteira agora</button>
+            </article>
+
+            <article class="dash-card" id="walletTransferCard">
+                <div class="dash-card-header">
+                    <h3 class="dash-card-title">Transferir $YRA</h3>
+                </div>
+                <form class="wallet-transfer-form" id="walletTransferForm" autocomplete="off">
+                    <label for="transferTo">Enviar para (usuário)</label>
+                    <input type="text" id="transferTo" name="transferTo" placeholder="nome_do_amigo" required>
+
+                    <label for="transferAmount">Quantidade de tokens</label>
+                    <input type="number" id="transferAmount" name="transferAmount" min="1" required>
+
+                    <label for="transferSecurity">Código de segurança</label>
+                    <input type="password" id="transferSecurity" name="transferSecurity" placeholder="xxx-xxx-xxx" required>
+
+                    <label for="transferDescription">Descrição (opcional)</label>
+                    <textarea id="transferDescription" name="transferDescription" rows="2" placeholder="Motivo da transferência"></textarea>
+
+                    <button type="submit" class="wallet-transfer-submit">Confirmar transferência</button>
+                </form>
+            </article>
+
+            <article class="dash-card" id="walletTransactionsCard">
+                <div class="dash-card-header">
+                    <h3 class="dash-card-title">Extrato da carteira</h3>
+                </div>
+                <p class="wallet-card-copy">Baixe um arquivo TXT completo com todas as movimentações sincronizadas da sua carteira Syra.</p>
+                <div class="wallet-card-actions">
+                    <button class="wallet-action-button" id="walletStatementButton" type="button" disabled>Baixar extrato em TXT</button>
+                </div>
+                <div id="walletTransactionsContent" class="wallet-note">Sincronizando transações...</div>
+            </article>
+
+            <article class="dash-card" id="walletBlockFormCard">
+                <div class="dash-card-header">
+                    <h3 class="dash-card-title">Adicionar bloco validado</h3>
+                </div>
+                <p class="wallet-card-copy">Informe um bloco que contenha "Syra" no hash para registrar a validação e receber sua recompensa.</p>
+                <form class="wallet-block-form" id="walletBlockForm" autocomplete="off">
+                    <div class="wallet-block-form-grid">
+                        <div>
+                            <label for="walletBlockIndex">Número do bloco</label>
+                            <input type="number" id="walletBlockIndex" name="blockIndex" min="1" required>
+                        </div>
+                        <div>
+                            <label for="walletBlockDate">Data da validação</label>
+                            <input type="date" id="walletBlockDate" name="blockDate" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="walletBlockHash">Hash completo</label>
+                        <textarea id="walletBlockHash" name="blockHash" rows="2" placeholder="Ex.: SyraXYZ123..." required></textarea>
+                    </div>
+                    <div>
+                        <p class="wallet-block-hint">Divida o hash em 4 partes para validação</p>
+                        <div class="wallet-block-parts-grid">
+                            <input type="text" name="blockHashPart1" data-block-part placeholder="Parte 1" required>
+                            <input type="text" name="blockHashPart2" data-block-part placeholder="Parte 2" required>
+                            <input type="text" name="blockHashPart3" data-block-part placeholder="Parte 3" required>
+                            <input type="text" name="blockHashPart4" data-block-part placeholder="Parte 4" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="wallet-block-submit">Adicionar bloco</button>
+                </form>
+            </article>
+
+            <article class="dash-card" id="walletBlocksCard">
+                <div class="dash-card-header">
+                    <h3 class="dash-card-title">Blocos minerados</h3>
+                </div>
+                <div id="walletBlocksContent" class="wallet-empty">Carregando blocos minerados...</div>
+            </article>
+        </section>
+    </main>
+
+    <div class="dash-toast" id="walletToast"></div>
+
+    <script src="../../script.js"></script>
+    <script>
+        const WALLET_STORAGE_KEYS = {
+            token: 'syra_jwt',
+            apiBase: 'syra_api_base_url'
+        };
+        const WALLET_DEFAULT_API_BASE = 'http://191.252.110.182:5000';
+        const WALLET_QR_BASE_URL = 'https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=';
+        let walletTokensEndpointUnavailable = false;
+        let walletBlocksHandlersAttached = false;
+        let walletTransactionsCache = [];
+
+        function walletEscapeHtml(value) {
+            return (value || '').replace(/[&<>"']/g, (char) => ({
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            })[char] || char);
+        }
+
+        function walletGenerateQrUrl(rawData) {
+            const payload = rawData ? encodeURIComponent(rawData) : 'SyraBlock';
+            return `${WALLET_QR_BASE_URL}${payload}`;
+        }
+
+        function walletSplitHashIntoParts(hashValue) {
+            if (!hashValue) {
+                return [];
+            }
+            const normalized = hashValue.trim();
+            if (!normalized) {
+                return [];
+            }
+            const separated = normalized.split(/[\s|,;:-]+/).filter(Boolean);
+            if (separated.length >= 4) {
+                return separated.slice(0, 4);
+            }
+            const compact = normalized.replace(/\s+/g, '');
+            if (!compact) {
+                return [];
+            }
+            const chunk = Math.ceil(compact.length / 4) || 1;
+            const parts = [];
+            for (let index = 0; index < 4; index += 1) {
+                const start = index * chunk;
+                const segment = compact.slice(start, start + chunk);
+                parts.push(segment || compact.slice(-chunk));
+            }
+            return parts.slice(0, 4);
+        }
+
+        function walletFillHashPartInputs(parts) {
+            const form = document.getElementById('walletBlockForm');
+            if (!form) {
+                return;
+            }
+            const inputs = Array.from(form.querySelectorAll('[data-block-part]'));
+            inputs.slice(0, 4).forEach((input, index) => {
+                input.value = parts[index] || '';
+            });
+        }
+
+        function walletPrefillHashParts() {
+            const form = document.getElementById('walletBlockForm');
+            if (!form) {
+                return;
+            }
+            const hashInput = form.blockHash;
+            if (!hashInput || !hashInput.value) {
+                return;
+            }
+            const parts = walletSplitHashIntoParts(hashInput.value);
+            if (parts.length === 4) {
+                walletFillHashPartInputs(parts);
+            }
+        }
+
+        function walletCollectHashParts(form, hashValue) {
+            const inputs = Array.from(form.querySelectorAll('[data-block-part]'));
+            let parts = inputs.map((input) => input.value.trim());
+            if (parts.every((part) => part)) {
+                return parts.slice(0, 4);
+            }
+            const autoParts = walletSplitHashIntoParts(hashValue);
+            if (autoParts.length === 4) {
+                walletFillHashPartInputs(autoParts);
+                return autoParts;
+            }
+            return parts.slice(0, 4);
+        }
+
+        function attachBlockHandlers(container) {
+            if (walletBlocksHandlersAttached || !container) {
+                return;
+            }
+            container.addEventListener('click', (event) => {
+                const qrButton = event.target.closest('.wallet-block-qr-button');
+                if (qrButton) {
+                    const card = qrButton.closest('.wallet-block-card');
+                    if (!card) {
+                        return;
+                    }
+                    const panel = card.querySelector('.wallet-block-qr');
+                    if (!panel) {
+                        return;
+                    }
+                    const qrValue = decodeURIComponent(qrButton.getAttribute('data-qr') || '');
+                    const image = panel.querySelector('img');
+                    if (image && !image.dataset.loaded) {
+                        image.src = walletGenerateQrUrl(qrValue);
+                        image.dataset.loaded = 'true';
+                    }
+
+                    document.querySelectorAll('.wallet-block-qr.open').forEach((openPanel) => {
+                        if (openPanel !== panel) {
+                            openPanel.classList.remove('open');
+                            openPanel.classList.add('hidden');
+                        }
+                    });
+
+                    const isOpen = panel.classList.contains('open');
+                    if (isOpen) {
+                        panel.classList.remove('open');
+                        panel.classList.add('hidden');
+                    } else {
+                        panel.classList.add('open');
+                        panel.classList.remove('hidden');
+                    }
+                    return;
+                }
+
+                const closeButton = event.target.closest('.wallet-block-qr-close');
+                if (closeButton) {
+                    const panel = closeButton.closest('.wallet-block-qr');
+                    if (panel) {
+                        panel.classList.remove('open');
+                        panel.classList.add('hidden');
+                    }
+                }
+            });
+            walletBlocksHandlersAttached = true;
+        }
+
+        function walletGetApiBase() {
+            const stored = localStorage.getItem(WALLET_STORAGE_KEYS.apiBase);
+            return stored && stored.trim() ? stored.trim() : WALLET_DEFAULT_API_BASE;
+        }
+
+        function walletResolveHandle() {
+            const token = localStorage.getItem(WALLET_STORAGE_KEYS.token);
+            if (!token) {
+                return '@usuario';
+            }
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                return payload?.username ? `@${payload.username}` : '@usuario';
+            } catch (error) {
+                return '@usuario';
+            }
+        }
+
+        function walletShowToast(message, type = 'success') {
+            const toast = document.getElementById('walletToast');
+            if (!toast) {
+                return;
+            }
+            toast.textContent = message;
+            toast.classList.remove('success', 'error', 'show');
+            toast.classList.add(type === 'error' ? 'error' : 'success');
+            void toast.offsetWidth;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3600);
+        }
+
+        function showSecurityAlert(code) {
+            const alertBox = document.getElementById('walletSecurityAlert');
+            if (!alertBox) {
+                return;
+            }
+            if (code) {
+                alertBox.textContent = `Guarde seu código de segurança: ${code}`;
+                alertBox.classList.remove('hidden');
+            } else {
+                alertBox.textContent = '';
+                alertBox.classList.add('hidden');
+            }
+        }
+
+        async function walletRequest(endpoint, options = {}) {
+            const token = localStorage.getItem(WALLET_STORAGE_KEYS.token);
+            if (!token) {
+                const error = new Error('Sessão expirada. Faça login novamente.');
+                error.status = 401;
+                throw error;
+            }
+
+            const headers = Object.assign(
+                {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                options.headers || {}
+            );
+
+            const response = await fetch(`${walletGetApiBase()}${endpoint}`, Object.assign({}, options, { headers }));
+
+            if (response.status === 204) {
+                return null;
+            }
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok) {
+                const message = data.error || data.message || 'Erro ao comunicar com a API Syra.';
+                const error = new Error(message);
+                error.status = response.status;
+                throw error;
+            }
+
+            return data;
+        }
+
+        function toggleNoWallet(state) {
+            const createCard = document.getElementById('walletCreateCard');
+            const summaryCard = document.getElementById('walletSummaryCard');
+            const transferCard = document.getElementById('walletTransferCard');
+            const transactionsCard = document.getElementById('walletTransactionsCard');
+            const blockFormCard = document.getElementById('walletBlockFormCard');
+            const securityAlert = document.getElementById('walletSecurityAlert');
+            const copyButton = document.getElementById('walletCopyButton');
+            const statementButton = document.getElementById('walletStatementButton');
+            if (!createCard || !summaryCard || !transferCard) {
+                return;
+            }
+            if (state) {
+                createCard.classList.remove('hidden');
+                summaryCard.classList.add('wallet-card-muted');
+                transferCard.classList.add('wallet-card-muted');
+                if (transactionsCard) {
+                    transactionsCard.classList.add('wallet-card-muted');
+                }
+                if (blockFormCard) {
+                    blockFormCard.classList.add('wallet-card-muted');
+                }
+                setTransferDisabled(true);
+                setBlockFormDisabled(true);
+                if (securityAlert) {
+                    securityAlert.classList.add('hidden');
+                    securityAlert.textContent = '';
+                }
+                if (copyButton) {
+                    copyButton.disabled = true;
+                }
+                if (statementButton) {
+                    statementButton.disabled = true;
+                }
+            } else {
+                createCard.classList.add('hidden');
+                summaryCard.classList.remove('wallet-card-muted');
+                transferCard.classList.remove('wallet-card-muted');
+                if (transactionsCard) {
+                    transactionsCard.classList.remove('wallet-card-muted');
+                }
+                if (blockFormCard) {
+                    blockFormCard.classList.remove('wallet-card-muted');
+                }
+                setTransferDisabled(false);
+                setBlockFormDisabled(false);
+                if (copyButton) {
+                    const currentCode = document.getElementById('walletSummaryCode')?.textContent?.trim();
+                    copyButton.disabled = !currentCode || currentCode === 'Carteira não localizada';
+                }
+                if (statementButton) {
+                    statementButton.disabled = walletTransactionsCache.length === 0;
+                }
+            }
+        }
+
+        function setTransferDisabled(disabled) {
+            const form = document.getElementById('walletTransferForm');
+            if (!form) {
+                return;
+            }
+            Array.from(form.elements).forEach((element) => {
+                element.disabled = disabled;
+            });
+        }
+
+        function setBlockFormDisabled(disabled) {
+            const form = document.getElementById('walletBlockForm');
+            if (!form) {
+                return;
+            }
+            Array.from(form.elements).forEach((element) => {
+                element.disabled = disabled;
+            });
+        }
+
+        function renderSummary(walletInfo, blocksData) {
+            const balanceLabel = document.getElementById('walletSummaryBalance');
+            const codeLabel = document.getElementById('walletSummaryCode');
+            const totalBlocksLabel = document.getElementById('walletTotalBlocks');
+            const updatedLabel = document.getElementById('walletUpdated');
+            const copyButton = document.getElementById('walletCopyButton');
+
+            if (!walletInfo) {
+                if (balanceLabel) balanceLabel.textContent = '--';
+                if (codeLabel) codeLabel.textContent = 'Carteira não localizada';
+                if (totalBlocksLabel) totalBlocksLabel.textContent = '0';
+                if (updatedLabel) updatedLabel.textContent = '--';
+                if (copyButton) copyButton.disabled = true;
+                return;
+            }
+
+            const balanceValue = walletInfo.balance ?? walletInfo.wallet?.balance ?? 0;
+            const walletCode = walletInfo.wallet_code || walletInfo.wallet?.wallet_code || 'Carteira não localizada';
+            const totalBlocks = blocksData?.statistics?.total_blocks ?? blocksData?.blocks?.length ?? 0;
+
+            if (balanceLabel) {
+                const numericBalance = Number(balanceValue) || 0;
+                balanceLabel.textContent = numericBalance.toLocaleString('pt-BR');
+            }
+            if (codeLabel) {
+                codeLabel.textContent = walletCode;
+            }
+            if (totalBlocksLabel) {
+                totalBlocksLabel.textContent = (Number(totalBlocks) || 0).toLocaleString('pt-BR');
+            }
+            if (updatedLabel) {
+                updatedLabel.textContent = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date());
+            }
+            if (copyButton) {
+                const usableCode = walletCode && walletCode !== 'Carteira não localizada';
+                copyButton.disabled = !usableCode;
+            }
+        }
+
+        function renderTransactions(transactions) {
+            walletTransactionsCache = Array.isArray(transactions) ? transactions.slice() : [];
+            const container = document.getElementById('walletTransactionsContent');
+            const statementButton = document.getElementById('walletStatementButton');
+
+            if (statementButton) {
+                statementButton.disabled = walletTransactionsCache.length === 0;
+            }
+
+            if (!container) {
+                return;
+            }
+
+            container.className = 'wallet-note';
+
+            if (walletTransactionsCache.length === 0) {
+                container.textContent = 'Nenhuma transação registrada até o momento.';
+                return;
+            }
+
+            const lastTransaction = walletTransactionsCache[0];
+            const timestamp = lastTransaction && lastTransaction.created_at ? new Date(lastTransaction.created_at) : null;
+            const formattedDate = timestamp && !Number.isNaN(timestamp.getTime())
+                ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(timestamp)
+                : '--';
+            const countLabel = walletTransactionsCache.length.toString().padStart(2, '0');
+
+            container.textContent = `Extrato sincronizado com ${countLabel} movimentações recentes. Última atualização: ${formattedDate}.`;
+        }
+
+        function handleStatementDownload() {
+            if (!walletTransactionsCache.length) {
+                walletShowToast('Nenhuma movimentação disponível para exportação.', 'error');
+                return;
+            }
+
+            const now = new Date();
+            const generatedAt = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(now);
+            const currentUsername = walletResolveHandle().replace('@', '') || 'usuario';
+            const normalizedUsername = currentUsername.replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'syra';
+            const header = [
+                'Extrato oficial Syra Wallet',
+                `Usuário: ${currentUsername}`,
+                `Gerado em: ${generatedAt}`,
+                '',
+            ].join('\n');
+
+            const currentHandle = currentUsername.toLowerCase();
+            const lines = walletTransactionsCache.map((transaction, index) => {
+                const txTimestamp = transaction.created_at ? new Date(transaction.created_at) : null;
+                const dateLabel = txTimestamp && !Number.isNaN(txTimestamp.getTime())
+                    ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(txTimestamp)
+                    : '--';
+                const fromUser = transaction.from_username || '--';
+                const toUser = transaction.to_username || '--';
+                const isIncoming = toUser.toLowerCase() === currentHandle;
+                const direction = isIncoming ? 'Recebido' : 'Enviado';
+                const description = transaction.description ? ` | descrição: ${transaction.description}` : '';
+                const type = transaction.transaction_type ? ` | tipo: ${transaction.transaction_type}` : '';
+                return `${index + 1}. ${dateLabel} | ${direction} | de ${fromUser} para ${toUser} | valor: ${transaction.amount}${type}${description}`;
+            });
+
+            const content = `${header}${lines.join('\n')}${lines.length ? '\n' : ''}`;
+            const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `extrato_syra_${normalizedUsername}.txt`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 400);
+            walletShowToast('Extrato exportado com sucesso. Verifique seus downloads.');
+        }
+
+        function renderMinedBlocks(blocks) {
+            const container = document.getElementById('walletBlocksContent');
+            if (!container) {
+                return;
+            }
+            if (!Array.isArray(blocks) || blocks.length === 0) {
+                container.className = 'wallet-empty';
+                container.textContent = 'Nenhum bloco minerado por enquanto.';
+                return;
+            }
+
+            const items = blocks
+                .slice(0, 10)
+                .map((block, index) => {
+                    const timestamp = block.validated_at ? new Date(block.validated_at) : null;
+                    const formattedDate = timestamp && !Number.isNaN(timestamp.getTime())
+                        ? new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(timestamp)
+                        : '--';
+                    const blockIndexLabel = block.block_index ? `#${block.block_index}` : `#${index + 1}`;
+                    const syraCount = Number(block.syra_count ?? 0);
+                    const safeHash = walletEscapeHtml(block.block_hash || '--');
+                    const hashLength = (block.block_hash || '').length;
+                    const qrPayload = `SyraBlock|hash:${block.block_hash || ''}|tokens:${syraCount}|validated:${formattedDate}`;
+                    const extraTag = hashLength ? `<span class="wallet-block-tag">${hashLength} caracteres</span>` : '';
+                    return `
+                        <article class="wallet-block-card">
+                            <div class="wallet-block-header">
+                                <span class="wallet-block-index">${blockIndexLabel}</span>
+                                <span class="wallet-block-date">${formattedDate}</span>
+                            </div>
+                            <p class="wallet-block-hash">${safeHash}</p>
+                            <div class="wallet-block-meta">
+                                <span class="wallet-block-tag">$YRA ${syraCount}</span>
+                                ${extraTag}
+                            </div>
+                            <button class="wallet-block-qr-button" data-qr="${encodeURIComponent(qrPayload)}" type="button">Ver QR Code</button>
+                            <div class="wallet-block-qr hidden">
+                                <img alt="QR code do bloco" loading="lazy" />
+                                <button class="wallet-block-qr-close" type="button">Fechar</button>
+                            </div>
+                        </article>
+                    `;
+                })
+                .join('');
+
+            container.className = '';
+            container.innerHTML = `<div class="wallet-blocks-grid">${items}</div>`;
+            attachBlockHandlers(container);
+        }
+
+        async function loadWalletOverview() {
+            const userHandleLabel = document.getElementById('walletUserHandle');
+            if (userHandleLabel) {
+                userHandleLabel.textContent = walletResolveHandle();
+            }
+            try {
+                let tokensData = null;
+                let tokensError = null;
+                if (!walletTokensEndpointUnavailable) {
+                    try {
+                        tokensData = await walletRequest('/me/wallet/tokens');
+                    } catch (error) {
+                        tokensError = error;
+                        if (!error.status || error.status >= 500) {
+                            walletTokensEndpointUnavailable = true;
+                        }
+                    }
+                }
+
+                if (tokensData) {
+                    renderSummary(tokensData.wallet, {
+                        blocks: tokensData.mined_blocks || [],
+                        statistics: { total_blocks: tokensData.total_blocks ?? (tokensData.mined_blocks || []).length }
+                    });
+                    renderTransactions(tokensData.recent_transactions || []);
+                    renderMinedBlocks(tokensData.mined_blocks || []);
+                    toggleNoWallet(!(tokensData.wallet && tokensData.wallet.wallet_code));
+                    walletTokensEndpointUnavailable = false;
+                    walletShowToast('Carteira sincronizada com sucesso.');
+                    return;
+                }
+
+                if (tokensError) {
+                    console.error(tokensError);
+                    if (tokensError.status === 404 || (tokensError.message && tokensError.message.toLowerCase().includes('carteira'))) {
+                        renderSummary(null, null);
+                        renderTransactions([]);
+                        renderMinedBlocks([]);
+                        toggleNoWallet(true);
+                        walletShowToast('Crie sua carteira para começar.', 'error');
+                        return;
+                    }
+                    if (tokensError.status === 401) {
+                        walletShowToast('Sessão expirada. Redirecionando...', 'error');
+                        setTimeout(() => {
+                            window.location.href = '../SyraID.html';
+                        }, 800);
+                        return;
+                    }
+                }
+
+                const walletInfo = await walletRequest('/wallet/info');
+                let blocksData = null;
+                try {
+                    blocksData = await walletRequest('/me/blocks');
+                } catch (blocksError) {
+                    console.error('Falha ao carregar blocos minerados.', blocksError);
+                }
+
+                renderSummary(walletInfo, blocksData);
+                renderTransactions(walletInfo?.recent_transactions || []);
+                renderMinedBlocks(blocksData?.blocks || []);
+                toggleNoWallet(!(walletInfo && (walletInfo.wallet_code || walletInfo.wallet?.wallet_code)));
+                walletShowToast('Carteira sincronizada com sucesso.');
+            } catch (error) {
+                console.error(error);
+                if (error.status === 401) {
+                    walletShowToast('Sessão expirada. Redirecionando...', 'error');
+                    setTimeout(() => {
+                        window.location.href = '../SyraID.html';
+                    }, 800);
+                    return;
+                }
+                if (error.status === 404 || (error.message && error.message.toLowerCase().includes('carteira'))) {
+                    renderSummary(null, null);
+                    renderTransactions([]);
+                    renderMinedBlocks([]);
+                    toggleNoWallet(true);
+                    walletShowToast('Crie sua carteira para começar.', 'error');
+                    return;
+                }
+                walletShowToast(error.message || 'Erro ao carregar a carteira.', 'error');
+            }
+        }
+
+        async function handleCreateWallet() {
+            const button = document.getElementById('walletCreateButton');
+            if (!button) {
+                return;
+            }
+            button.disabled = true;
+            button.textContent = 'Gerando carteira...';
+            try {
+                const data = await walletRequest('/wallet/create', { method: 'POST' });
+                const successMessage = data.message || 'Carteira criada com sucesso.';
+                if (data.security_code) {
+                    showSecurityAlert(data.security_code);
+                    walletShowToast(`${successMessage} Código destacado acima.`);
+                } else {
+                    walletShowToast(successMessage);
+                }
+                await loadWalletOverview();
+            } catch (error) {
+                walletShowToast(error.message || 'Não foi possível criar a carteira.', 'error');
+            } finally {
+                button.disabled = false;
+                button.textContent = 'Criar minha carteira agora';
+            }
+        }
+
+        async function handleTransfer(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const body = {
+                to_username: form.transferTo.value.trim(),
+                amount: Number.parseInt(form.transferAmount.value, 10),
+                security_code: form.transferSecurity.value.trim(),
+                description: form.transferDescription.value.trim() || undefined
+            };
+
+            if (!body.to_username || Number.isNaN(body.amount) || body.amount <= 0 || !body.security_code) {
+                walletShowToast('Preencha os dados da transferência corretamente.', 'error');
+                return;
+            }
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Enviando...';
+
+            try {
+                const data = await walletRequest('/wallet/transfer', {
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
+                walletShowToast(data.message || 'Transferência realizada.');
+                form.reset();
+                await loadWalletOverview();
+            } catch (error) {
+                walletShowToast(error.message || 'Não foi possível concluir a transferência.', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Confirmar transferência';
+            }
+        }
+
+        async function handleBlockSubmission(event) {
+            event.preventDefault();
+            const form = event.currentTarget;
+            const submitButton = form.querySelector('button[type="submit"]');
+            const blockIndex = Number.parseInt(form.blockIndex.value, 10);
+            const blockDate = form.blockDate.value;
+            const blockHash = form.blockHash.value.trim();
+
+            if (!blockIndex || blockIndex <= 0) {
+                walletShowToast('Informe um número de bloco válido.', 'error');
+                return;
+            }
+
+            if (!blockDate) {
+                walletShowToast('Selecione a data em que o bloco foi validado.', 'error');
+                return;
+            }
+
+            if (!blockHash) {
+                walletShowToast('Informe o hash completo do bloco.', 'error');
+                return;
+            }
+
+            const containsSyra = blockHash.includes('Syra');
+
+            if (!containsSyra) {
+                walletShowToast('O hash precisa conter "Syra" para ser aceito.', 'error');
+                return;
+            }
+
+            const hashParts = walletCollectHashParts(form, blockHash);
+            if (hashParts.length !== 4 || hashParts.some((part) => !part)) {
+                walletShowToast('Divida o hash em quatro partes válidas.', 'error');
+                return;
+            }
+
+            const [year, month, day] = blockDate.split('-');
+            if (!year || !month || !day) {
+                walletShowToast('Data inválida.', 'error');
+                return;
+            }
+
+            const payload = {
+                index: blockIndex,
+                hash: blockHash,
+                hash_parts: hashParts,
+                date: `${day}/${month}/${year}`,
+                contains_syra: containsSyra
+            };
+
+            submitButton.disabled = true;
+            submitButton.textContent = 'Validando...';
+
+            try {
+                const response = await walletRequest('/blocks/validate', {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                walletShowToast(response.message || 'Bloco validado com sucesso!');
+                form.reset();
+                walletFillHashPartInputs(['', '', '', '']);
+                await loadWalletOverview();
+            } catch (error) {
+                walletShowToast(error.message || 'Não foi possível validar o bloco.', 'error');
+            } finally {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Adicionar bloco';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const token = localStorage.getItem(WALLET_STORAGE_KEYS.token);
+            if (!token) {
+                walletShowToast('Sessão não encontrada. Redirecionando...', 'error');
+                setTimeout(() => {
+                    window.location.href = '../SyraID.html';
+                }, 700);
+                return;
+            }
+
+            const reloadButton = document.getElementById('walletReload');
+            const backButton = document.getElementById('walletBack');
+            const createButton = document.getElementById('walletCreateButton');
+            const transferForm = document.getElementById('walletTransferForm');
+            const copyButton = document.getElementById('walletCopyButton');
+            const statementButton = document.getElementById('walletStatementButton');
+            const blockForm = document.getElementById('walletBlockForm');
+            const blockHashInput = document.getElementById('walletBlockHash');
+
+            if (reloadButton) {
+                reloadButton.addEventListener('click', () => {
+                    reloadButton.disabled = true;
+                    reloadButton.textContent = 'Atualizando...';
+                    loadWalletOverview().finally(() => {
+                        reloadButton.disabled = false;
+                        reloadButton.textContent = 'Atualizar';
+                    });
+                });
+            }
+
+            if (backButton) {
+                backButton.addEventListener('click', () => {
+                    window.location.href = '../syradash.html';
+                });
+            }
+
+            if (createButton) {
+                createButton.addEventListener('click', handleCreateWallet);
+            }
+
+            if (transferForm) {
+                transferForm.addEventListener('submit', handleTransfer);
+            }
+
+            if (copyButton) {
+                copyButton.addEventListener('click', async () => {
+                    if (copyButton.disabled) {
+                        return;
+                    }
+                    const codeElement = document.getElementById('walletSummaryCode');
+                    const code = codeElement ? codeElement.textContent.trim() : '';
+                    if (!code || code === 'Carteira não localizada') {
+                        walletShowToast('Nenhum código disponível para copiar.', 'error');
+                        return;
+                    }
+                    try {
+                        await navigator.clipboard.writeText(code);
+                        walletShowToast('Código copiado para a área de transferência.');
+                    } catch (clipError) {
+                        try {
+                            const tempInput = document.createElement('textarea');
+                            tempInput.value = code;
+                            tempInput.setAttribute('readonly', '');
+                            tempInput.style.position = 'absolute';
+                            tempInput.style.left = '-9999px';
+                            document.body.appendChild(tempInput);
+                            tempInput.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(tempInput);
+                            walletShowToast('Código copiado para a área de transferência.');
+                        } catch (fallbackError) {
+                            walletShowToast('Não foi possível copiar o código automaticamente.', 'error');
+                        }
+                    }
+                });
+            }
+
+            if (statementButton) {
+                statementButton.addEventListener('click', handleStatementDownload);
+            }
+
+            if (blockForm) {
+                blockForm.addEventListener('submit', handleBlockSubmission);
+            }
+
+            if (blockHashInput) {
+                ['blur', 'change'].forEach((eventName) => {
+                    blockHashInput.addEventListener(eventName, walletPrefillHashParts);
+                });
+            }
+
+            loadWalletOverview();
+        });
+    </script>
+</body>
+</html>
