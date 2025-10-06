@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SyraCore • Cadastro & Identidade</title>
+    <link rel="stylesheet" href="../style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            background: #ffffff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding: 80px 20px 40px;
+        }
+
+        .form-container {
+            max-width: 700px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            border: 1px solid #e5e7eb;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .form-title {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-subtitle {
+            color: #333333;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #000000;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-input,
+        .form-textarea {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: #ffffff;
+            color: #374151;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #000000;
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.9rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .btn-primary {
+            background: #000000;
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            background: #1f2937;
+        }
+
+        .btn-secondary {
+            background: #ffffff;
+            color: #000000;
+            border: 1px solid #d1d5db;
+        }
+
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #000000;
+        }
+
+        .preview-section {
+            margin-top: 2.5rem;
+            padding: 2rem;
+            background: #f9fafb;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .preview-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .business-card {
+            width: 350px;
+            height: 200px;
+            background: #ffffff;
+            border: 3px solid #000000;
+            border-radius: 16px;
+            padding: 1.5rem;
+            color: #000000;
+            margin: 0 auto 1rem;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header {
+            position: relative;
+            z-index: 2;
+        }
+
+        .card-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .card-syra-user {
+            font-size: 0.9rem;
+            opacity: 0.7;
+            margin-bottom: 0.8rem;
+        }
+
+        .card-position {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .card-sector {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            margin-bottom: 1rem;
+        }
+
+        .card-contact {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .card-back-logo {
+            font-size: 2.8rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            letter-spacing: 3px;
+        }
+
+        .card-back-main {
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .card-back-team {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+        }
+
+        .card-back-subtitle {
+            font-size: 0.75rem;
+            opacity: 0.6;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .form-note {
+            background: #f8fafc;
+            border-left: 4px solid #000000;
+            padding: 1rem 1.2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .business-card {
+                width: 100%;
+                max-width: 350px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <div class="overlay" onclick="closeMenu()"></div>
+
+    <nav class="sidebar">
+        <a href="../index.html" class="menu-item">Início</a>
+        <a href="../syrax.html" class="menu-item">SyraX</a>
+        <a href="../lunagpt.html" class="menu-item">LunaGPT</a>
+        <a href="../sobre.html" class="menu-item">Sobre</a>
+        <a href="../contato.html" class="menu-item">Contato</a>
+        <a href="../colabs/colabs.html" class="menu-item">Colabs</a>
+        <div class="menu-footer">
+            Desenvolvido pela @SyraDevOps
+        </div>
+    </nav>
+
+    <main class="form-container">
+        <header class="form-header">
+            <h1 class="form-title">SyraCore</h1>
+            <p class="form-subtitle">Cadastro & Identidade • Gere seu formulário PDF, cartão de visita e documento de cadastro</p>
+        </header>
+
+        <div class="form-note">
+            <strong>Instruções:</strong> Preencha os dados abaixo para gerar automaticamente seu formulário de cadastro em PDF e cartão de visita digital. Todos os campos são obrigatórios.
+        </div>
+
+        <form id="cadastroForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="nome">Nome Completo</label>
+                    <input type="text" id="nome" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="email">E-mail</label>
+                    <input type="email" id="email" class="form-input" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="userSyra">Usuário Syra</label>
+                    <input type="text" id="userSyra" class="form-input" placeholder="@usuario" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="telefone">Telefone</label>
+                    <input type="tel" id="telefone" class="form-input" placeholder="(11) 99999-9999" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label" for="cargo">Cargo</label>
+                    <input type="text" id="cargo" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="setor">Setor</label>
+                    <input type="text" id="setor" class="form-input" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="descricaoCargo">Descrição do Cargo</label>
+                <textarea id="descricaoCargo" class="form-textarea" rows="3" placeholder="Descreva suas principais responsabilidades e atividades..." required></textarea>
+            </div>
+
+            <div class="action-buttons">
+                <button type="button" class="btn btn-primary" onclick="gerarPDF()">Gerar PDF</button>
+                <button type="button" class="btn btn-secondary" onclick="atualizarPreview()">Visualizar</button>
+            </div>
+        </form>
+
+        <div class="preview-section" id="previewSection" style="display: none;">
+            <h3 class="preview-title">Prévia do Cartão de Visita</h3>
+            <div style="text-align: center; margin-bottom: 1rem; font-weight: 600; color: #000000;">FRENTE</div>
+            <div class="business-card" id="businessCard">
+                <div class="card-header">
+                    <div class="card-name" id="cardNome">Nome Completo</div>
+                    <div class="card-syra-user" id="cardUserSyra">@usuario</div>
+                    <div class="card-position" id="cardCargo">Cargo</div>
+                    <div class="card-sector" id="cardSetor">Setor</div>
+                    <div class="card-contact" id="cardContato">contato@email.com • (11) 99999-9999</div>
+                </div>
+            </div>
+            <div style="text-align: center; margin-bottom: 1rem; font-weight: 600; color: #000000;">VERSO</div>
+            <div class="business-card-back">
+                <div class="card-back-logo">SYRA</div>
+                <div class="card-back-main">@SyraDevOps</div>
+                <div class="card-back-team">@SyraTeam</div>
+                <div class="card-back-subtitle">Inovação • Tecnologia • Futuro</div>
+            </div>
+        </div>
+    </main>
+
+    <script src="../script.js"></script>
+    <script>
+        function atualizarPreview() {
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const userSyra = document.getElementById('userSyra').value;
+            const telefone = document.getElementById('telefone').value;
+            const cargo = document.getElementById('cargo').value;
+            const setor = document.getElementById('setor').value;
+
+            if (!nome || !email || !userSyra || !telefone || !cargo || !setor) {
+                alert('⚠️ Preencha todos os campos para visualizar o cartão.');
+                return;
+            }
+
+            document.getElementById('cardNome').textContent = nome;
+            document.getElementById('cardUserSyra').textContent = userSyra;
+            document.getElementById('cardCargo').textContent = cargo;
+            document.getElementById('cardSetor').textContent = setor;
+            document.getElementById('cardContato').textContent = `${email} • ${telefone}`;
+
+            document.getElementById('previewSection').style.display = 'block';
+        }
+
+        function gerarPDF() {
+            const { jsPDF } = window.jspdf;
+            
+            const nome = document.getElementById('nome').value;
+            const email = document.getElementById('email').value;
+            const userSyra = document.getElementById('userSyra').value;
+            const telefone = document.getElementById('telefone').value;
+            const cargo = document.getElementById('cargo').value;
+            const setor = document.getElementById('setor').value;
+            const descricaoCargo = document.getElementById('descricaoCargo').value;
+
+            if (!nome || !email || !userSyra || !telefone || !cargo || !setor || !descricaoCargo) {
+                alert('⚠️ Preencha todos os campos antes de gerar o PDF.');
+                return;
+            }
+
+            const pdf = new jsPDF();
+            
+            // Cabeçalho
+            pdf.setFontSize(24);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text('SyraCore - Formulário de Cadastro', 20, 30);
+            
+            pdf.setFontSize(12);
+            pdf.setTextColor(64, 64, 64);
+            pdf.text('Documento de Identidade Corporativa', 20, 40);
+            
+            // Linha separadora
+            pdf.setDrawColor(0, 0, 0);
+            pdf.line(20, 50, 190, 50);
+            
+            // Dados pessoais
+            pdf.setFontSize(14);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text('DADOS PESSOAIS', 20, 65);
+            
+            pdf.setFontSize(11);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(`Nome Completo: ${nome}`, 20, 80);
+            pdf.text(`E-mail: ${email}`, 20, 90);
+            pdf.text(`Usuário Syra: ${userSyra}`, 20, 100);
+            pdf.text(`Telefone: ${telefone}`, 20, 110);
+            
+            // Dados profissionais
+            pdf.setFontSize(14);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text('DADOS PROFISSIONAIS', 20, 130);
+            
+            pdf.setFontSize(11);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(`Cargo: ${cargo}`, 20, 145);
+            pdf.text(`Setor: ${setor}`, 20, 155);
+            
+            // Descrição do cargo
+            pdf.setFontSize(14);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text('DESCRIÇÃO DO CARGO', 20, 175);
+            
+            pdf.setFontSize(11);
+            pdf.setTextColor(0, 0, 0);
+            const splitDescription = pdf.splitTextToSize(descricaoCargo, 170);
+            pdf.text(splitDescription, 20, 190);
+            
+            // Rodapé
+            const dataAtual = new Date().toLocaleDateString('pt-BR');
+            pdf.setFontSize(10);
+            pdf.setTextColor(64, 64, 64);
+            pdf.text(`Gerado em: ${dataAtual}`, 20, 270);
+            pdf.text('SyraDevOps © 2025 - Todos os direitos reservados', 20, 280);
+            
+            // Nova página para o cartão de visita
+            pdf.addPage();
+            
+            // Título da segunda página
+            pdf.setFontSize(20);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text('Cartão de Visita Digital - Frente e Verso', 20, 30);
+            
+            // Cartão de visita FRENTE
+            pdf.setFontSize(12);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text('FRENTE:', 20, 50);
+            
+            pdf.setDrawColor(0, 0, 0);
+            pdf.setFillColor(255, 255, 255);
+            pdf.rect(20, 60, 170, 80, 'FD');
+            
+            pdf.setFontSize(16);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text(nome, 30, 80);
+            
+            pdf.setFontSize(12);
+            pdf.text(userSyra, 30, 90);
+            
+            pdf.setFontSize(14);
+            pdf.text(cargo, 30, 105);
+            
+            pdf.setFontSize(10);
+            pdf.text(setor, 30, 115);
+            
+            pdf.setFontSize(9);
+            pdf.text(`${email} • ${telefone}`, 30, 130);
+            
+            // Cartão de visita VERSO
+            pdf.setFontSize(12);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text('VERSO:', 20, 160);
+            
+            pdf.setDrawColor(0, 0, 0);
+            pdf.setFillColor(0, 0, 0);
+            pdf.rect(20, 170, 170, 80, 'FD');
+            
+            pdf.setFontSize(24);
+            pdf.setTextColor(255, 255, 255);
+            pdf.text('SYRA', 85, 195);
+            
+            pdf.setFontSize(14);
+            pdf.text('@SyraDevOps', 75, 210);
+            
+            pdf.setFontSize(12);
+            pdf.text('@SyraTeam', 80, 225);
+            
+            pdf.setFontSize(10);
+            pdf.text('Inovação • Tecnologia • Futuro', 70, 240);
+            
+            // QR Code no verso (simulado)
+            pdf.setDrawColor(255, 255, 255);
+            pdf.setFillColor(255, 255, 255);
+            pdf.rect(150, 180, 30, 30, 'FD');
+            pdf.setFontSize(8);
+            pdf.setTextColor(0, 0, 0);
+            pdf.text('QR ID', 160, 198);
+            
+            // Salvar PDF
+            const nomeArquivo = `syracore_cadastro_${nome.toLowerCase().replace(/\s+/g, '_')}.pdf`;
+            pdf.save(nomeArquivo);
+            
+            alert('✅ PDF gerado com sucesso! Verifique seus downloads.');
+        }
+
+        // Auto-completar @ no campo usuário Syra
+        document.getElementById('userSyra').addEventListener('input', function(e) {
+            if (!e.target.value.startsWith('@') && e.target.value.length > 0) {
+                e.target.value = '@' + e.target.value;
+            }
+        });
+
+        // Máscara para telefone
+        document.getElementById('telefone').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 11) {
+                value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+            } else if (value.length >= 7) {
+                value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+            } else if (value.length >= 3) {
+                value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+            }
+            e.target.value = value;
+        });
+
+        // Gerar QR Code inicial
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(gerarQRCode, 500);
+        });
+    </script>
+</body>
+</html>
