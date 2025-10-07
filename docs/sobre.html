@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre - SyraDevOps</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .social-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .social-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .social-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.7rem 1.5rem;
+            background-color: #000;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid #000;
+        }
+        
+        .social-link:hover {
+            background-color: #fff;
+            color: #000;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .social-card .feature-description {
+            margin-bottom: 0.5rem;
+            min-height: 3rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .institutional-docs {
+            margin: 3.5rem 0 2.5rem;
+            padding: 2.5rem 3rem;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02));
+            border-radius: 28px;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 18px 45px rgba(0, 0, 0, 0.08);
+        }
+
+        .institutional-docs h2 {
+            margin-bottom: 1rem;
+        }
+
+        .institutional-docs p {
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .docs-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.85rem 1.75rem;
+            border-radius: 999px;
+            background: #000;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            letter-spacing: 0.04em;
+            transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+        }
+
+        .docs-link:hover,
+        .docs-link:focus-visible {
+            background: #111827;
+            box-shadow: 0 12px 28px rgba(17, 24, 39, 0.25);
+            transform: translateY(-3px);
+        }
+        
+        /* Responsividade para cards sociais */
+        @media (max-width: 768px) {
+            .social-link {
+                font-size: 0.9rem;
+                padding: 0.6rem 1.2rem;
+            }
+
+            .institutional-docs {
+                padding: 2rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .social-link {
+                font-size: 0.8rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .institutional-docs {
+                padding: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Ícone hambúrguer -->
+    <div class="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
+
+    <!-- Overlay -->
+    <div class="overlay" onclick="closeMenu()"></div>
+
+    <!-- Menu lateral -->
+    <nav class="sidebar">
+        <a href="index.html" class="menu-item">Início</a>
+            <a href="syrax.html" class="menu-item">SyraX</a>
+            <a href="lunagpt.html" class="menu-item">LunaGPT</a>
+            <a href="sobre.html" class="menu-item">Sobre</a>
+            <a href="contato.html" class="menu-item">Contato</a>
+            <a href="colabs/colabs.html" class="menu-item">Colabs</a>
+            <div class="menu-footer">
+                Desenvolvido pela @SyraDevOps
+            </div>
+    </nav>
+
+    <div class="page-container">
+        <h1 class="page-title">Tecnologia com Propósito, Raízes no Futuro</h1>
+        
+        <div class="page-content">
+            <p>Nascida no coração histórico de Minas Gerais, um lugar onde o passado e o futuro se encontram, a SyraDevOps surge como uma força inovadora com uma missão clara: desenvolver tecnologia que sirva à humanidade. Somos mais do que uma empresa de software; somos arquitetos de soluções, catalisadores de cultura e parceiros da comunidade, comprometidos em criar um impacto positivo e duradouro.</p>
+        </div>
+
+        <h2 class="page-subtitle">Nossa Filosofia</h2>
+        <div class="page-content">
+            <p>Nossa filosofia é simples: <strong>a tecnologia deve ter um propósito</strong>. Em um mundo cada vez mais digital, focamos na conexão humana, construindo ferramentas que não apenas resolvem problemas complexos, mas que também empoderam pessoas e impulsionam negócios. Essa crença nos guia em cada projeto, desde a criação de websites que funcionam como portais digitais para a cultura local, até o desenvolvimento de ferramentas customizadas e serviços totalmente automatizados que liberam o potencial criativo de nossos parceiros.</p>
+        </div>
+
+        <h2 class="page-subtitle">Nossa Expertise</h2>
+        <div class="page-content">
+            <p>Nossa expertise é vasta e profunda, navegando com fluidez entre as fronteiras da ciência de dados e do machine learning. Transformamos dados brutos em insights estratégicos e construímos sistemas inteligentes que aprendem, adaptam-se e evoluem, oferecendo uma vantagem competitiva real e sustentável.</p>
+        </div>
+
+        <h2 class="page-subtitle">O Nascimento da Luna</h2>
+        <div class="page-content">
+            <p>Apenas um mês após nossa fundação em janeiro de 2025, um marco definiu nossa trajetória e personificou nossa alma inovadora. Em <strong>12 de fevereiro de 2025</strong>, demos vida à Luna. Mais do que nosso principal modelo de inteligência artificial, Luna é o símbolo da nossa busca incansável pela excelência técnica e pela inovação com propósito. Ela representa a fusão harmoniosa entre a lógica do código e a intuição da criatividade, sendo a peça central de muitas de nossas soluções mais avançadas.</p>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3 class="feature-title">Ciência de Dados</h3>
+                <p class="feature-description">Transformamos dados brutos em insights estratégicos, revelando padrões e oportunidades ocultas nos seus dados.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3 class="feature-title">Machine Learning</h3>
+                <p class="feature-description">Sistemas inteligentes que aprendem, adaptam-se e evoluem, oferecendo vantagem competitiva sustentável.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3 class="feature-title">Automação Inteligente</h3>
+                <p class="feature-description">Serviços totalmente automatizados que liberam o potencial criativo e otimizam processos complexos.</p>
+            </div>
+            
+            <div class="feature-card">
+                <h3 class="feature-title">Portais Culturais</h3>
+                <p class="feature-description">Websites que funcionam como portais digitais, conectando tecnologia moderna com cultura local.</p>
+            </div>
+        </div>
+
+        <h2 class="page-subtitle">Nossa Visão de Futuro</h2>
+        <div class="page-content">
+            <p>Guiada por um núcleo fundador comprometido com a perenidade de seus valores, a SyraDevOps foi estruturada para ser mais do que um negócio: <strong>uma instituição</strong>. Essa governança de longo prazo nos permite investir na comunidade, apoiar iniciativas culturais e ousar em projetos que outros considerariam arriscados, sempre com o olhar no horizonte.</p>
+            <p>Acreditamos que, ao fortalecer nossas raízes, ganhamos mais força para alcançar uma visão global. A SyraDevOps é a ponte entre a tradição e a vanguarda, entre a necessidade local e a solução tecnológica global.</p>
+        </div>
+
+        <div class="contact-info">
+            <h3 style="color: #000; margin-bottom: 1rem;">Construindo o Futuro</h3>
+            <p>Estamos aqui para ouvir, para entender e para construir. Estamos construindo o futuro, uma linha de código e uma conexão humana de cada vez. A SyraDevOps não é apenas tecnologia - é tecnologia com propósito, enraizada no presente e voltada para o futuro.</p>
+        </div>
+
+        <section class="institutional-docs">
+            <h2 class="page-subtitle">Governança com Transparência</h2>
+            <p>Nosso compromisso com a perenidade e com a comunidade também vive nos documentos que norteiam nossas decisões. Conheça a base institucional que sustenta a SyraDevOps e explore nossos estatutos, regimentos e políticas em um só lugar.</p>
+            <a class="docs-link" href="documentos.html">Acessar Carta Institucional</a>
+        </section>
+
+        <h2 class="page-subtitle">Conecte-se Conosco</h2>
+        
+        <div class="feature-grid">
+            <div class="feature-card social-card">
+                <h3 class="feature-title">Instagram</h3>
+                <p class="feature-description">Acompanhe nossos projetos e bastidores do desenvolvimento.</p>
+                <a href="https://instagram.com/syradevops" target="_blank" class="social-link">@SyraDevOps</a>
+            </div>
+            
+            <div class="feature-card social-card">
+                <h3 class="feature-title">X (Twitter)</h3>
+                <p class="feature-description">Novidades em tecnologia e atualizações dos nossos projetos.</p>
+                <a href="https://x.com/syradevops" target="_blank" class="social-link">@SyraDevOps</a>
+            </div>
+            
+            <div class="feature-card social-card">
+                <h3 class="feature-title">GitHub</h3>
+                <p class="feature-description">Explore nossos repositórios open source e contribuições.</p>
+                <a href="https://github.com/syradevops" target="_blank" class="social-link">@SyraDevOps</a>
+            </div>
+            
+            <div class="feature-card social-card">
+                <h3 class="feature-title">LinkedIn</h3>
+                <p class="feature-description">Conecte-se conosco profissionalmente e veja nossas atualizações corporativas.</p>
+                <a href="https://www.linkedin.com/company/syracit/posts/?feedView=all" target="_blank" class="social-link">SyraCit Company</a>
+            </div>
+            
+            <div class="feature-card social-card">
+                <h3 class="feature-title">YouTube</h3>
+                <p class="feature-description">Tutoriais, palestras e demonstrações dos nossos produtos.</p>
+                <a href="https://www.youtube.com/@SyRaDevOps" target="_blank" class="social-link">@SyRaDevOps</a>
+            </div>
+            
+            <div class="feature-card social-card">
+                <h3 class="feature-title">Twitch</h3>
+                <p class="feature-description">Lives de desenvolvimento, coding sessions e talks sobre tecnologia.</p>
+                <a href="https://www.twitch.tv/syradevops" target="_blank" class="social-link">@syradevops</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
