@@ -556,11 +556,13 @@
 			let after = null;
 			while (results.reddit.length < maxResults) {
 				const res = await searchReddit(query, after);
+				console.log('Reddit search results:', res); // Debug
 				if (res.results.length === 0) break;
 				results.reddit = results.reddit.concat(res.results);
 				after = res.after;
 				if (res.results.length < 4) break;
 			}
+			console.log('Total Reddit results loaded:', results.reddit.length); // Debug
 
 			// Load DuckDuckGo once
 			const duckRes = await searchDuckDuckGo(query, 0);
@@ -614,7 +616,34 @@
 				html += '</div></div>';
 			}
 
-			// Paginated results
+			// Show Reddit results separately if available
+			if (resultsByAPI && resultsByAPI.reddit && resultsByAPI.reddit.length > 0) {
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="reddit">';
+				html += '<div class="column-header">Reddit</div>';
+				resultsByAPI.reddit.slice(0, 3).forEach(result => {
+					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+					const titleText = titleMatch ? titleMatch[2] : result.title.replace(/<[^>]*>/g, '');
+					const linkUrl = titleMatch ? titleMatch[1] : '#';
+
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								${result.image ? `<img src="${result.image}" alt="${titleText}" class="result-image visible" onerror="this.style.display='none'">` : '<div class="result-image"></div>'}
+								<div class="result-text">
+									<div class="result-title">${titleText}</div>
+									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
+									<div class="result-description">${result.description.replace(/<[^>]*>/g, '')}</div>
+									<div class="result-source">${result.meta || 'Reddit'}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			// Paginated results (Wikipedia + DuckDuckGo)
 			const start = (page - 1) * pageSize;
 			const end = start + pageSize;
 			const pageResults = allResults.slice(start, end);
@@ -622,7 +651,7 @@
 			if (pageResults.length > 0) {
 				html += '<div class="results-columns">';
 				html += '<div class="api-column" data-api="results">';
-				html += '<div class="column-header">Resultados</div>';
+				html += '<div class="column-header">Outros Resultados</div>';
 				pageResults.forEach(result => {
 					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
 					const titleText = titleMatch ? titleMatch[2] : result.title.replace(/<[^>]*>/g, '');
@@ -741,24 +770,52 @@
 
 		async function searchReddit(query, after = null) {
 			try {
+				// Tentar usar API alternativa que não tenha restrições CORS
 				let url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&limit=4`;
 				if (after) url += `&after=${after}`;
-				const response = await fetch(url);
+				
+				const response = await fetch(url, {
+					method: 'GET',
+					headers: {
+						'User-Agent': 'LunaGPT/1.0'
+					}
+				});
+				
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				
 				const data = await response.json();
+
+				if (!data.data || !data.data.children) {
+					return { results: [], after: null };
+				}
 
 				const results = data.data.children.map(post => {
 					const item = post.data;
 					return {
 						title: `<a href="https://www.reddit.com${item.permalink}" target="_blank">${item.title}</a>`,
 						description: item.selftext ? item.selftext.substring(0, 200) + '...' : 'Clique para ver o conteúdo completo',
-						image: item.thumbnail && item.thumbnail !== 'self' && item.thumbnail !== 'default' ? item.thumbnail : null,
-						meta: `👍 ${item.ups} upvotes • 💬 ${item.num_comments} comentários • r/${item.subreddit}`
+						image: item.thumbnail && item.thumbnail !== 'self' && item.thumbnail !== 'default' && item.thumbnail.startsWith('http') ? item.thumbnail : null,
+						meta: `👍 ${item.ups || 0} upvotes • 💬 ${item.num_comments || 0} comentários • r/${item.subreddit}`
 					};
 				});
 
 				return { results: results, after: data.data.after };
 			} catch (error) {
-				return { results: [], after: null };
+				console.warn('Reddit API error:', error);
+				// Como fallback, criar alguns resultados simulados para demonstração
+				return {
+					results: [
+						{
+							title: `<a href="https://www.reddit.com/search/?q=${encodeURIComponent(query)}" target="_blank">Buscar "${query}" no Reddit</a>`,
+							description: 'Clique para pesquisar este termo diretamente no Reddit e ver discussões da comunidade.',
+							image: null,
+							meta: 'Reddit - Busca manual necessária devido a restrições de API'
+						}
+					],
+					after: null
+				};
 			}
 		}
 
