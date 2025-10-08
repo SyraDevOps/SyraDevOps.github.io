@@ -350,6 +350,119 @@
 			margin-bottom: 0.5rem;
 		}
 
+		.terms-sidebar {
+			position: fixed;
+			right: 20px;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 200px;
+			max-height: 400px;
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(-50%) translateX(30px);
+			transition: all 0.3s ease;
+			z-index: 1000;
+		}
+
+		.terms-sidebar.visible {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(-50%) translateX(0);
+		}
+
+		.terms-sidebar h3 {
+			color: #6b7280;
+			font-size: 0.95rem;
+			font-weight: 500;
+			margin: 0 0 1rem 0;
+			text-align: left;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		}
+
+		.terms-container {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			max-height: 350px;
+			overflow-y: auto;
+		}
+
+		.terms-container::-webkit-scrollbar {
+			display: none;
+		}
+
+		.term-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.25rem 0;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			opacity: 0;
+			animation: fadeIn 0.3s ease forwards;
+		}
+
+		.term-item:nth-child(1) { animation-delay: 0.05s; }
+		.term-item:nth-child(2) { animation-delay: 0.1s; }
+		.term-item:nth-child(3) { animation-delay: 0.15s; }
+		.term-item:nth-child(4) { animation-delay: 0.2s; }
+		.term-item:nth-child(5) { animation-delay: 0.25s; }
+		.term-item:nth-child(6) { animation-delay: 0.3s; }
+		.term-item:nth-child(7) { animation-delay: 0.35s; }
+		.term-item:nth-child(8) { animation-delay: 0.4s; }
+		.term-item:nth-child(9) { animation-delay: 0.45s; }
+		.term-item:nth-child(10) { animation-delay: 0.5s; }
+
+		@keyframes fadeIn {
+			to {
+				opacity: 1;
+			}
+		}
+
+		.term-item:hover {
+			color: #3b82f6;
+		}
+
+		.term-text {
+			color: #6b7280;
+			font-size: 0.95rem;
+			font-weight: 500;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			line-height: 1.6;
+			transition: color 0.2s ease;
+		}
+
+		.term-count {
+			color: #9ca3af;
+			font-size: 0.8rem;
+			font-weight: 400;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			transition: color 0.2s ease;
+		}
+
+		.terms-progress {
+			width: 100%;
+			height: 4px;
+			background: #f3f4f6;
+			border-radius: 2px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.terms-progress-bar {
+			height: 100%;
+			background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+			border-radius: 2px;
+			transition: width 0.3s ease;
+			width: 0%;
+		}
+
+		@media (max-width: 1024px) {
+			.terms-sidebar {
+				display: none;
+			}
+		}
+
 		@media (max-width: 640px) {
 			.search-container {
 				padding: 1rem;
@@ -398,7 +511,7 @@
 
 	<main class="search-container">
 		<div>
-			<h1 class="search-title">LunaGPT</h1>
+			<h1 class="search-title">LunaGPT Search</h1>
 			<p class="search-subtitle">Sua assistente inteligente está pronta para ajudar</p>
 		</div>
 
@@ -427,6 +540,14 @@
 		<button id="load-more-btn" onclick="loadMoreResults()" style="display:none; margin: 20px auto; padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">Carregar Mais</button>
 	</main>
 
+	<!-- Terms Sidebar -->
+	<div class="terms-sidebar" id="terms-sidebar">
+		<h3>Termos relevantes</h3>
+		<div id="terms-list">
+			<!-- Terms will be populated here -->
+		</div>
+	</div>
+
 	<script src="script.js"></script>
 	<script>
 		let searchInProgress = false;
@@ -436,9 +557,114 @@
 		let currentQuery = '';
 		let currentPage = 1;
 		let totalPages = 1;
-		let allResults = [];
 		let pageSize = 8;
 		let resultsByAPI = {};
+		let aggregatedResults = [];
+		let primaryResultsBySource = {};
+		let allResults = [];
+
+		const SECTION_SOURCES = new Set(['reddit', 'arxiv', 'nasa', 'openlibrary']);
+		const PRIMARY_RESULTS_LIMIT = 3;
+		const SOURCE_LABELS = {
+			wikipedia: 'Wikipedia',
+			reddit: 'Reddit',
+			duckduckgo: 'DuckDuckGo',
+			arxiv: 'ArXiv',
+			nasa: 'NASA',
+			meteo: 'Open Meteo',
+			dictionary: 'Dicionário',
+			openlibrary: 'Open Library'
+		};
+
+		function stripHTML(html) {
+			const div = document.createElement('div');
+			div.innerHTML = html || '';
+			return div.textContent || div.innerText || '';
+		}
+
+		function createResultKey(result) {
+			const title = stripHTML(result.title || '').toLowerCase();
+			const description = stripHTML(result.description || '').toLowerCase();
+			const linkMatch = (result.title || '').match(/href="([^"]*)"/i);
+			const link = linkMatch ? linkMatch[1] : '';
+			return `${result.source || 'unknown'}|${title}|${description}|${link}`;
+		}
+
+		function getSourceLabel(source) {
+			return SOURCE_LABELS[source] || 'Fonte';
+		}
+
+		function prepareResultsData(results) {
+			primaryResultsBySource = {};
+			aggregatedResults = [];
+
+			const sourcePriority = ['wikipedia', 'duckduckgo', 'reddit', 'arxiv', 'nasa', 'openlibrary'];
+			const pools = [];
+			const seenKeys = new Set();
+
+			sourcePriority.forEach((source) => {
+				const sourceResults = Array.isArray(results[source]) ? results[source] : [];
+				if (!sourceResults.length) return;
+
+				const hasPrimarySection = SECTION_SOURCES.has(source);
+				const primaryCount = hasPrimarySection ? PRIMARY_RESULTS_LIMIT : 0;
+				primaryResultsBySource[source] = hasPrimarySection ? sourceResults.slice(0, primaryCount) : [];
+
+				const remainder = hasPrimarySection ? sourceResults.slice(primaryCount) : sourceResults.slice();
+				if (!remainder.length) return;
+
+				pools.push({
+					source,
+					items: remainder.map(item => {
+						return {
+							...item,
+							source
+						};
+					})
+				});
+			});
+
+			let added = true;
+			while (added) {
+				added = false;
+				pools.forEach(pool => {
+					if (!pool.items.length) return;
+					const candidate = pool.items.shift();
+					const key = createResultKey(candidate);
+					if (seenKeys.has(key)) {
+						return;
+					}
+					seenKeys.add(key);
+					aggregatedResults.push(candidate);
+					added = true;
+				});
+			}
+
+			// Include any remaining items that were skipped due to duplicates
+			pools.forEach(pool => {
+				pool.items.forEach(candidate => {
+					const key = createResultKey(candidate);
+					if (!seenKeys.has(key)) {
+						seenKeys.add(key);
+						aggregatedResults.push(candidate);
+					}
+				});
+			});
+
+			allResults = []
+				.concat(results.wikipedia || [])
+				.concat(results.reddit || [])
+				.concat(results.duckduckgo || [])
+				.concat(results.arxiv || [])
+				.concat(results.nasa || [])
+				.concat(results.openlibrary || []);
+		}
+
+		// Terms analysis variables
+		let commonTerms = {};
+		let termsUpdateInterval;
+		let scrollProgress = 0;
+		let isTermsSidebarVisible = false;
 
 		document.addEventListener('DOMContentLoaded', function() {
 			const dotsElement = document.getElementById('dots');
@@ -469,7 +695,181 @@
 
 			// Configurar observer para animações de scroll
 			setupScrollObserver();
+			setupTermsAnalysis();
 		});
+
+		function setupTermsAnalysis() {
+			// Setup scroll listener for terms sidebar
+			window.addEventListener('scroll', updateTermsSidebar);
+			window.addEventListener('resize', updateTermsSidebar);
+		}
+
+		function extractTermsFromResults(results) {
+			const stopWords = new Set([
+				'de', 'da', 'do', 'das', 'dos', 'a', 'o', 'as', 'os', 'e', 'em', 'para', 'com', 'por', 'no', 'na', 'nos', 'nas',
+				'um', 'uma', 'uns', 'umas', 'que', 'se', 'não', 'mais', 'como', 'muito', 'sobre', 'após', 'entre', 'ser',
+				'ter', 'fazer', 'seu', 'sua', 'seus', 'suas', 'este', 'esta', 'estes', 'estas', 'esse', 'essa', 'esses',
+				'essas', 'aquele', 'aquela', 'aqueles', 'aquelas', 'the', 'of', 'and', 'to', 'in', 'is', 'it', 'you',
+				'that', 'he', 'was', 'for', 'on', 'are', 'as', 'with', 'his', 'they', 'i', 'at', 'be', 'this', 'have',
+				'from', 'or', 'one', 'had', 'by', 'word', 'but', 'not', 'what', 'all', 'were', 'we', 'when', 'your',
+				'can', 'said', 'there', 'each', 'which', 'she', 'do', 'how', 'their', 'if', 'will', 'up', 'other',
+				'about', 'out', 'many', 'then', 'them', 'these', 'so', 'some', 'her', 'would', 'make', 'like', 'into',
+				'him', 'time', 'has', 'two', 'more', 'go', 'no', 'way', 'could', 'my', 'than', 'first', 'been', 'call',
+				'who', 'oil', 'its', 'now', 'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'may', 'part'
+			]);
+
+			const termCounts = {};
+			const allText = results.map(result => {
+				const title = result.title.replace(/<[^>]*>/g, '');
+				const description = result.description.replace(/<[^>]*>/g, '');
+				return `${title} ${description}`.toLowerCase();
+			}).join(' ');
+
+			// Extract words (3+ characters, letters only)
+			const words = allText.match(/\b[a-záàâãäéèêëíìîïóòôõöúùûüçñ]{3,}\b/gi) || [];
+			
+			words.forEach(word => {
+				const cleanWord = word.toLowerCase().trim();
+				if (!stopWords.has(cleanWord) && cleanWord.length >= 3) {
+					termCounts[cleanWord] = (termCounts[cleanWord] || 0) + 1;
+				}
+			});
+
+			// Get top 10 most common terms
+			return Object.entries(termCounts)
+				.filter(([term, count]) => count >= 2) // Only terms that appear at least twice
+				.sort((a, b) => b[1] - a[1])
+				.slice(0, 10)
+				.map(([term, count]) => ({ term, count }));
+		}
+
+		function updateTermsSidebar() {
+			const sidebar = document.getElementById('terms-sidebar');
+			const progressBar = document.getElementById('terms-progress-bar');
+			const termsList = document.getElementById('terms-list');
+
+			if (!sidebar || !allResults.length) return;
+
+			// Calculate scroll progress
+			const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+			const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+			scrollProgress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+
+			// Show sidebar when scrolling through results
+			const resultsContainer = document.getElementById('search-results');
+			if (resultsContainer && resultsContainer.children.length > 0) {
+				const rect = resultsContainer.getBoundingClientRect();
+				const shouldShow = rect.top < window.innerHeight && rect.bottom > 0 && scrollTop > 100;
+
+				if (shouldShow && !isTermsSidebarVisible) {
+					isTermsSidebarVisible = true;
+					sidebar.classList.add('visible');
+					updateTermsContent();
+				} else if (!shouldShow && isTermsSidebarVisible) {
+					isTermsSidebarVisible = false;
+					sidebar.classList.remove('visible');
+				}
+			}
+
+			// Update progress bar
+			if (progressBar) {
+				progressBar.style.width = `${Math.min(scrollProgress, 100)}%`;
+			}
+		}
+
+		function updateTermsContent() {
+			const termsList = document.getElementById('terms-list');
+			if (!termsList || !allResults.length) return;
+
+			// Extract terms from current results
+			const terms = extractTermsFromResults(allResults);
+
+			if (terms.length === 0) {
+				termsList.innerHTML = '<div style="color: #9ca3af; font-size: 0.8rem;">Analisando...</div>';
+				return;
+			}
+
+			// Create simple terms list
+			const termsHTML = `
+				<div class="terms-container">
+					${terms.map(({ term, count }, index) => `
+						<div class="term-item" data-term="${term}">
+							<span class="term-text">${term}</span>
+							<span class="term-count">${count}</span>
+						</div>
+					`).join('')}
+				</div>
+			`;
+
+			termsList.innerHTML = termsHTML;
+
+			// Add simple click handlers
+			termsList.querySelectorAll('.term-item').forEach((item) => {
+				item.addEventListener('click', () => {
+					const term = item.dataset.term;
+					highlightTermInResults(term);
+				});
+			});
+		}
+
+		function highlightTermInResults(term) {
+			// Simple highlighting
+			const resultsContainer = document.getElementById('search-results');
+			if (!resultsContainer) return;
+
+			// Remove existing highlights
+			resultsContainer.querySelectorAll('.highlight-term').forEach(el => {
+				el.classList.remove('highlight-term');
+			});
+
+			// Add simple highlight style
+			if (!document.querySelector('#highlight-styles')) {
+				const style = document.createElement('style');
+				style.id = 'highlight-styles';
+				style.textContent = `
+					.highlight-term {
+						background: rgba(59, 130, 246, 0.15) !important;
+						border-radius: 2px !important;
+						padding: 1px 2px !important;
+						transition: all 0.3s ease !important;
+					}
+				`;
+				document.head.appendChild(style);
+			}
+
+			// Find and highlight terms
+			const searchText = term.toLowerCase();
+			const walker = document.createTreeWalker(
+				resultsContainer,
+				NodeFilter.SHOW_TEXT,
+				{
+					acceptNode: function(node) {
+						return node.textContent.toLowerCase().includes(searchText) ? 
+							NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+					}
+				},
+				false
+			);
+
+			let node;
+			let highlightedCount = 0;
+			while (node = walker.nextNode() && highlightedCount < 5) {
+				if (node.textContent.toLowerCase().includes(searchText)) {
+					const parent = node.parentElement;
+					if (parent && !parent.classList.contains('highlight-term')) {
+						parent.classList.add('highlight-term');
+						highlightedCount++;
+					}
+				}
+			}
+
+			// Remove highlight after 2 seconds
+			setTimeout(() => {
+				resultsContainer.querySelectorAll('.highlight-term').forEach(el => {
+					el.classList.remove('highlight-term');
+				});
+			}, 2000);
+		}
 
 		function setupScrollObserver() {
 			observer = new IntersectionObserver((entries) => {
@@ -511,10 +911,8 @@
 				// Load all results
 				const allResultsData = await loadAllResults(query);
 				resultsByAPI = allResultsData;
-
-				// Combine all results
-				allResults = allResultsData.wikipedia.concat(allResultsData.reddit).concat(allResultsData.duckduckgo);
-				totalPages = Math.ceil(allResults.length / pageSize);
+				prepareResultsData(resultsByAPI);
+				totalPages = aggregatedResults.length > 0 ? Math.ceil(aggregatedResults.length / pageSize) : 1;
 
 				// Display first page
 				displayResults(resultsByAPI, 1);
@@ -539,7 +937,11 @@
 				dictionary: dictionaryResults.status === 'fulfilled' ? dictionaryResults.value : [],
 				wikipedia: [],
 				reddit: [],
-				duckduckgo: []
+				duckduckgo: [],
+				arxiv: [],
+				nasa: [],
+				meteo: [],
+				openlibrary: []
 			};
 
 			// Load Wikipedia
@@ -568,16 +970,32 @@
 			const duckRes = await searchDuckDuckGo(query, 0);
 			results.duckduckgo = duckRes.results.slice(0, maxResults);
 
+			// Load ArXiv (scientific papers)
+			const arxivRes = await searchArXiv(query);
+			results.arxiv = arxivRes.results.slice(0, 10);
+
+			// Load NASA APIs
+			const nasaRes = await searchNASA(query);
+			results.nasa = nasaRes.results.slice(0, 10);
+
+			// Load Open Meteo (weather data)
+			const meteoRes = await searchOpenMeteo(query);
+			results.meteo = meteoRes.results;
+
+			// Load Open Library
+			const openLibRes = await searchOpenLibrary(query);
+			results.openlibrary = openLibRes.results.slice(0, 10);
+
 			return results;
 		}
 
 		function displayResults(resultsByAPI, page = 1) {
 			const resultsContainer = document.getElementById('search-results');
-			
-			let html = '';
 
-			// Mostrar mapa primeiro se houver resultados
-			if (resultsByAPI && resultsByAPI.maps && resultsByAPI.maps.length > 0) {
+			let html = '';
+			const showPrimarySections = page === 1;
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.maps && resultsByAPI.maps.length > 0) {
 				const mapResult = resultsByAPI.maps[0];
 				html += `
 					<div class="map-section">
@@ -594,8 +1012,7 @@
 				`;
 			}
 
-			// Dictionary if available
-			if (resultsByAPI && resultsByAPI.dictionary && resultsByAPI.dictionary.length > 0) {
+			if (showPrimarySections && resultsByAPI && resultsByAPI.dictionary && resultsByAPI.dictionary.length > 0) {
 				html += '<div class="results-columns">';
 				html += '<div class="api-column" data-api="dictionary">';
 				html += '<div class="column-header">Dicionário</div>';
@@ -607,7 +1024,7 @@
 								<div class="result-text">
 									<div class="result-title">${result.title}</div>
 									<div class="result-description">${result.description}</div>
-									<div class="result-source">Dicionário</div>
+									<div class="result-source">${getSourceLabel('dictionary')}</div>
 								</div>
 							</div>
 						</div>
@@ -616,14 +1033,14 @@
 				html += '</div></div>';
 			}
 
-			// Show Reddit results separately if available
-			if (resultsByAPI && resultsByAPI.reddit && resultsByAPI.reddit.length > 0) {
+			if (showPrimarySections && resultsByAPI && resultsByAPI.reddit && resultsByAPI.reddit.length > 0) {
+				const redditFeatured = primaryResultsBySource.reddit && primaryResultsBySource.reddit.length ? primaryResultsBySource.reddit : resultsByAPI.reddit.slice(0, PRIMARY_RESULTS_LIMIT);
 				html += '<div class="results-columns">';
 				html += '<div class="api-column" data-api="reddit">';
 				html += '<div class="column-header">Reddit</div>';
-				resultsByAPI.reddit.slice(0, 3).forEach(result => {
+				redditFeatured.forEach(result => {
 					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
-					const titleText = titleMatch ? titleMatch[2] : result.title.replace(/<[^>]*>/g, '');
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
 					const linkUrl = titleMatch ? titleMatch[1] : '#';
 
 					html += `
@@ -633,8 +1050,8 @@
 								<div class="result-text">
 									<div class="result-title">${titleText}</div>
 									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
-									<div class="result-description">${result.description.replace(/<[^>]*>/g, '')}</div>
-									<div class="result-source">${result.meta || 'Reddit'}</div>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel('reddit')}</div>
 								</div>
 							</div>
 						</div>
@@ -643,10 +1060,111 @@
 				html += '</div></div>';
 			}
 
-			// Paginated results (Wikipedia + DuckDuckGo)
+			if (showPrimarySections && resultsByAPI && resultsByAPI.arxiv && resultsByAPI.arxiv.length > 0) {
+				const arxivFeatured = primaryResultsBySource.arxiv && primaryResultsBySource.arxiv.length ? primaryResultsBySource.arxiv : resultsByAPI.arxiv.slice(0, PRIMARY_RESULTS_LIMIT);
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="arxiv">';
+				html += '<div class="column-header">ArXiv - Papers Científicos</div>';
+				arxivFeatured.forEach(result => {
+					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
+					const linkUrl = titleMatch ? titleMatch[1] : '#';
+
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								<div class="result-image"></div>
+								<div class="result-text">
+									<div class="result-title">${titleText}</div>
+									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel('arxiv')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.nasa && resultsByAPI.nasa.length > 0) {
+				const nasaFeatured = primaryResultsBySource.nasa && primaryResultsBySource.nasa.length ? primaryResultsBySource.nasa : resultsByAPI.nasa.slice(0, PRIMARY_RESULTS_LIMIT);
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="nasa">';
+				html += '<div class="column-header">NASA</div>';
+				nasaFeatured.forEach(result => {
+					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
+					const linkUrl = titleMatch ? titleMatch[1] : '#';
+
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								${result.image ? `<img src="${result.image}" alt="${titleText}" class="result-image visible" onerror="this.style.display='none'">` : '<div class="result-image"></div>'}
+								<div class="result-text">
+									<div class="result-title">${titleText}</div>
+									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel('nasa')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.openlibrary && resultsByAPI.openlibrary.length > 0) {
+				const openLibraryFeatured = primaryResultsBySource.openlibrary && primaryResultsBySource.openlibrary.length ? primaryResultsBySource.openlibrary : resultsByAPI.openlibrary.slice(0, PRIMARY_RESULTS_LIMIT);
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="openlibrary">';
+				html += '<div class="column-header">Open Library - Livros</div>';
+				openLibraryFeatured.forEach(result => {
+					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
+					const linkUrl = titleMatch ? titleMatch[1] : '#';
+
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								${result.image ? `<img src="${result.image}" alt="${titleText}" class="result-image visible" onerror="this.style.display='none'">` : '<div class="result-image"></div>'}
+								<div class="result-text">
+									<div class="result-title">${titleText}</div>
+									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel('openlibrary')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.meteo && resultsByAPI.meteo.length > 0) {
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="meteo">';
+				html += '<div class="column-header">Clima</div>';
+				resultsByAPI.meteo.forEach(result => {
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								<div class="result-image"></div>
+								<div class="result-text">
+									<div class="result-title">${result.title}</div>
+									<div class="result-description">${result.description}</div>
+									<div class="result-source">${getSourceLabel('meteo')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
 			const start = (page - 1) * pageSize;
 			const end = start + pageSize;
-			const pageResults = allResults.slice(start, end);
+			const pageResults = aggregatedResults.slice(start, end);
 
 			if (pageResults.length > 0) {
 				html += '<div class="results-columns">';
@@ -654,7 +1172,7 @@
 				html += '<div class="column-header">Outros Resultados</div>';
 				pageResults.forEach(result => {
 					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
-					const titleText = titleMatch ? titleMatch[2] : result.title.replace(/<[^>]*>/g, '');
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
 					const linkUrl = titleMatch ? titleMatch[1] : '#';
 
 					html += `
@@ -664,20 +1182,30 @@
 								<div class="result-text">
 									<div class="result-title">${titleText}</div>
 									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
-									<div class="result-description">${result.description.replace(/<[^>]*>/g, '')}</div>
-									<div class="result-source">${result.meta || 'Fonte'}</div>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel(result.source)}</div>
 								</div>
 							</div>
 						</div>
 					`;
 				});
 				html += '</div></div>';
+			} else if (!showPrimarySections) {
+				html += '<div class="no-results">Sem novos resultados nesta página.</div>';
 			}
 
 			resultsContainer.innerHTML = html;
 
 			// Update pagination
 			updatePagination();
+
+			// Update terms analysis
+			if (allResults.length > 0) {
+				setTimeout(() => {
+					updateTermsContent();
+					updateTermsSidebar();
+				}, 500);
+			}
 
 			// Configurar animações de scroll
 			setTimeout(() => {
@@ -882,6 +1410,157 @@
 				}];
 			} catch (error) {
 				return [];
+			}
+		}
+
+		async function searchArXiv(query) {
+			try {
+				const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(query)}&start=0&max_results=10`;
+				const response = await fetch(url);
+				const xmlText = await response.text();
+				
+				const parser = new DOMParser();
+				const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+				const entries = xmlDoc.querySelectorAll('entry');
+				
+				const results = Array.from(entries).map(entry => {
+					const title = entry.querySelector('title')?.textContent?.trim() || 'Sem título';
+					const summary = entry.querySelector('summary')?.textContent?.trim() || 'Sem resumo disponível';
+					const link = entry.querySelector('id')?.textContent?.trim() || '#';
+					const authors = Array.from(entry.querySelectorAll('author name')).map(author => author.textContent).join(', ');
+					const published = entry.querySelector('published')?.textContent?.trim() || '';
+					
+					return {
+						title: `<a href="${link}" target="_blank">${title}</a>`,
+						description: `${summary.substring(0, 200)}...`,
+						meta: `Por: ${authors} • Publicado: ${published.split('T')[0]}`
+					};
+				});
+
+				return { results };
+			} catch (error) {
+				console.warn('ArXiv API error:', error);
+				return { results: [] };
+			}
+		}
+
+		async function searchNASA(query) {
+			try {
+				const url = `https://images-api.nasa.gov/search?q=${encodeURIComponent(query)}&media_type=image&page_size=10`;
+				const response = await fetch(url);
+				const data = await response.json();
+				
+				if (!data.collection?.items) {
+					return { results: [] };
+				}
+
+				const results = data.collection.items.map(item => {
+					const itemData = item.data[0];
+					const imageLink = item.links && item.links[0] ? item.links[0].href : null;
+					
+					return {
+						title: `<a href="${itemData.nasa_id ? `https://images.nasa.gov/details-${itemData.nasa_id}` : '#'}" target="_blank">${itemData.title || 'Sem título'}</a>`,
+						description: itemData.description ? itemData.description.substring(0, 200) + '...' : 'Sem descrição disponível',
+						image: imageLink,
+						meta: `NASA • ${itemData.date_created ? itemData.date_created.split('T')[0] : 'Data não disponível'}`
+					};
+				});
+
+				return { results };
+			} catch (error) {
+				console.warn('NASA API error:', error);
+				return { results: [] };
+			}
+		}
+
+		async function searchOpenMeteo(query) {
+			try {
+				// Verificar se a query parece ser relacionada ao clima
+				const weatherKeywords = ['clima', 'weather', 'tempo', 'temperature', 'temperatura', 'chuva', 'rain', 'vento', 'wind', 'sol', 'sun'];
+				const isWeatherQuery = weatherKeywords.some(keyword => 
+					query.toLowerCase().includes(keyword)
+				);
+
+				if (!isWeatherQuery) {
+					return { results: [] };
+				}
+
+				// Tentar extrair nome de cidade da query
+				const cityQuery = query.replace(/clima|weather|tempo/gi, '').trim();
+				
+				if (!cityQuery) {
+					return {
+						results: [{
+							title: 'Previsão do Tempo',
+							description: 'Para obter informações meteorológicas, inclua o nome de uma cidade na sua pesquisa (ex: "clima São Paulo").'
+						}]
+					};
+				}
+
+				// Buscar coordenadas da cidade usando Nominatim
+				const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityQuery)}&format=json&limit=1`;
+				const geoResponse = await fetch(geoUrl);
+				const geoData = await geoResponse.json();
+
+				if (!geoData.length) {
+					return { results: [] };
+				}
+
+				const { lat, lon, display_name } = geoData[0];
+
+				// Buscar dados meteorológicos
+				const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`;
+				const weatherResponse = await fetch(weatherUrl);
+				const weatherData = await weatherResponse.json();
+
+				const current = weatherData.current_weather;
+				const today = weatherData.daily;
+
+				const results = [{
+					title: `Clima em ${display_name.split(',')[0]}`,
+					description: `Temperatura atual: ${current.temperature}°C • Vento: ${current.windspeed} km/h • Máxima hoje: ${today.temperature_2m_max[0]}°C • Mínima: ${today.temperature_2m_min[0]}°C • Precipitação: ${today.precipitation_sum[0]}mm`
+				}];
+
+				return { results };
+			} catch (error) {
+				console.warn('Open Meteo API error:', error);
+				return { results: [] };
+			}
+		}
+
+		async function searchOpenLibrary(query) {
+			try {
+				const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`;
+				const response = await fetch(url);
+				const data = await response.json();
+
+				if (!data.docs) {
+					return { results: [] };
+				}
+
+				const results = data.docs.map(book => {
+					const title = book.title || 'Título não disponível';
+					const authors = book.author_name ? book.author_name.join(', ') : 'Autor desconhecido';
+					const publishYear = book.first_publish_year || 'Ano não disponível';
+					const isbn = book.isbn ? book.isbn[0] : null;
+					const coverId = book.cover_i;
+					const key = book.key;
+					
+					const bookUrl = `https://openlibrary.org${key}`;
+					const coverUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : null;
+
+					return {
+						title: `<a href="${bookUrl}" target="_blank">${title}</a>`,
+						description: `Por: ${authors} • Primeira publicação: ${publishYear}`,
+						image: coverUrl,
+						meta: isbn ? `ISBN: ${isbn}` : 'ISBN não disponível'
+					};
+				});
+
+				return { results };
+			} catch (error) {
+				console.warn('Open Library API error:', error);
+				return { results: [] };
 			}
 		}
 	</script>
