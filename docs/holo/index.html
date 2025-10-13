@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syra - Video Loop</title>
+    <style>
+        body {
+            background-color: black;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+        video {
+            background-color: black;
+            max-width: 100%;
+            max-height: 100%;
+            width: auto;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <video id="videoPlayer" muted autoplay loop style="background-color: black;"></video>
+    <script>
+        var videos = ['./videos/01.mp4', './videos/02.mp4', './videos/03.mp4', "./videos/04.mp4", "./videos/05.mp4"];
+        var currentIndex = 0;
+        var videoPlayer = document.getElementById('videoPlayer');
+
+        function playNextVideo() {
+            currentIndex = (currentIndex + 1) % videos.length;
+            videoPlayer.src = videos[currentIndex];
+            videoPlayer.load();
+            videoPlayer.play().catch(function(error) {
+                console.log('Erro ao reproduzir vídeo:', error);
+            });
+        }
+
+        // Iniciar com o primeiro vídeo
+        videoPlayer.src = videos[currentIndex];
+        videoPlayer.load();
+        videoPlayer.play().catch(function(error) {
+            console.log('Erro ao iniciar reprodução:', error);
+        });
+
+        // Event listener para quando um vídeo terminar
+        videoPlayer.addEventListener('ended', function() {
+            playNextVideo();
+        });
+
+        // Event listener para erros de carregamento
+        videoPlayer.addEventListener('error', function() {
+            console.log('Erro ao carregar vídeo:', videos[currentIndex]);
+            // Tentar o próximo vídeo em caso de erro
+            setTimeout(playNextVideo, 1000);
+        });
+
+        // Garantir que o vídeo continue tocando
+        videoPlayer.addEventListener('pause', function() {
+            if (!videoPlayer.ended) {
+                videoPlayer.play().catch(function(error) {
+                    console.log('Erro ao retomar reprodução:', error);
+                });
+            }
+        });
+
+        // Log para debug
+        console.log('Syra Video Loop iniciado com', videos.length, 'vídeos');
+    </script>
+</body>
+</html>
