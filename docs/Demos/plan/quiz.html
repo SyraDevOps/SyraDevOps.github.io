@@ -158,10 +158,16 @@
       color: var(--qb-dark);
       font-style: italic;
       line-height: 1.4;
-      margin-bottom: 30px;
+      margin-bottom: 10px;
       max-width: 600px;
       margin-left: auto;
       margin-right: auto;
+    }
+    .intermedia-author {
+      font-size: 14px;
+      color: var(--qb-muted);
+      margin-bottom: 30px;
+      font-weight: 500;
     }
     .intermedia-continue {
       background: var(--qb-mid);
@@ -191,6 +197,7 @@
       .intermedia-screen { padding: 20px; }
       .intermedia-image { height: 200px; }
       .intermedia-phrase { font-size: 16px; }
+      .intermedia-author { font-size: 13px; }
     }
     @media (max-width:420px){
       body{ padding:14px; }
@@ -230,7 +237,7 @@
     <div class="quiz-body">
       <section class="card" aria-labelledby="q-meta">
         <div class="question-meta" id="q-meta">
-          <div class="q-index"><span id="current">1</span> / <span id="total">4</span></div>
+          <div class="q-index"><span id="current">1</span> / <span id="total">10</span></div>
           <div class="progress" aria-hidden="true"><i id="progress-bar" style="width:0%"></i></div>
         </div>
         <h2 class="question" id="question">Carregando...</h2>
@@ -244,6 +251,7 @@
         <div class="intermedia-screen" id="intermedia-screen">
           <img class="intermedia-image" id="intermedia-image" src="" alt="Imagem astronômica">
           <p class="intermedia-phrase" id="intermedia-phrase"></p>
+          <p class="intermedia-author" id="intermedia-author"></p>
           <button class="intermedia-continue" id="intermedia-continue">Continuar</button>
         </div>
       </section>
@@ -270,20 +278,31 @@
     </div>
   </main>
   <script>
-    // Perguntas (4)
+    // Perguntas (10)
     const QUESTIONS = [
       { q: "Qual é o planeta mais próximo do Sol?", choices: ["Vênus","Marte","Mercúrio","Terra"], a: 2 },
       { q: "Qual é o maior planeta do Sistema Solar?", choices: ["Saturno","Júpiter","Netuno","Urano"], a: 1 },
       { q: "Como chamamos uma estrela que explode no fim de sua vida?", choices: ["Pulsar","Buraco negro","Supernova","Quasar"], a: 2 },
-      { q: "Qual a unidade usada para medir distâncias interplanetárias dentro do Sistema Solar?", choices: ["Ano-luz","Parsec","Unidade Astronômica (UA)","Quilômetro"], a: 2 }
+      { q: "Qual a unidade usada para medir distâncias interplanetárias dentro do Sistema Solar?", choices: ["Ano-luz","Parsec","Unidade Astronômica (UA)","Quilômetro"], a: 2 },
+      { q: "Qual desses objetos é uma galáxia vizinha da Via Láctea?", choices: ["Andrômeda","Órion","Polaris","Centauro A"], a: 0 },
+      { q: "Qual planeta tem um rastro de anéis visíveis?", choices: ["Marte","Vênus","Saturno","Mercúrio"], a: 2 },
+      { q: "O que é uma 'estrela cadente' na verdade?", choices: ["Um cometa passando","Um meteoro entrando na atmosfera","Uma supernova","Um satélite artificial"], a: 1 },
+      { q: "Qual foi o primeiro satélite artificial lançado ao espaço?", choices: ["Sputnik 1","Apollo 11","Vostok 1","Explorer 1"], a: 0 },
+      { q: "Qual elemento é o mais abundante nas estrelas (incluindo o Sol)?", choices: ["Oxigênio","Hélio","Hidrogênio","Carbono"], a: 2 },
+      { q: "Como chamamos o ponto mais próximo da Terra no caminho elíptico da Lua?", choices: ["Apogeu","Perigeu","Periélio","Afélio"], a: 1 }
     ];
     
-    // Imagens e frases entre perguntas
+    // Imagens e frases entre perguntas (9 intervalos para 10 perguntas)
     const INTERMEDIA_CONTENT = [
-      { img: "imgs/01.jpeg", phrase: "O universo é uma biblioteca cósmica onde cada estrela conta uma história diferente." },
-      { img: "imgs/02.jpeg", phrase: "Somos todos feitos de poeira estelar - literalmente parte do cosmos." },
-      { img: "imgs/03.jpeg", phrase: "A astronomia nos ensina que somos pequenos, mas parte de algo infinitamente grandioso." },
-      { img: "imgs/04.jpeg", phrase: "Cada planeta é um mundo único, com seus próprios mistérios esperando para serem descobertos." }
+      { img: "imgs/01.jpeg", phrase: "Há muito tempo que amo demais as estrelas para temer a noite", author: "The Old Astronomer, Sarah Williams (1868)" },
+      { img: "imgs/02.jpeg", phrase: "Contemplar as estrelas sempre me faz sonhar", author: "Vincent van Gogh" },
+      { img: "imgs/03.jpeg", phrase: "Nós somos poeiras de estrelas", author: "Carl Sagan" },
+      { img: "imgs/04.jpeg", phrase: "A poluição, a ganança e a estupidez são as maiores ameaças ao planeta", author: "Stephen Hawking" },
+      { img: "imgs/05.jpeg", phrase: "A verdadeira ciência ensina sobretudo a duvidar e a ser ignorante", author: "Miguel Unamuno" },
+      { img: "imgs/01.jpeg", phrase: "O cosmos é tudo o que é, ou foi, ou será. Nossas contemplações do cosmos nos agitam", author: "Carl Sagan" },
+      { img: "imgs/02.jpeg", phrase: "O universo não é apenas mais estranho do que imaginamos, é mais estranho do que podemos imaginar", author: "J.B.S. Haldane" },
+      { img: "imgs/03.jpeg", phrase: "A astronomia é útil porque nos eleva acima de nós mesmos; é útil porque é grande", author: "Henri Poincaré" },
+      { img: "imgs/04.jpeg", phrase: "Duas coisas enchem o ânimo de admiração e venerável temor: o céu estrelado acima de mim e a lei moral dentro de mim", author: "Immanuel Kant" }
     ];
     // Estado
     let current = 0;
@@ -307,6 +326,7 @@
     const elIntermediaScreen = document.getElementById('intermedia-screen');
     const elIntermediaImage = document.getElementById('intermedia-image');
     const elIntermediaPhrase = document.getElementById('intermedia-phrase');
+    const elIntermediaAuthor = document.getElementById('intermedia-author');
     const elIntermediaContinue = document.getElementById('intermedia-continue');
     elTotal.textContent = total;
     function renderQuestion() {
@@ -391,7 +411,131 @@
       const mediaIndex = current - 1; // Usar pergunta anterior para mostrar imagem
       if (mediaIndex >= 0 && mediaIndex < INTERMEDIA_CONTENT.length) {
         elIntermediaImage.src = INTERMEDIA_CONTENT[mediaIndex].img;
-        elIntermediaPhrase.textContent = INTERMEDIA_CONTENT[mediaIndex].phrase;
+        elIntermediaPhrase.textContent = `"${INTERMEDIA_CONTENT[mediaIndex].phrase}"`; 
+        elIntermediaAuthor.textContent = `— ${INTERMEDIA_CONTENT[mediaIndex].author}`;
+      }
+      
+      elIntermediaScreen.classList.add('active');
+    }
+    
+    function hideIntermediaScreen() {
+      showingIntermedia = false;
+      
+      // Mostrar elementos da pergunta
+      document.querySelector('.question-meta').style.display = 'flex';
+      elQuestion.style.display = 'block';
+      elOptions.style.display = 'grid';
+      document.querySelector('.controls').style.display = 'flex';
+      
+      // Esconder tela intermediária
+      elIntermediaScreen.classList.remove('active');
+      
+      // Carregar próxima pergunta
+      renderQuestion();
+    }
+    
+    function showIntermediaScreen() {
+      if (current >= total) {
+        showResult();
+        return;
+      }
+      
+      showingIntermedia = true;
+      
+      // Esconder elementos da pergunta
+      document.querySelector('.question-meta').style.display = 'none';
+      elQuestion.style.display = 'none';
+      elOptions.style.display = 'none';
+      document.querySelector('.controls').style.display = 'none';
+      
+      // Mostrar tela intermediária
+      const mediaIndex = current - 1; // Usar pergunta anterior para mostrar imagem
+      if (mediaIndex >= 0 && mediaIndex < INTERMEDIA_CONTENT.length) {
+        elIntermediaImage.src = INTERMEDIA_CONTENT[mediaIndex].img;
+        elIntermediaPhrase.textContent = `"${INTERMEDIA_CONTENT[mediaIndex].phrase}"`;
+        elIntermediaAuthor.textContent = `— ${INTERMEDIA_CONTENT[mediaIndex].author}`;
+      }
+      
+      elIntermediaScreen.classList.add('active');
+    }
+    
+    function hideIntermediaScreen() {
+      showingIntermedia = false;
+      
+      // Mostrar elementos da pergunta
+      document.querySelector('.question-meta').style.display = 'flex';
+      elQuestion.style.display = 'block';
+      elOptions.style.display = 'grid';
+      document.querySelector('.controls').style.display = 'flex';
+      
+      // Esconder tela intermediária
+      elIntermediaScreen.classList.remove('active');
+      
+      // Carregar próxima pergunta
+      renderQuestion();
+    }
+    
+    function showIntermediaScreen() {
+      if (current >= total) {
+        showResult();
+        return;
+      }
+      
+      showingIntermedia = true;
+      
+      // Esconder elementos da pergunta
+      document.querySelector('.question-meta').style.display = 'none';
+      elQuestion.style.display = 'none';
+      elOptions.style.display = 'none';
+      document.querySelector('.controls').style.display = 'none';
+      
+      // Mostrar tela intermediária
+      const mediaIndex = current - 1; // Usar pergunta anterior para mostrar imagem
+      if (mediaIndex >= 0 && mediaIndex < INTERMEDIA_CONTENT.length) {
+        elIntermediaImage.src = INTERMEDIA_CONTENT[mediaIndex].img;
+        elIntermediaPhrase.textContent = `"${INTERMEDIA_CONTENT[mediaIndex].phrase}"`;
+        elIntermediaAuthor.textContent = `— ${INTERMEDIA_CONTENT[mediaIndex].author}`;
+      }
+      
+      elIntermediaScreen.classList.add('active');
+    }
+    
+    function hideIntermediaScreen() {
+      showingIntermedia = false;
+      
+      // Mostrar elementos da pergunta
+      document.querySelector('.question-meta').style.display = 'flex';
+      elQuestion.style.display = 'block';
+      elOptions.style.display = 'grid';
+      document.querySelector('.controls').style.display = 'flex';
+      
+      // Esconder tela intermediária
+      elIntermediaScreen.classList.remove('active');
+      
+      // Carregar próxima pergunta
+      renderQuestion();
+    }
+    
+    function showIntermediaScreen() {
+      if (current >= total) {
+        showResult();
+        return;
+      }
+      
+      showingIntermedia = true;
+      
+      // Esconder elementos da pergunta
+      document.querySelector('.question-meta').style.display = 'none';
+      elQuestion.style.display = 'none';
+      elOptions.style.display = 'none';
+      document.querySelector('.controls').style.display = 'none';
+      
+      // Mostrar tela intermediária
+      const mediaIndex = current - 1; // Usar pergunta anterior para mostrar imagem
+      if (mediaIndex >= 0 && mediaIndex < INTERMEDIA_CONTENT.length) {
+        elIntermediaImage.src = INTERMEDIA_CONTENT[mediaIndex].img;
+        elIntermediaPhrase.textContent = `"${INTERMEDIA_CONTENT[mediaIndex].phrase}"`;
+        elIntermediaAuthor.textContent = `— ${INTERMEDIA_CONTENT[mediaIndex].author}`;
       }
       
       elIntermediaScreen.classList.add('active');
