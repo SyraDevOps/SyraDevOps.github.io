@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+	<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2547921887453012"
+     crossorigin="anonymous"></script>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>LunaGPT - SyraDevOps</title>
+	<link rel="stylesheet" href="style.css">
+	<style>
+		body {
+			background: #ffffff;
+			color: #1f2937;
+			min-height: 100vh;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			margin: 0;
+			padding: 0;
+		}
+
+		.search-container {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			gap: 2rem;
+			max-width: 600px;
+			width: 100%;
+			padding: 2rem;
+		}
+
+		.search-bar {
+			width: 100%;
+			max-width: 500px;
+			position: relative;
+		}
+
+		.search-input {
+			width: 100%;
+			padding: 1.2rem 2rem;
+			font-size: 1.1rem;
+			border: 2px solid #e5e7eb;
+			border-radius: 50px;
+			background: #ffffff;
+			color: #374151;
+			outline: none;
+			transition: all 0.3s ease;
+			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+		}
+
+		.search-input:focus {
+			border-color: #3b82f6;
+			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+		}
+
+		.search-results {
+			margin-top: 3rem;
+			max-width: 1200px;
+			width: 100%;
+		}
+
+		.map-section {
+			margin-bottom: 3rem;
+			opacity: 0;
+			transform: translateY(30px);
+			transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+		}
+
+		.map-section.visible {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		.map-container {
+			background: #ffffff;
+			border-radius: 20px;
+			padding: 2rem;
+			box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+			border: 1px solid #e5e7eb;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.map-container::before {
+			content: '';
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 4px;
+			background: linear-gradient(90deg, #10b981, #059669, #10b981);
+			background-size: 200% 100%;
+			animation: shimmer 2s ease-in-out infinite;
+		}
+
+		.map-title {
+			font-size: 1.5rem;
+			font-weight: 600;
+			color: #1f2937;
+			margin-bottom: 1.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.map-frame {
+			width: 100%;
+			height: 400px;
+			border: none;
+			border-radius: 16px;
+			box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+		}
+
+		.results-columns {
+			display: flex;
+			flex-direction: column;
+			gap: 1.5rem;
+			margin-top: 2rem;
+			max-width: 800px;
+		}
+
+		.api-column {
+			display: flex;
+			flex-direction: column;
+			gap: 1rem;
+		}
+
+		.column-header {
+			font-size: 0.9rem;
+			font-weight: 500;
+			color: #666666;
+			margin-bottom: 0.5rem;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			border-bottom: 1px solid #e0e0e0;
+			padding-bottom: 0.25rem;
+		}
+
+		.result-item {
+			padding: 1rem 0;
+			border-bottom: 1px solid #f0f0f0;
+			transition: all 0.2s ease;
+			opacity: 0;
+			transform: translateY(20px);
+		}
+
+		.result-item.visible {
+			opacity: 1;
+			transform: translateY(0);
+		}
+
+		.result-item:hover {
+			background: rgba(0, 0, 0, 0.02);
+			padding-left: 0.5rem;
+			margin-left: -0.5rem;
+			margin-right: -0.5rem;
+			padding-right: 0.5rem;
+		}
+
+		.result-content {
+			display: flex;
+			gap: 1rem;
+			align-items: flex-start;
+		}
+
+		.result-image {
+			flex-shrink: 0;
+			width: 120px;
+			height: 80px;
+			object-fit: cover;
+			border-radius: 8px;
+			border: 1px solid #e0e0e0;
+			background: #f8f9fa;
+			display: none;
+		}
+
+		.result-image.visible {
+			display: block;
+		}
+
+		.result-text {
+			flex: 1;
+			min-width: 0;
+		}
+
+		.result-title {
+			font-size: 1.1rem;
+			font-weight: 400;
+			color: #1a1a1a;
+			line-height: 1.4;
+			margin-bottom: 0.25rem;
+		}
+
+		.result-link {
+			color: #0066cc;
+			text-decoration: none;
+			position: relative;
+			font-size: 0.9rem;
+			display: inline-block;
+			margin-bottom: 0.5rem;
+		}
+
+		.result-link::after {
+			content: '';
+			position: absolute;
+			bottom: -2px;
+			left: 0;
+			width: 0;
+			height: 1px;
+			background: #0066cc;
+			transition: width 0.3s ease;
+		}
+
+		.result-link:hover::after {
+			width: 100%;
+		}
+
+		.result-description {
+			color: #666666;
+			line-height: 1.5;
+			font-size: 0.95rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.result-source {
+			color: #999999;
+			font-size: 0.8rem;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+
+		@media (max-width: 768px) {
+			.results-columns {
+				grid-template-columns: 1fr;
+				gap: 1.5rem;
+			}
+
+			.column-header {
+				position: static;
+			}
+
+			.map-frame {
+				height: 300px;
+			}
+		}
+
+		.loading {
+			text-align: center;
+			padding: 3rem;
+			color: #6b7280;
+			font-size: 1.1rem;
+		}
+
+		.loading-spinner {
+			display: inline-block;
+			width: 24px;
+			height: 24px;
+			border: 3px solid #e5e7eb;
+			border-top: 3px solid #3b82f6;
+			border-radius: 50%;
+			animation: spin 1s linear infinite;
+			margin-right: 0.5rem;
+		}
+
+		@keyframes spin {
+			0% { transform: rotate(0deg); }
+			100% { transform: rotate(360deg); }
+		}
+
+		.error {
+			background: #fef2f2;
+			border: 1px solid #fecaca;
+			color: #dc2626;
+			padding: 1rem;
+			border-radius: 12px;
+			text-align: center;
+			margin: 1rem 0;
+		}
+
+		.no-results {
+			text-align: center;
+			padding: 3rem;
+			color: #9ca3af;
+			font-size: 1.1rem;
+		}
+
+		.search-input::placeholder {
+			color: #9ca3af;
+			font-style: italic;
+		}
+
+		#pagination button {
+			margin: 0 5px;
+			padding: 8px 12px;
+			border: 1px solid #d1d5db;
+			background: white;
+			color: #374151;
+			cursor: pointer;
+			border-radius: 4px;
+			transition: all 0.2s;
+		}
+
+		#pagination button:hover {
+			background: #f3f4f6;
+		}
+
+		#pagination button.active {
+			background: #3b82f6;
+			color: white;
+			border-color: #3b82f6;
+		}
+
+		#pagination button:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		.typing-animation {
+			position: absolute;
+			right: 1.5rem;
+			top: 50%;
+			transform: translateY(-50%);
+			font-size: 1.1rem;
+			color: #6b7280;
+			font-weight: 500;
+			letter-spacing: 1px;
+		}
+
+		.cursor {
+			animation: blink 1s infinite;
+		}
+
+		@keyframes blink {
+			0%, 50% { opacity: 1; }
+			51%, 100% { opacity: 0; }
+		}
+
+		.search-subtitle {
+			color: #6b7280;
+			font-size: 0.95rem;
+			text-align: center;
+			line-height: 1.6;
+			max-width: 400px;
+		}
+
+		.search-title {
+			color: #1f2937;
+			font-size: 2rem;
+			font-weight: 600;
+			text-align: center;
+			margin-bottom: 0.5rem;
+		}
+
+		.terms-sidebar {
+			position: fixed;
+			right: 20px;
+			top: 50%;
+			transform: translateY(-50%);
+			width: 200px;
+			max-height: 400px;
+			opacity: 0;
+			visibility: hidden;
+			transform: translateY(-50%) translateX(30px);
+			transition: all 0.3s ease;
+			z-index: 1000;
+		}
+
+		.terms-sidebar.visible {
+			opacity: 1;
+			visibility: visible;
+			transform: translateY(-50%) translateX(0);
+		}
+
+		.terms-sidebar h3 {
+			color: #6b7280;
+			font-size: 0.95rem;
+			font-weight: 500;
+			margin: 0 0 1rem 0;
+			text-align: left;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+		}
+
+		.terms-container {
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+			max-height: 350px;
+			overflow-y: auto;
+		}
+
+		.terms-container::-webkit-scrollbar {
+			display: none;
+		}
+
+		.term-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0.25rem 0;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			opacity: 0;
+			animation: fadeIn 0.3s ease forwards;
+		}
+
+		.term-item:nth-child(1) { animation-delay: 0.05s; }
+		.term-item:nth-child(2) { animation-delay: 0.1s; }
+		.term-item:nth-child(3) { animation-delay: 0.15s; }
+		.term-item:nth-child(4) { animation-delay: 0.2s; }
+		.term-item:nth-child(5) { animation-delay: 0.25s; }
+		.term-item:nth-child(6) { animation-delay: 0.3s; }
+		.term-item:nth-child(7) { animation-delay: 0.35s; }
+		.term-item:nth-child(8) { animation-delay: 0.4s; }
+		.term-item:nth-child(9) { animation-delay: 0.45s; }
+		.term-item:nth-child(10) { animation-delay: 0.5s; }
+
+		@keyframes fadeIn {
+			to {
+				opacity: 1;
+			}
+		}
+
+		.term-item:hover {
+			color: #3b82f6;
+		}
+
+		.term-text {
+			color: #6b7280;
+			font-size: 0.95rem;
+			font-weight: 500;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			line-height: 1.6;
+			transition: color 0.2s ease;
+		}
+
+		.term-count {
+			color: #9ca3af;
+			font-size: 0.8rem;
+			font-weight: 400;
+			font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+			transition: color 0.2s ease;
+		}
+
+		.terms-progress {
+			width: 100%;
+			height: 4px;
+			background: #f3f4f6;
+			border-radius: 2px;
+			margin-bottom: 1rem;
+			overflow: hidden;
+		}
+
+		.terms-progress-bar {
+			height: 100%;
+			background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+			border-radius: 2px;
+			transition: width 0.3s ease;
+			width: 0%;
+		}
+
+		@media (max-width: 1024px) {
+			.terms-sidebar {
+				display: none;
+			}
+		}
+
+		@media (max-width: 640px) {
+			.search-container {
+				padding: 1rem;
+			}
+
+			.search-title {
+				font-size: 1.8rem;
+			}
+
+			.search-input {
+				font-size: 1rem;
+				padding: 1rem 1.5rem;
+			}
+
+			.result-image {
+				width: 80px;
+				height: 60px;
+			}
+
+			.result-content {
+				gap: 0.75rem;
+			}
+		}
+	</style>
+</head>
+<body>
+	<div class="hamburger" onclick="toggleMenu()">
+		<span></span>
+		<span></span>
+		<span></span>
+	</div>
+
+	<div class="overlay" onclick="closeMenu()"></div>
+
+	<nav class="sidebar">
+		<a href="index.html" class="menu-item">Início</a>
+		<a href="syrax.html" class="menu-item">SyraX</a>
+		<a href="lunagpt.html" class="menu-item">LunaGPT</a>
+		<a href="sobre.html" class="menu-item">Sobre</a>
+		<a href="contato.html" class="menu-item">Contato</a>
+		<a href="colabs/colabs.html" class="menu-item">Colabs</a>
+		<div class="menu-footer">
+			Desenvolvido pela @SyraDevOps
+		</div>
+	</nav>
+
+	<main class="search-container">
+		<div>
+			<h1 class="search-title">LunaGPT Search</h1>
+			<p class="search-subtitle">Sua assistente inteligente está pronta para ajudar</p>
+		</div>
+
+		<div class="search-bar">
+			<form onsubmit="performSearch(event)">
+				<input
+					type="text"
+					class="search-input"
+					id="search-query"
+					placeholder=" Pesquise algo"
+					required
+				>
+			</form>
+			<div class="typing-animation" id="typing-animation">
+				<span id="dots">...</span>
+			</div>
+		</div>
+
+		<div class="search-results" id="search-results">
+			<!-- Resultados aparecerão aqui -->
+		</div>
+
+		<div id="pagination" style="text-align: center; margin: 20px 0;"></div>
+
+		<!-- Temporary load more button for debugging -->
+		<button id="load-more-btn" onclick="loadMoreResults()" style="display:none; margin: 20px auto; padding: 10px 20px; background: #3b82f6; color: white; border: none; border-radius: 5px; cursor: pointer;">Carregar Mais</button>
+	</main>
+
+	<!-- Terms Sidebar -->
+	<div class="terms-sidebar" id="terms-sidebar">
+		<h3>Termos relevantes</h3>
+		<div id="terms-list">
+			<!-- Terms will be populated here -->
+		</div>
+	</div>
+
+	<script src="script.js"></script>
+	<script>
+		let searchInProgress = false;
+		let observer;
+
+		// Pagination variables
+		let currentQuery = '';
+		let currentPage = 1;
+		let totalPages = 1;
+		let pageSize = 8;
+		let resultsByAPI = {};
+		let aggregatedResults = [];
+		let primaryResultsBySource = {};
+		let allResults = [];
+
+		const SECTION_SOURCES = new Set(['reddit', 'arxiv', 'nasa', 'openlibrary']);
+		const PRIMARY_RESULTS_LIMIT = 3;
+		const SOURCE_LABELS = {
+			wikipedia: 'Wikipedia',
+			reddit: 'Reddit',
+			duckduckgo: 'DuckDuckGo',
+			arxiv: 'ArXiv',
+			nasa: 'NASA',
+			meteo: 'Open Meteo',
+			dictionary: 'Dicionário',
+			openlibrary: 'Open Library'
+		};
+
+		function stripHTML(html) {
+			const div = document.createElement('div');
+			div.innerHTML = html || '';
+			return div.textContent || div.innerText || '';
+		}
+
+		function createResultKey(result) {
+			const title = stripHTML(result.title || '').toLowerCase();
+			const description = stripHTML(result.description || '').toLowerCase();
+			const linkMatch = (result.title || '').match(/href="([^"]*)"/i);
+			const link = linkMatch ? linkMatch[1] : '';
+			return `${result.source || 'unknown'}|${title}|${description}|${link}`;
+		}
+
+		function getSourceLabel(source) {
+			return SOURCE_LABELS[source] || 'Fonte';
+		}
+
+		function prepareResultsData(results) {
+			primaryResultsBySource = {};
+			aggregatedResults = [];
+
+			const sourcePriority = ['wikipedia', 'duckduckgo', 'reddit', 'arxiv', 'nasa', 'openlibrary'];
+			const pools = [];
+			const seenKeys = new Set();
+
+			sourcePriority.forEach((source) => {
+				const sourceResults = Array.isArray(results[source]) ? results[source] : [];
+				if (!sourceResults.length) return;
+
+				const hasPrimarySection = SECTION_SOURCES.has(source);
+				const primaryCount = hasPrimarySection ? PRIMARY_RESULTS_LIMIT : 0;
+				primaryResultsBySource[source] = hasPrimarySection ? sourceResults.slice(0, primaryCount) : [];
+
+				const remainder = hasPrimarySection ? sourceResults.slice(primaryCount) : sourceResults.slice();
+				if (!remainder.length) return;
+
+				pools.push({
+					source,
+					items: remainder.map(item => {
+						return {
+							...item,
+							source
+						};
+					})
+				});
+			});
+
+			let added = true;
+			while (added) {
+				added = false;
+				pools.forEach(pool => {
+					if (!pool.items.length) return;
+					const candidate = pool.items.shift();
+					const key = createResultKey(candidate);
+					if (seenKeys.has(key)) {
+						return;
+					}
+					seenKeys.add(key);
+					aggregatedResults.push(candidate);
+					added = true;
+				});
+			}
+
+			// Include any remaining items that were skipped due to duplicates
+			pools.forEach(pool => {
+				pool.items.forEach(candidate => {
+					const key = createResultKey(candidate);
+					if (!seenKeys.has(key)) {
+						seenKeys.add(key);
+						aggregatedResults.push(candidate);
+					}
+				});
+			});
+
+			allResults = []
+				.concat(results.wikipedia || [])
+				.concat(results.reddit || [])
+				.concat(results.duckduckgo || [])
+				.concat(results.arxiv || [])
+				.concat(results.nasa || [])
+				.concat(results.openlibrary || []);
+		}
+
+		// Terms analysis variables
+		let commonTerms = {};
+		let termsUpdateInterval;
+		let scrollProgress = 0;
+		let isTermsSidebarVisible = false;
+
+		document.addEventListener('DOMContentLoaded', function() {
+			const dotsElement = document.getElementById('dots');
+			const typingAnimation = document.getElementById('typing-animation');
+			const searchInput = document.getElementById('search-query');
+			const texts = ['...', '..', '.', ''];
+			let currentIndex = 0;
+			let dotsInterval;
+
+			function animateDots() {
+				dotsElement.textContent = texts[currentIndex];
+				currentIndex = (currentIndex + 1) % texts.length;
+			}
+
+			// Iniciar animação
+			dotsInterval = setInterval(animateDots, 500);
+
+			// Ocultar animação quando usuário começar a digitar
+			searchInput.addEventListener('focus', function() {
+				typingAnimation.style.display = 'none';
+			});
+
+			searchInput.addEventListener('blur', function() {
+				if (!searchInput.value.trim()) {
+					typingAnimation.style.display = 'block';
+				}
+			});
+
+			// Configurar observer para animações de scroll
+			setupScrollObserver();
+			setupTermsAnalysis();
+		});
+
+		function setupTermsAnalysis() {
+			// Setup scroll listener for terms sidebar
+			window.addEventListener('scroll', updateTermsSidebar);
+			window.addEventListener('resize', updateTermsSidebar);
+		}
+
+		function extractTermsFromResults(results) {
+			const stopWords = new Set([
+				'de', 'da', 'do', 'das', 'dos', 'a', 'o', 'as', 'os', 'e', 'em', 'para', 'com', 'por', 'no', 'na', 'nos', 'nas',
+				'um', 'uma', 'uns', 'umas', 'que', 'se', 'não', 'mais', 'como', 'muito', 'sobre', 'após', 'entre', 'ser',
+				'ter', 'fazer', 'seu', 'sua', 'seus', 'suas', 'este', 'esta', 'estes', 'estas', 'esse', 'essa', 'esses',
+				'essas', 'aquele', 'aquela', 'aqueles', 'aquelas', 'the', 'of', 'and', 'to', 'in', 'is', 'it', 'you',
+				'that', 'he', 'was', 'for', 'on', 'are', 'as', 'with', 'his', 'they', 'i', 'at', 'be', 'this', 'have',
+				'from', 'or', 'one', 'had', 'by', 'word', 'but', 'not', 'what', 'all', 'were', 'we', 'when', 'your',
+				'can', 'said', 'there', 'each', 'which', 'she', 'do', 'how', 'their', 'if', 'will', 'up', 'other',
+				'about', 'out', 'many', 'then', 'them', 'these', 'so', 'some', 'her', 'would', 'make', 'like', 'into',
+				'him', 'time', 'has', 'two', 'more', 'go', 'no', 'way', 'could', 'my', 'than', 'first', 'been', 'call',
+				'who', 'oil', 'its', 'now', 'find', 'long', 'down', 'day', 'did', 'get', 'come', 'made', 'may', 'part'
+			]);
+
+			const termCounts = {};
+			const allText = results.map(result => {
+				const title = result.title.replace(/<[^>]*>/g, '');
+				const description = result.description.replace(/<[^>]*>/g, '');
+				return `${title} ${description}`.toLowerCase();
+			}).join(' ');
+
+			// Extract words (3+ characters, letters only)
+			const words = allText.match(/\b[a-záàâãäéèêëíìîïóòôõöúùûüçñ]{3,}\b/gi) || [];
+			
+			words.forEach(word => {
+				const cleanWord = word.toLowerCase().trim();
+				if (!stopWords.has(cleanWord) && cleanWord.length >= 3) {
+					termCounts[cleanWord] = (termCounts[cleanWord] || 0) + 1;
+				}
+			});
+
+			// Get top 10 most common terms
+			return Object.entries(termCounts)
+				.filter(([term, count]) => count >= 2) // Only terms that appear at least twice
+				.sort((a, b) => b[1] - a[1])
+				.slice(0, 10)
+				.map(([term, count]) => ({ term, count }));
+		}
+
+		function updateTermsSidebar() {
+			const sidebar = document.getElementById('terms-sidebar');
+			const progressBar = document.getElementById('terms-progress-bar');
+			const termsList = document.getElementById('terms-list');
+
+			if (!sidebar || !allResults.length) return;
+
+			// Calculate scroll progress
+			const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+			const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+			scrollProgress = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
+
+			// Show sidebar when scrolling through results
+			const resultsContainer = document.getElementById('search-results');
+			if (resultsContainer && resultsContainer.children.length > 0) {
+				const rect = resultsContainer.getBoundingClientRect();
+				const shouldShow = rect.top < window.innerHeight && rect.bottom > 0 && scrollTop > 100;
+
+				if (shouldShow && !isTermsSidebarVisible) {
+					isTermsSidebarVisible = true;
+					sidebar.classList.add('visible');
+					updateTermsContent();
+				} else if (!shouldShow && isTermsSidebarVisible) {
+					isTermsSidebarVisible = false;
+					sidebar.classList.remove('visible');
+				}
+			}
+
+			// Update progress bar
+			if (progressBar) {
+				progressBar.style.width = `${Math.min(scrollProgress, 100)}%`;
+			}
+		}
+
+		function updateTermsContent() {
+			const termsList = document.getElementById('terms-list');
+			if (!termsList || !allResults.length) return;
+
+			// Extract terms from current results
+			const terms = extractTermsFromResults(allResults);
+
+			if (terms.length === 0) {
+				termsList.innerHTML = '<div style="color: #9ca3af; font-size: 0.8rem;">Analisando...</div>';
+				return;
+			}
+
+			// Create simple terms list
+			const termsHTML = `
+				<div class="terms-container">
+					${terms.map(({ term, count }, index) => `
+						<div class="term-item" data-term="${term}">
+							<span class="term-text">${term}</span>
+							<span class="term-count">${count}</span>
+						</div>
+					`).join('')}
+				</div>
+			`;
+
+			termsList.innerHTML = termsHTML;
+
+			// Add simple click handlers
+			termsList.querySelectorAll('.term-item').forEach((item) => {
+				item.addEventListener('click', () => {
+					const term = item.dataset.term;
+					highlightTermInResults(term);
+				});
+			});
+		}
+
+		function highlightTermInResults(term) {
+			// Simple highlighting
+			const resultsContainer = document.getElementById('search-results');
+			if (!resultsContainer) return;
+
+			// Remove existing highlights
+			resultsContainer.querySelectorAll('.highlight-term').forEach(el => {
+				el.classList.remove('highlight-term');
+			});
+
+			// Add simple highlight style
+			if (!document.querySelector('#highlight-styles')) {
+				const style = document.createElement('style');
+				style.id = 'highlight-styles';
+				style.textContent = `
+					.highlight-term {
+						background: rgba(59, 130, 246, 0.15) !important;
+						border-radius: 2px !important;
+						padding: 1px 2px !important;
+						transition: all 0.3s ease !important;
+					}
+				`;
+				document.head.appendChild(style);
+			}
+
+			// Find and highlight terms
+			const searchText = term.toLowerCase();
+			const walker = document.createTreeWalker(
+				resultsContainer,
+				NodeFilter.SHOW_TEXT,
+				{
+					acceptNode: function(node) {
+						return node.textContent.toLowerCase().includes(searchText) ? 
+							NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+					}
+				},
+				false
+			);
+
+			let node;
+			let highlightedCount = 0;
+			while (node = walker.nextNode() && highlightedCount < 5) {
+				if (node.textContent.toLowerCase().includes(searchText)) {
+					const parent = node.parentElement;
+					if (parent && !parent.classList.contains('highlight-term')) {
+						parent.classList.add('highlight-term');
+						highlightedCount++;
+					}
+				}
+			}
+
+			// Remove highlight after 2 seconds
+			setTimeout(() => {
+				resultsContainer.querySelectorAll('.highlight-term').forEach(el => {
+					el.classList.remove('highlight-term');
+				});
+			}, 2000);
+		}
+
+		function setupScrollObserver() {
+			observer = new IntersectionObserver((entries) => {
+				entries.forEach(entry => {
+					if (entry.isIntersecting) {
+						entry.target.classList.add('visible');
+					}
+				});
+			}, {
+				threshold: 0.1,
+				rootMargin: '0px 0px -50px 0px'
+			});
+		}
+
+		async function performSearch(event) {
+			event.preventDefault();
+			
+			if (searchInProgress) return;
+			
+			const query = document.getElementById('search-query').value.trim();
+			if (!query) return;
+
+			// Initialize pagination
+			currentQuery = query;
+			currentPage = 1;
+
+			searchInProgress = true;
+			const resultsContainer = document.getElementById('search-results');
+			
+			// Mostrar loading
+			resultsContainer.innerHTML = `
+				<div class="loading">
+					<div class="loading-spinner"></div>
+					Pesquisando em múltiplas fontes...
+				</div>
+			`;
+
+			try {
+				// Load all results
+				const allResultsData = await loadAllResults(query);
+				resultsByAPI = allResultsData;
+				prepareResultsData(resultsByAPI);
+				totalPages = aggregatedResults.length > 0 ? Math.ceil(aggregatedResults.length / pageSize) : 1;
+
+				// Display first page
+				displayResults(resultsByAPI, 1);
+			} catch (error) {
+				resultsContainer.innerHTML = '<div class="error">❌ Erro ao realizar pesquisa. Tente novamente.</div>';
+			} finally {
+				searchInProgress = false;
+			}
+		}
+
+		async function loadAllResults(query) {
+			const maxResults = 50; // Maximum results per API
+
+			// Load maps and dictionary once
+			const [mapResults, dictionaryResults] = await Promise.allSettled([
+				searchMaps(query),
+				searchDictionary(query)
+			]);
+
+			const results = {
+				maps: mapResults.status === 'fulfilled' ? mapResults.value : [],
+				dictionary: dictionaryResults.status === 'fulfilled' ? dictionaryResults.value : [],
+				wikipedia: [],
+				reddit: [],
+				duckduckgo: [],
+				arxiv: [],
+				nasa: [],
+				meteo: [],
+				openlibrary: []
+			};
+
+			// Load Wikipedia
+			let offset = 0;
+			while (results.wikipedia.length < maxResults) {
+				const res = await searchWikipedia(query, offset);
+				if (res.results.length === 0) break;
+				results.wikipedia = results.wikipedia.concat(res.results);
+				offset += res.results.length;
+				if (res.results.length < 4) break;
+			}
+
+			// Load Reddit
+			let after = null;
+			while (results.reddit.length < maxResults) {
+				const res = await searchReddit(query, after);
+				console.log('Reddit search results:', res); // Debug
+				if (res.results.length === 0) break;
+				results.reddit = results.reddit.concat(res.results);
+				after = res.after;
+				if (res.results.length < 4) break;
+			}
+			console.log('Total Reddit results loaded:', results.reddit.length); // Debug
+
+			// Load DuckDuckGo once
+			const duckRes = await searchDuckDuckGo(query, 0);
+			results.duckduckgo = duckRes.results.slice(0, maxResults);
+
+			// Load ArXiv (scientific papers)
+			const arxivRes = await searchArXiv(query);
+			results.arxiv = arxivRes.results.slice(0, 10);
+
+			// Load NASA APIs
+			const nasaRes = await searchNASA(query);
+			results.nasa = nasaRes.results.slice(0, 10);
+
+			// Load Open Meteo (weather data)
+			const meteoRes = await searchOpenMeteo(query);
+			results.meteo = meteoRes.results;
+
+			// Load Open Library
+			const openLibRes = await searchOpenLibrary(query);
+			results.openlibrary = openLibRes.results.slice(0, 10);
+
+			return results;
+		}
+
+		function displayResults(resultsByAPI, page = 1) {
+			const resultsContainer = document.getElementById('search-results');
+
+			let html = '';
+			const showPrimarySections = page === 1;
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.maps && resultsByAPI.maps.length > 0) {
+				const mapResult = resultsByAPI.maps[0];
+				html += `
+					<div class="map-section">
+						<div class="map-container">
+							<h3 class="map-title">Localização Encontrada</h3>
+							<p style="color: #6b7280; margin-bottom: 1.5rem;">${mapResult.display_name}</p>
+							<iframe 
+								class="map-frame"
+								src="https://www.openstreetmap.org/export/embed.html?bbox=${parseFloat(mapResult.lon)-0.01},${parseFloat(mapResult.lat)-0.01},${parseFloat(mapResult.lon)+0.01},${parseFloat(mapResult.lat)+0.01}&layer=mapnik&marker=${mapResult.lat},${mapResult.lon}"
+								allowfullscreen>
+							</iframe>
+						</div>
+					</div>
+				`;
+			}
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.dictionary && resultsByAPI.dictionary.length > 0) {
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="dictionary">';
+				html += '<div class="column-header">Dicionário</div>';
+				resultsByAPI.dictionary.forEach(result => {
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								<div class="result-image"></div>
+								<div class="result-text">
+									<div class="result-title">${result.title}</div>
+									<div class="result-description">${result.description}</div>
+									<div class="result-source">${getSourceLabel('dictionary')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.reddit && resultsByAPI.reddit.length > 0) {
+				const redditFeatured = primaryResultsBySource.reddit && primaryResultsBySource.reddit.length ? primaryResultsBySource.reddit : resultsByAPI.reddit.slice(0, PRIMARY_RESULTS_LIMIT);
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="reddit">';
+				html += '<div class="column-header">Reddit</div>';
+				redditFeatured.forEach(result => {
+					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
+					const linkUrl = titleMatch ? titleMatch[1] : '#';
+
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								${result.image ? `<img src="${result.image}" alt="${titleText}" class="result-image visible" onerror="this.style.display='none'">` : '<div class="result-image"></div>'}
+								<div class="result-text">
+									<div class="result-title">${titleText}</div>
+									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel('reddit')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.arxiv && resultsByAPI.arxiv.length > 0) {
+				const arxivFeatured = primaryResultsBySource.arxiv && primaryResultsBySource.arxiv.length ? primaryResultsBySource.arxiv : resultsByAPI.arxiv.slice(0, PRIMARY_RESULTS_LIMIT);
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="arxiv">';
+				html += '<div class="column-header">ArXiv - Papers Científicos</div>';
+				arxivFeatured.forEach(result => {
+					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
+					const linkUrl = titleMatch ? titleMatch[1] : '#';
+
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								<div class="result-image"></div>
+								<div class="result-text">
+									<div class="result-title">${titleText}</div>
+									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel('arxiv')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.nasa && resultsByAPI.nasa.length > 0) {
+				const nasaFeatured = primaryResultsBySource.nasa && primaryResultsBySource.nasa.length ? primaryResultsBySource.nasa : resultsByAPI.nasa.slice(0, PRIMARY_RESULTS_LIMIT);
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="nasa">';
+				html += '<div class="column-header">NASA</div>';
+				nasaFeatured.forEach(result => {
+					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
+					const linkUrl = titleMatch ? titleMatch[1] : '#';
+
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								${result.image ? `<img src="${result.image}" alt="${titleText}" class="result-image visible" onerror="this.style.display='none'">` : '<div class="result-image"></div>'}
+								<div class="result-text">
+									<div class="result-title">${titleText}</div>
+									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel('nasa')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.openlibrary && resultsByAPI.openlibrary.length > 0) {
+				const openLibraryFeatured = primaryResultsBySource.openlibrary && primaryResultsBySource.openlibrary.length ? primaryResultsBySource.openlibrary : resultsByAPI.openlibrary.slice(0, PRIMARY_RESULTS_LIMIT);
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="openlibrary">';
+				html += '<div class="column-header">Open Library - Livros</div>';
+				openLibraryFeatured.forEach(result => {
+					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
+					const linkUrl = titleMatch ? titleMatch[1] : '#';
+
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								${result.image ? `<img src="${result.image}" alt="${titleText}" class="result-image visible" onerror="this.style.display='none'">` : '<div class="result-image"></div>'}
+								<div class="result-text">
+									<div class="result-title">${titleText}</div>
+									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel('openlibrary')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			if (showPrimarySections && resultsByAPI && resultsByAPI.meteo && resultsByAPI.meteo.length > 0) {
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="meteo">';
+				html += '<div class="column-header">Clima</div>';
+				resultsByAPI.meteo.forEach(result => {
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								<div class="result-image"></div>
+								<div class="result-text">
+									<div class="result-title">${result.title}</div>
+									<div class="result-description">${result.description}</div>
+									<div class="result-source">${getSourceLabel('meteo')}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			}
+
+			const start = (page - 1) * pageSize;
+			const end = start + pageSize;
+			const pageResults = aggregatedResults.slice(start, end);
+
+			if (pageResults.length > 0) {
+				html += '<div class="results-columns">';
+				html += '<div class="api-column" data-api="results">';
+				html += '<div class="column-header">Outros Resultados</div>';
+				pageResults.forEach(result => {
+					const titleMatch = result.title.match(/<a[^>]*href="([^"]*)"[^>]*>([^<]*)<\/a>/);
+					const titleText = titleMatch ? titleMatch[2] : stripHTML(result.title);
+					const linkUrl = titleMatch ? titleMatch[1] : '#';
+
+					html += `
+						<div class="result-item">
+							<div class="result-content">
+								${result.image ? `<img src="${result.image}" alt="${titleText}" class="result-image visible" onerror="this.style.display='none'">` : '<div class="result-image"></div>'}
+								<div class="result-text">
+									<div class="result-title">${titleText}</div>
+									<a href="${linkUrl}" target="_blank" class="result-link">${linkUrl}</a>
+									<div class="result-description">${stripHTML(result.description)}</div>
+									<div class="result-source">${result.meta || getSourceLabel(result.source)}</div>
+								</div>
+							</div>
+						</div>
+					`;
+				});
+				html += '</div></div>';
+			} else if (!showPrimarySections) {
+				html += '<div class="no-results">Sem novos resultados nesta página.</div>';
+			}
+
+			resultsContainer.innerHTML = html;
+
+			// Update pagination
+			updatePagination();
+
+			// Update terms analysis
+			if (allResults.length > 0) {
+				setTimeout(() => {
+					updateTermsContent();
+					updateTermsSidebar();
+				}, 500);
+			}
+
+			// Configurar animações de scroll
+			setTimeout(() => {
+				const elementsToAnimate = resultsContainer.querySelectorAll('.map-section, .result-item');
+				elementsToAnimate.forEach(element => {
+					observer.observe(element);
+				});
+			}, 100);
+		}
+
+		function updatePagination() {
+			const paginationContainer = document.getElementById('pagination');
+			if (totalPages <= 1) {
+				paginationContainer.innerHTML = '';
+				return;
+			}
+
+			let html = '<button onclick="changePage(currentPage - 1)" ' + (currentPage === 1 ? 'disabled' : '') + '>&lt; Anterior</button> ';
+
+			const maxVisible = 5;
+			let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
+			let end = Math.min(totalPages, start + maxVisible - 1);
+			start = Math.max(1, end - maxVisible + 1);
+
+			for (let i = start; i <= end; i++) {
+				html += `<button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>${i}</button> `;
+			}
+
+			html += '<button onclick="changePage(currentPage + 1)" ' + (currentPage === totalPages ? 'disabled' : '') + '>Próxima &gt;</button>';
+
+			paginationContainer.innerHTML = html;
+		}
+
+		function changePage(page) {
+			if (page < 1 || page > totalPages) return;
+			currentPage = page;
+			displayResults(resultsByAPI, page);
+			window.scrollTo(0, 0);
+		}
+
+		async function searchMaps(query) {
+			try {
+				const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=1`;
+				const response = await fetch(url);
+				const data = await response.json();
+				return data;
+			} catch (error) {
+				return [];
+			}
+		}
+
+		async function searchWikipedia(query, offset = 0) {
+			try {
+				const url = `https://pt.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&format=json&origin=*&srlimit=4&sroffset=${offset}`;
+				const response = await fetch(url);
+				const data = await response.json();
+
+				// Para cada resultado, tentar obter a imagem da página
+				const results = await Promise.all(data.query.search.map(async (item) => {
+					let imageUrl = null;
+					
+					try {
+						// Tentar obter imagem da página
+						const imageUrlApi = `https://pt.wikipedia.org/w/api.php?action=query&prop=pageimages&piprop=thumbnail&pithumbsize=200&titles=${encodeURIComponent(item.title)}&format=json&origin=*`;
+						const imageResponse = await fetch(imageUrlApi);
+						const imageData = await imageResponse.json();
+						
+						const pages = imageData.query.pages;
+						const pageId = Object.keys(pages)[0];
+						if (pages[pageId].thumbnail) {
+							imageUrl = pages[pageId].thumbnail.source;
+						}
+					} catch (error) {
+						// Se não conseguir imagem, continua sem ela
+					}
+
+					return {
+						title: `<a href="https://pt.wikipedia.org/wiki/${encodeURIComponent(item.title.replace(/ /g, '_'))}" target="_blank">${item.title}</a>`,
+						description: item.snippet + '...',
+						image: imageUrl,
+						meta: null
+					};
+				}));
+
+				return { results: results };
+			} catch (error) {
+				return { results: [] };
+			}
+		}
+
+		async function searchReddit(query, after = null) {
+			try {
+				// Tentar usar API alternativa que não tenha restrições CORS
+				let url = `https://www.reddit.com/search.json?q=${encodeURIComponent(query)}&limit=4`;
+				if (after) url += `&after=${after}`;
+				
+				const response = await fetch(url, {
+					method: 'GET',
+					headers: {
+						'User-Agent': 'LunaGPT/1.0'
+					}
+				});
+				
+				if (!response.ok) {
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+				
+				const data = await response.json();
+
+				if (!data.data || !data.data.children) {
+					return { results: [], after: null };
+				}
+
+				const results = data.data.children.map(post => {
+					const item = post.data;
+					return {
+						title: `<a href="https://www.reddit.com${item.permalink}" target="_blank">${item.title}</a>`,
+						description: item.selftext ? item.selftext.substring(0, 200) + '...' : 'Clique para ver o conteúdo completo',
+						image: item.thumbnail && item.thumbnail !== 'self' && item.thumbnail !== 'default' && item.thumbnail.startsWith('http') ? item.thumbnail : null,
+						meta: `👍 ${item.ups || 0} upvotes • 💬 ${item.num_comments || 0} comentários • r/${item.subreddit}`
+					};
+				});
+
+				return { results: results, after: data.data.after };
+			} catch (error) {
+				console.warn('Reddit API error:', error);
+				// Como fallback, criar alguns resultados simulados para demonstração
+				return {
+					results: [
+						{
+							title: `<a href="https://www.reddit.com/search/?q=${encodeURIComponent(query)}" target="_blank">Buscar "${query}" no Reddit</a>`,
+							description: 'Clique para pesquisar este termo diretamente no Reddit e ver discussões da comunidade.',
+							image: null,
+							meta: 'Reddit - Busca manual necessária devido a restrições de API'
+						}
+					],
+					after: null
+				};
+			}
+		}
+
+		async function searchDuckDuckGo(query, offset = 0) {
+			try {
+				const url = `https://api.duckduckgo.com/?q=${encodeURIComponent(query)}&format=json`;
+				const response = await fetch(url);
+				const data = await response.json();
+
+				const results = [];
+
+				if (data.Abstract) {
+					results.push({
+						title: data.Heading || query,
+						description: data.Abstract,
+						image: data.Image ? `https://duckduckgo.com${data.Image}` : null,
+						meta: data.AbstractURL ? `<a href="${data.AbstractURL}" target="_blank">Leia mais →</a>` : null
+					});
+				}
+
+				if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+					data.RelatedTopics.slice(0, 4 + offset).forEach(topic => {  // maybe increase with offset
+						if (topic.Text) {
+							results.push({
+								title: topic.FirstURL ? `<a href="${topic.FirstURL}" target="_blank">${topic.Text.split(' - ')[0]}</a>` : topic.Text.split(' - ')[0],
+								description: topic.Text,
+								image: topic.Icon && topic.Icon.URL ? topic.Icon.URL : null,
+								meta: null
+							});
+						}
+					});
+				}
+
+				return { results: results };
+			} catch (error) {
+				return { results: [] };
+			}
+		}
+
+		async function searchDictionary(query) {
+			try {
+				// Só procurar no dicionário se for uma palavra simples em inglês
+				if (query.split(' ').length > 1 || !/^[a-zA-Z]+$/.test(query)) {
+					return [];
+				}
+
+				const url = `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(query.toLowerCase())}`;
+				const response = await fetch(url);
+				
+				if (!response.ok) return [];
+
+				const data = await response.json();
+				const entry = data[0];
+
+				if (!entry) return [];
+
+				const meaning = entry.meanings[0];
+				const definition = meaning.definitions[0];
+
+				return [{
+					title: `${entry.word} ${entry.phonetic ? `(${entry.phonetic})` : ''}`,
+					description: `<strong>${meaning.partOfSpeech}</strong>: ${definition.definition}${definition.example ? `<br><em>Exemplo: "${definition.example}"</em>` : ''}`,
+					meta: null
+				}];
+			} catch (error) {
+				return [];
+			}
+		}
+
+		async function searchArXiv(query) {
+			try {
+				const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(query)}&start=0&max_results=10`;
+				const response = await fetch(url);
+				const xmlText = await response.text();
+				
+				const parser = new DOMParser();
+				const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+				const entries = xmlDoc.querySelectorAll('entry');
+				
+				const results = Array.from(entries).map(entry => {
+					const title = entry.querySelector('title')?.textContent?.trim() || 'Sem título';
+					const summary = entry.querySelector('summary')?.textContent?.trim() || 'Sem resumo disponível';
+					const link = entry.querySelector('id')?.textContent?.trim() || '#';
+					const authors = Array.from(entry.querySelectorAll('author name')).map(author => author.textContent).join(', ');
+					const published = entry.querySelector('published')?.textContent?.trim() || '';
+					
+					return {
+						title: `<a href="${link}" target="_blank">${title}</a>`,
+						description: `${summary.substring(0, 200)}...`,
+						meta: `Por: ${authors} • Publicado: ${published.split('T')[0]}`
+					};
+				});
+
+				return { results };
+			} catch (error) {
+				console.warn('ArXiv API error:', error);
+				return { results: [] };
+			}
+		}
+
+		async function searchNASA(query) {
+			try {
+				const url = `https://images-api.nasa.gov/search?q=${encodeURIComponent(query)}&media_type=image&page_size=10`;
+				const response = await fetch(url);
+				const data = await response.json();
+				
+				if (!data.collection?.items) {
+					return { results: [] };
+				}
+
+				const results = data.collection.items.map(item => {
+					const itemData = item.data[0];
+					const imageLink = item.links && item.links[0] ? item.links[0].href : null;
+					
+					return {
+						title: `<a href="${itemData.nasa_id ? `https://images.nasa.gov/details-${itemData.nasa_id}` : '#'}" target="_blank">${itemData.title || 'Sem título'}</a>`,
+						description: itemData.description ? itemData.description.substring(0, 200) + '...' : 'Sem descrição disponível',
+						image: imageLink,
+						meta: `NASA • ${itemData.date_created ? itemData.date_created.split('T')[0] : 'Data não disponível'}`
+					};
+				});
+
+				return { results };
+			} catch (error) {
+				console.warn('NASA API error:', error);
+				return { results: [] };
+			}
+		}
+
+		async function searchOpenMeteo(query) {
+			try {
+				// Verificar se a query parece ser relacionada ao clima
+				const weatherKeywords = ['clima', 'weather', 'tempo', 'temperature', 'temperatura', 'chuva', 'rain', 'vento', 'wind', 'sol', 'sun'];
+				const isWeatherQuery = weatherKeywords.some(keyword => 
+					query.toLowerCase().includes(keyword)
+				);
+
+				if (!isWeatherQuery) {
+					return { results: [] };
+				}
+
+				// Tentar extrair nome de cidade da query
+				const cityQuery = query.replace(/clima|weather|tempo/gi, '').trim();
+				
+				if (!cityQuery) {
+					return {
+						results: [{
+							title: 'Previsão do Tempo',
+							description: 'Para obter informações meteorológicas, inclua o nome de uma cidade na sua pesquisa (ex: "clima São Paulo").'
+						}]
+					};
+				}
+
+				// Buscar coordenadas da cidade usando Nominatim
+				const geoUrl = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(cityQuery)}&format=json&limit=1`;
+				const geoResponse = await fetch(geoUrl);
+				const geoData = await geoResponse.json();
+
+				if (!geoData.length) {
+					return { results: [] };
+				}
+
+				const { lat, lon, display_name } = geoData[0];
+
+				// Buscar dados meteorológicos
+				const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto`;
+				const weatherResponse = await fetch(weatherUrl);
+				const weatherData = await weatherResponse.json();
+
+				const current = weatherData.current_weather;
+				const today = weatherData.daily;
+
+				const results = [{
+					title: `Clima em ${display_name.split(',')[0]}`,
+					description: `Temperatura atual: ${current.temperature}°C • Vento: ${current.windspeed} km/h • Máxima hoje: ${today.temperature_2m_max[0]}°C • Mínima: ${today.temperature_2m_min[0]}°C • Precipitação: ${today.precipitation_sum[0]}mm`
+				}];
+
+				return { results };
+			} catch (error) {
+				console.warn('Open Meteo API error:', error);
+				return { results: [] };
+			}
+		}
+
+		async function searchOpenLibrary(query) {
+			try {
+				const url = `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10`;
+				const response = await fetch(url);
+				const data = await response.json();
+
+				if (!data.docs) {
+					return { results: [] };
+				}
+
+				const results = data.docs.map(book => {
+					const title = book.title || 'Título não disponível';
+					const authors = book.author_name ? book.author_name.join(', ') : 'Autor desconhecido';
+					const publishYear = book.first_publish_year || 'Ano não disponível';
+					const isbn = book.isbn ? book.isbn[0] : null;
+					const coverId = book.cover_i;
+					const key = book.key;
+					
+					const bookUrl = `https://openlibrary.org${key}`;
+					const coverUrl = coverId ? `https://covers.openlibrary.org/b/id/${coverId}-M.jpg` : null;
+
+					return {
+						title: `<a href="${bookUrl}" target="_blank">${title}</a>`,
+						description: `Por: ${authors} • Primeira publicação: ${publishYear}`,
+						image: coverUrl,
+						meta: isbn ? `ISBN: ${isbn}` : 'ISBN não disponível'
+					};
+				});
+
+				return { results };
+			} catch (error) {
+				console.warn('Open Library API error:', error);
+				return { results: [] };
+			}
+		}
+	</script>
+</body>
+</html>
+

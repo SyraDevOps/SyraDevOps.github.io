@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syra Home - Painel de Controle</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --success-color: #28a745;
+            --danger-color: #dc3545;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #343a40;
+            --border-color: #dee2e6;
+            --shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-container {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--card-background);
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #bd2130;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            border: 1px solid var(--border-color);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+            font-size: 0.9rem;
+        }
+
+        .info-section {
+            grid-column: 1 / -1; /* Ocupa toda a largura */
+        }
+
+        .info-section h3 {
+            color: var(--danger-color);
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        .info-section p {
+            background-color: #fff3cd;
+            color: #856404;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #ffeeba;
+            font-size: 0.95rem;
+        }
+
+        .info-section code {
+            background-color: #e2e6ea;
+            color: var(--text-color);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .device-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .device-list li {
+            padding: 8px 0;
+            border-bottom: 1px dashed var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .device-list li:last-child {
+            border-bottom: none;
+        }
+
+        .message-item {
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: #f1f1f1;
+        }
+
+        .message-item strong {
+            color: var(--primary-color);
+        }
+
+        .message-item small {
+            display: block;
+            color: var(--secondary-color);
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="dashboard-container">
+
+    <!-- Card 1: Criar Dispositivo -->
+    <div class="card">
+        <h2>Criar Novo Dispositivo</h2>
+        <form id="createDeviceForm">
+            <label for="deviceName">Nome do Dispositivo:</label>
+            <input type="text" id="deviceName" placeholder="Ex: Sala-Luz-Principal" required>
+            <button type="submit" class="btn-success">Registrar Dispositivo</button>
+        </form>
+        <div id="createDeviceResult" class="result-box hidden"></div>
+    </div>
+
+    <!-- Card 2: Enviar Mensagem -->
+    <div class="card">
+        <h2>Enviar Mensagem (Bridge)</h2>
+        <form id="sendMessageForm">
+            <label for="messageTo">Destinatário (Dispositivo):</label>
+            <select id="messageTo" required>
+                <option value="">Carregando dispositivos...</option>
+            </select>
+
+            <label for="messageFrom">Remetente (Seu Nome/Dispositivo):</label>
+            <input type="text" id="messageFrom" placeholder="Ex: Painel-Web" value="Painel-Web" required>
+
+            <label for="messageBody">Mensagem (Data):</label>
+            <textarea id="messageBody" rows="3" placeholder="Ex: LIGAR_LUZ" required></textarea>
+
+            <button type="submit">Enviar Mensagem</button>
+        </form>
+        <div id="sendMessageResult" class="result-box hidden"></div>
+    </div>
+
+    <!-- Card 3: Visualizar Mensagens -->
+    <div class="card">
+        <h2>Visualizar Mensagens</h2>
+        <form id="viewMessagesForm">
+            <label for="viewDevice">Dispositivo para checar mensagens:</label>
+            <select id="viewDevice" required>
+                <option value="">Carregando dispositivos...</option>
+            </select>
+            <button type="submit">Buscar Mensagens</button>
+        </form>
+        <div id="viewMessagesResult" class="result-box hidden"></div>
+    </div>
+
+    <!-- Card 4: Lista de Dispositivos e Info -->
+    <div class="card">
+        <h2>Dispositivos Registrados</h2>
+        <ul id="registeredDevices" class="device-list">
+            <li>Nenhum dispositivo registrado.</li>
+        </ul>
+        <button onclick="fetchDevices()" class="btn-secondary">Atualizar Lista</button>
+        
+        <h2 style="margin-top: 20px;">Informações do Sistema</h2>
+        <div id="systemInfo" class="result-box">Carregando...</div>
+    </div>
+
+    <!-- Card 5: Informações Importantes (Exclusão) -->
+    <div class="card info-section">
+        <h2>Informações Importantes</h2>
+        <h3>Como Apagar um Dispositivo (Avançado)</h3>
+        <p>
+            A exclusão de um dispositivo é uma operação de segurança que geralmente requer a execução de um comando HTTP DELETE diretamente no terminal (CMD ou PowerShell no Windows, Terminal no Linux/macOS). 
+            Isso garante que a remoção seja intencional e não acidental.
+            Para apagar o dispositivo chamado <strong>"teste"</strong>, execute o seguinte comando:
+            <code>curl -X DELETE "http://Syra-Home-SYRA0156326.local/dispositivos?name=teste"</code>
+        </p>
+        <p>
+            <strong>Nota:</strong> Substitua <code>"teste"</code> pelo nome exato do dispositivo que você deseja remover. O comando deve ser executado em uma rede onde o endereço <code>Syra-Home-SYRA0156326.local</code> seja acessível.
+        </p>
+    </div>
+
+</div>
+
+<script>
+    const API_BASE_URL = "http://Syra-Home-SYRA0156326.local";
+
+    // --- Funções de Utilidade ---
+
+    function showResult(elementId, message, isError = false) {
+        const element = document.getElementById(elementId);
+        element.classList.remove('hidden');
+        element.style.backgroundColor = isError ? '#f8d7da' : '#d4edda';
+        element.style.color = isError ? '#721c24' : '#155724';
+        element.innerHTML = message;
+    }
+
+    function hideResult(elementId) {
+        document.getElementById(elementId).classList.add('hidden');
+    }
+
+    // --- Funções de API ---
+
+    async function fetchSystemInfo() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/info`);
+            const data = await response.json();
+            document.getElementById('systemInfo').innerHTML = `
+                <strong>ID:</strong> ${data.id}<br>
+                <strong>Nome:</strong> ${data.name}<br>
+                <strong>IP:</strong> ${data.ip}<br>
+                <strong>Status:</strong> ${data.status}<br>
+                <strong>mDNS:</strong> ${data.mdns}
+            `;
+        } catch (error) {
+            document.getElementById('systemInfo').innerHTML = `<span style="color: var(--danger-color);">Erro ao carregar info: ${error.message}</span>`;
+        }
+    }
+
+    async function fetchDevices() {
+        const listElement = document.getElementById('registeredDevices');
+        const selectElements = [document.getElementById('messageTo'), document.getElementById('viewDevice')];
+        
+        listElement.innerHTML = '<li>Carregando...</li>';
+        selectElements.forEach(sel => sel.innerHTML = '<option value="">Carregando dispositivos...</option>');
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/dispositivos`);
+            const data = await response.json();
+            
+            listElement.innerHTML = '';
+            selectElements.forEach(sel => sel.innerHTML = '<option value="">Selecione um dispositivo</option>');
+
+            if (data.items && data.items.length > 0) {
+                data.items.forEach(device => {
+                    // Lista
+                    const li = document.createElement('li');
+                    li.textContent = device;
+                    listElement.appendChild(li);
+
+                    // Selects
+                    const option = document.createElement('option');
+                    option.value = device;
+                    option.textContent = device;
+                    selectElements.forEach(sel => sel.appendChild(option.cloneNode(true)));
+                });
+            } else {
+                listElement.innerHTML = '<li>Nenhum dispositivo registrado.</li>';
+            }
+        } catch (error) {
+            listElement.innerHTML = `<li><span style="color: var(--danger-color);">Erro ao carregar dispositivos: ${error.message}</span></li>`;
+            selectElements.forEach(sel => sel.innerHTML = '<option value="">Erro ao carregar</option>');
+        }
+    }
+
+    // --- Handlers de Formulário ---
+
+    document.getElementById('createDeviceForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        hideResult('createDeviceResult');
+        const deviceName = document.getElementById('deviceName').value.trim();
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/dispositivos`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `name=${encodeURIComponent(deviceName)}`
+            });
+
+            const text = await response.text();
+            const data = JSON.parse(text);
+
+            if (response.ok && data.ok) {
+                showResult('createDeviceResult', `✅ Dispositivo <strong>${deviceName}</strong> registrado com sucesso!`);
+                document.getElementById('deviceName').value = '';
+                fetchDevices(); // Atualiza a lista
+            } else {
+                showResult('createDeviceResult', `❌ Erro ao registrar: ${data.err || 'Resposta desconhecida'}`, true);
+            }
+        } catch (error) {
+            showResult('createDeviceResult', `❌ Erro de conexão: ${error.message}`, true);
+        }
+    });
+
+    document.getElementById('sendMessageForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        hideResult('sendMessageResult');
+        const to = document.getElementById('messageTo').value;
+        const from = document.getElementById('messageFrom').value.trim();
+        const body = document.getElementById('messageBody').value.trim();
+
+        if (!to) {
+            showResult('sendMessageResult', '❌ Por favor, selecione um dispositivo destinatário.', true);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/bridge`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `to=${encodeURIComponent(to)}&from=${encodeURIComponent(from)}&data=${encodeURIComponent(body)}`
+            });
+
+            const text = await response.text();
+            const data = JSON.parse(text);
+
+            if (response.ok && data.ok) {
+                showResult('sendMessageResult', `✅ Mensagem enviada para <strong>${to}</strong> com sucesso!`);
+                document.getElementById('messageBody').value = '';
+            } else {
+                showResult('sendMessageResult', `❌ Erro ao enviar: ${data.err || 'Resposta desconhecida'}`, true);
+            }
+        } catch (error) {
+            showResult('sendMessageResult', `❌ Erro de conexão: ${error.message}`, true);
+        }
+    });
+
+    document.getElementById('viewMessagesForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        hideResult('viewMessagesResult');
+        const device = document.getElementById('viewDevice').value;
+
+        if (!device) {
+            showResult('viewMessagesResult', '❌ Por favor, selecione um dispositivo para checar mensagens.', true);
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/bridge?device=${encodeURIComponent(device)}`);
+            const data = await response.json();
+
+            if (response.ok && data.ok) {
+                if (data.messages && data.messages.length > 0) {
+                    let html = `<strong>${data.messages.length}</strong> mensagens encontradas para <strong>${device}</strong>:<br><br>`;
+                    data.messages.forEach(msg => {
+                        html += `
+                            <div class="message-item">
+                                <strong>De:</strong> ${msg.from}<br>
+                                <strong>Conteúdo:</strong> ${msg.data}
+                                <small>Timestamp: ${new Date(msg.ts).toLocaleString()}</small>
+                            </div>
+                        `;
+                    });
+                    showResult('viewMessagesResult', html);
+                } else {
+                    showResult('viewMessagesResult', `ℹ️ Nenhuma mensagem pendente para <strong>${device}</strong>.`);
+                }
+            } else {
+                showResult('viewMessagesResult', `❌ Erro ao buscar: ${data.err || 'Resposta desconhecida'}`, true);
+            }
+        } catch (error) {
+            showResult('viewMessagesResult', `❌ Erro de conexão: ${error.message}`, true);
+        }
+    });
+
+    // --- Inicialização ---
+
+    window.onload = () => {
+        fetchSystemInfo();
+        fetchDevices();
+    };
+</script>
+
+</body>
+</html>
