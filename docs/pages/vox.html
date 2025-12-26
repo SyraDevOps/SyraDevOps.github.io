@@ -237,6 +237,39 @@
             animation: statusPulse 2s infinite;
         }
 
+        .audio-meter {
+            position: fixed;
+            top: 26px;
+            right: 50px;
+            height: 16px;
+            width: 120px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            z-index: 1002;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .audio-meter .bar {
+            height: 100%;
+            width: 6%;
+            background: linear-gradient(90deg, #8bc34a, #4caf50);
+            transition: width 120ms ease, background 180ms ease;
+        }
+
+        .audio-meter.level-low .bar {
+            background: linear-gradient(90deg, #cddc39, #9e9d24);
+        }
+
+        .audio-meter.level-muted .bar {
+            background: linear-gradient(90deg, #f44336, #d32f2f);
+        }
+
+        .audio-meter.level-high .bar {
+            background: linear-gradient(90deg, #ff9800, #f57c00);
+        }
+
         .highlight {
             background-color: #90EE90;
             padding: 2px 4px;
@@ -244,6 +277,56 @@
             font-weight: 500;
             color: #333;
         }
+
+        .badge-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+            font-size: 0.78rem;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 999px;
+            background: rgba(0, 0, 0, 0.06);
+            color: #333;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            text-transform: none;
+            letter-spacing: 0.01em;
+        }
+
+        .badge-question { background: rgba(30, 136, 229, 0.12); border-color: rgba(30, 136, 229, 0.35); color: #1e88e5; }
+        .badge-command { background: rgba(255, 112, 67, 0.14); border-color: rgba(255, 112, 67, 0.35); color: #f4511e; }
+        .badge-topic { background: rgba(0, 200, 83, 0.14); border-color: rgba(0, 200, 83, 0.35); color: #00c853; }
+        .badge-thought { background: rgba(156, 39, 176, 0.12); border-color: rgba(156, 39, 176, 0.35); color: #9c27b0; }
+        .badge-note { background: rgba(255, 202, 40, 0.18); border-color: rgba(255, 202, 40, 0.45); color: #c17900; }
+        .badge-task { background: rgba(3, 169, 244, 0.16); border-color: rgba(3, 169, 244, 0.35); color: #0288d1; }
+        .badge-idea { background: rgba(255, 235, 59, 0.26); border-color: rgba(255, 235, 59, 0.55); color: #8a7300; }
+
+        .confidence-dot {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: #666;
+        }
+
+        .confidence-dot::before {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+        }
+
+        .conf-high::before { background: #4CAF50; box-shadow: 0 0 8px rgba(76, 175, 80, 0.4); }
+        .conf-mid::before { background: #FFC107; box-shadow: 0 0 8px rgba(255, 193, 7, 0.35); }
+        .conf-low::before { background: #F44336; box-shadow: 0 0 8px rgba(244, 67, 54, 0.35); }
+
+        .line-reviewed { border-left-color: #FFC107; background: rgba(255, 193, 7, 0.08); }
 
         @keyframes pulse {
             0% {
@@ -403,6 +486,9 @@
     </div>
 
     <div class="status-indicator" id="statusIndicator"></div>
+    <div class="audio-meter" id="audioMeter" aria-label="Nível de áudio">
+        <div class="bar"></div>
+    </div>
 
     <div class="transcription-display" id="transcriptionDisplay">
         <div class="transcription-lines" id="transcriptionLines">
@@ -420,156 +506,466 @@
         const statusIndicator = document.getElementById('statusIndicator');
         const transcriptionLines = document.getElementById('transcriptionLines');
         const saveControls = document.getElementById('saveControls');
+        const audioMeter = document.getElementById('audioMeter');
+        const audioBar = audioMeter ? audioMeter.querySelector('.bar') : null;
 
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const MAX_ROLLBACK_WORDS = 5;
+        const MIN_WORDS_FOR_SAVE = 3;
+        const SAVE_DEBOUNCE_MS = 1500;
+        const FREEZE_MS = 1500;
+        const SILENCE_THRESHOLD = 0.02;
+        const SILENCE_MS = 1200;
 
-        let recognition = null;
-        let isListening = false;
-        let allTranscriptions = [];
-        let allRawTranscriptions = [];
-        let entryWordCounts = [];
-        let transcriptionEntryElements = [];
-        let committedWords = [];
-        let interimElement = null;
-        let lastSavedTranscription = '';
-        let sessionStartTime = null;
-        let lastTranscriptionTime = 0;
+        const commandWords = ['salvar', 'limpar', 'parar', 'pausar', 'continuar', 'gravar'];
+        const questionWords = ['por que', 'porque', 'por quê', 'quando', 'como', 'onde', 'quem'];
+        const connectors = ['então', 'mas', 'porém', 'contudo', 'logo', 'portanto'];
 
-        function highlightKeywords(text) {
-            const keywords = ['olá', 'teste', 'português', 'reconhecimento', 'voz', 'syra', 'tecnologia', 'inteligência', 'artificial'];
-            return keywords.reduce((acc, keyword) => {
-                const regex = new RegExp(`\\b${keyword}\\b`, 'gi');
-                return acc.replace(regex, match => `<span class="highlight">${match}</span>`);
-            }, text);
-        }
+        const loadDictionary = () => {
+            try {
+                const stored = localStorage.getItem('voxDictionary');
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                return [];
+            }
+        };
 
-        function updateEmptyStateWhenNeeded() {
-            if (!allTranscriptions.length && !interimElement) {
-                const message = isListening ? 'Escutando...' : 'Clique no microfone para começar a falar...';
+        const saveDictionary = dict => {
+            try {
+                localStorage.setItem('voxDictionary', JSON.stringify(dict.slice(0, 200)));
+            } catch (e) {
+                // ignore quota
+            }
+        };
+
+        const voxState = {
+            recognition: null,
+            isListening: false,
+            committedWords: [],
+            entries: [],
+            entryWordCounts: [],
+            entryNodes: [],
+            entryMeta: [],
+            rawTranscriptions: [],
+            interimNode: null,
+            lastSavedNormalized: '',
+            lastSavedAt: 0,
+            sessionStart: null,
+            audioContext: null,
+            analyser: null,
+            audioRAF: null,
+            silenceStartedAt: null,
+            silenceRecently: false,
+            lastEventAt: 0,
+            lastRms: 0,
+            dictionary: loadDictionary()
+        };
+
+        const semanticState = {
+            frequencies: {}
+        };
+
+        const normalizeTranscript = text => {
+            return text
+                .toLowerCase()
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^\w\s]/g, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        };
+
+        const escapeHtml = text => text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+
+        const extractWords = text => text.split(/\s+/).filter(Boolean);
+
+        const applyAutoPunctuation = (text, context) => {
+            const trimmed = text.trim();
+            if (!trimmed) {
+                return '';
+            }
+
+            const lower = normalizeTranscript(trimmed);
+            const endsWithPunct = /[.!?…:]$/.test(trimmed);
+            const pause = context?.pause || 0;
+            const silence = context?.silenceRecently;
+            const hasQuestionCue = questionWords.some(q => lower.includes(q));
+
+            if (endsWithPunct) {
+                return trimmed;
+            }
+
+            if (hasQuestionCue) {
+                return `${trimmed}?`;
+            }
+
+            if (silence || pause > 1200) {
+                return `${trimmed}.`;
+            }
+
+            if (pause > 700) {
+                return `${trimmed},`;
+            }
+
+            return trimmed;
+        };
+
+        const polishSentence = text => {
+            if (!text) return '';
+            let t = text.replace(/\s+/g, ' ').trim();
+            // remove repetições imediatas
+            t = t.replace(/(\b\w+\b)\s+\1/gi, '$1');
+            // capitaliza início
+            t = t.charAt(0).toUpperCase() + t.slice(1);
+            // garante pontuação final
+            if (!/[.!?…:]$/.test(t)) {
+                t += '.';
+            }
+            return t;
+        };
+
+        const computeRollback = (segmentWords, committedWords) => {
+            let prefix = 0;
+            const len = Math.min(segmentWords.length, committedWords.length);
+            while (prefix < len && segmentWords[prefix].toLowerCase() === committedWords[prefix].toLowerCase()) {
+                prefix++;
+            }
+            const minPrefix = Math.max(0, committedWords.length - MAX_ROLLBACK_WORDS);
+            return Math.max(prefix, minPrefix);
+        };
+
+        const detectBadges = text => {
+            const norm = normalizeTranscript(text);
+            const badges = [];
+            if (questionWords.some(q => norm.includes(q)) || /\?$/.test(text.trim())) {
+                badges.push('question');
+            }
+            if (commandWords.some(cmd => norm.includes(cmd))) {
+                badges.push('command');
+            }
+            if (connectors.some(c => norm.startsWith(c))) {
+                badges.push('topic');
+            }
+            if (/\b(tarefa|to\s?do|task)\b/i.test(text)) {
+                badges.push('task');
+            }
+            if (/\b(ideia|idea|inspira)\b/i.test(text)) {
+                badges.push('idea');
+            }
+            if (/\b(nota|anota|registrar)\b/i.test(text)) {
+                badges.push('note');
+            }
+            if (/\b(tipo|hum|é\.{0,2}|é\s+que)\b/i.test(text) || /\.\.\.$/.test(text.trim())) {
+                badges.push('thought');
+            }
+            return badges;
+        };
+
+        const confidenceLevel = score => {
+            if (score >= 0.7) return 'conf-high';
+            if (score >= 0.4) return 'conf-mid';
+            return 'conf-low';
+        };
+
+        const deriveConfidenceScore = (speechConfidence, rms) => {
+            const conf = typeof speechConfidence === 'number' ? speechConfidence : 0.55;
+            const volume = Math.min(1, Math.max(0, rms * 2.5));
+            const blend = (conf * 0.65) + (volume * 0.35);
+            return Math.min(1, Math.max(0.15, blend));
+        };
+
+        const freezeOldEntries = now => {
+            voxState.entryMeta.forEach(meta => {
+                if (!meta) return;
+                if (!meta.frozenAt && now - meta.createdAt >= FREEZE_MS) {
+                    meta.frozenAt = now;
+                }
+            });
+        };
+
+        const recomputeFrequencies = () => {
+            const freq = {};
+            voxState.entries.forEach(text => {
+                extractWords(normalizeTranscript(text)).forEach(word => {
+                    freq[word] = (freq[word] || 0) + 1;
+                    if (!voxState.dictionary.includes(word) && word.length >= 6) {
+                        voxState.dictionary.push(word);
+                    }
+                });
+            });
+            semanticState.frequencies = freq;
+            saveDictionary(voxState.dictionary);
+        };
+
+        const refreshHighlights = () => {
+            voxState.entryNodes.forEach((node, index) => {
+                if (node) {
+                    node.innerHTML = buildLineHtml(voxState.entries[index], voxState.entryMeta[index]);
+                    node.classList.toggle('line-reviewed', !!voxState.entryMeta[index]?.reviewed);
+                }
+            });
+        };
+
+        const shouldHighlightWord = word => {
+            const norm = normalizeTranscript(word);
+            const freq = semanticState.frequencies[norm] || 0;
+            const isCommand = commandWords.includes(norm);
+            const inDictionary = voxState.dictionary.includes(norm);
+            const isLong = norm.length >= 9;
+            const hasNumber = /\d/.test(word);
+            const isRepeated = freq >= 3;
+            return isCommand || isLong || hasNumber || isRepeated || (!freq && !inDictionary && norm.length >= 6);
+        };
+
+        const highlightSemantic = text => {
+            const tokens = text.split(/(\s+)/);
+            return tokens.map(token => {
+                if (/^\s+$/.test(token)) {
+                    return token;
+                }
+                if (shouldHighlightWord(token)) {
+                    return `<span class="highlight">${escapeHtml(token)}</span>`;
+                }
+                return escapeHtml(token);
+            }).join('');
+        };
+
+        const buildBadgesHtml = badges => {
+            if (!badges || !badges.length) return '';
+            const mapClass = {
+                question: 'badge-question',
+                command: 'badge-command',
+                topic: 'badge-topic',
+                thought: 'badge-thought',
+                note: 'badge-note',
+                task: 'badge-task',
+                idea: 'badge-idea'
+            };
+            return `<div class="badge-row">${badges.map(b => `<span class="badge ${mapClass[b] || ''}">${b}</span>`).join('')}</div>`;
+        };
+
+        const buildLineHtml = (text, meta) => {
+            const confClass = confidenceLevel(meta?.confidence || 0.5);
+            const confLabel = meta?.confidence ? `${Math.round(meta.confidence * 100)}%` : '';
+            const confidenceHtml = `<span class="confidence-dot ${confClass}">${confLabel}</span>`;
+            const badgesHtml = buildBadgesHtml(meta?.badges || []);
+            return `${highlightSemantic(text)}${badgesHtml ? badgesHtml : ''}<div class="badge-row">${confidenceHtml}</div>`;
+        };
+
+        const updateEmptyStateWhenNeeded = () => {
+            if (!voxState.entries.length && !voxState.interimNode) {
+                const message = voxState.isListening ? 'Escutando...' : 'Clique no microfone para começar a falar...';
                 transcriptionLines.innerHTML = `<div class="empty-state">${message}</div>`;
                 saveControls.style.display = 'none';
             }
-        }
+        };
 
-        function trimStoredEntriesTo(wordCount) {
-            let totalWords = entryWordCounts.reduce((sum, count) => sum + count, 0);
+        const trimStoredEntriesTo = wordCount => {
+            let total = voxState.entryWordCounts.reduce((sum, count) => sum + count, 0);
 
-            while (totalWords > wordCount && allTranscriptions.length) {
-                const lastIndex = allTranscriptions.length - 1;
-                const wordsInEntry = entryWordCounts[lastIndex];
-                const removeCount = Math.min(wordsInEntry, totalWords - wordCount);
+            while (total > wordCount && voxState.entries.length) {
+                const lastIndex = voxState.entries.length - 1;
+                const wordsInEntry = voxState.entryWordCounts[lastIndex];
+                const removeCount = Math.min(wordsInEntry, total - wordCount);
 
                 if (removeCount === wordsInEntry) {
-                    const element = transcriptionEntryElements[lastIndex];
-                    if (element) {
-                        element.remove();
+                    const node = voxState.entryNodes[lastIndex];
+                    if (node) {
+                        node.remove();
                     }
-                    allTranscriptions.pop();
-                    entryWordCounts.pop();
-                    transcriptionEntryElements.pop();
+                    voxState.entries.pop();
+                    voxState.entryWordCounts.pop();
+                    voxState.entryNodes.pop();
+                    voxState.entryMeta.pop();
                 } else {
-                    const words = allTranscriptions[lastIndex].split(/\s+/);
+                    const words = voxState.entries[lastIndex].split(/\s+/);
                     const updatedWords = words.slice(0, words.length - removeCount);
-                    allTranscriptions[lastIndex] = updatedWords.join(' ');
-                    entryWordCounts[lastIndex] -= removeCount;
-                    const element = transcriptionEntryElements[lastIndex];
-                    if (element) {
-                        element.innerHTML = highlightKeywords(allTranscriptions[lastIndex]);
+                    voxState.entries[lastIndex] = updatedWords.join(' ');
+                    voxState.entryWordCounts[lastIndex] -= removeCount;
+                    const node = voxState.entryNodes[lastIndex];
+                    if (node) {
+                        node.innerHTML = buildLineHtml(voxState.entries[lastIndex], voxState.entryMeta[lastIndex]);
                     }
                 }
 
-                totalWords -= removeCount;
+                total -= removeCount;
             }
 
-            committedWords = committedWords.slice(0, wordCount);
+            voxState.committedWords = voxState.committedWords.slice(0, wordCount);
+            recomputeFrequencies();
+            refreshHighlights();
             updateEmptyStateWhenNeeded();
-        }
+        };
 
-        function handleFinalSegment(segmentText) {
-            const cleanedSegment = segmentText.replace(/\s+/g, ' ').trim();
-            if (!cleanedSegment) {
+        const mergeOrAppendEntry = (newWords, meta, now) => {
+            const newText = newWords.join(' ').trim();
+            if (!newText) {
                 return;
             }
 
-            if (interimElement) {
-                interimElement.remove();
-                interimElement = null;
+            if (!voxState.entries.length) {
+                transcriptionLines.innerHTML = '';
             }
 
-            const segmentWords = cleanedSegment.split(/\s+/).filter(Boolean);
-            let prefixLength = 0;
+            const lastIndex = voxState.entries.length - 1;
+            const lastMeta = voxState.entryMeta[lastIndex];
+            const startWithConnector = connectors.includes(normalizeTranscript(newWords[0] || ''));
+            const canMerge =
+                lastIndex >= 0 &&
+                voxState.entryWordCounts[lastIndex] > 0 &&
+                !/[.!?…:]$/.test(voxState.entries[lastIndex].trim()) &&
+                voxState.entryWordCounts[lastIndex] + newWords.length <= 40 &&
+                newWords.length <= 6 &&
+                !startWithConnector &&
+                !(lastMeta && lastMeta.frozenAt);
 
-            while (
-                prefixLength < committedWords.length &&
-                prefixLength < segmentWords.length &&
-                segmentWords[prefixLength].toLowerCase() === committedWords[prefixLength].toLowerCase()
-            ) {
-                prefixLength++;
+            if (canMerge) {
+                if (!voxState.entryMeta[lastIndex]) {
+                    voxState.entryMeta[lastIndex] = { createdAt: now, confidence: meta.confidence, badges: [...(meta.badges || [])] };
+                }
+                voxState.entries[lastIndex] = `${voxState.entries[lastIndex]} ${newText}`.trim();
+                voxState.entryWordCounts[lastIndex] += newWords.length;
+                if (lastMeta) {
+                    lastMeta.confidence = Math.max(lastMeta.confidence || 0, meta.confidence || 0);
+                    lastMeta.badges = Array.from(new Set([...(lastMeta.badges || []), ...(meta.badges || [])]));
+                    lastMeta.reviewed = lastMeta.reviewed || meta.reviewed;
+                }
+                const node = voxState.entryNodes[lastIndex];
+                if (node) {
+                    node.innerHTML = buildLineHtml(voxState.entries[lastIndex], voxState.entryMeta[lastIndex]);
+                    if (lastMeta?.reviewed) {
+                        node.classList.add('line-reviewed');
+                    }
+                }
+            } else {
+                const lineDiv = document.createElement('div');
+                lineDiv.className = 'transcription-line';
+                if (meta?.reviewed) {
+                    lineDiv.classList.add('line-reviewed');
+                }
+                lineDiv.innerHTML = buildLineHtml(newText, meta);
+                transcriptionLines.appendChild(lineDiv);
+
+                voxState.entryNodes.push(lineDiv);
+                voxState.entries.push(newText);
+                voxState.entryWordCounts.push(newWords.length);
+                voxState.entryMeta.push(meta);
             }
 
-            if (prefixLength < committedWords.length) {
+            transcriptionLines.scrollTop = transcriptionLines.scrollHeight;
+            saveControls.style.display = 'flex';
+            recomputeFrequencies();
+            refreshHighlights();
+            freezeOldEntries(now);
+        };
+
+        const commitSegment = (cleanedText, meta, now) => {
+            if (voxState.interimNode) {
+                voxState.interimNode.remove();
+                voxState.interimNode = null;
+            }
+
+            const segmentWords = extractWords(cleanedText);
+            if (!segmentWords.length) {
+                updateEmptyStateWhenNeeded();
+                return;
+            }
+
+            const prefixLength = computeRollback(segmentWords, voxState.committedWords);
+            if (prefixLength < voxState.committedWords.length) {
                 trimStoredEntriesTo(prefixLength);
             }
 
             const newWords = segmentWords.slice(prefixLength);
-            const newText = newWords.join(' ').trim();
+            mergeOrAppendEntry(newWords, meta, now);
+            voxState.committedWords = segmentWords.slice(0, prefixLength + newWords.length);
+        };
 
-            if (newText) {
-                if (!allTranscriptions.length) {
-                    transcriptionLines.innerHTML = '';
+        const shouldSaveFinal = (text, now) => {
+            const normalized = normalizeTranscript(text);
+            const words = extractWords(normalized);
+            const enoughWords = words.length >= MIN_WORDS_FOR_SAVE;
+            const changed = normalized && normalized !== voxState.lastSavedNormalized;
+            const spacedOut = now - voxState.lastSavedAt >= SAVE_DEBOUNCE_MS;
+            return enoughWords && changed && spacedOut;
+        };
+
+        const formatTimestamp = (start, now) => {
+            const elapsedSec = Math.floor((now - start) / 1000);
+            const minutes = Math.floor(elapsedSec / 60);
+            const seconds = elapsedSec % 60;
+            return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        };
+
+        const handleFinalSegment = (text, now, confidenceHint, pauseSinceLast) => {
+            const cleaned = text.replace(/\s+/g, ' ').trim();
+            if (!cleaned) {
+                return;
+            }
+
+            if (voxState.sessionStart === null) {
+                voxState.sessionStart = now;
+            }
+
+            const withPunctuation = applyAutoPunctuation(cleaned, { pause: pauseSinceLast, silenceRecently: voxState.silenceRecently });
+            const polished = polishSentence(withPunctuation);
+            const badges = detectBadges(polished);
+            const confidenceScore = deriveConfidenceScore(confidenceHint, voxState.lastRms || 0);
+            const meta = {
+                createdAt: now,
+                frozenAt: null,
+                confidence: confidenceScore,
+                badges,
+                reviewed: true
+            };
+
+            if (shouldSaveFinal(polished, now)) {
+                const timestamp = formatTimestamp(voxState.sessionStart, now);
+                voxState.rawTranscriptions.push(`[${timestamp}] ${polished}`);
+                voxState.lastSavedNormalized = normalizeTranscript(polished);
+                voxState.lastSavedAt = now;
+            }
+
+            commitSegment(polished, meta, now);
+        };
+
+        const renderInterim = text => {
+            const interim = text.trim();
+            if (interim) {
+                if (!voxState.interimNode) {
+                    voxState.interimNode = document.createElement('div');
+                    voxState.interimNode.className = 'transcription-line interim';
+                    transcriptionLines.appendChild(voxState.interimNode);
                 }
-
-                const lastIndex = allTranscriptions.length - 1;
-                const canMerge =
-                    lastIndex >= 0 &&
-                    entryWordCounts[lastIndex] > 0 &&
-                    !/[.!?…:]$/.test(allTranscriptions[lastIndex].trim()) &&
-                    entryWordCounts[lastIndex] + newWords.length <= 40 &&
-                    newWords.length <= 6;
-
-                if (canMerge) {
-                    allTranscriptions[lastIndex] = `${allTranscriptions[lastIndex]} ${newText}`.trim();
-                    entryWordCounts[lastIndex] += newWords.length;
-                    const element = transcriptionEntryElements[lastIndex];
-                    if (element) {
-                        element.innerHTML = highlightKeywords(allTranscriptions[lastIndex]);
-                    }
-                } else {
-                    const lineDiv = document.createElement('div');
-                    lineDiv.className = 'transcription-line';
-                    lineDiv.innerHTML = highlightKeywords(newText);
-                    transcriptionLines.appendChild(lineDiv);
-
-                    transcriptionEntryElements.push(lineDiv);
-                    allTranscriptions.push(newText);
-                    entryWordCounts.push(newWords.length);
-                }
-
+                voxState.interimNode.innerHTML = highlightSemantic(interim);
                 transcriptionLines.scrollTop = transcriptionLines.scrollHeight;
-                saveControls.style.display = 'flex';
-            } else {
+            } else if (voxState.interimNode) {
+                voxState.interimNode.remove();
+                voxState.interimNode = null;
                 updateEmptyStateWhenNeeded();
             }
+        };
 
-            committedWords = segmentWords;
-        }
-
-        function initializeSpeechRecognition() {
-            if (recognition || !SpeechRecognition) {
-                if (!recognition && !SpeechRecognition) {
+        const initializeSpeechRecognition = () => {
+            if (voxState.recognition || !SpeechRecognition) {
+                if (!voxState.recognition && !SpeechRecognition) {
                     transcriptionLines.innerHTML = '<div class="empty-state" style="color: #ff6b6b;">Reconhecimento de voz não suportado neste navegador</div>';
                 }
-                return !!recognition;
+                return !!voxState.recognition;
             }
 
-            recognition = new SpeechRecognition();
+            const recognition = new SpeechRecognition();
             recognition.continuous = true;
             recognition.interimResults = true;
             recognition.lang = 'pt-BR';
 
             recognition.onstart = () => {
                 statusIndicator.classList.add('active');
-                if (!allTranscriptions.length && !interimElement) {
+                if (!voxState.entries.length && !voxState.interimNode) {
                     transcriptionLines.innerHTML = '<div class="empty-state">Escutando...</div>';
                 }
                 transcriptionLines.classList.add('visible');
@@ -577,49 +973,27 @@
 
             recognition.onresult = event => {
                 let interimTranscript = '';
-                const currentTime = Date.now();
-                
-                if (!sessionStartTime) {
-                    sessionStartTime = currentTime;
+                const now = Date.now();
+                const pause = voxState.lastEventAt ? now - voxState.lastEventAt : 0;
+                voxState.lastEventAt = now;
+
+                if (voxState.sessionStart === null) {
+                    voxState.sessionStart = now;
                 }
 
                 for (let i = event.resultIndex; i < event.results.length; i++) {
                     const result = event.results[i];
                     const transcript = result[0].transcript.trim();
+                    const confidenceHint = typeof result[0].confidence === 'number' ? result[0].confidence : undefined;
 
                     if (result.isFinal && transcript) {
-                        // Só salva se for diferente da última transcrição e tiver pelo menos 2 segundos de diferença
-                        if (transcript !== lastSavedTranscription && (currentTime - lastTranscriptionTime) > 2000) {
-                            const timeFromStart = Math.floor((currentTime - sessionStartTime) / 1000);
-                            const minutes = Math.floor(timeFromStart / 60);
-                            const seconds = timeFromStart % 60;
-                            const timeStamp = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-                            
-                            allRawTranscriptions.push(`[${timeStamp}] ${transcript}`);
-                            lastSavedTranscription = transcript;
-                            lastTranscriptionTime = currentTime;
-                        }
-                        handleFinalSegment(transcript);
+                        handleFinalSegment(transcript, now, confidenceHint, pause);
                     } else if (!result.isFinal) {
-                        interimTranscript += transcript;
+                        interimTranscript += ` ${transcript}`;
                     }
                 }
 
-                const trimmedInterim = interimTranscript.trim();
-
-                if (trimmedInterim) {
-                    if (!interimElement) {
-                        interimElement = document.createElement('div');
-                        interimElement.className = 'transcription-line interim';
-                        transcriptionLines.appendChild(interimElement);
-                    }
-                    interimElement.innerHTML = highlightKeywords(trimmedInterim);
-                    transcriptionLines.scrollTop = transcriptionLines.scrollHeight;
-                } else if (interimElement) {
-                    interimElement.remove();
-                    interimElement = null;
-                    updateEmptyStateWhenNeeded();
-                }
+                renderInterim(interimTranscript);
             };
 
             recognition.onerror = event => {
@@ -635,16 +1009,16 @@
             };
 
             recognition.onend = () => {
-                if (interimElement) {
-                    interimElement.remove();
-                    interimElement = null;
+                if (voxState.interimNode) {
+                    voxState.interimNode.remove();
+                    voxState.interimNode = null;
                 }
 
-                if (isListening) {
+                if (voxState.isListening) {
                     setTimeout(() => {
-                        if (isListening && recognition) {
+                        if (voxState.isListening && voxState.recognition) {
                             try {
-                                recognition.start();
+                                voxState.recognition.start();
                             } catch (error) {
                                 console.warn('Falha ao reiniciar reconhecimento:', error);
                                 stopRecognition();
@@ -657,43 +1031,43 @@
                 }
             };
 
+            voxState.recognition = recognition;
             return true;
-        }
+        };
 
-        function startRecognition() {
+        const startRecognition = () => {
             if (!initializeSpeechRecognition()) {
                 return;
             }
-
-            if (isListening) {
+            if (voxState.isListening) {
                 return;
             }
 
             try {
-                if (!sessionStartTime) {
-                    sessionStartTime = Date.now();
-                    lastTranscriptionTime = 0;
-                    lastSavedTranscription = '';
+                if (voxState.sessionStart === null) {
+                    voxState.sessionStart = Date.now();
+                    voxState.lastSavedAt = 0;
+                    voxState.lastSavedNormalized = '';
                 }
-                recognition.start();
-                isListening = true;
+                voxState.recognition.start();
+                voxState.isListening = true;
                 micButton.classList.add('recording');
                 statusIndicator.classList.add('active');
             } catch (error) {
                 console.error('Não foi possível iniciar o reconhecimento:', error);
             }
-        }
+        };
 
-        function stopRecognition() {
-            if (!isListening) {
+        const stopRecognition = () => {
+            if (!voxState.isListening) {
                 return;
             }
 
-            isListening = false;
+            voxState.isListening = false;
 
-            if (recognition) {
+            if (voxState.recognition) {
                 try {
-                    recognition.stop();
+                    voxState.recognition.stop();
                 } catch (error) {
                     console.warn('Falha ao parar reconhecimento:', error);
                 }
@@ -702,27 +1076,27 @@
             micButton.classList.remove('recording');
             statusIndicator.classList.remove('active');
 
-            if (interimElement) {
-                interimElement.remove();
-                interimElement = null;
+            if (voxState.interimNode) {
+                voxState.interimNode.remove();
+                voxState.interimNode = null;
             }
 
-            if (!allTranscriptions.length) {
+            if (!voxState.entries.length) {
                 transcriptionLines.classList.remove('visible');
                 updateEmptyStateWhenNeeded();
             }
-        }
+        };
 
-        function toggleVoiceRecording() {
-            if (isListening) {
+        const toggleVoiceRecording = () => {
+            if (voxState.isListening) {
                 stopRecognition();
             } else {
                 startRecognition();
             }
-        }
+        };
 
-        function saveTranscription() {
-            if (!allRawTranscriptions.length) {
+        const saveTranscription = () => {
+            if (!voxState.rawTranscriptions.length) {
                 alert('Não há transcrições para salvar');
                 return;
             }
@@ -731,8 +1105,8 @@
             const timestamp = now.toLocaleString('pt-BR').replace(/[/:]/g, '-');
             const filename = `transcricao-vox-${timestamp}.txt`;
 
-            const header = `Transcrição Vox - SyraDevOps\nData: ${now.toLocaleString('pt-BR')}\nTotal de frases: ${allRawTranscriptions.length}\n${'='.repeat(50)}\n\n`;
-            const body = allRawTranscriptions.join('\n\n');
+            const header = `Transcrição Vox - SyraDevOps\nData: ${now.toLocaleString('pt-BR')}\nTotal de frases: ${voxState.rawTranscriptions.length}\n${'='.repeat(50)}\n\n`;
+            const body = voxState.rawTranscriptions.join('\n\n');
             const blob = new Blob([header + body], { type: 'text/plain;charset=utf-8' });
             const url = URL.createObjectURL(blob);
 
@@ -757,35 +1131,117 @@
                 successDiv.remove();
                 updateEmptyStateWhenNeeded();
             }, 3000);
-        }
+        };
 
-        function clearTranscription() {
-            allTranscriptions = [];
-            allRawTranscriptions = [];
-            entryWordCounts = [];
-            committedWords = [];
-            transcriptionEntryElements.forEach(element => element.remove());
-            transcriptionEntryElements = [];
-            
-            // Reset variáveis de tempo
-            sessionStartTime = null;
-            lastTranscriptionTime = 0;
-            lastSavedTranscription = '';
+        const clearTranscription = () => {
+            voxState.entries = [];
+            voxState.rawTranscriptions = [];
+            voxState.entryWordCounts = [];
+            voxState.entryMeta = [];
+            voxState.committedWords = [];
+            voxState.entryNodes.forEach(node => node.remove());
+            voxState.entryNodes = [];
+            transcriptionLines.innerHTML = '';
+            voxState.sessionStart = null;
+            voxState.lastSavedAt = 0;
+            voxState.lastSavedNormalized = '';
+            voxState.silenceStartedAt = null;
+            voxState.silenceRecently = false;
+            voxState.lastEventAt = 0;
+            voxState.lastRms = 0;
 
-            if (interimElement) {
-                interimElement.remove();
-                interimElement = null;
+            if (voxState.interimNode) {
+                voxState.interimNode.remove();
+                voxState.interimNode = null;
             }
 
             saveControls.style.display = 'none';
-            if (isListening) {
+            if (voxState.isListening) {
                 transcriptionLines.classList.add('visible');
             } else {
                 transcriptionLines.classList.remove('visible');
             }
 
+            recomputeFrequencies();
             updateEmptyStateWhenNeeded();
-        }
+        };
+
+        const updateAudioMeter = rms => {
+            if (!audioMeter || !audioBar) {
+                return;
+            }
+
+            voxState.lastRms = rms;
+
+            const clamped = Math.min(1, Math.max(0, rms * 3.5));
+            const width = Math.max(4, Math.round(clamped * 100));
+            audioBar.style.width = `${width}%`;
+
+            audioMeter.classList.remove('level-muted', 'level-low', 'level-high');
+            if (clamped < 0.05) {
+                audioMeter.classList.add('level-muted');
+            } else if (clamped < 0.12) {
+                audioMeter.classList.add('level-low');
+            } else if (clamped > 0.9) {
+                audioMeter.classList.add('level-high');
+            }
+        };
+
+        const setupAudioMeter = async () => {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || voxState.audioContext) {
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+                const context = new (window.AudioContext || window.webkitAudioContext)();
+                const analyser = context.createAnalyser();
+                analyser.fftSize = 2048;
+                const source = context.createMediaStreamSource(stream);
+                source.connect(analyser);
+
+                voxState.audioContext = context;
+                voxState.analyser = analyser;
+
+                const data = new Uint8Array(analyser.fftSize);
+
+                const loop = () => {
+                    analyser.getByteTimeDomainData(data);
+                    let sum = 0;
+                    for (let i = 0; i < data.length; i++) {
+                        const v = (data[i] - 128) / 128;
+                        sum += v * v;
+                    }
+                    const rms = Math.sqrt(sum / data.length);
+                    updateAudioMeter(rms);
+
+                    const now = performance.now();
+                    if (rms < SILENCE_THRESHOLD) {
+                        if (!voxState.silenceStartedAt) {
+                            voxState.silenceStartedAt = now;
+                        }
+                        if (now - voxState.silenceStartedAt > SILENCE_MS) {
+                            voxState.silenceRecently = true;
+                        }
+                    } else {
+                        voxState.silenceStartedAt = null;
+                        voxState.silenceRecently = false;
+                    }
+
+                    voxState.audioRAF = requestAnimationFrame(loop);
+                };
+
+                loop();
+            } catch (err) {
+                console.warn('Permissão de microfone negada para medidor:', err);
+                updateAudioMeter(0);
+            }
+        };
+
+        // expõe handlers para o HTML inline
+        window.toggleVoiceRecording = toggleVoiceRecording;
+        window.saveTranscription = saveTranscription;
+        window.clearTranscription = clearTranscription;
 
         window.addEventListener('load', () => {
             if (!SpeechRecognition) {
@@ -794,6 +1250,7 @@
             }
 
             initializeSpeechRecognition();
+            setupAudioMeter();
 
             if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
                 navigator.mediaDevices.getUserMedia({ audio: true })
