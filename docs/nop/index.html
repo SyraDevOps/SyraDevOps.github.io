@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acesso | SyraDevOps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; }
+        .input-field {
+            background-color: #171717;
+            border: 1px solid #262626;
+            color: white;
+            transition: all 0.3s;
+        }
+        .input-field:focus {
+            border-color: #404040;
+            outline: none;
+            box-shadow: 0 0 0 1px rgba(255,255,255,0.1);
+        }
+        .btn-primary {
+            background-color: white;
+            color: black;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-primary:hover { background-color: #d4d4d4; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen font-sans antialiased">
+
+    <div class="w-full max-w-md p-8 fade-in">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-bold tracking-tighter text-white mb-2">SyraDevOps</h1>
+            <p class="text-neutral-500 text-sm">Identidade Segura</p>
+        </div>
+
+        <!-- Alerta de Erros -->
+        <div id="alert-box" class="hidden mb-6 p-3 text-sm rounded border border-red-900 bg-red-900/20 text-red-200 text-center"></div>
+
+        <!-- Abas -->
+        <div class="flex border-b border-neutral-800 mb-8" id="auth-tabs">
+            <button onclick="toggleView('login')" id="tab-login" class="flex-1 pb-3 text-sm font-medium border-b-2 border-white text-white">Entrar</button>
+            <button onclick="toggleView('register')" id="tab-register" class="flex-1 pb-3 text-sm font-medium border-b-2 border-transparent text-neutral-500 hover:text-neutral-300">Criar Conta</button>
+        </div>
+
+        <!-- Login -->
+        <form id="form-login" onsubmit="handleLogin(event)" class="space-y-5">
+            <div>
+                <label class="block text-xs font-medium text-neutral-400 mb-1 uppercase">Username</label>
+                <input type="text" id="login-user" class="input-field w-full p-3 rounded-md text-sm" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-neutral-400 mb-1 uppercase">Token (6 Dígitos)</label>
+                <input type="text" id="login-token" class="input-field w-full p-3 rounded-md text-sm font-mono tracking-widest" maxlength="6" required>
+            </div>
+            <button type="submit" id="btn-login" class="btn-primary w-full py-3 rounded-md mt-4">Acessar</button>
+        </form>
+
+        <!-- Registro -->
+        <form id="form-register" onsubmit="handleRegister(event)" class="space-y-5 hidden">
+            <div>
+                <label class="block text-xs font-medium text-neutral-400 mb-1 uppercase">Username</label>
+                <input type="text" id="reg-user" class="input-field w-full p-3 rounded-md text-sm" required>
+            </div>
+            <div>
+                <label class="block text-xs font-medium text-neutral-400 mb-1 uppercase">E-mail</label>
+                <input type="email" id="reg-email" class="input-field w-full p-3 rounded-md text-sm" required>
+            </div>
+            <button type="submit" id="btn-register" class="btn-primary w-full py-3 rounded-md mt-4">Registrar</button>
+        </form>
+
+        <!-- Sucesso Registro -->
+        <div id="register-success" class="hidden bg-neutral-900 border border-neutral-800 p-6 rounded-lg text-center fade-in">
+            <div class="mb-4 text-white font-semibold">Sucesso</div>
+            <p class="text-neutral-400 text-xs mb-6">Copie seus dados agora.</p>
+            
+            <div class="bg-black border border-neutral-800 rounded p-4 mb-4">
+                <p class="text-xs text-neutral-500 mb-1">TOKEN DE ACESSO</p>
+                <p id="new-token" class="text-2xl font-mono text-white tracking-widest select-all font-bold"></p>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 mb-6">
+                <div class="bg-neutral-950 p-2 rounded border border-neutral-800">
+                    <span class="block text-[10px] text-neutral-500">USER</span>
+                    <span id="new-user" class="text-sm text-white font-mono"></span>
+                </div>
+                <div class="bg-neutral-950 p-2 rounded border border-neutral-800">
+                    <span class="block text-[10px] text-neutral-500">RECOVERY</span>
+                    <span id="new-recovery" class="text-[10px] text-neutral-400 font-mono break-all"></span>
+                </div>
+            </div>
+
+            <button onclick="toggleView('login')" class="w-full py-2 bg-neutral-800 hover:bg-neutral-700 text-white rounded text-sm transition">Ir para Login</button>
+        </div>
+    </div>
+
+    <script>
+        // GARANTIR HTTPS
+        const API_URL = 'https://api.syradevops.com:80'; 
+
+        if (localStorage.getItem('token')) {
+            window.location.href = 'dashboard.html';
+        }
+
+        function toggleView(view) {
+            document.getElementById('alert-box').classList.add('hidden');
+            if (view === 'login') {
+                document.getElementById('form-login').classList.remove('hidden');
+                document.getElementById('form-register').classList.add('hidden');
+                document.getElementById('register-success').classList.add('hidden');
+                document.getElementById('tab-login').classList.replace('border-transparent', 'border-white');
+                document.getElementById('tab-login').classList.replace('text-neutral-500', 'text-white');
+                document.getElementById('tab-register').classList.replace('border-white', 'border-transparent');
+                document.getElementById('tab-register').classList.replace('text-white', 'text-neutral-500');
+            } else {
+                document.getElementById('form-login').classList.add('hidden');
+                document.getElementById('form-register').classList.remove('hidden');
+                document.getElementById('register-success').classList.add('hidden');
+                document.getElementById('tab-register').classList.replace('border-transparent', 'border-white');
+                document.getElementById('tab-register').classList.replace('text-neutral-500', 'text-white');
+                document.getElementById('tab-login').classList.replace('border-white', 'border-transparent');
+                document.getElementById('tab-login').classList.replace('text-white', 'text-neutral-500');
+            }
+        }
+
+        function showAlert(msg) {
+            const box = document.getElementById('alert-box');
+            box.innerText = msg;
+            box.classList.remove('hidden');
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-login');
+            btn.innerText = "Carregando...";
+            btn.disabled = true;
+
+            const username = document.getElementById('login-user').value;
+            const token = document.getElementById('login-token').value;
+
+            try {
+                const res = await fetch(`${API_URL}/v1/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, token })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.ok) {
+                    localStorage.setItem('token', data.session);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    showAlert(data.message || "Erro no login: Verifique Token ou User");
+                }
+            } catch (err) {
+                console.error(err);
+                showAlert("Erro de conexão (CORS/SSL). Use um servidor local (Live Server).");
+            } finally {
+                btn.innerText = "Acessar";
+                btn.disabled = false;
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-register');
+            btn.innerText = "Processando...";
+            btn.disabled = true;
+
+            const username = document.getElementById('reg-user').value;
+            const email = document.getElementById('reg-email').value;
+
+            try {
+                const res = await fetch(`${API_URL}/v1/users/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email })
+                });
+
+                const data = await res.json();
+
+                if (res.ok && data.ok) {
+                    document.getElementById('form-register').classList.add('hidden');
+                    document.getElementById('auth-tabs').classList.add('hidden');
+                    document.getElementById('register-success').classList.remove('hidden');
+
+                    document.getElementById('new-token').innerText = data.token;
+                    document.getElementById('new-user').innerText = data.username;
+                    document.getElementById('new-recovery').innerText = data.recovery_token;
+                } else {
+                    showAlert(data.error || "Erro ao criar conta.");
+                }
+            } catch (err) {
+                console.error(err);
+                showAlert("Erro de conexão com a API.");
+            } finally {
+                btn.innerText = "Registrar";
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

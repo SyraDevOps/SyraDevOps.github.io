@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SyraDevOps</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0a0a0a; color: #e5e5e5; }
+        .card {
+            background-color: #111;
+            border: 1px solid #262626;
+        }
+        .input-dark {
+            background-color: #000;
+            border: 1px solid #333;
+            color: white;
+        }
+        .input-dark:focus { border-color: white; outline: none; }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="border-b border-neutral-800 bg-black/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+            <span class="font-bold text-white tracking-tight text-lg">SyraDevOps</span>
+            <button onclick="handleLogout()" class="text-xs text-neutral-400 hover:text-white transition uppercase tracking-widest font-semibold">
+                Sair
+            </button>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <main class="flex-1 max-w-4xl mx-auto w-full px-6 py-12 fade-in">
+        
+        <header class="mb-10 flex items-end justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-white mb-2">Visão Geral</h1>
+                <p class="text-neutral-500 text-sm">Gerencie suas configurações de conta e plano.</p>
+            </div>
+            <div id="plan-badge" class="hidden px-3 py-1 rounded-full border border-neutral-700 bg-neutral-900 text-xs text-neutral-300 font-mono">
+                <!-- Preenchido via JS -->
+            </div>
+        </header>
+
+        <!-- Profile Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- User Info Card -->
+            <div class="card rounded-xl p-6 md:col-span-2 shadow-lg relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <svg class="w-24 h-24 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+
+                <h3 class="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-6">Dados Pessoais</h3>
+                
+                <div class="space-y-6 relative z-10">
+                    <div>
+                        <label class="block text-xs text-neutral-500 mb-1">USERNAME</label>
+                        <p id="dash-username" class="text-2xl font-bold text-white">...</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-neutral-500 mb-1">ID DE USUÁRIO</label>
+                            <p id="dash-id" class="text-sm font-mono text-neutral-300 truncate">...</p>
+                        </div>
+                        <div>
+                            <label class="block text-xs text-neutral-500 mb-1">DATA DE CRIAÇÃO</label>
+                            <p id="dash-created" class="text-sm font-mono text-neutral-300">...</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t border-neutral-800">
+                        <label class="block text-xs text-neutral-500 mb-2 uppercase">Atualizar E-mail</label>
+                        <form onsubmit="updateEmail(event)" class="flex gap-2">
+                            <input type="email" id="dash-email" class="input-dark flex-1 px-3 py-2 rounded text-sm transition" placeholder="novo@email.com">
+                            <button type="submit" class="bg-white text-black hover:bg-neutral-200 px-4 py-2 rounded text-sm font-bold transition">Salvar</button>
+                        </form>
+                        <p id="update-msg" class="text-xs mt-2 h-4"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats/Plan Card -->
+            <div class="card rounded-xl p-6 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-sm font-semibold text-neutral-400 uppercase tracking-wider mb-4">Assinatura</h3>
+                    <div class="mb-4">
+                        <span class="text-4xl font-bold text-white block" id="plan-name">...</span>
+                        <span class="text-sm text-neutral-500" id="plan-cycle">...</span>
+                    </div>
+                </div>
+                
+                <div class="mt-4 p-4 bg-neutral-900 rounded border border-neutral-800">
+                    <p class="text-xs text-neutral-400 leading-relaxed">
+                        Seu plano está ativo. Para upgrades ou cancelamentos, contate o suporte administrativo.
+                    </p>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const API_URL = 'https://api.syradevops.com';
+        const token = localStorage.getItem('token');
+
+        // Proteção de Rota
+        if (!token) {
+            window.location.href = 'index.html';
+        }
+
+        // Carregar dados ao iniciar
+        document.addEventListener('DOMContentLoaded', fetchProfile);
+
+        async function fetchProfile() {
+            try {
+                const res = await fetch(`${API_URL}/v1/auth/me`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (res.status === 401 || res.status === 403) {
+                    handleLogout();
+                    return;
+                }
+
+                const data = await res.json();
+                
+                if (data.ok) {
+                    renderDashboard(data);
+                }
+            } catch (err) {
+                console.error("Erro ao carregar profile", err);
+            }
+        }
+
+        function renderDashboard(data) {
+            // Textos
+            document.getElementById('dash-username').innerText = data.username;
+            document.getElementById('dash-id').innerText = data.id;
+            document.getElementById('dash-email').value = data.email;
+            
+            // Data
+            const date = new Date(data.created);
+            document.getElementById('dash-created').innerText = date.toLocaleDateString('pt-BR');
+
+            // Plano
+            if (data.plan) {
+                const pName = data.plan.plan.charAt(0).toUpperCase() + data.plan.plan.slice(1);
+                document.getElementById('plan-name').innerText = pName;
+                document.getElementById('plan-cycle').innerText = `Ciclo ${data.plan.subscription}`;
+                
+                // Badge
+                const badge = document.getElementById('plan-badge');
+                badge.innerText = `${pName} • ${data.plan.subscription}`;
+                badge.classList.remove('hidden');
+            }
+        }
+
+        async function updateEmail(e) {
+            e.preventDefault();
+            const email = document.getElementById('dash-email').value;
+            const msg = document.getElementById('update-msg');
+            msg.innerText = "Atualizando...";
+            msg.className = "text-xs mt-2 text-neutral-500";
+
+            try {
+                const res = await fetch(`${API_URL}/v1/auth/me`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email })
+                });
+                
+                if (res.ok) {
+                    msg.innerText = "E-mail atualizado com sucesso.";
+                    msg.className = "text-xs mt-2 text-green-400";
+                } else {
+                    msg.innerText = "Erro ao atualizar.";
+                    msg.className = "text-xs mt-2 text-red-400";
+                }
+            } catch (err) {
+                msg.innerText = "Erro de conexão.";
+                msg.className = "text-xs mt-2 text-red-400";
+            }
+        }
+
+        async function handleLogout() {
+            try {
+                // Tenta avisar a API
+                await fetch(`${API_URL}/v1/auth/logout`, {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+            } catch (e) {
+                console.log('Logout local forçado');
+            } finally {
+                localStorage.removeItem('token');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>
