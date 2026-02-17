@@ -1,0 +1,2265 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUN - Multi-Sphere Logic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Inter:wght@300;400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.js"></script>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text: #000000;
+            --accent: #00b400;
+            --off-white: #F2F2F0;
+            --gray-warm: #DADADA;
+        }
+
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg);
+            font-family: 'Inter', sans-serif;
+            color: var(--text);
+            transition: background-color 2s ease;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Invisible input to capture typing */
+        #hidden-input {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .user-typing {
+            position: absolute;
+            top: 78%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Inter', sans-serif;
+            font-weight: 300;
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            letter-spacing: 0.05em;
+            color: rgba(0, 0, 0, 0.4);
+            z-index: 4;
+            max-width: 80%;
+            text-align: center;
+            pointer-events: none;
+            min-height: 1.5em;
+            transition: opacity 0.5s ease;
+        }
+
+        .status-text {
+            position: absolute;
+            bottom: 15%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: 'Libre Baskerville', serif;
+            font-size: clamp(1.2rem, 2.5vw, 2rem);
+            opacity: 0;
+            transition: opacity 1s ease, transform 1s ease;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .status-text.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(-10px);
+        }
+
+        .green-text {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Vox Styles */
+        .vox-transcription {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70%;
+            text-align: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.4rem, 3vw, 2.2rem);
+            color: rgba(0, 0, 0, 0.9);
+            line-height: 1.5;
+            z-index: 10;
+            pointer-events: none;
+            font-weight: 300;
+            letter-spacing: -0.02em;
+        }
+
+        .vox-prompt {
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            display: none;
+            z-index: 100;
+            font-family: 'Inter', sans-serif;
+            animation: slideUp 0.5s ease forwards;
+        }
+
+        .auth-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            padding: clamp(18px, 4vw, 56px);
+            background: radial-gradient(circle at 18% 50%, rgba(0, 180, 0, 0.08) 0%, rgba(0, 180, 0, 0) 42%);
+            transition: opacity 0.9s ease, transform 0.9s ease;
+        }
+
+        .auth-overlay.is-exiting {
+            opacity: 0;
+            transform: translateY(-10px);
+            pointer-events: none;
+        }
+
+        .auth-panel {
+            width: min(430px, 85vw);
+            margin-left: min(34vw, 360px);
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            border-radius: 0;
+            padding: 0;
+            display: grid;
+            gap: 14px;
+            animation: authIn 0.8s cubic-bezier(0.2, 0.9, 0.2, 1) both;
+        }
+
+        .auth-kicker {
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.24em;
+            font-size: 0.74rem;
+            color: rgba(0, 0, 0, 0.5);
+            text-transform: uppercase;
+        }
+
+        .auth-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 500;
+            margin: 0;
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        .auth-sub {
+            margin: 0;
+            font-size: 0.92rem;
+            color: rgba(0, 0, 0, 0.62);
+            line-height: 1.45;
+        }
+
+        .auth-form {
+            display: grid;
+            gap: 10px;
+            min-height: 118px;
+        }
+
+        .auth-field {
+            position: relative;
+        }
+
+        .auth-field input {
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid rgba(0, 0, 0, 0.16);
+            border-radius: 13px;
+            padding: 12px 14px;
+            background: rgba(255, 255, 255, 0.68);
+            color: rgba(0, 0, 0, 0.85);
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+        }
+
+        .auth-field input:focus {
+            border-color: rgba(0, 180, 0, 0.65);
+            box-shadow: 0 0 0 4px rgba(0, 180, 0, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .auth-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .auth-btn {
+            border: 0;
+            border-radius: 13px;
+            padding: 11px 14px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+        }
+
+        .auth-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .auth-btn:active {
+            transform: translateY(1px) scale(0.99);
+        }
+
+        .auth-btn.enter {
+            background: linear-gradient(145deg, #101112, #232427);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+        }
+
+        .auth-btn.register {
+            background: linear-gradient(145deg, #e7ffe7, #d3f5d3);
+            color: #0b3f0b;
+            box-shadow: 0 8px 22px rgba(0, 150, 0, 0.16);
+        }
+
+        .auth-feedback {
+            min-height: 1.3em;
+            font-size: 0.86rem;
+            color: rgba(0, 0, 0, 0.62);
+            transition: opacity 0.2s ease;
+        }
+
+        .auth-feedback.ok {
+            color: #0b6a0b;
+        }
+
+        .auth-secret {
+            margin-top: 4px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 180, 0, 0.22);
+            background: rgba(231, 255, 231, 0.52);
+            color: rgba(5, 60, 5, 0.92);
+            font-size: 0.84rem;
+            line-height: 1.45;
+            white-space: pre-line;
+        }
+
+        .top-actions {
+            position: absolute;
+            top: 18px;
+            right: 18px;
+            z-index: 40;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border: 1px solid rgba(0, 0, 0, 0.14);
+            background: rgba(255, 255, 255, 0.88);
+            color: rgba(0, 0, 0, 0.84);
+            border-radius: 14px;
+            padding: 0;
+            cursor: pointer;
+            box-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(4px);
+            transition: transform 0.2s ease, box-shadow 0.25s ease, opacity 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 1.9;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.16);
+        }
+
+        .icon-btn:active {
+            transform: translateY(1px) scale(0.99);
+        }
+
+        .settings-panel {
+            position: absolute;
+            left: min(34vw, 380px);
+            top: 14%;
+            z-index: 39;
+            width: min(560px, calc(100vw - 80px));
+            background:
+                linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(247, 251, 247, 0.86));
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            border-radius: 22px;
+            box-shadow: 0 28px 74px rgba(0, 0, 0, 0.18);
+            padding: 18px 18px 14px;
+            backdrop-filter: blur(8px);
+            display: none;
+            animation: authIn 0.35s ease both;
+        }
+
+        .settings-title {
+            margin: 0;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.34rem;
+            letter-spacing: 0.06em;
+            color: rgba(0, 0, 0, 0.86);
+        }
+
+        .settings-sub {
+            margin: 5px 0 14px 0;
+            font-size: 0.9rem;
+            color: rgba(0, 0, 0, 0.56);
+        }
+
+        .settings-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .settings-input {
+            flex: 1;
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.86);
+            border-radius: 11px;
+            padding: 11px 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.96rem;
+            outline: none;
+        }
+
+        .settings-input:focus {
+            border-color: rgba(0, 180, 0, 0.6);
+            box-shadow: 0 0 0 3px rgba(0, 180, 0, 0.12);
+        }
+
+        .settings-btn {
+            border: 0;
+            border-radius: 11px;
+            padding: 11px 14px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            background: linear-gradient(145deg, #111, #262626);
+            color: #fff;
+        }
+
+        .settings-btn.secondary {
+            background: linear-gradient(145deg, #e7ffe7, #d3f5d3);
+            color: #0b3f0b;
+        }
+
+        .settings-status {
+            min-height: 1.2em;
+            font-size: 0.86rem;
+            color: rgba(0, 0, 0, 0.55);
+            margin-bottom: 8px;
+        }
+
+        .plugin-list {
+            display: grid;
+            gap: 8px;
+            max-height: 300px;
+            overflow: auto;
+            padding-right: 4px;
+        }
+
+        .plugin-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.84);
+            border-radius: 10px;
+            padding: 10px 12px;
+            font-size: 0.86rem;
+        }
+
+        .plugin-actions {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .plugin-tag {
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(0, 180, 0, 0.16);
+            color: rgba(0, 70, 0, 0.9);
+        }
+
+        .plugin-toggle {
+            border: 1px solid rgba(0, 0, 0, 0.14);
+            background: rgba(255, 255, 255, 0.85);
+            color: rgba(0, 0, 0, 0.82);
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.68rem;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+        }
+
+        @media (max-width: 980px) {
+            .settings-panel {
+                left: auto;
+                right: 18px;
+                top: 82px;
+                width: min(560px, calc(100vw - 36px));
+            }
+        }
+
+        @keyframes authIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @media (max-width: 780px) {
+            .auth-overlay {
+                justify-content: flex-end;
+                padding: 18px;
+                background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.9));
+            }
+
+            .auth-panel {
+                width: 100%;
+                max-width: 520px;
+                margin-left: 0;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateX(-50%) translateY(40px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <input type="text" id="hidden-input" autofocus>
+    <div id="top-actions" class="top-actions" style="display:none;">
+        <button id="btn-logout-top" class="icon-btn" type="button" title="Logout" aria-label="Logout">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
+                <path d="M15 16l5-4-5-4" />
+                <path d="M20 12H9" />
+            </svg>
+        </button>
+        <button id="btn-settings-top" class="icon-btn" type="button" title="Configuracoes" aria-label="Configuracoes">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <circle cx="12" cy="12" r="3.2" />
+                <path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.04 1.57V22a2 2 0 1 1-4 0v-.09a1.7 1.7 0 0 0-1.04-1.57 1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.57-1.04H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.66 8.4a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.7 1.7 0 0 0 1.87.34H9A1.7 1.7 0 0 0 10 2.09V2a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15 3.66h.02a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.7 1.7 0 0 0-.34 1.87V8A1.7 1.7 0 0 0 20.91 10H21a2 2 0 1 1 0 4h-.09A1.7 1.7 0 0 0 19.4 15z" />
+            </svg>
+        </button>
+    </div>
+    <div id="settings-panel" class="settings-panel">
+        <h3 class="settings-title">Painel de Configuracoes</h3>
+        <p class="settings-sub">Acesso admin requerido para listar plugins e gerenciar presets.</p>
+        <div id="settings-gate" style="display:block;">
+            <div class="settings-row">
+                <input id="settings-admin-code" class="settings-input" type="text" maxlength="4" placeholder="Codigo admin (4 letras)">
+                <button id="btn-settings-unlock" class="settings-btn" type="button">Entrar</button>
+            </div>
+            <div id="settings-status" class="settings-status"></div>
+        </div>
+        <div id="settings-content" style="display:none;">
+            <div class="settings-row">
+                <button id="btn-settings-refresh-plugins" class="settings-btn secondary" type="button">Atualizar Plugins</button>
+                <button id="btn-settings-add-preset" class="settings-btn secondary" type="button">Adicionar Preset</button>
+            </div>
+            <div id="settings-plugin-list" class="plugin-list"></div>
+        </div>
+    </div>
+    <div id="auth-overlay" class="auth-overlay">
+        <div class="auth-panel">
+            <span class="auth-kicker">Neural Access</span>
+            <h1 class="auth-title">Conectar Interface</h1>
+            <p id="auth-subtitle" class="auth-sub">Fluxo neural em DNA. Entre com user e token para iniciar.</p>
+
+            <div id="login-form" class="auth-form">
+                <label class="auth-field">
+                    <input id="login-user" type="text" autocomplete="username" placeholder="User">
+                </label>
+                <label class="auth-field">
+                    <input id="login-token" type="password" autocomplete="current-password" placeholder="Token">
+                </label>
+            </div>
+
+            <div id="register-form" class="auth-form" style="display: none;">
+                <label class="auth-field">
+                    <input id="register-user" type="text" autocomplete="username" placeholder="User">
+                </label>
+                <label class="auth-field">
+                    <input id="register-email" type="email" autocomplete="email" placeholder="Email">
+                </label>
+            </div>
+
+            <div class="auth-actions">
+                <button id="btn-enter" class="auth-btn enter" type="button">Entrar</button>
+                <button id="btn-register" class="auth-btn register" type="button">Registrar</button>
+            </div>
+            <div id="auth-feedback" class="auth-feedback"></div>
+            <div id="auth-secret-view" class="auth-secret" style="display:none;"></div>
+            <button id="btn-download-auth" class="auth-btn register" type="button" style="display:none;">Baixar JSON de acesso</button>
+        </div>
+    </div>
+
+    <div id="user-display" class="user-typing"></div>
+    <div id="vox-display" class="vox-transcription"></div>
+    <div id="vox-prompt" class="vox-prompt">Baixar transcrição? (Digite "sim" ou "não")</div>
+
+    <div id="status" class="status-text">
+        <span class="green-text">Node</span> conectado
+    </div>
+    <canvas id="canvas"></canvas>
+
+    <script src="./assets/app.js"></script>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let particles = [];
+        let spheres = [];
+        const maxSpheres = 5;
+
+        // High-Performance Configuration (Elite Performance optimized)
+        const particleCountPerSphere = 65; // Total ~325 particles (Safe for all PCs)
+        const sphereRadius = 120;
+        const interactionRadius = 180;
+
+        let mouse = { x: null, y: null };
+        let rotationX = 0;
+        let rotationY = 0;
+        let isSending = false;
+        let isVoxMode = false;
+        let isPromptingDownload = false;
+        let transcriptionSegments = []; // Array of {time: string, text: string}
+        let recognition = null;
+        let voxStartTime = 0;
+
+        const voxDisplay = document.getElementById('vox-display');
+        const voxPrompt = document.getElementById('vox-prompt');
+
+        let radioPlayer = null;
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        let audioCtx, oscillator, gainNode;
+
+        // State & Memory
+        let userName = localStorage.getItem('syn-user') || 'Operador';
+        let mood = 'stable'; // stable, contemplative, focused, protective, observing
+        let lastInteractionTime = Date.now();
+        let errorSequence = 0;
+        let isDeepMode = false;
+        let isSleeping = false;
+        let commandHistory = [];
+        let commandStats = { wiki: 0, clima: 0, radio: 0, util: 0 };
+        let lastCommandTime = 0;
+        let isSynchronized = false;
+        let systemLoad = 0;
+        let ripples = []; // {x, y, r, alpha}
+        let peer = null;
+        let peerConn = null;
+        let myPeerId = null;
+        let macros = JSON.parse(localStorage.getItem('syn-macros') || "{}");
+        let weatherStats = { temp: 20, wind: 5 };
+        let vibrationAmount = 0;
+        let isOfflineMode = false;
+        let isAuthPhase = true;
+        let authMode = 'login';
+        let isSettingsMode = false;
+        let isSettingsAdminUnlocked = false;
+        let pendingRegistration = null;
+        const AUTH_API_BASE = "https://api.syradevops.com";
+
+        // Voice Synthesis
+        function speak(text, type = 'concept', onFinished = null) {
+            if (!window.speechSynthesis || isSleeping) return;
+            window.speechSynthesis.cancel();
+
+            const hour = new Date().getHours();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'pt-BR';
+
+            if (onFinished) {
+                utterance.onend = onFinished;
+            }
+
+            // Time-based and Mood-based parameters
+            let rate = 1.05;
+            let pitch = 0.85;
+
+            if (hour < 6) { rate = 0.85; pitch = 0.7; }
+            else if (hour > 22) { rate = 0.95; pitch = 0.8; }
+
+            if (mood === 'contemplative') rate *= 0.9;
+            if (mood === 'focused') rate *= 1.1;
+
+            if (type === 'person') pitch = 0.95;
+            else if (type === 'place') pitch = 0.75;
+
+            utterance.rate = rate;
+            utterance.pitch = pitch;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        async function searchWiki(query) {
+            return null;
+        }
+
+        async function searchBooks(query) {
+            spheres[0].state = 'processing';
+            userDisplay.textContent = "";
+            spheres[0].state = 'error';
+            userDisplay.textContent = "Busca de livros indisponivel sem API.";
+            speak("Busca de livros desativada.");
+            setTimeout(() => spheres[0].state = 'idle', 3000);
+        }
+
+        async function searchImages(query) {
+            spheres[0].state = 'processing';
+            userDisplay.textContent = "";
+            spheres[0].state = 'error';
+            userDisplay.textContent = "Busca de imagens indisponivel sem API.";
+            speak("Busca de imagens desativada.");
+            setTimeout(() => spheres[0].state = 'idle', 3000);
+        }
+
+        async function trackISS() {
+            return "Rastreamento ISS desativado (sem API).";
+        }
+
+        async function getCryptoPrice(id) {
+            return "Consulta de cripto desativada (sem API).";
+        }
+
+        async function getDefinition(word) {
+            return "Definicoes online desativadas.";
+        }
+
+        async function getWeather(city) {
+            return `Clima para ${city} indisponivel sem API.`;
+        }
+
+        function getWeatherDesc(code) {
+            const map = { 0: "Céu limpo", 1: "Céu limpo", 2: "Parcialmente nublado", 3: "Nublado", 45: "Nevoeiro", 48: "Nevoeiro", 51: "Chuvisco", 61: "Chuva leve", 71: "Neve leve", 95: "Trovoada" };
+            return map[code] || "Estável";
+        }
+
+        function synOpinion(type) {
+            const opinions = {
+                news: "Contexto global apresenta instabilidade moderada nos tópicos indexados.",
+                price: "Ativo sob flutuação algorítmica normal. Volatilidade monitorada.",
+                iss: "Trajetória orbital nominal. Sem anomalias de telemetria.",
+                clima: "Variações atmosféricas dentro da curva estatística local.",
+                default: "Dados processados com integridade de 99.8%."
+            };
+            return opinions[type] || opinions.default;
+        }
+
+        function hapticFeedback(time = 30) {
+            if (navigator.vibrate) navigator.vibrate(time);
+        }
+
+        const hexToRgb = hex => {
+            if (hex.startsWith('rgb')) {
+                const parts = hex.match(/\d+/g);
+                return { r: parseInt(parts[0]), g: parseInt(parts[1]), b: parseInt(parts[2]) };
+            }
+            const bigint = parseInt(hex.replace('#', ''), 16);
+            return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+        }
+
+        // Color Schemes
+        const schemes = [
+            { r: 0, g: 180, b: 0 },   // Green (Center)
+            { r: 0, g: 100, b: 255 }, // Blue
+            { r: 180, g: 0, b: 255 }, // Purple
+            { r: 255, g: 100, b: 0 }, // Orange
+            { r: 0, g: 200, b: 200 }  // Cyan
+        ];
+
+        const deviceNames = ["Aura", "Nebula", "Vector", "Pulse", "Core", "Flux", "Nexus", "Vertex", "Prism", "Nova"];
+
+        async function getNews(topic = 'technology') {
+            return `Noticias de ${topic} indisponiveis sem API.`;
+        }
+
+        function saveMemory(text) {
+            let memories = JSON.parse(localStorage.getItem('syn-memory') || "[]");
+            memories.push(text);
+            localStorage.setItem('syn-memory', JSON.stringify(memories));
+            return `Registro salvo. Total: ${memories.length}`;
+        }
+
+        function readMemory() {
+            let memories = JSON.parse(localStorage.getItem('syn-memory') || "[]");
+            if (memories.length === 0) return "Bancos de memória vazios.";
+            return memories.map((m, i) => `[${i + 1}] ${m}`).join("\n");
+        }
+
+        let analyser, dataArray, audioSource, audioLevel = 0;
+        async function initAudioSystem() {
+            if (audioCtx) return;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                audioSource = audioCtx.createMediaStreamSource(stream);
+                audioSource.connect(analyser);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                oscillator = audioCtx.createOscillator();
+                gainNode = audioCtx.createGain();
+                const panner = audioCtx.createStereoPanner(); // Create panner node
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(55, audioCtx.currentTime);
+                gainNode.gain.setValueAtTime(0.01, audioCtx.currentTime);
+                oscillator.connect(gainNode);
+                gainNode.connect(panner); // Connect gain to panner
+                panner.connect(audioCtx.destination); // Connect panner to destination
+                oscillator.start();
+            } catch (err) { console.log("Áudio negado."); }
+        }
+
+        function setAmbientVolume(vol) {
+            if (gainNode) {
+                gainNode.gain.setTargetAtTime(vol, audioCtx.currentTime, 0.5);
+                oscillator.frequency.setTargetAtTime(mood === 'contemplative' ? 40 : 55, audioCtx.currentTime, 1);
+
+                // Binaural Panning based on mouse
+                if (audioCtx.createStereoPanner) { // Check if StereoPannerNode is supported
+                    const panner = gainNode.context.createStereoPanner();
+                    gainNode.disconnect(); // Disconnect from previous destination
+                    gainNode.connect(panner);
+                    panner.connect(audioCtx.destination);
+                    const panX = (mouse.x / width) * 2 - 1;
+                    panner.pan.setTargetAtTime(panX, audioCtx.currentTime, 0.5);
+                }
+            }
+        }
+
+        function detectIntent(text) {
+            const val = text.toLowerCase();
+            if (val.startsWith('porque') || val.startsWith('por que')) return 'analytical';
+            if (val.startsWith('como')) return 'instructional';
+            if (val.startsWith('quem')) return 'historical';
+            if (val.startsWith('o que')) return 'conceptual';
+            return 'general';
+        }
+
+        class Sphere {
+            constructor(id, scheme) {
+                this.id = id;
+                this.scheme = scheme;
+                this.isForming = false;
+                this.state = 'idle'; // idle, listening, thinking, processing, error, response
+                this.role = id === 0 ? 'core' : 'sensor';
+                this.contextType = 'concept'; // person, place, concept
+
+                const names = ["Syn", "NEX", "AXIS", "VOLT", "ECHO"];
+                this.deviceName = names[id] || `Unit-${id}`;
+                this.function = ["Core", "Percebe", "Decide", "Age", "Aprende"][id] || "Process";
+                this.labelOpacity = 0;
+                this.labelPos = { x: 0, y: 150 }; // Drifting labels
+
+                this.xOffset = 0;
+                this.yOffset = 0;
+                this.zOffset = id * -30;
+                this.dynamicScale = 1;
+                this.breathing = 0;
+
+                this.particles = [];
+                for (let i = 0; i < particleCountPerSphere; i++) {
+                    const p = new Particle(this);
+                    p.indexInSphere = i;
+                    this.particles.push(p);
+                    particles.push(p);
+                }
+
+                if (id === 0) {
+                    setTimeout(() => this.isForming = true, 4000);
+                } else {
+                    setTimeout(() => this.isForming = true, 1000);
+                }
+            }
+
+            updateLayout(count, textLength) {
+                if (isSleeping) {
+                    this.dynamicScale *= 0.99;
+                    this.breathing *= 0.9;
+                    return;
+                }
+
+                const idleTime = (Date.now() - lastInteractionTime) / 1000;
+                if (idleTime > 60 && mood !== 'observing' && mood !== 'contemplative') mood = 'observing';
+                if (idleTime > 180 && mood !== 'contemplative') mood = 'contemplative';
+
+                let breathingSpeed = this.role === 'core' ? 0.0015 : 0.001;
+                let breathingAmp = this.role === 'core' ? 0.03 : 0.015;
+
+                if (isSynchronized) {
+                    breathingSpeed = 0.002;
+                    breathingAmp = 0.04;
+                } else if (this.state === 'thinking') {
+                    breathingSpeed = 0.004;
+                    breathingAmp = 0.08;
+                } else {
+                    if (mood === 'contemplative') { breathingSpeed *= 0.5; breathingAmp *= 0.5; }
+                    if (mood === 'observing') { breathingSpeed *= 0.7; breathingAmp *= 0.6; }
+                    if (mood === 'focused') { breathingSpeed *= 1.5; breathingAmp *= 0.8; }
+                }
+
+                this.breathing = (Math.sin(Date.now() * breathingSpeed) * breathingAmp) + (audioLevel * 0.0005);
+
+                let targetX = 0, targetY = 0, targetZ = 0;
+
+                if (this.id === 0) {
+                    targetY = -height * (isDeepMode ? 0.1 : 0.25);
+                } else {
+                    const side = (this.id % 2 === 0) ? 1 : -1;
+                    const spacingY = 320;
+                    const row = Math.floor((this.id - 1) / 2);
+                    targetX = side * (width * (isDeepMode ? 0.45 : 0.35));
+                    targetY = -120 + (row * spacingY);
+                    targetZ = -80 - (row * 20);
+                }
+
+                this.xOffset += (targetX - this.xOffset) * 0.05;
+                this.yOffset += (targetY - this.yOffset) * 0.05;
+                this.zOffset += (targetZ - this.zOffset) * 0.05;
+
+                // Dynamic Specialization (Hierarquia Dinâmica)
+                let baseScale = 1;
+                if (this.id === 2) baseScale += Math.min(commandStats.wiki * 0.05, 0.4);
+                if (this.id === 1) baseScale += Math.min(commandStats.clima * 0.1, 0.3);
+                this.dynamicScale += (baseScale - this.dynamicScale) * 0.02;
+
+                // Vibration injection
+                if (vibrationAmount > 0.1) {
+                    this.xOffset += (Math.random() - 0.5) * vibrationAmount;
+                    this.yOffset += (Math.random() - 0.5) * vibrationAmount;
+                }
+            }
+
+            drawHalo() {
+                if (!this.isForming || isAuthPhase || isSettingsMode) return;
+                const centerX = width / 2 + this.xOffset;
+                const centerY = height / 2 + this.yOffset;
+                // Audio-reactive expansion
+                const radius = sphereRadius * (this.dynamicScale + this.breathing + (audioLevel * 0.005)) * 1.8;
+
+                let haloColor;
+                switch (this.state) {
+                    case 'listening': haloColor = '0, 180, 255'; break;
+                    case 'thinking': haloColor = '255, 255, 255'; break; // White pulse for thinking
+                    case 'processing': haloColor = '180, 0, 255'; break;
+                    case 'error': haloColor = '255, 50, 50'; break; // Softer red
+                    case 'response':
+                        if (this.contextType === 'person') haloColor = '255, 150, 0';
+                        else if (this.contextType === 'place') haloColor = '0, 255, 150';
+                        else haloColor = '150, 255, 255';
+                        break;
+                    default:
+                        if (mood === 'protective') haloColor = '255, 200, 200';
+                        else haloColor = `${this.scheme.r}, ${this.scheme.g}, ${this.scheme.b}`;
+                }
+
+                const grad = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, radius);
+                let alpha = (this.state === 'idle') ? 0.05 : 0.15 + Math.sin(Date.now() * 0.005) * 0.05;
+                if (this.state === 'thinking') alpha = 0.2 + Math.sin(Date.now() * 0.004) * 0.1;
+
+                grad.addColorStop(0, `rgba(${haloColor}, ${alpha})`);
+                grad.addColorStop(1, `rgba(${haloColor}, 0)`);
+
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        class Particle {
+            constructor(sphere) {
+                this.sphere = sphere;
+                this.init();
+            }
+
+            init() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.z = 0;
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                this.size = Math.random() * 2 + 1;
+
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(Math.random() * 2 - 1);
+                const finalSphereRadius = sphereRadius;
+                this.sphereX = finalSphereRadius * Math.sin(phi) * Math.cos(theta);
+                this.sphereY = finalSphereRadius * Math.sin(phi) * Math.sin(theta);
+                this.sphereZ = finalSphereRadius * Math.cos(phi);
+
+                this.color = { r: 0, g: 0, b: 0, a: 0.6 };
+            }
+
+            update() {
+                if (isAuthPhase) {
+                    const total = Math.max(1, this.sphere.particles.length - 1);
+                    const idx = this.indexInSphere || 0;
+                    const lineTop = height * 0.1;
+                    const lineBottom = height * 0.9;
+                    const ratio = idx / total;
+                    const strand = idx % 2;
+                    const helixX = Math.max(72, width * 0.18);
+                    const phase = (ratio * Math.PI * 18) + (Date.now() * 0.004);
+                    const radius = Math.max(16, Math.min(28, width * 0.018));
+                    const targetX = helixX + Math.sin(phase + (strand * Math.PI)) * radius;
+                    const targetY = lineTop + ((lineBottom - lineTop) * ratio) + Math.cos(phase * 0.6) * 10;
+
+                    this.x += (targetX - this.x) * 0.09;
+                    this.y += (targetY - this.y) * 0.09;
+                    this.z = 0;
+                    this.color.r = strand ? 18 : 0;
+                    this.color.g = 150 + Math.floor((Math.sin(Date.now() * 0.003 + idx) + 1) * 45);
+                    this.color.b = strand ? 95 : 40;
+                    this.color.a = 0.78;
+                    return;
+                }
+
+                if (isSettingsMode) {
+                    const localIdx = (this.indexInSphere || 0) + (this.sphere.id * particleCountPerSphere);
+                    const t = Date.now() * 0.0018;
+                    const ringCenterX = Math.max(120, width * 0.22);
+                    const ringCenterY = height * 0.5;
+                    const totalP = Math.max(1, particles.length);
+                    const angle = ((localIdx / totalP) * Math.PI * 2) + t;
+                    const ringRadius = Math.min(170, Math.max(90, width * 0.12)) + Math.sin((localIdx * 0.05) + (t * 2.5)) * 7;
+
+                    const targetX = ringCenterX + Math.cos(angle) * ringRadius;
+                    const targetY = ringCenterY + Math.sin(angle) * ringRadius;
+
+                    this.x += (targetX - this.x) * 0.1;
+                    this.y += (targetY - this.y) * 0.1;
+                    this.z = 0;
+                    this.color.r = 8;
+                    this.color.g = 165 + Math.floor((Math.sin(t + localIdx) + 1) * 35);
+                    this.color.b = 95;
+                    this.color.a = 0.82;
+                    return;
+                }
+
+                if (!this.sphere.isForming) {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > width) this.vx *= -1;
+                    if (this.y < 0 || this.y > height) this.vy *= -1;
+                } else {
+                    let x = this.sphereX;
+                    let y = this.sphereY;
+                    let z = this.sphereZ;
+
+                    let cosY = Math.cos(rotationY);
+                    let sinY = Math.sin(rotationY);
+                    let x1 = x * cosY - z * sinY;
+                    let z1 = x * sinY + z * cosY;
+
+                    let cosX = Math.cos(rotationX);
+                    let sinX = Math.sin(rotationX);
+                    let y2 = y * cosX - z1 * sinX;
+                    let z2 = y * sinX + z1 * cosX;
+
+                    // Smooth transition to sphere with dynamic target positions
+                    let dissipation = (spheres[0].state === 'response') ? 4 : 1;
+                    let targetX = width / 2 + (x1 * (this.sphere.dynamicScale + this.sphere.breathing) * dissipation) + this.sphere.xOffset;
+                    let targetY = height / 2 + (y2 * (this.sphere.dynamicScale + this.sphere.breathing) * dissipation) + this.sphere.yOffset;
+                    let finalZ = z2 + this.sphere.zOffset;
+
+                    // Ripple Influence
+                    ripples.forEach(r => {
+                        const dx = this.x - r.x;
+                        const dy = this.y - r.y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        const force = Math.max(0, (r.radius - dist) / r.radius) * r.alpha * 10;
+                        targetX += (dx / dist) * force;
+                        targetY += (dy / dist) * force;
+                    });
+
+                    // Weather Wind Drift (X-Axis)
+                    targetX += (Math.sin(Date.now() * 0.001) * weatherStats.wind * 0.5);
+
+                    // Depth-aware speed
+                    const speedMult = 0.05 + systemLoad * 0.1;
+                    this.x += (targetX - this.x) * speedMult;
+                    this.y += (targetY - this.y) * speedMult;
+                    this.z = finalZ;
+
+                    const normalizedZ = (z2 + sphereRadius) / (sphereRadius * 2);
+                    this.color.a = 0.4 + (normalizedZ * (0.6 + (audioLevel * 0.001)));
+
+                    if (isVoxMode) {
+                        const isRingParticle = (this.sphere.id === 0 && particles.indexOf(this) % 4 === 0);
+                        if (isRingParticle) {
+                            const ringRadius = 40 + (audioLevel * 0.1);
+                            const angle = (particles.indexOf(this) / 40) * Math.PI * 2;
+                            targetX = width - 100 + Math.cos(angle + (rotationY * 2)) * ringRadius;
+                            targetY = 100 + Math.sin(angle + (rotationY * 2)) * ringRadius;
+                            finalZ = 0;
+                            this.color.g = 255; this.color.r = 255; this.color.b = 255; this.color.a = 0.9;
+                        } else {
+                            const sideX = (this.sphereX > 0) ? width * 0.9 : width * 0.1;
+                            const sideY = (this.sphereY > 0) ? height * 0.9 : height * 0.1;
+                            targetX = sideX + (Math.sin(this.sphereX) * 50);
+                            targetY = sideY + (Math.cos(this.sphereY) * 50);
+                            this.color.a *= 0.2;
+                        }
+                    }
+                    else if (this.sphere.state === 'thinking') {
+                        // Thinking logic: tighter orbits
+                        const t = Date.now() * 0.002;
+                        targetX += Math.sin(t + this.sphere.id) * 30;
+                        targetY += Math.cos(t + this.sphere.id) * 30;
+                    } else if (this.sphere.id === 0 && !isSending) {
+                        const textLength = hiddenInput.value.length;
+                        if (textLength > 5) {
+                            const scatterFactor = Math.min((textLength - 5) * 5, 250);
+                            targetX += (Math.sin(this.sphereX + textLength) * scatterFactor);
+                            targetY += (Math.cos(this.sphereY + textLength) * scatterFactor);
+                        }
+                    }
+
+                    this.x += (targetX - this.x) * speedMult;
+                    this.y += (targetY - this.y) * speedMult;
+                    this.z = finalZ;
+
+                    if (isSending && this.sphere.id === 0) {
+                        this.color.r = 255; this.color.g = 0; this.color.b = 0;
+                    } else if (isVoxMode && this.sphere.id === 0) {
+                        this.color.r = 0; this.color.g = 150; this.color.b = 255;
+                    } else {
+                        this.color.r = Math.floor(normalizedZ * this.sphere.scheme.r);
+                        this.color.g = Math.floor(normalizedZ * this.sphere.scheme.g);
+                        this.color.b = Math.floor(normalizedZ * this.sphere.scheme.b);
+                    }
+                }
+            }
+
+            draw() {
+                const perspective = 600;
+                const scale = perspective / (perspective - this.z);
+                const baseSize = this.size;
+
+                // Optimized Draw (Removed expensive Gaussian Blur)
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, Math.max(0.1, baseSize * scale), 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${this.color.r}, ${this.color.g}, ${this.color.b}, ${this.color.a})`;
+                ctx.fill();
+            }
+        }
+
+        const hiddenInput = document.getElementById('hidden-input');
+        const userDisplay = document.getElementById('user-display');
+        const status = document.getElementById('status');
+        const authOverlay = document.getElementById('auth-overlay');
+        const authSubtitle = document.getElementById('auth-subtitle');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginUserInput = document.getElementById('login-user');
+        const loginTokenInput = document.getElementById('login-token');
+        const registerUserInput = document.getElementById('register-user');
+        const registerEmailInput = document.getElementById('register-email');
+        const enterBtn = document.getElementById('btn-enter');
+        const registerBtn = document.getElementById('btn-register');
+        const authFeedback = document.getElementById('auth-feedback');
+        const authSecretView = document.getElementById('auth-secret-view');
+        const downloadAuthBtn = document.getElementById('btn-download-auth');
+        const topActions = document.getElementById('top-actions');
+        const logoutTopBtn = document.getElementById('btn-logout-top');
+        const settingsTopBtn = document.getElementById('btn-settings-top');
+        const settingsPanel = document.getElementById('settings-panel');
+        const settingsGate = document.getElementById('settings-gate');
+        const settingsContent = document.getElementById('settings-content');
+        const settingsAdminCodeInput = document.getElementById('settings-admin-code');
+        const settingsUnlockBtn = document.getElementById('btn-settings-unlock');
+        const settingsStatus = document.getElementById('settings-status');
+        const settingsPluginList = document.getElementById('settings-plugin-list');
+        const settingsRefreshPluginsBtn = document.getElementById('btn-settings-refresh-plugins');
+        const settingsAddPresetBtn = document.getElementById('btn-settings-add-preset');
+
+        hiddenInput.blur();
+
+        function apiClient(path, opts = {}) {
+            if (window.SoryWeb && window.SoryWeb.store && window.SoryWeb.api) {
+                window.SoryWeb.store.apiBase = AUTH_API_BASE;
+                return window.SoryWeb.api(path, { ...opts, base: AUTH_API_BASE });
+            }
+            const method = opts.method || "GET";
+            const body = opts.body;
+            const bearer = opts.bearer || "";
+            const headers = {};
+            if (bearer) headers["Authorization"] = `Bearer ${bearer}`;
+            if (body !== undefined) headers["Content-Type"] = "application/json";
+            return fetch(`${AUTH_API_BASE}${path}`, {
+                method,
+                headers,
+                body: body !== undefined ? JSON.stringify(body) : undefined
+            }).then(async (res) => {
+                const text = await res.text();
+                let json;
+                try { json = JSON.parse(text); } catch { json = { raw: text }; }
+                if (!res.ok) throw new Error(json.error || `http ${res.status}`);
+                return json;
+            });
+        }
+
+        function saveSession(username, session, token = "") {
+            localStorage.setItem('syn-user', username || "");
+            localStorage.setItem('sory_username', username || "");
+            localStorage.setItem('syn_user_session', session || "");
+            localStorage.setItem('sory_user_session', session || "");
+            if (token) {
+                localStorage.setItem('syn-token', token);
+                localStorage.setItem('sory_last_token', token);
+            }
+        }
+
+        function setTopActionsVisibility(show) {
+            topActions.style.display = show ? 'flex' : 'none';
+        }
+
+        function sessionBearerForPresets() {
+            return localStorage.getItem('sory_user_session') ||
+                localStorage.getItem('syn_user_session') ||
+                localStorage.getItem('sory_admin_session') ||
+                localStorage.getItem('syn_admin_session') ||
+                "";
+        }
+
+        function setSettingsGateState(unlocked) {
+            isSettingsAdminUnlocked = unlocked;
+            settingsGate.style.display = unlocked ? 'none' : 'block';
+            settingsContent.style.display = unlocked ? 'block' : 'none';
+        }
+
+        function renderPlugins(plugins) {
+            if (!Array.isArray(plugins) || plugins.length === 0) {
+                settingsPluginList.innerHTML = `<div class="settings-status">Nenhum plugin retornado.</div>`;
+                return;
+            }
+            settingsPluginList.innerHTML = plugins.map((p) => {
+                const name = (p.Name || p.name || "plugin").toString();
+                const enabled = !!(p.Enabled ?? p.enabled);
+                const compat = !!(p.Compatible ?? p.compatible);
+                const target = enabled ? "false" : "true";
+                return `
+                <div class="plugin-item">
+                    <span>${name}</span>
+                    <span class="plugin-actions">
+                        <span class="plugin-tag">${enabled ? "ON" : "OFF"}${compat ? " / OK" : ""}</span>
+                        <button class="plugin-toggle" data-plugin="${name.replace(/"/g, '&quot;')}" data-enable="${target}" type="button">${enabled ? "DESATIVAR" : "ATIVAR"}</button>
+                    </span>
+                </div>`;
+            }).join("");
+        }
+
+        async function setPluginState(pluginName, enabled) {
+            const adminSession = localStorage.getItem('sory_admin_session') || localStorage.getItem('syn_admin_session') || "";
+            if (!adminSession) {
+                settingsStatus.textContent = "Sessao admin ausente.";
+                return;
+            }
+            settingsStatus.textContent = `Aplicando ${pluginName} -> ${enabled ? 'ON' : 'OFF'}...`;
+            try {
+                await apiClient("/v1/admin/plugins/set", {
+                    method: "POST",
+                    bearer: adminSession,
+                    body: { plugin: pluginName, enabled }
+                });
+                settingsStatus.textContent = `Plugin ${pluginName} atualizado.`;
+                await loadAllPlugins();
+            } catch (err) {
+                settingsStatus.textContent = `Falha ao atualizar ${pluginName}.`;
+            }
+        }
+
+        async function loadAllPlugins() {
+            const adminSession = localStorage.getItem('sory_admin_session') || localStorage.getItem('syn_admin_session') || "";
+            if (!adminSession) {
+                settingsStatus.textContent = "Sessao admin ausente.";
+                return;
+            }
+            settingsStatus.textContent = "Carregando plugins...";
+            try {
+                const out = await apiClient("/v1/plugins", { bearer: adminSession });
+                renderPlugins(out.plugins || []);
+                settingsStatus.textContent = `Plugins carregados: ${(out.plugins || []).length}`;
+            } catch (err) {
+                settingsStatus.textContent = "Falha ao listar plugins.";
+            }
+        }
+
+        async function unlockAdminSettings() {
+            const code = (settingsAdminCodeInput.value || "").trim().toUpperCase();
+            if (!/^[A-Z]{4}$/.test(code)) {
+                settingsStatus.textContent = "Digite 4 letras para o admin.";
+                return;
+            }
+            settingsStatus.textContent = "Validando admin...";
+            try {
+                const out = await apiClient("/v1/auth/admin_code", {
+                    method: "POST",
+                    body: { admin_code: code }
+                });
+                const adminSession = out.session || "";
+                localStorage.setItem('sory_admin_session', adminSession);
+                localStorage.setItem('syn_admin_session', adminSession);
+                setSettingsGateState(true);
+                await loadAllPlugins();
+            } catch (err) {
+                settingsStatus.textContent = "Codigo admin invalido.";
+            }
+        }
+
+        async function addPresetNow() {
+            const bearer = sessionBearerForPresets();
+            if (!bearer) {
+                settingsStatus.textContent = "Sessao ausente para salvar preset.";
+                return;
+            }
+            const stamp = new Date().toISOString().replace(/[-:T]/g, "").slice(0, 13);
+            const name = `preset_${stamp}`;
+            settingsStatus.textContent = "Salvando preset...";
+            try {
+                await apiClient("/v1/user/presets/save", {
+                    method: "POST",
+                    bearer,
+                    body: { name }
+                });
+                settingsStatus.textContent = `Preset salvo: ${name}`;
+            } catch (err) {
+                settingsStatus.textContent = "Falha ao adicionar preset.";
+            }
+        }
+
+        function buildAccessJson(payload) {
+            return {
+                username: payload.username || "",
+                email: payload.email || "",
+                token: payload.token || "",
+                recovery_token: payload.recovery_token || "",
+                admin_code: payload.admin_code || "",
+                user_id: payload.id || "",
+                generated_at: new Date().toISOString()
+            };
+        }
+
+        function downloadAuthJson(payload) {
+            const accessData = buildAccessJson(payload);
+            const blob = new Blob([JSON.stringify(accessData, null, 2)], { type: 'application/json;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `sory_access_${(accessData.username || 'user')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function showRegisterSecrets(payload) {
+            const adminCode = payload.admin_code || "-";
+            const token = payload.token || "-";
+            const recovery = payload.recovery_token || "-";
+            authSecretView.style.display = 'block';
+            authSecretView.textContent = `Token de login: ${token}\nToken de recuperacao: ${recovery}\nCodigo admin: ${adminCode}`;
+            downloadAuthBtn.style.display = 'block';
+        }
+
+        function setAuthMode(mode) {
+            authMode = mode;
+            const isRegister = mode === 'register';
+            loginForm.style.display = isRegister ? 'none' : 'grid';
+            registerForm.style.display = isRegister ? 'grid' : 'none';
+            authSubtitle.textContent = isRegister
+                ? "Registro local no fluxo DNA: informe user e email."
+                : "Fluxo neural em DNA. Entre com user e token para iniciar.";
+            authFeedback.classList.remove('ok');
+            authFeedback.textContent = "";
+            authSecretView.style.display = 'none';
+            downloadAuthBtn.style.display = 'none';
+            if (isRegister) registerUserInput.focus();
+            else loginUserInput.focus();
+        }
+
+        function completeAuthFlow(name, message) {
+            userName = name;
+            authFeedback.textContent = message;
+            authFeedback.classList.add('ok');
+            authOverlay.classList.add('is-exiting');
+            setTimeout(() => {
+                isAuthPhase = false;
+                spheres.forEach(s => { s.isForming = true; });
+                hiddenInput.focus();
+                authOverlay.style.display = 'none';
+                setTopActionsVisibility(true);
+            }, 900);
+        }
+
+        async function submitLogin() {
+            const user = loginUserInput.value.trim();
+            const token = loginTokenInput.value.trim();
+            if (!user || !/^\d{6}$/.test(token)) {
+                authFeedback.textContent = "Informe user e token de 6 digitos.";
+                return;
+            }
+            try {
+                authFeedback.textContent = "Validando acesso...";
+                const out = await apiClient("/v1/auth/login", {
+                    method: "POST",
+                    body: { username: user, token }
+                });
+                const session = out.session || "";
+                saveSession(user, session, token);
+                completeAuthFlow(user, "Acesso validado.");
+            } catch (err) {
+                authFeedback.textContent = "Falha no login. Verifique user/token.";
+            }
+        }
+
+        async function submitRegister() {
+            const user = registerUserInput.value.trim();
+            const email = registerEmailInput.value.trim();
+            const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            if (!user || !emailOk) {
+                authFeedback.textContent = "Informe user e email valido.";
+                return;
+            }
+            try {
+                authFeedback.textContent = "Registrando usuario...";
+                const out = await apiClient("/v1/users/register", {
+                    method: "POST",
+                    body: { username: user, email }
+                });
+                pendingRegistration = out;
+                localStorage.setItem('sory_username', out.username || user);
+                localStorage.setItem('syn-user', out.username || user);
+                localStorage.setItem('sory_email', out.email || email);
+                localStorage.setItem('syn-email', out.email || email);
+                localStorage.setItem('sory_user_id', out.id || "");
+                localStorage.setItem('sory_recovery_token', out.recovery_token || "");
+                localStorage.setItem('sory_last_admin', out.admin_code || "");
+                localStorage.setItem('sory_last_token', out.token || "");
+
+                showRegisterSecrets(out);
+                loginUserInput.value = out.username || user;
+                loginTokenInput.value = out.token || "";
+                authFeedback.textContent = "Registro concluido. Baixe o JSON e clique em Entrar.";
+                authFeedback.classList.add('ok');
+                authMode = 'login';
+                loginForm.style.display = 'grid';
+                registerForm.style.display = 'none';
+            } catch (err) {
+                authFeedback.textContent = "Falha no registro.";
+            }
+        }
+
+        enterBtn.addEventListener('click', () => {
+            if (authMode === 'register') setAuthMode('login');
+            else void submitLogin();
+        });
+
+        registerBtn.addEventListener('click', () => {
+            if (authMode === 'login') setAuthMode('register');
+            else void submitRegister();
+        });
+
+        downloadAuthBtn.addEventListener('click', () => {
+            if (!pendingRegistration) return;
+            downloadAuthJson(pendingRegistration);
+        });
+
+        [loginUserInput, loginTokenInput, registerUserInput, registerEmailInput].forEach(el => {
+            el.addEventListener('keydown', (e) => {
+                if (e.key !== 'Enter') return;
+                e.preventDefault();
+                if (authMode === 'login') void submitLogin();
+                else void submitRegister();
+            });
+        });
+
+        if (window.SoryWeb && window.SoryWeb.store) {
+            window.SoryWeb.store.apiBase = AUTH_API_BASE;
+        }
+        localStorage.setItem("sory_api_base", AUTH_API_BASE);
+
+        setAuthMode('login');
+
+        const existingSession = localStorage.getItem('sory_user_session') || localStorage.getItem('syn_user_session');
+        const existingUser = localStorage.getItem('sory_username') || localStorage.getItem('syn-user');
+        const existingToken = localStorage.getItem('sory_last_token') || localStorage.getItem('syn-token');
+        if (existingUser) loginUserInput.value = existingUser;
+        if (existingToken) loginTokenInput.value = existingToken;
+
+        if (existingSession && existingUser) {
+            saveSession(existingUser, existingSession, existingToken);
+            isAuthPhase = false;
+            spheres.forEach(s => { s.isForming = true; });
+            authOverlay.style.display = 'none';
+            hiddenInput.focus();
+            setTopActionsVisibility(true);
+        } else {
+            setTopActionsVisibility(false);
+        }
+
+        settingsUnlockBtn.addEventListener('click', () => { void unlockAdminSettings(); });
+        settingsAdminCodeInput.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            void unlockAdminSettings();
+        });
+        settingsPluginList.addEventListener('click', (e) => {
+            const btn = e.target.closest('.plugin-toggle');
+            if (!btn) return;
+            const pluginName = (btn.getAttribute('data-plugin') || "").trim();
+            const enableValue = btn.getAttribute('data-enable') === "true";
+            if (!pluginName) return;
+            void setPluginState(pluginName, enableValue);
+        });
+        settingsRefreshPluginsBtn.addEventListener('click', () => { void loadAllPlugins(); });
+        settingsAddPresetBtn.addEventListener('click', () => { void addPresetNow(); });
+
+        settingsTopBtn.addEventListener('click', () => {
+            isSettingsMode = !isSettingsMode;
+
+            if (isSettingsMode) {
+                hiddenInput.blur();
+                voxDisplay.innerHTML = "";
+                userDisplay.textContent = "";
+                settingsPanel.style.display = 'block';
+
+                const hasAdmin = !!(localStorage.getItem('sory_admin_session') || localStorage.getItem('syn_admin_session'));
+                setSettingsGateState(hasAdmin);
+                if (hasAdmin) {
+                    settingsStatus.textContent = "Sessao admin ativa.";
+                    void loadAllPlugins();
+                } else {
+                    settingsStatus.textContent = "Digite o codigo admin de 4 letras para entrar.";
+                    settingsAdminCodeInput.focus();
+                }
+            } else {
+                voxDisplay.innerHTML = "";
+                settingsPanel.style.display = 'none';
+                hiddenInput.focus();
+            }
+        });
+
+        logoutTopBtn.addEventListener('click', async () => {
+            const session = localStorage.getItem('sory_user_session') || localStorage.getItem('syn_user_session') || "";
+            try {
+                if (session) {
+                    await apiClient("/v1/auth/logout", { method: "POST", bearer: session });
+                }
+            } catch (err) {
+                // best effort: local cleanup still happens
+            }
+
+            localStorage.removeItem('sory_user_session');
+            localStorage.removeItem('syn_user_session');
+            localStorage.removeItem('sory_admin_session');
+            localStorage.removeItem('syn_admin_session');
+            isSettingsMode = false;
+            settingsPanel.style.display = 'none';
+            location.reload();
+        });
+
+        window.addEventListener('click', (e) => {
+            if (isAuthPhase || isSettingsMode) return;
+            hiddenInput.focus();
+            if (isVoxMode) {
+                const dx = e.clientX - (width - 100);
+                const dy = e.clientY - 100;
+                if (Math.sqrt(dx * dx + dy * dy) < 80) endVoxMode();
+            }
+        });
+
+        hiddenInput.addEventListener('input', (e) => {
+            userDisplay.textContent = e.target.value;
+            vibrationAmount = Math.min(vibrationAmount + 5, 15);
+        });
+
+        // Cognitive Time System
+        function perceive() {
+            spheres[0].state = 'listening';
+            vibrationAmount = 6;
+            userDisplay.textContent = "";
+        }
+
+        function getThinkTime(input, type) {
+            let base = 1200;
+            base += input.length * 20;
+            if (type === 'wiki') base += 800;
+            if (type === 'calc') base += 300;
+            if (type === 'gemini') base += 1500;
+            if (mood === 'contemplative') base *= 1.4;
+            if (mood === 'focused') base *= 0.8;
+            return Math.min(base, 4500); // Max cap
+        }
+
+        function deliver() {
+            spheres[0].state = 'response';
+            isSynchronized = true;
+            vibrationAmount = 15;
+            ripples.push({ x: width / 2, y: height / 2, radius: 10, alpha: 1 });
+        }
+
+        async function cognitiveResponse(input, type, logicExecutor) {
+            perceive();
+            const thinkTime = getThinkTime(input, type);
+            spheres[0].state = 'thinking';
+
+            // Execute logic in parallel with thinking phase
+            const [result] = await Promise.all([
+                logicExecutor(),
+                new Promise(r => setTimeout(r, thinkTime))
+            ]);
+
+            deliver();
+
+            setTimeout(() => {
+                // Show result logic here usually, but our executors update DOM/Speak directly.
+                // We just ensure state reset here.
+                spheres[0].state = 'idle';
+                isSynchronized = false;
+            }, 6000);
+
+            return result;
+        }
+
+        window.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter' && document.activeElement === hiddenInput) {
+                // Re-trigger global logic, but wrapped
+                // To avoid rewriting the huge event listener completely, we adapt the logic slightly
+                // by creating a wrapper on calls.
+            }
+        });
+
+        // REPLACING THE ENTIRE KEYDOWN LOGIC WITH CLEANER COGNITIVE WRAPPERS
+        hiddenInput.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter') {
+                if (isAuthPhase || isSettingsMode) return;
+                e.preventDefault();
+                const rawVal = hiddenInput.value.trim();
+                const val = rawVal.toLowerCase();
+                if (!val) return;
+                hapticFeedback();
+                hiddenInput.value = '';
+
+                try {
+                    if (isPromptingDownload) { handleDownloadPrompt(val); return; }
+                    if (val === 'syn vox') { voxStartTime = Date.now(); startVoxMode(false); return; }
+                    if (val === '/vx' || val === 'iniciar vx') { voxStartTime = Date.now(); startVoxMode(true); return; }
+
+                    if (val === '/offline') {
+                        isOfflineMode = !isOfflineMode;
+                        userDisplay.textContent = isOfflineMode ? "Sistemas externos: DESATIVADO" : "Sistemas externos: ONLINE";
+                        speak(isOfflineMode ? "Protocolos externos encerrados." : "Conexão neural restabelecida.");
+                        return;
+                    }
+
+                    // Simple Immediate Commands (No thinking needed)
+                    if (['help', 'ajuda', '?', '/clr', '/stop'].includes(val)) {
+                        if (val === '/clr') {
+                            voxDisplay.textContent = ""; userDisplay.textContent = "";
+                            spheres.forEach((s, i) => s.scheme = schemes[i % schemes.length]);
+                        }
+                        if (val === '/stop') { if (radioPlayer) radioPlayer.pause(); }
+                        if (val === 'help' || val === 'ajuda' || val === '?') showHelp();
+                        return;
+                    }
+
+                    // Complex Cognitive Commands
+                    let type = 'general';
+                    if (val.startsWith('/q') || val.includes('quem')) type = 'wiki';
+                    if (val.startsWith('calc:')) type = 'calc';
+                    if (val.startsWith('/clima')) type = 'clima';
+                    if (val === 'criar syn') type = 'system';
+                    if (!val.startsWith('/')) type = 'gemini';
+
+                    await cognitiveResponse(rawVal, type, async () => {
+                        // Routing Logic
+                        if (val === 'criar syn') { createNewSphere(); return; }
+                        if (val === '/deep') {
+                            isDeepMode = !isDeepMode;
+                            userDisplay.textContent = isDeepMode ? "Consciência expandida." : "Nivelamento neural.";
+                            document.body.style.background = isDeepMode ? "radial-gradient(circle, #0a0a0a 0%, #000 100%)" : "#fff";
+                            speak(userDisplay.textContent);
+                            return;
+                        }
+                        if (val === '/sleep') {
+                            speak("Estado preservado."); isSleeping = true;
+                            setTimeout(() => {
+                                document.body.style.background = "#fff";
+                                document.body.innerHTML = "<div style='display:flex; justify-content:center; align-items:center; height:100vh; font-family:Inter; font-weight:300; letter-spacing:4px; color:#ccc;'>HIBERNATION_COMPLETE</div>";
+                            }, 3000);
+                            return;
+                        }
+                        if (val.startsWith('/clima ')) {
+                            const city = rawVal.substring(7);
+                            const info = await getWeather(city);
+                            voxDisplay.innerHTML = `<span style="color:var(--accent); font-size:0.8em; letter-spacing:2px;">METEO_SENSOR //</span><br>${info}<br><p style="font-size:0.4em; opacity:0.5; margin-top:10px;">SYN: ${synOpinion('clima')}</p>`;
+                            speak(info);
+                            return;
+                        }
+                        if (val.startsWith('calc:')) {
+                            const expr = rawVal.substring(5).trim();
+                            try {
+                                const res = math.evaluate(expr);
+                                userDisplay.textContent = `Resultado: ${res}`;
+                                speak(res.toString().replace('.', ','));
+                            } catch { userDisplay.textContent = "Erro de sintaxe."; }
+                            return;
+                        }
+                        if (val.startsWith('lembrar: ')) {
+                            userDisplay.textContent = saveMemory(rawVal.substring(9));
+                            speak("Nota salva.");
+                            return;
+                        }
+                        if (val === '/memoria') {
+                            const notes = readMemory();
+                            voxDisplay.style.fontSize = "0.9rem";
+                            voxDisplay.innerHTML = `<span style="color:var(--accent)">MEMORIA:</span><br>${notes.replace(/\n/g, '<br>')}`;
+                            speak("Acessando memórias.");
+                            return;
+                        }
+                        if (val === '/esquecer') { localStorage.removeItem('syn-memory'); userDisplay.textContent = "Memória limpa."; return; }
+
+                        // Handle Trace/IP/QR/Keygen/Matrix/Radio/Ler/Time/Cor/Ghost/News/Foco/ISS/Price
+                        if (val === '/trace' || val === '/ip') { handleTrace(); return; }
+                        if (val.startsWith('/qr ')) {
+                            userDisplay.textContent = "Comando /qr desativado sem API.";
+                            speak("Recurso QR desativado.");
+                            return;
+                        }
+                        if (val === '/keygen' || val === '/senha') {
+                            const key = crypto.randomUUID();
+                            navigator.clipboard.writeText(key);
+                            voxDisplay.innerHTML = `<span style="color:var(--accent)">KEY:</span><br>${key}`;
+                            speak("Chave gerada.");
+                            return;
+                        }
+                        if (val === '/matrix') {
+                            if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+                            else if (document.exitFullscreen) document.exitFullscreen();
+                            return;
+                        }
+                        if (val === '/radio') {
+                            if (!radioPlayer) { radioPlayer = new Audio(); radioPlayer.crossOrigin = "anonymous"; }
+                            const streamUrl = 'https://stream.nightride.fm/nightride.m4a';
+                            radioPlayer.src = streamUrl; radioPlayer.volume = 0.3; radioPlayer.play();
+                            userDisplay.textContent = "Sintonizando...";
+                            return;
+                        }
+                        if (val.startsWith('/ler ')) {
+                            const words = rawVal.substring(5).split(' ');
+                            let i = 0;
+                            voxDisplay.style.fontSize = "3rem"; voxDisplay.style.fontWeight = "bold";
+                            const interval = setInterval(() => {
+                                if (i < words.length) { voxDisplay.innerHTML = words[i]; i++; }
+                                else { clearInterval(interval); voxDisplay.textContent = ""; voxDisplay.style.fontSize = ""; speak("Fim."); }
+                            }, 200);
+                            return;
+                        }
+                        if (val.startsWith('/enc ')) {
+                            const encoded = btoa(rawVal.substring(5));
+                            voxDisplay.innerHTML = `ENCODED: ${encoded}`;
+                            navigator.clipboard.writeText(encoded);
+                            return;
+                        }
+                        if (val.startsWith('/dec ')) {
+                            try { voxDisplay.innerHTML = `DECODED: ${atob(rawVal.substring(5))}`; } catch { userDisplay.textContent = "Erro."; }
+                            return;
+                        }
+                        if (val === '/time') {
+                            const now = new Date();
+                            const getT = (z) => now.toLocaleTimeString('pt-BR', { timeZone: z, hour: '2-digit', minute: '2-digit' });
+                            voxDisplay.innerHTML = `LON: ${getT('Europe/London')} | TKY: ${getT('Asia/Tokyo')} | LOC: ${getT('America/Sao_Paulo')}`;
+                            speak("Tempo sincronizado.");
+                            return;
+                        }
+                        if (val.startsWith('/cor ')) {
+                            const color = val.split(' ')[1];
+                            document.documentElement.style.setProperty('--accent', color);
+                            const rgb = hexToRgb(color);
+                            if (rgb) spheres.forEach(sphere => sphere.scheme = rgb);
+                            return;
+                        }
+                        if (val === '/ghost') {
+                            document.body.style.backgroundColor = 'black';
+                            spheres.forEach(s => s.scheme = { r: 255, g: 255, b: 255 });
+                            setTimeout(() => { document.body.style.backgroundColor = ''; spheres.forEach((s, i) => s.scheme = schemes[i % schemes.length]); }, 4000);
+                            return;
+                        }
+                        if (val.startsWith('/news')) {
+                            const news = await getNews(val.split(' ')[1] || 'tech');
+                            voxDisplay.innerHTML = news; speak(news);
+                            return;
+                        }
+                        if (val.startsWith('/foco ')) {
+                            const mins = parseInt(val.split(' ')[1]) || 25;
+                            spheres.forEach(s => s.scheme = { r: 0, g: 30, b: 60 });
+                            setTimeout(() => spheres.forEach((s, i) => s.scheme = schemes[i % schemes.length]), mins * 60000);
+                            return;
+                        }
+                        if (val === '/iss') {
+                            const info = await trackISS();
+                            voxDisplay.innerHTML = info; speak(info);
+                            return;
+                        }
+                        if (val.startsWith('/price ')) {
+                            const info = await getCryptoPrice(val.split(' ')[1]);
+                            userDisplay.textContent = info; speak(info);
+                            return;
+                        }
+                        if (val.startsWith('/q ') || val.startsWith('quem é ') || val.startsWith('o que é ')) {
+                            await handleQuery(rawVal.replace(/^\/q\s+|quem é\s+|o que é\s+/i, ""));
+                            return;
+                        }
+                        if (val.startsWith('/book ') || val.startsWith('/livro ')) {
+                            await searchBooks(rawVal.replace(/^\/book\s+|\/livro\s+/i, ""));
+                            return;
+                        }
+                        if (val.startsWith('/img ') || val.startsWith('/imagem ')) {
+                            await searchImages(rawVal.replace(/^\/img\s+|\/imagem\s+/i, ""));
+                            return;
+                        }
+
+                        // Smart Notes (Keyboard)
+                        if (handleSmartNotes(rawVal)) return;
+
+                        // Syra Node Integration
+                        if (window.awaitingNodeDomain) {
+                            window.awaitingNodeDomain = false;
+                            const domain = rawVal;
+                            userDisplay.textContent = `Registrando ${domain}...`;
+                            userDisplay.textContent = "Integracao de nodes desativada sem API.";
+                            speak("Integracao de rede desativada.");
+                            return;
+                        }
+
+                        if (val === 'adicionar node') {
+                            window.awaitingNodeDomain = true;
+                            userDisplay.textContent = "Insira o domínio (ex: Syra-Home.local):";
+                            speak("Aguardando endereço do dispositivo.");
+                            return;
+                        }
+
+                        if (val === '/check' || val === 'verificar mensagens') {
+                            userDisplay.textContent = "Consulta de nodes desativada sem API.";
+                            return;
+                        }
+
+                        if (val.startsWith('/send ')) {
+                            userDisplay.textContent = "Envio para nodes desativado sem API.";
+                            return;
+                        }
+
+                        // Local proxy for /info to a specific node (if user types /info <domain>)
+                        if (val.startsWith('/info ') && val.includes('.')) {
+                            userDisplay.textContent = "Consulta /info externa desativada sem API.";
+                            return;
+                        }
+
+                        // Syra / P2P / Macros / Default (Gemini)
+                        if (val.startsWith('/syra ')) {
+                            speak("Comando Syra enviado.");
+                            return;
+                        }
+                        if (val.startsWith('/p2p ')) {
+                            speak("Comando P2P processado.");
+                            return;
+                        }
+                        if (val.startsWith('/macro ')) {
+                            speak("Macro registrada.");
+                            return;
+                        }
+                        if (macros[val]) {
+                            speak("Executando macro.");
+                            return;
+                        }
+
+                        // Default -> Gemini
+                        triggerSendEffect();
+                        await callGemini(rawVal);
+                    });
+
+                } catch (err) {
+                    console.error(err);
+                    userDisplay.textContent = "Erro no executor cognitivo.";
+                }
+
+                lastInteractionTime = Date.now();
+                if (Date.now() - lastCommandTime < 5000) mood = 'focused';
+                lastCommandTime = Date.now();
+                commandHistory.push(val);
+                if (commandHistory.length > 50) commandHistory.shift();
+            }
+        });
+
+        async function handleQuery(query) {
+            const intent = detectIntent(query);
+            spheres[0].state = 'processing';
+            userDisplay.textContent = "";
+            triggerSendEffect();
+
+            // Contextual cognitive pause
+            let wait = (intent === 'analytical') ? 1200 : 650;
+            await new Promise(r => setTimeout(r, wait));
+
+            const data = await searchWiki(query);
+            if (data && data.extract) {
+                if (Math.random() > 0.7) {
+                    await new Promise(r => setTimeout(r, 800));
+                }
+
+                spheres[0].state = 'response';
+                isSynchronized = true; // Collective breath start
+
+                let welcome = (Math.random() > 0.8) ? `${userName}, ` : "";
+                let essence = data.extract.split('. ').slice(0, 2).join('. ') + '.';
+
+                voxDisplay.innerHTML = `
+                    <div style="font-family: 'Outfit', sans-serif; text-align: center; max-width: 80%; margin: 0 auto; animation: fadeUp 1s ease forwards;">
+                        <span style="color: var(--accent); font-weight: 600; font-size: 0.7em; letter-spacing: 3px; opacity: 0.6;">${data.title.toUpperCase()}</span><br>
+                        <p style="font-size: clamp(1.1rem, 2.5vw, 1.8rem); margin: 15px 0; line-height: 1.4; color: rgba(0,0,0,0.85); font-weight: 300;">${essence}</p>
+                        <div style="font-size: 0.3em; opacity: 0.4; letter-spacing: 1px; display: flex; justify-content: center; gap: 20px;">
+                            <span>SOURCE: WIKI_NODES</span>
+                            <span>STATUS: STABLE</span>
+                        </div>
+                    </div>`;
+
+                speak(welcome + essence, 'concept', () => {
+                    if (vxAutoSend) startVoxMode(true);
+                });
+
+                setTimeout(() => {
+                    spheres[0].state = 'idle';
+                    isSynchronized = false;
+                }, 6000);
+            } else {
+                spheres[0].state = 'error';
+                errorSequence++;
+                if (errorSequence > 2) mood = 'protective';
+                userDisplay.textContent = "";
+                speak("Dados não indexados.");
+                setTimeout(() => { spheres[0].state = 'idle'; }, 3000);
+            }
+        }
+
+        async function callGemini(prompt) {
+            const session = localStorage.getItem('sory_user_session') || localStorage.getItem('syn_user_session') || "";
+            if (!session) {
+                userDisplay.textContent = "Sessao ausente. Faca login para usar o chat.";
+                spheres[0].state = 'error';
+                setTimeout(() => { spheres[0].state = 'idle'; }, 2500);
+                return;
+            }
+
+            spheres[0].state = 'processing';
+            userDisplay.textContent = "";
+
+            try {
+                const out = await apiClient("/v1/chat", {
+                    method: "POST",
+                    bearer: session,
+                    body: { message: prompt }
+                });
+
+                const text = (out && (out.reply || out.message || out.output)) || "Sem resposta da API.";
+                spheres[0].state = 'response';
+                isSynchronized = true;
+
+                voxDisplay.innerHTML = `
+                    <div style="font-family: 'Outfit', sans-serif; font-size: clamp(1.6rem, 4.5vw, 3rem); color: rgba(0, 0, 0, 0.9); font-weight: 300; max-width: 85%; margin: 0 auto; line-height: 1.3; animation: fadeUp 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; letter-spacing: -0.03em;">
+                        ${text}
+                    </div>`;
+
+                speak(text, 'concept', () => {
+                    if (vxAutoSend) startVoxMode(true);
+                });
+
+                setTimeout(() => {
+                    spheres[0].state = 'idle';
+                    isSynchronized = false;
+                    voxDisplay.innerHTML = "";
+                }, 7000);
+            } catch (err) {
+                spheres[0].state = 'error';
+                userDisplay.textContent = "Falha no chat da API.";
+                setTimeout(() => { spheres[0].state = 'idle'; }, 3000);
+            }
+        }
+
+        async function handleTrace() {
+            userDisplay.textContent = "Comando /trace desativado sem API.";
+        }
+
+        function showHelp() {
+            const commands = ["/radio", "/ler", "/q", "/iss", "/trace", "/enc", "/time", "/cor", "/senha", "/matrix", "/clr"];
+            userDisplay.innerHTML = `<div style="font-size: 0.6em; color: rgba(0,0,0,0.5)">${commands.join(" | ")}</div>`;
+        }
+
+        let silenceTimer = null;
+        let vxAutoSend = false;
+
+        function startVoxMode(autoSend = false) {
+            if (!SpeechRecognition) return;
+            initAudioSystem();
+            spheres[0].state = 'listening';
+            isVoxMode = true;
+            vxAutoSend = autoSend;
+            transcriptionSegments = []; // Clear for new session
+            voxStartTime = Date.now(); // Safety reset
+            voxDisplay.textContent = autoSend ? "Ouvindo (Auto-Send)..." : "Gravando...";
+
+            if (recognition) { recognition.stop(); }
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'pt-BR';
+
+            recognition.onresult = (event) => {
+                let interim = "";
+                let hasFinal = false;
+                let finalPhrase = "";
+
+                // Reset silence timer on any input
+                if (silenceTimer) clearTimeout(silenceTimer);
+
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const phrase = event.results[i][0].transcript.trim();
+                    if (event.results[i].isFinal) {
+                        hasFinal = true;
+                        finalPhrase = phrase;
+                        const elapsed = Math.floor((Date.now() - voxStartTime) / 1000);
+                        const mins = Math.floor(elapsed / 60).toString().padStart(2, '0');
+                        const secs = (elapsed % 60).toString().padStart(2, '0');
+                        transcriptionSegments.push({ time: `[${mins}:${secs}]`, text: phrase });
+                    } else {
+                        interim = phrase;
+                    }
+                }
+
+                const lastIdx = transcriptionSegments.length - 1;
+                const history = lastIdx >= 0 ? transcriptionSegments[lastIdx].text : "";
+                voxDisplay.innerHTML = `<span style="font-size:0.6em; opacity:0.4;">${history}</span><br>${interim}`;
+
+                // Silence Detection for Auto-Send
+                if (vxAutoSend) {
+                    // If we have final text or significant interim, start counting silence
+                    if (interim.length > 0 || hasFinal) {
+                        silenceTimer = setTimeout(() => {
+                            if (isVoxMode) {
+                                const fullText = transcriptionSegments.map(s => s.text).join(" ") + (interim ? " " + interim : "");
+                                if (fullText.trim().length > 0) {
+                                    endVoxMode(true);
+                                    // Trigger Cognitive Response
+                                    userDisplay.textContent = fullText;
+                                    // Call the main handler - reusing the logic from keydown might be hard if not extracted. 
+                                    // We will manually trigger the flow.
+                                    handleAutoVxCommand(fullText);
+                                }
+                            }
+                        }, 2500); // 2.5s silence to trigger
+                    }
+                }
+            };
+
+            recognition.onerror = (event) => {
+                if (event.error === 'no-speech' && vxAutoSend) return; // Ignore no-speech in auto mode
+                console.error("Speech Error", event.error);
+            };
+
+            recognition.start();
+        }
+
+        async function handleAutoVxCommand(text) {
+            const val = text.toLowerCase().trim();
+
+            // Smart Note / Ant Logic (Local & Optimized)
+            if (handleSmartNotes(val)) return;
+
+            triggerSendEffect();
+
+            // Quick check for simple commands
+            if (val.includes('quem é')) { await handleQuery(val.replace("quem é", "")); return; }
+            if (val.includes('livro') || val.includes('autor')) { await searchBooks(text.replace(/livro|autor|procure|por/gi, "").trim()); return; }
+            if (val.includes('imagem') || val.includes('foto') || val.includes('mostre')) { await searchImages(text.replace(/imagem|foto|mostre|veja|procure|de/gi, "").trim()); return; }
+
+            // Default to Gemini
+            await callGemini(text);
+        }
+
+        function handleSmartNotes(rawText) {
+            const lower = rawText.toLowerCase().trim();
+            const noteKey = 'syn-temp-notes';
+
+            // 1. Detect "Anote" Intent
+            // Captures: "anote isso: ..." or "anote que ..."
+            const saveMatch = lower.match(/^(anote|nota|lembrar)\s+(.*)/);
+            if (saveMatch) {
+                const content = rawText.substring(saveMatch[1].length).trim(); // Preserve case of content
+                if (!content) return false;
+
+                const notes = JSON.parse(localStorage.getItem(noteKey) || "[]");
+                notes.push(content);
+                localStorage.setItem(noteKey, JSON.stringify(notes));
+
+                userDisplay.textContent = "Anotado.";
+                speak("Registro efetuado.");
+                return true;
+            }
+
+            // 2. Detect "Read/Check" Intent (/ant)
+            // Captures: "/ant", "tem algo anotado", "ler notas"
+            if (lower === '/ant' || lower.includes('algo anotado') || lower.includes('ler nota')) {
+                const notes = JSON.parse(localStorage.getItem(noteKey) || "[]");
+                if (notes.length === 0) {
+                    userDisplay.textContent = "Nenhuma nota pendente.";
+                    speak("Nada constado nos registros temporários.");
+                    return true;
+                }
+
+                // Pop the *oldest* (FIFO) or *newest* (LIFO)? "Tem algo anotado" implies checking queue.
+                // User said "vizualizada ela apagada". 
+                const note = notes.shift(); // FIFO: Get oldest
+                localStorage.setItem(noteKey, JSON.stringify(notes));
+
+                voxDisplay.innerHTML = `<span style="color:var(--accent); font-size:0.8em; letter-spacing:2px;">NOTA RAPIDA //</span><br>${note}`;
+                speak(`Nota: ${note}`);
+
+                // Clear display after reading to simulate "consumption"
+                setTimeout(() => {
+                    if (voxDisplay.innerText.includes(note)) voxDisplay.innerHTML = "";
+                }, 8000);
+
+                return true;
+            }
+
+            return false;
+        }
+
+        function endVoxMode(isAuto = false) {
+            if (recognition) {
+                recognition.onend = null;
+                recognition.stop();
+                recognition = null;
+            }
+            isVoxMode = false;
+            voxDisplay.textContent = "";
+            spheres[0].state = 'idle';
+            if (transcriptionSegments.length > 0 && !isAuto) {
+                isPromptingDownload = true;
+                voxPrompt.style.display = "block";
+            } else {
+                transcriptionSegments = [];
+            }
+        }
+
+        function handleDownloadPrompt(val) {
+            if (val === 'sim') {
+                const totalElapsed = Math.floor((Date.now() - voxStartTime) / 1000);
+                const duration = `${Math.floor(totalElapsed / 60)}m ${totalElapsed % 60}s`;
+                const formattedText = transcriptionSegments.map(s => `${s.time} ${s.text}`).join("\n");
+                const header = `LUN VOX - Transcrição Cognitiva\nData: ${new Date().toLocaleString()}\nDuração Total: ${duration}\n${'-'.repeat(30)}\n\n`;
+                const blob = new Blob([header + formattedText], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `LUN_VOX_${Date.now()}.txt`;
+                a.click();
+            }
+            isPromptingDownload = false;
+            voxPrompt.style.display = "none";
+            transcriptionSegments = [];
+        }
+
+        function triggerSendEffect() {
+            if (isSending) return;
+            isSending = true;
+            setTimeout(() => isSending = false, 3000);
+        }
+
+        function createNewSphere() {
+            if (spheres.length < maxSpheres) spheres.push(new Sphere(spheres.length, schemes[spheres.length]));
+        }
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+        window.addEventListener('mousemove', (e) => { mouse.x = e.clientX; mouse.y = e.clientY; });
+        spheres.push(new Sphere(0, schemes[0]));
+
+        async function fetchAPI(endpoint, options = {}) {
+            return null;
+        }
+
+        async function syraBridgeLoop() {
+            return;
+        }
+
+        // P2P Logic
+        function initPeer() {
+            userDisplay.textContent = "P2P desativado sem API.";
+        }
+
+        function connectToPeer(id) {
+            userDisplay.textContent = "P2P desativado sem API.";
+        }
+
+        function setupPeerConn() {
+            return;
+        }
+
+        async function coreLoop() {
+            await updateInfo();
+            // ... (keeping existing coreLoop if any)
+        }
+
+        // Start Syra Link (disabled)
+
+        function drawDeviceLabel(sphere) {
+            const centerX = width / 2 + sphere.xOffset;
+            const centerY = height / 2 + sphere.yOffset;
+
+            // Random drifting labels
+            sphere.labelPos.x += (Math.sin(Date.now() * 0.001 + sphere.id) * 0.2);
+            sphere.labelPos.y += (Math.cos(Date.now() * 0.001 + sphere.id) * 0.2);
+
+            const dist = Math.sqrt((mouse.x - centerX) ** 2 + (mouse.y - centerY) ** 2);
+            if (dist < 100 && !isVoxMode) {
+                ctx.font = '300 12px Inter';
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                ctx.textAlign = 'center';
+                ctx.letterSpacing = "3px";
+                ctx.fillText(sphere.deviceName.toUpperCase(), centerX + sphere.labelPos.x, centerY + sphere.labelPos.y);
+            }
+        }
+
+        function animate() {
+            ctx.fillStyle = isDeepMode ? '#000000' : '#ffffff'; ctx.fillRect(0, 0, width, height);
+
+            // Update Ripples
+            ripples.forEach((r, i) => {
+                r.radius += 10;
+                r.alpha *= 0.95;
+                if (r.alpha < 0.01) ripples.splice(i, 1);
+            });
+
+            if (analyser) {
+                analyser.getByteFrequencyData(dataArray);
+                let sum = 0; for (let i = 0; i < 60; i++) sum += dataArray[i];
+                audioLevel = sum / 60;
+            }
+            rotationX += 0.005; rotationY += 0.007;
+            const currentTextLength = hiddenInput.value.length;
+            spheres.forEach(s => s.updateLayout(spheres.length, currentTextLength));
+
+            if (vibrationAmount > 0) vibrationAmount *= 0.92;
+
+            // Parallax Display Effect
+            if (voxDisplay.innerHTML !== "") {
+                const offX = (mouse.x - width / 2) * 0.02;
+                const offY = (mouse.y - height / 2) * 0.02;
+                voxDisplay.style.transform = `translate(calc(-50% + ${offX}px), calc(-50% + ${offY}px))`;
+            }
+
+            if (spheres[0].state === 'response' || spheres[0].state === 'processing') {
+                ctx.beginPath(); ctx.lineWidth = 0.5; ctx.strokeStyle = `rgba(0, 180, 0, ${0.1 + (audioLevel * 0.002)})`;
+                const coreX = width / 2 + spheres[0].xOffset; const coreY = height / 2 + spheres[0].yOffset;
+                spheres.slice(1).forEach(s => { ctx.moveTo(coreX, coreY); ctx.lineTo(width / 2 + s.xOffset, height / 2 + s.yOffset); });
+                ctx.stroke();
+            }
+
+            spheres.forEach(s => s.drawHalo());
+
+            // Rendering Optim: Single loop particles
+            let i = particles.length;
+            while (i--) {
+                particles[i].update();
+                particles[i].draw();
+            }
+
+            spheres.forEach(s => drawDeviceLabel(s));
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+
+</html>
