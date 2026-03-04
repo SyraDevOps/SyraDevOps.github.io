@@ -37,6 +37,15 @@ function escapeHtml(v) {
     .replaceAll("'", "&#039;");
 }
 
+function resolveMediaURL(v) {
+  const raw = String(v || "").trim();
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw;
+  if (raw.startsWith("//")) return `${location.protocol}${raw}`;
+  if (raw.startsWith("/")) return `${API_BASE}${raw}`;
+  return raw;
+}
+
 function getCartToken() {
   let token = localStorage.getItem("cart_token");
   if (!token) {
@@ -271,7 +280,7 @@ function renderHeroBanners(banners) {
   let idx = 0;
   const paint = () => {
     const current = ordered[idx] || ordered[0];
-    const image = String(current.image || "").trim();
+    const image = resolveMediaURL(current.image);
     const link = String(current.link || "").trim();
     if (image) {
       media.style.background = `linear-gradient(170deg, rgba(22, 22, 22, 0.06), rgba(22, 22, 22, 0.2)), url("${encodeURI(image)}") center/cover`;
@@ -311,7 +320,7 @@ function productTagsHTML(p, newestIDs = new Set()) {
 }
 
 function productCardHTML(p) {
-  const img = (p.images && p.images[0]) || "https://placehold.co/700x880?text=Knimodas";
+  const img = resolveMediaURL((p.images && p.images[0]) || "https://placehold.co/700x880?text=Knimodas");
   return `
     <article class="card product-card">
       <a href="produto.html?id=${p.id}" class="product-media-link">
@@ -374,7 +383,7 @@ async function loadHome() {
       .map(
         (p) => `
       <article class="card promo-card">
-        <div class="promo-media">${p.image_url ? `<img src="${escapeHtml(p.image_url)}" alt="${escapeHtml(p.title)}" loading="lazy" />` : ""}</div>
+        <div class="promo-media">${p.image_url ? `<img src="${escapeHtml(resolveMediaURL(p.image_url))}" alt="${escapeHtml(p.title)}" loading="lazy" />` : ""}</div>
         <h3>${escapeHtml(p.title)}</h3>
         <p>${escapeHtml(p.description || "")}</p>
         <a class="btn alt" href="${escapeHtml(p.cta_link || "produtos.html")}">${escapeHtml(p.cta_label || "Ver Oferta")}</a>
@@ -593,7 +602,7 @@ async function loadProductPage() {
   try {
     const productData = await api(`/products/${id}`);
     const p = productData.product || productData;
-    const images = p.images?.length ? p.images : ["https://placehold.co/900x1100?text=Knimodas"];
+    const images = (p.images?.length ? p.images : ["https://placehold.co/900x1100?text=Knimodas"]).map(resolveMediaURL);
     const sizes = optionsFromVariants(p.variants, "size");
     const colors = optionsFromVariants(p.variants, "color");
 
