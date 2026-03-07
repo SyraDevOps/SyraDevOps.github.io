@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ff6b6b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+    <title>Login e Registro</title>
+    <link rel="stylesheet" href="styles.css?v=202603071600">
+    <script src="font-size.js"></script>
+    <script src="theme.js"></script>
+</head>
+<body>
+    <div class="notebook-page">
+        <div class="content auth-content">
+            <h1 class="auth-main-title">Querido Diário</h1>
+            <div class="auth-card">
+                <h2>Acesse sua conta</h2>
+
+                <div class="auth-tabs" role="tablist" aria-label="Alternar entre login e registro">
+                    <button type="button" class="auth-tab active" data-auth-target="login">Login</button>
+                    <button type="button" class="auth-tab" data-auth-target="registro">Registro</button>
+                </div>
+
+                <form class="auth-form active" id="loginForm" data-auth-form="login">
+                    <input type="email" id="loginEmail" placeholder="E-mail" required>
+                    <input type="password" id="loginPassword" placeholder="Senha" required>
+                    <button type="submit" class="auth-submit">Entrar</button>
+                    <p id="loginError" class="auth-error" style="color:#e74c3c;font-size:0.85rem;display:none;"></p>
+                </form>
+
+                <form class="auth-form" id="registroForm" data-auth-form="registro">
+                    <input type="text" id="regUsername" placeholder="Username" minlength="3" maxlength="30" required>
+                    <input type="email" id="regEmail" placeholder="E-mail" required>
+                    <input type="password" id="regPassword" placeholder="Senha (min. 6 caracteres)" minlength="6" required>
+                    <input type="password" id="regPasswordConfirm" placeholder="Confirmação da senha" required>
+                    <button type="submit" class="auth-submit">Criar conta</button>
+                    <p id="regError" class="auth-error" style="color:#e74c3c;font-size:0.85rem;display:none;"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script src="crypto-utils.js"></script>
+    <script src="backup-utils.js"></script>
+    <script src="analytics-utils.js"></script>
+    <script src="script.js"></script>
+    <script>
+    // If already authenticated, redirect to diary
+    if (typeof QDApi !== 'undefined' && QDApi.isAuthenticated) {
+        window.location.href = 'diario.html';
+    }
+
+    // Login form handler
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('loginError');
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            errorEl.style.display = 'none';
+
+            try {
+                await QDApi.login(email, password);
+                window.location.href = 'diario.html';
+            } catch (err) {
+                errorEl.textContent = err.message || 'Erro ao fazer login';
+                errorEl.style.display = 'block';
+            }
+        });
+    }
+
+    // Register form handler
+    const registroForm = document.getElementById('registroForm');
+    if (registroForm) {
+        registroForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('regError');
+            const username = document.getElementById('regUsername').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            errorEl.style.display = 'none';
+
+            if (password !== passwordConfirm) {
+                errorEl.textContent = 'As senhas não coincidem';
+                errorEl.style.display = 'block';
+                return;
+            }
+
+            try {
+                await QDApi.register(username, email, password);
+                window.location.href = 'diario.html';
+            } catch (err) {
+                errorEl.textContent = err.message || 'Erro ao criar conta';
+                errorEl.style.display = 'block';
+            }
+        });
+    }
+    </script>
+</body>
+</html>
+
