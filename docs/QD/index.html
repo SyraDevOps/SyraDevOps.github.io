@@ -1,0 +1,187 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Faça login ou registre-se no seu diário pessoal com assistente IA Sory.">
+    <meta name="theme-color" content="#ff6b6b">
+    <meta name="color-scheme" content="light dark">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://api.syradevops.com; worker-src 'self'; manifest-src 'self';">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="QDiário">
+    <meta name="msapplication-TileColor" content="#ff6b6b">
+    <meta name="msapplication-tap-highlight" content="no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="manifest" href="manifest.webmanifest?v=20260309">
+    <link rel="icon" href="icons/assets/favicon.png?v=20260309" sizes="32x32" type="image/png">
+    <link rel="icon" href="icons/assets/icon.png?v=20260309" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="icons/assets/icon.png?v=20260309" sizes="192x192">
+    <link rel="shortcut icon" href="icons/assets/favicon.png?v=20260309" type="image/png">
+    <title>Login e Registro</title>
+    <link rel="stylesheet" href="styles.css?v=202603071600">
+    <link rel="stylesheet" href="toast-styles.css">
+    <script type="module" src="utils.js"></script>
+    <script src="font-size.js"></script>
+    <script src="theme.js"></script>
+</head>
+<body>
+    <div class="notebook-page">
+        <div class="content auth-content">
+            <h1 class="auth-main-title">Querido Diário</h1>
+            <div class="auth-card">
+                <h2>Acesse sua conta</h2>
+
+                <div class="auth-tabs" role="tablist" aria-label="Alternar entre login e registro">
+                    <button type="button" class="auth-tab active" data-auth-target="login">Login</button>
+                    <button type="button" class="auth-tab" data-auth-target="registro">Registro</button>
+                </div>
+
+                <form class="auth-form active" id="loginForm" data-auth-form="login">
+                    <input type="email" id="loginEmail" placeholder="E-mail" required>
+                    <input type="password" id="loginPassword" placeholder="Senha" required>
+                    <button type="submit" class="auth-submit">Entrar</button>
+                    <p id="loginError" class="auth-error" style="color:#e74c3c;font-size:0.85rem;display:none;"></p>
+                </form>
+
+                <form class="auth-form" id="registroForm" data-auth-form="registro">
+                    <input type="text" id="regUsername" placeholder="Username" minlength="3" maxlength="30" required>
+                    <input type="email" id="regEmail" placeholder="E-mail" required>
+                    <input type="password" id="regPassword" placeholder="Senha (min. 6 caracteres)" minlength="6" required>
+                    <input type="password" id="regPasswordConfirm" placeholder="Confirmação da senha" required>
+                    <button type="submit" class="auth-submit">Criar conta</button>
+                    <p id="regError" class="auth-error" style="color:#e74c3c;font-size:0.85rem;display:none;"></p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script src="profile-store.js"></script>
+    <script src="crypto-utils.js"></script>
+    <script src="backup-utils.js"></script>
+    <script src="analytics-utils.js"></script>
+    <script src="script.js"></script>
+    
+    <!-- PWA Support Scripts -->
+    <script src="pwa-install.js"></script>
+    <script>
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('✅ Service Worker registrado', reg))
+                    .catch(err => console.log('❌ Erro ao registrar Service Worker:', err));
+            });
+        }
+    </script>
+    <script>
+    // Import utilities
+    import { ErrorHandler } from './utils.js';
+    
+    // Initialize error handler
+    document.addEventListener('DOMContentLoaded', () => {
+        ErrorHandler.init();
+        
+        // Process offline queue when online
+        if (typeof QDApi !== 'undefined') {
+            window.addEventListener('online', () => {
+                QDApi.processOfflineQueue();
+            });
+        }
+    });
+    
+    // If already authenticated, redirect to diary
+    if (typeof QDApi !== 'undefined' && QDApi.isAuthenticated) {
+        window.location.href = 'diario.html';
+    }
+
+    // Login form handler with loading state
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('loginError');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            errorEl.style.display = 'none';
+
+            // Set loading state
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Entrando...';
+
+            try {
+                await QDApi.login(email, password);
+                if (window.QDProfileStore?.ensureDisplayName) {
+                    await window.QDProfileStore.ensureDisplayName(QDApi?.user?.username);
+                }
+                ErrorHandler.success('Login realizado com sucesso!');
+                setTimeout(() => window.location.href = 'diario.html', 500);
+            } catch (err) {
+                errorEl.textContent = err.message || 'Erro ao fazer login';
+                errorEl.style.display = 'block';
+                ErrorHandler.error(err.message || 'Erro ao fazer login');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+    }
+
+    // Register form handler with loading state
+    const registroForm = document.getElementById('registroForm');
+    if (registroForm) {
+        registroForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const errorEl = document.getElementById('regError');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const username = document.getElementById('regUsername').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+            errorEl.style.display = 'none';
+
+            if (password !== passwordConfirm) {
+                errorEl.textContent = 'As senhas não coincidem';
+                errorEl.style.display = 'block';
+                ErrorHandler.warning('As senhas não coincidem');
+                return;
+            }
+
+            if (password.length < 6) {
+                errorEl.textContent = 'A senha deve ter no mínimo 6 caracteres';
+                errorEl.style.display = 'block';
+                ErrorHandler.warning('A senha deve ter no mínimo 6 caracteres');
+                return;
+            }
+
+            // Set loading state
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Criando conta...';
+
+            try {
+                await QDApi.register(username, email, password);
+                if (window.QDProfileStore?.ensureDisplayName) {
+                    await window.QDProfileStore.ensureDisplayName(username);
+                }
+                ErrorHandler.success('Conta criada com sucesso!');
+                setTimeout(() => window.location.href = 'diario.html', 500);
+            } catch (err) {
+                errorEl.textContent = err.message || 'Erro ao criar conta';
+                errorEl.style.display = 'block';
+                ErrorHandler.error(err.message || 'Erro ao criar conta');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
+    }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, minimum-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="description" content="Gerencie sua coleção de adesivos favoritos, crie adesivos personalizados e salve sua identidade visual.">
+    <meta name="theme-color" content="#ff6b6b">
+    <meta name="color-scheme" content="light">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="QDiário">
+    <meta name="msapplication-TileColor" content="#ff6b6b">
+    <meta name="msapplication-tap-highlight" content="no">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="manifest" href="manifest.webmanifest?v=20260309">
+    <link rel="icon" href="icons/assets/favicon.png?v=20260309" sizes="32x32" type="image/png">
+    <link rel="icon" href="icons/assets/icon.png?v=20260309" sizes="192x192" type="image/png">
+    <link rel="apple-touch-icon" href="icons/assets/icon.png?v=20260309" sizes="192x192">
+    <link rel="shortcut icon" href="icons/assets/favicon.png?v=20260309" type="image/png">
+    <title>Adesivos</title>
+    <link rel="stylesheet" href="styles.css?v=202603071600">
+    <link rel="stylesheet" href="toast-styles.css">
+    <script src="font-size.js"></script>
+    <script src="theme.js"></script>
+</head>
+<body>
+    <button class="menu-button" id="menuButton" aria-label="Abrir menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="sidebar" id="sidebar">
+        <ul>
+            <li><a href="diario.html">Diario</a></li>
+            <li><a href="linha-do-tempo.html">Linha do Tempo</a></li>
+            <li><a href="notas.html">Notas</a></li>
+            <li><a href="adesivos.html" class="active">Adesivos</a></li>
+            <li><a href="perfil.html">Perfil</a></li>
+            <li><a href="#" onclick="QDApi.logout(); return false;" style="color:#e74c3c;">Sair</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            Feito por <a href="https://github.com/SyraDevOps" target="_blank" rel="noopener">@SyraDevOps</a>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay"></div>
+
+    <div class="notebook-page">
+        <div class="content sticker-hub-page">
+            <section class="sticker-hub-hero">
+                <div>
+                    <h1>Adesivos</h1>
+                    <p class="sticker-hub-lead">Seu painel de coleção pessoal. Favoritar, criar e salvar agora ficou em um lugar só.</p>
+                </div>
+                <div class="sticker-hub-pill" id="favoritesCountPill">0 favoritos</div>
+            </section>
+
+            <section class="sticker-hub-panel">
+                <h2>Buscar no Catálogo</h2>
+                <div class="sticker-hub-toolbar">
+                    <input id="hubSearchInput" class="sticker-hub-search" type="text" placeholder="Buscar por nome do adesivo..." aria-label="Buscar adesivo">
+                    <select id="hubCategorySelect" class="sticker-hub-select" aria-label="Filtrar por categoria"></select>
+                </div>
+                <div id="hubCatalogGrid" class="sticker-hub-grid" aria-live="polite"></div>
+            </section>
+
+            <section class="sticker-hub-layout">
+                <article class="sticker-hub-panel">
+                    <h2>Seus Favoritos</h2>
+                    <p class="sticker-hub-note">Esses são os adesivos que aparecem no atalho rápido lateral.</p>
+                    <div id="hubFavoritesGrid" class="sticker-hub-grid compact" aria-live="polite"></div>
+                </article>
+
+                <article class="sticker-hub-panel">
+                    <h2>Criar Novo Adesivo</h2>
+                    <form id="createStickerForm" class="sticker-hub-form">
+                        <label for="customStickerName">Nome</label>
+                        <input id="customStickerName" class="sticker-hub-input" type="text" maxlength="40" placeholder="Ex: Meta da semana" required>
+
+                        <label for="customStickerEmoji">Emoji</label>
+                        <input id="customStickerEmoji" class="sticker-hub-input" type="text" maxlength="2" placeholder="✨">
+
+                        <label for="customStickerColor">Cor de fundo</label>
+                        <input id="customStickerColor" class="sticker-hub-color" type="color" value="#ffe8cf">
+
+                        <button class="sticker-hub-button" type="submit">Salvar adesivo criado</button>
+                    </form>
+
+                    <div class="sticker-hub-divider"></div>
+
+                    <label class="sticker-hub-upload" for="customStickerImageInput">
+                        <span>Importar imagem personalizada</span>
+                        <small>PNG/JPG com transparência recomendada</small>
+                    </label>
+                    <input id="customStickerImageInput" type="file" accept="image/png,image/jpeg,image/jpg" style="display:none;">
+
+                    <p id="customStickerStatus" class="sticker-hub-status" aria-live="polite"></p>
+                </article>
+            </section>
+
+            <section class="sticker-hub-panel">
+                <h2>Meus Adesivos Salvos</h2>
+                <p class="sticker-hub-note">Gerencie seus adesivos personalizados e favorite os que quiser no acesso rápido.</p>
+                <div id="hubCustomGrid" class="sticker-hub-grid" aria-live="polite"></div>
+            </section>
+        </div>
+    </div>
+
+    <script src="api-client.js"></script>
+    <script src="profile-store.js"></script>
+    <script src="crypto-utils.js"></script>
+    <script src="backup-utils.js"></script>
+    <script src="analytics-utils.js"></script>
+    <script src="script.js"></script>
+    <script src="stickers.js"></script>
+    <script src="stickers-manager.js"></script>
+
+    <script src="pwa-install.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .catch(() => null);
+            });
+        }
+    </script>
+</body>
+</html>
