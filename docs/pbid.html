@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIBID Física UFSJ</title>
+    <!-- Tailwind CSS v4 CDN -->
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #003366;
+            --accent-blue: #0056b3;
+            --text-dark: #1a1a1a;
+            --text-light: #666666;
+            --bg-soft: #f4f7f9;
+            --border-clean: #e1e8ed;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-soft);
+            color: var(--text-dark);
+        }
+
+        .glass-effect {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(4px);
+            border-bottom: 1px solid var(--border-clean);
+        }
+
+        .section-padding {
+            padding: 5rem 1.5rem;
+        }
+
+        @media (min-width: 640px) { .section-padding { padding: 5rem 3rem; } }
+        @media (min-width: 1024px) { .section-padding { padding: 5rem 6rem; } }
+
+        .clean-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-clean);
+            transition: all 0.3s ease;
+        }
+
+        /* Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="selection:bg-[#003366] selection:text-white">
+
+    <!-- Navigation -->
+    <nav id="navbar" class="fixed top-0 left-0 w-full z-50 transition-all duration-300 py-4">
+        <div class="max-w-7xl mx-auto px-6 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="bg-[#003366] w-9 h-9 rounded flex items-center justify-center">
+                    <span class="text-white font-bold text-[10px]">UFSJ</span>
+                </div>
+                <span id="nav-logo-text" class="font-sans text-lg font-bold tracking-tight uppercase text-white">
+                    PIBID Física
+                </span>
+            </div>
+
+            <!-- Desktop Menu -->
+            <div class="hidden lg:flex items-center gap-6">
+                <a href="#home" class="nav-link text-[13px] font-semibold uppercase tracking-wider transition-colors hover:text-[#0056b3] text-white/90">Início</a>
+                <a href="#sobre" class="nav-link text-[13px] font-semibold uppercase tracking-wider transition-colors hover:text-[#0056b3] text-white/90">Sobre</a>
+                <a href="#subprojeto" class="nav-link text-[13px] font-semibold uppercase tracking-wider transition-colors hover:text-[#0056b3] text-white/90">Projeto</a>
+                <a href="#portfolio" class="nav-link text-[13px] font-semibold uppercase tracking-wider transition-colors hover:text-[#0056b3] text-white/90">Portfólio</a>
+                <a href="#producoes" class="nav-link text-[13px] font-semibold uppercase tracking-wider transition-colors hover:text-[#0056b3] text-white/90">Produções</a>
+                <a href="#galeria" class="nav-link text-[13px] font-semibold uppercase tracking-wider transition-colors hover:text-[#0056b3] text-white/90">Galeria</a>
+                <a href="#noticias" class="nav-link text-[13px] font-semibold uppercase tracking-wider transition-colors hover:text-[#0056b3] text-white/90">Notícias</a>
+                <a href="#contato" class="nav-link text-[13px] font-semibold uppercase tracking-wider transition-colors hover:text-[#0056b3] text-white/90">Contato</a>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button id="menu-toggle" class="lg:hidden p-2 text-white">
+                <svg id="menu-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+                <svg id="close-icon" class="hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+            </button>
+        </div>
+        
+        <!-- Mobile Menu Overlay -->
+        <div id="mobile-menu" class="hidden fixed inset-0 bg-[#003366] z-40 flex flex-col items-center justify-center gap-8">
+            <a href="#home" class="text-2xl font-bold text-white uppercase tracking-widest">Início</a>
+            <a href="#sobre" class="text-2xl font-bold text-white uppercase tracking-widest">Sobre</a>
+            <a href="#subprojeto" class="text-2xl font-bold text-white uppercase tracking-widest">Projeto</a>
+            <a href="#portfolio" class="text-2xl font-bold text-white uppercase tracking-widest">Portfólio</a>
+            <a href="#contato" class="text-2xl font-bold text-white uppercase tracking-widest">Contato</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative h-[80vh] flex items-center justify-center overflow-hidden">
+        <div class="absolute inset-0 bg-[#003366] z-0">
+            <div class="absolute inset-0 bg-gradient-to-br from-[#003366] to-[#0056b3] opacity-90"></div>
+        </div>
+        
+        <div class="relative z-10 text-center px-6 max-w-4xl mx-auto">
+            <div class="reveal active">
+                <h1 class="text-4xl md:text-6xl lg:text-7xl font-sans font-extrabold text-white mb-6 leading-tight tracking-tight">
+                    Educar para Transformar
+                </h1>
+                <p class="text-lg md:text-xl text-white/90 font-medium mb-10 max-w-3xl mx-auto leading-relaxed">
+                    O subprojeto de Física da UFSJ integra teoria e prática docente, aproximando licenciandos da realidade escolar e promovendo inovação no ensino de ciências.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="#sobre" class="bg-white text-[#003366] px-8 py-3 rounded font-bold text-sm uppercase tracking-wide hover:bg-slate-50 transition-all">
+                        Conheça o projeto
+                    </a>
+                    <a href="#portfolio" class="border border-white/20 text-white px-8 py-3 rounded font-bold text-sm uppercase tracking-wide hover:bg-white/10 transition-all">
+                        Explorar atividades
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact Stats Overlay -->
+    <div class="max-w-7xl mx-auto px-6 -mt-16 relative z-20 reveal">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-8 rounded-xl border border-[#e1e8ed] shadow-sm text-center">
+                <span class="block text-3xl font-extrabold text-[#003366]">12</span>
+                <span class="text-[11px] font-bold text-[#666666] uppercase tracking-widest mt-1 block">Bolsistas Ativos</span>
+            </div>
+            <div class="bg-white p-8 rounded-xl border border-[#e1e8ed] shadow-sm text-center">
+                <span class="block text-3xl font-extrabold text-[#003366]">04</span>
+                <span class="text-[11px] font-bold text-[#666666] uppercase tracking-widest mt-1 block">Escolas Parceiras</span>
+            </div>
+            <div class="bg-white p-8 rounded-xl border border-[#e1e8ed] shadow-sm text-center">
+                <span class="block text-3xl font-extrabold text-[#003366]">150+</span>
+                <span class="text-[11px] font-bold text-[#666666] uppercase tracking-widest mt-1 block">Alunos Impactados</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Section -->
+    <section id="sobre" class="section-padding bg-white">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16 items-center">
+            <div class="w-full lg:w-1/2 reveal">
+                <span class="text-[#0056b3] font-bold uppercase tracking-widest text-xs mb-4 block">Sobre o Programa</span>
+                <h2 class="text-3xl md:text-4xl font-sans font-extrabold text-[#003366] mb-8 leading-tight">
+                    O PIBID integra teoria e prática na formação docente em Física
+                </h2>
+                <div class="space-y-6 text-[#666666] leading-relaxed text-base">
+                    <p>
+                        O PIBID é uma iniciativa da CAPES que visa antecipar o vínculo entre os futuros mestres e o ambiente escolar na educação básica. Através da imersão no cotidiano das escolas públicas, promovemos uma formação sólida e inovadora.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8">
+                        <div class="flex gap-3 items-center bg-[#f4f7f9] p-4 rounded-lg border border-[#e1e8ed]">
+                            <div class="w-2 h-2 bg-[#003366] rounded-full"></div>
+                            <p class="text-xs font-bold uppercase text-[#1a1a1a] tracking-wide">Valorização do magistério</p>
+                        </div>
+                        <div class="flex gap-3 items-center bg-[#f4f7f9] p-4 rounded-lg border border-[#e1e8ed]">
+                            <div class="w-2 h-2 bg-[#003366] rounded-full"></div>
+                            <p class="text-xs font-bold uppercase text-[#1a1a1a] tracking-wide">Qualidade na educação básica</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full lg:w-1/2 reveal">
+                <div class="rounded-2xl overflow-hidden border border-[#e1e8ed] shadow-sm">
+                    <img src="https://picsum.photos/seed/pibid-info/1000/800" alt="PIBID em ação" class="w-full h-auto aspect-video object-cover" referrerpolicy="no-referrer">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Subproject Section -->
+    <section id="subprojeto" class="section-padding border-y border-[#e1e8ed]">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16 reveal">
+                <span class="text-[#0056b3] font-bold uppercase tracking-widest text-xs mb-4 block">Subprojeto de Física</span>
+                <h2 class="text-3xl md:text-4xl font-sans font-extrabold text-[#003366] mb-4">UFSJ - São João del-Rei</h2>
+                <p class="max-w-2xl text-[#666666] text-base leading-relaxed">
+                    Foco no desenvolvimento de materiais didáticos manipuláveis, experimentação e o uso de TICs para desmistificar o ensino de Física.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 clean-card p-10 reveal">
+                    <h3 class="text-sm font-bold uppercase text-[#003366] mb-8 tracking-widest border-b border-[#f4f7f9] pb-4">
+                        Coordenação e Equipe
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded bg-[#f4f7f9] flex items-center justify-center text-[#003366] font-bold text-xs">J</div>
+                            <div>
+                                <p class="font-bold text-[#1a1a1a] text-sm">Prof. Dr. João Silva</p>
+                                <p class="text-[11px] text-[#666666] uppercase font-bold tracking-tighter">Coordenador de Área</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded bg-[#f4f7f9] flex items-center justify-center text-[#003366] font-bold text-xs">M</div>
+                            <div>
+                                <p class="font-bold text-[#1a1a1a] text-sm">Profa. Dra. Maria Oliveira</p>
+                                <p class="text-[11px] text-[#666666] uppercase font-bold tracking-tighter">Coordenadora de Gestão</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-[#003366] p-10 rounded-xl shadow-lg text-white reveal">
+                    <h3 class="text-sm font-bold uppercase mb-8 tracking-widest border-b border-white/10 pb-4">
+                        Escolas Parceiras
+                    </h3>
+                    <ul class="space-y-4">
+                        <li class="flex gap-3 items-start">
+                            <div class="w-1.5 h-1.5 bg-[#0056b3] rounded-full mt-1.5"></div>
+                            <p class="text-sm font-medium opacity-90">Escola Estadual Professor João dos Santos</p>
+                        </li>
+                        <li class="flex gap-3 items-start">
+                            <div class="w-1.5 h-1.5 bg-[#0056b3] rounded-full mt-1.5"></div>
+                            <p class="text-sm font-medium opacity-90">Escola Estadual Maria da Conceição</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Portfolio Section -->
+    <section id="portfolio" class="section-padding bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16 reveal">
+                <span class="text-[#0056b3] font-bold uppercase tracking-widest text-xs mb-4 block">Portfólio de Atividades</span>
+                <h2 class="text-3xl md:text-4xl font-sans font-extrabold text-[#003366] mb-2">Relatos e Produções</h2>
+                <p class="text-[#666666] text-sm font-medium uppercase tracking-wide">Experiências práticas nas escolas estaduais</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Project 1 -->
+                <div class="clean-card group overflow-hidden reveal">
+                    <div class="relative aspect-video overflow-hidden">
+                        <img src="https://picsum.photos/seed/physics1/600/400" alt="Projeto" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-[#003366]/90 text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-widest">Oficina</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-[10px] font-bold text-[#0056b3] uppercase tracking-widest mb-2 block">2024</span>
+                        <h3 class="text-lg font-bold text-[#1a1a1a] mb-3 group-hover:text-[#0056b3] transition-colors">Laboratório Itinerante</h3>
+                        <p class="text-[#666666] text-xs leading-relaxed mb-6">Experimentos práticos levados às salas de aula sem laboratório próprio.</p>
+                        <button class="text-[11px] font-bold text-[#003366] uppercase tracking-widest border-b-2 border-[#003366]/10 hover:border-[#003366] transition-all pb-1">Ver Detalhes</button>
+                    </div>
+                </div>
+                <!-- Project 2 -->
+                <div class="clean-card group overflow-hidden reveal">
+                    <div class="relative aspect-video overflow-hidden">
+                        <img src="https://picsum.photos/seed/physics2/600/400" alt="Projeto" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-[#003366]/90 text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-widest">Extensão</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-[10px] font-bold text-[#0056b3] uppercase tracking-widest mb-2 block">2023</span>
+                        <h3 class="text-lg font-bold text-[#1a1a1a] mb-3 group-hover:text-[#0056b3] transition-colors">Astronomia na Praça</h3>
+                        <p class="text-[#666666] text-xs leading-relaxed mb-6">Observação do céu noturno e palestras abertas à comunidade escolar.</p>
+                        <button class="text-[11px] font-bold text-[#003366] uppercase tracking-widest border-b-2 border-[#003366]/10 hover:border-[#003366] transition-all pb-1">Ver Detalhes</button>
+                    </div>
+                </div>
+                <!-- Project 3 -->
+                <div class="clean-card group overflow-hidden reveal">
+                    <div class="relative aspect-video overflow-hidden">
+                        <img src="https://picsum.photos/seed/physics3/600/400" alt="Projeto" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-[#003366]/90 text-white text-[9px] font-bold px-2 py-1 rounded uppercase tracking-widest">Inovação</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <span class="text-[10px] font-bold text-[#0056b3] uppercase tracking-widest mb-2 block">2023</span>
+                        <h3 class="text-lg font-bold text-[#1a1a1a] mb-3 group-hover:text-[#0056b3] transition-colors">Robótica Sustentável</h3>
+                        <p class="text-[#666666] text-xs leading-relaxed mb-6">Utilização de materiais recicláveis para ensino de eletrônica e mecânica.</p>
+                        <button class="text-[11px] font-bold text-[#003366] uppercase tracking-widest border-b-2 border-[#003366]/10 hover:border-[#003366] transition-all pb-1">Ver Detalhes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Productions & Documents -->
+    <section id="producoes" class="section-padding bg-[#003366] text-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-20">
+                <div class="reveal">
+                    <div class="flex items-center gap-3 mb-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0056b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></svg>
+                        <h2 class="text-3xl font-sans font-extrabold">Produção Acadêmica</h2>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-lg hover:bg-white/10 transition-colors">
+                            <span class="text-[#0056b3] font-bold text-[9px] uppercase tracking-widest">Artigo</span>
+                            <h4 class="text-base font-bold mb-2">Simuladores no ensino de Óptica</h4>
+                            <p class="text-[11px] font-bold text-white/40 uppercase">Silva, J.; Oliveira, M.</p>
+                        </div>
+                        <div class="bg-white/5 border border-white/10 p-6 rounded-lg hover:bg-white/10 transition-colors">
+                            <span class="text-[#0056b3] font-bold text-[9px] uppercase tracking-widest">Resumo</span>
+                            <h4 class="text-base font-bold mb-2">Gincana de Física Ludicidade</h4>
+                            <p class="text-[11px] font-bold text-white/40 uppercase">Souza, A.; Ferreira, L.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="documentos" class="reveal">
+                    <div class="flex items-center gap-3 mb-8">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0056b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        <h2 class="text-3xl font-sans font-extrabold">Editais & Documentos</h2>
+                    </div>
+                    <div class="flex flex-col gap-3">
+                        <a href="#" class="flex justify-between items-center p-4 rounded-lg bg-white/5 border border-white/10 hover:border-[#0056b3] transition-all">
+                            <div class="flex items-center gap-4">
+                                <span class="text-[9px] text-[#0056b3] uppercase font-extrabold tracking-widest">PDF</span>
+                                <p class="font-bold text-sm tracking-tight">Edital de Seleção 2024.2</p>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-20"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        </a>
+                        <a href="#" class="flex justify-between items-center p-4 rounded-lg bg-white/5 border border-white/10 hover:border-[#0056b3] transition-all">
+                            <div class="flex items-center gap-4">
+                                <span class="text-[9px] text-[#0056b3] uppercase font-extrabold tracking-widest">PDF</span>
+                                <p class="font-bold text-sm tracking-tight">Manual do Bolsista</p>
+                            </div>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-20"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="galeria" class="section-padding bg-[#f4f7f9]">
+        <div class="max-w-7xl mx-auto text-center">
+            <div class="mb-16 reveal">
+                <span class="text-[#0056b3] font-bold uppercase tracking-widest text-xs mb-4 block">Galeria</span>
+                <h2 class="text-3xl md:text-4xl font-sans font-extrabold text-[#003366] mb-4">Ciência e Prática</h2>
+                <div class="w-12 h-0.5 bg-[#003366] mx-auto"></div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 reveal">
+                <div class="relative group rounded-lg overflow-hidden aspect-square border border-[#e1e8ed]">
+                    <img src="https://picsum.photos/seed/img1/800/600" alt="Galeria" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                </div>
+                <div class="relative group rounded-lg overflow-hidden aspect-square border border-[#e1e8ed]">
+                    <img src="https://picsum.photos/seed/img2/800/600" alt="Galeria" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                </div>
+                <div class="relative group rounded-lg overflow-hidden aspect-square border border-[#e1e8ed]">
+                    <img src="https://picsum.photos/seed/img3/800/600" alt="Galeria" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                </div>
+                <div class="relative group rounded-lg overflow-hidden aspect-square border border-[#e1e8ed]">
+                    <img src="https://picsum.photos/seed/img4/800/600" alt="Galeria" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- News Section -->
+    <section id="noticias" class="section-padding bg-white border-y border-[#e1e8ed]">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16">
+            <div class="lg:w-2/3 reveal">
+                <span class="text-[#0056b3] font-bold uppercase tracking-widest text-xs mb-4 block">Notícias Recentes</span>
+                <div class="space-y-8">
+                    <div class="flex flex-col md:flex-row gap-6 items-start pb-8 border-b border-[#f4f7f9] last:border-0">
+                        <div class="w-full md:w-40 aspect-video rounded-lg overflow-hidden border border-[#e1e8ed]">
+                            <img src="https://picsum.photos/seed/news1/600/400" alt="Notícia" class="w-full h-full object-cover">
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold text-[#0056b3] uppercase tracking-widest">10 Out 2024</span>
+                            <h3 class="text-lg font-bold text-[#1a1a1a] mt-1 hover:text-[#0056b3] cursor-pointer">Inscrições abertas para bolsistas</h3>
+                            <p class="text-[#666666] text-xs mt-2">O subprojeto de Física abre seleção para estudantes da licenciatura na UFSJ.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="lg:w-1/3 reveal">
+                <div class="bg-[#f4f7f9] p-8 rounded-xl border border-[#e1e8ed]">
+                    <h3 class="text-sm font-bold uppercase text-[#003366] mb-6 tracking-widest border-b border-[#e1e8ed] pb-3">Links Úteis</h3>
+                    <ul class="space-y-3">
+                        <li class="text-xs font-bold text-[#0056b3] hover:text-[#003366] cursor-pointer">Portal do Aluno UFSJ</li>
+                        <li class="text-xs font-bold text-[#0056b3] hover:text-[#003366] cursor-pointer">Plataforma Paulo Freire</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contato" class="section-padding bg-[#f4f7f9]">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12">
+            <div class="lg:w-1/3 bg-[#003366] p-12 rounded-xl text-white shadow-lg reveal">
+                <h2 class="text-3xl font-sans font-extrabold mb-8">Fale Conosco</h2>
+                <div class="space-y-6">
+                    <div class="flex gap-4 items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0056b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Email</p>
+                            <p class="text-sm font-medium">pibidfisica@ufsj.edu.br</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 items-start">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0056b3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+                        <div>
+                            <p class="text-[10px] font-bold uppercase tracking-widest text-white/40 mb-1">Endereço</p>
+                            <p class="text-sm font-medium">Campus Dom Bosco - UFSJ, MG</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:w-2/3 bg-white p-12 rounded-xl border border-[#e1e8ed] shadow-sm reveal">
+                <form class="grid grid-cols-1 md:grid-cols-2 gap-6" onsubmit="event.preventDefault()">
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-[#666666] uppercase tracking-widest">Nome</label>
+                        <input type="text" class="w-full border border-[#e1e8ed] rounded px-4 py-2 text-sm focus:border-[#0056b3] focus:outline-none bg-[#f4f7f9]">
+                    </div>
+                    <div class="space-y-1">
+                        <label class="text-[10px] font-bold text-[#666666] uppercase tracking-widest">Email</label>
+                        <input type="email" class="w-full border border-[#e1e8ed] rounded px-4 py-2 text-sm focus:border-[#0056b3] focus:outline-none bg-[#f4f7f9]">
+                    </div>
+                    <div class="md:col-span-2 space-y-1">
+                        <label class="text-[10px] font-bold text-[#666666] uppercase tracking-widest">Mensagem</label>
+                        <textarea rows="4" class="w-full border border-[#e1e8ed] rounded px-4 py-2 text-sm focus:border-[#0056b3] focus:outline-none bg-[#f4f7f9]"></textarea>
+                    </div>
+                    <button class="bg-[#003366] text-white px-8 py-3 rounded font-bold text-xs uppercase tracking-widest hover:bg-black transition-all">
+                        Enviar Mensagem
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-white py-10 border-t border-[#e1e8ed]">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-center md:text-left">
+                <div class="flex items-center gap-2 mb-2 justify-center md:justify-start">
+                    <div class="bg-[#003366] w-6 h-6 rounded flex items-center justify-center">
+                        <span class="text-white font-bold text-[8px]">UFSJ</span>
+                    </div>
+                    <h3 class="text-sm font-bold text-[#003366] uppercase tracking-tight">PIBID Física UFSJ</h3>
+                </div>
+                <p class="text-[11px] text-[#666666] font-medium">&copy; 2024 PIBID Física UFSJ - Departamento de Física e Matemática</p>
+            </div>
+            
+            <div class="flex gap-8 items-center grayscale opacity-60">
+                <div class="font-extrabold text-sm tracking-tight">UFSJ</div>
+                <div class="font-extrabold text-sm tracking-tight text-[#003366]">CAPES</div>
+                <div class="font-extrabold text-sm tracking-tight">MEC</div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            const logoText = document.getElementById('nav-logo-text');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const menuToggle = document.getElementById('menu-toggle');
+            
+            if (window.scrollY > 50) {
+                navbar.classList.add('glass-effect', 'py-2', 'shadow-sm');
+                navbar.classList.remove('bg-transparent', 'py-4');
+                logoText.classList.remove('text-white');
+                logoText.classList.add('text-[#003366]');
+                menuToggle.classList.remove('text-white');
+                menuToggle.classList.add('text-[#003366]');
+                navLinks.forEach(link => {
+                    link.classList.remove('text-white/90');
+                    link.classList.add('text-[#1a1a1a]');
+                });
+            } else {
+                navbar.classList.remove('glass-effect', 'py-2', 'shadow-sm');
+                navbar.classList.add('bg-transparent', 'py-4');
+                logoText.classList.add('text-white');
+                logoText.classList.remove('text-[#003366]');
+                menuToggle.classList.add('text-white');
+                menuToggle.classList.remove('text-[#003366]');
+                navLinks.forEach(link => {
+                    link.classList.add('text-white/90');
+                    link.classList.remove('text-[#1a1a1a]');
+                });
+            }
+        });
+
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menu-toggle');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+        const closeIcon = document.getElementById('close-icon');
+
+        menuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            menuIcon.classList.toggle('hidden');
+            closeIcon.classList.toggle('hidden');
+            document.body.classList.toggle('overflow-hidden');
+        });
+
+        // Close mobile menu on link click
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+                menuIcon.classList.remove('hidden');
+                closeIcon.classList.add('hidden');
+                document.body.classList.remove('overflow-hidden');
+            });
+        });
+
+        // Scroll Reveal Animation using Intersection Observer
+        const observerOptions = {
+            root: null,
+            threshold: 0.1,
+            rootMargin: '0px'
+        };
+
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => {
+            revealObserver.observe(el);
+        });
+    </script>
+</body>
+</html>
