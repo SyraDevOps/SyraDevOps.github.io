@@ -1,0 +1,106 @@
+:root {
+    --primary-blue: #003366;
+    --accent-blue: #0056b3;
+    --text-dark: #1a1a1a;
+    --text-light: #666666;
+    --bg-soft: #f4f7f9;
+    --border-clean: #e1e8ed;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-soft);
+    color: var(--text-dark);
+    line-height: 1.6;
+}
+
+.glass-effect {
+    background-color: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-clean);
+}
+
+.section-padding {
+    padding: 6rem 1.5rem;
+}
+
+@media (min-width: 640px) { .section-padding { padding: 6rem 3rem; } }
+@media (min-width: 1024px) { .section-padding { padding: 8rem 6rem; } }
+
+.clean-card {
+    background-color: white;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border-clean);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.clean-card:hover {
+    box-shadow: 0 10px 30px rgba(0, 51, 102, 0.08);
+    transform: translateY(-5px);
+    border-color: var(--primary-blue);
+}
+
+/* Animations */
+.reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.8s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Typography Refinements */
+h1, h2, h3, h4 {
+    letter-spacing: -0.02em;
+}
+
+.academic-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--accent-blue);
+    display: block;
+    margin-bottom: 1rem;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+::-webkit-scrollbar-track {
+    background: var(--bg-soft);
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Hero Gradient */
+.hero-gradient {
+    background: linear-gradient(135deg, #002244 0%, #003366 50%, #004488 100%);
+}
+
+/* Navigation Links */
+.nav-link {
+    position: relative;
+}
+.nav-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: -4px;
+    left: 0;
+    background-color: currentColor;
+    transition: width 0.3s ease;
+}
+.nav-link:hover::after {
+    width: 100%;
+}
