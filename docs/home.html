@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYRA | Operational Interface</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <style>
+        :root {
+            --primary-white: #ffffff;
+            --bg-light: #fcfcfc;
+            --sidebar-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #888;
+            --accent-border: rgba(0, 0, 0, 0.06);
+            --sidebar-width: 280px;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+        .noise {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.015; pointer-events: none; z-index: 100;
+        }
+        .dashboard-container { display: flex; height: 100vh; width: 100vw; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            height: 100%;
+            display: flex; flex-direction: column;
+            padding: 40px 0; z-index: 10;
+            border-right: 1px solid var(--accent-border);
+        }
+        .sidebar-header { padding: 0 40px 60px 40px; }
+        .sidebar-logo { max-width: 100px; filter: grayscale(1); }
+        .nav-group { flex-grow: 1; display: flex; flex-direction: column; }
+        .nav-item {
+            padding: 16px 40px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .nav-item:hover { color: var(--text-main); }
+        .nav-item.active { color: var(--text-main); font-weight: 700; border-left: 3px solid var(--text-main); }
+        .sidebar-footer { padding: 40px; border-top: 1px solid var(--accent-border); }
+        .sidebar-footer-text { font-family: 'Space Grotesk', sans-serif; font-size: 10px; color: #999; line-height: 1.5; }
+
+        /* MAIN CONTENT */
+        .main-content {
+            flex-grow: 1; display: flex; flex-direction: column;
+            background-color: var(--bg-light); position: relative;
+        }
+        .top-info {
+            padding: 25px 40px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-family: 'Space Grotesk', sans-serif;
+            border-bottom: 1px solid var(--accent-border);
+            background: rgba(252,252,252,0.9); backdrop-filter: blur(10px); z-index: 5;
+        }
+        .top-left { display: flex; align-items: center; gap: 20px; }
+        .status-badge { font-size: 9px; letter-spacing: 2px; color: #999; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .dot { width: 6px; height: 6px; background: #00e676; border-radius: 50%; box-shadow: 0 0 8px #00e676; }
+        .dot.offline { background: #ff3d00; box-shadow: 0 0 8px #ff3d00; }
+        .clock { font-size: 11px; color: #999; }
+        .btn-finalize {
+            display: none;
+            background: transparent; border: 1px solid #1a1a1a;
+            color: #1a1a1a; padding: 7px 16px; border-radius: 6px;
+            font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 600;
+            letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-finalize:hover { background: #1a1a1a; color: #fff; }
+        .btn-finalize.visible { display: block; }
+
+        /* CHAT */
+        .chat-container {
+            flex-grow: 1; padding: 40px 10%; overflow-y: auto;
+            display: flex; flex-direction: column; gap: 40px; scroll-behavior: smooth;
+        }
+        .empty-state { margin: auto; max-width: 500px; text-align: center; animation: fadeIn 1s ease; }
+        .empty-state h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; margin-bottom: 15px; letter-spacing: -0.5px; }
+        .empty-state p { font-size: 0.9rem; line-height: 1.7; color: var(--text-muted); font-weight: 300; }
+
+        .message { max-width: 85%; position: relative; animation: messageFade 0.4s ease forwards; display: flex; flex-direction: column; }
+        .label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; letter-spacing: 1px; margin-bottom: 8px; font-weight: 600; color: #bbb; text-transform: uppercase; }
+        .content-box {
+            padding: 20px 28px; border-radius: 12px; font-size: 0.95rem;
+            line-height: 1.7; box-shadow: 0 4px 20px rgba(0,0,0,0.02); border: 1px solid var(--accent-border);
+        }
+        .message.model { align-self: flex-start; }
+        .message.model .content-box { background: #fff; color: var(--text-main); border-top-left-radius: 2px; }
+        .message.user { align-self: flex-end; }
+        .message.user .content-box { background: #1a1a1a; color: #fff; border-top-right-radius: 2px; }
+        .message.user .label { text-align: right; }
+
+        .content-box p { margin-bottom: 12px; }
+        .content-box p:last-child { margin-bottom: 0; }
+        .content-box h1, .content-box h2, .content-box h3 { margin: 20px 0 10px 0; font-family: 'Space Grotesk', sans-serif; }
+        .content-box ul, .content-box ol { margin: 10px 0 10px 20px; }
+        .content-box li { margin-bottom: 5px; }
+        .content-box pre {
+            background-color: #0d1117 !important; color: #c9d1d9 !important;
+            border-radius: 8px; padding: 16px; margin: 15px 0; overflow-x: auto;
+            border: 1px solid #30363d;
+        }
+        .content-box pre code { font-family: 'Courier New', Courier, monospace; font-size: 0.85rem; background: transparent !important; }
+        .content-box p code, .content-box li code {
+            background: rgba(0,0,0,0.06); color: #d73a49;
+            padding: 3px 6px; border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace; font-size: 0.85rem;
+        }
+        .message.user .content-box p code { background: rgba(255,255,255,0.15); color: #ffb7b7; }
+
+        /* INPUT */
+        .input-area { padding: 30px 10%; background: linear-gradient(to top, var(--bg-light) 70%, transparent); }
+        .input-wrapper {
+            max-width: 1000px; margin: 0 auto; background: #fff;
+            border: 1px solid var(--accent-border); border-radius: 14px;
+            padding: 8px 16px; display: flex; align-items: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04); transition: var(--transition);
+        }
+        .input-wrapper:focus-within { border-color: #000; box-shadow: 0 10px 40px rgba(0,0,0,0.08); }
+        input#user-input {
+            flex-grow: 1; background: transparent; border: none; color: var(--text-main);
+            padding: 15px; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none;
+        }
+        .send-btn {
+            background: #1a1a1a; border: none; width: 40px; height: 40px; border-radius: 10px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition);
+        }
+        .send-btn:hover { background: #000; transform: scale(1.05); }
+        .send-btn:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        .loader { display: flex; gap: 4px; padding: 10px 0; }
+        .loader span { width: 6px; height: 6px; background: #1a1a1a; border-radius: 50%; animation: bounce 1.4s infinite ease-in-out both; }
+        .loader span:nth-child(1) { animation-delay: -0.32s; }
+        .loader span:nth-child(2) { animation-delay: -0.16s; }
+
+        .session-banner {
+            display: none; padding: 12px 40px; background: #f8f8f8;
+            border-bottom: 1px solid var(--accent-border);
+            font-family: 'Space Grotesk', sans-serif; font-size: 10px;
+            color: #999; letter-spacing: 1px; align-items: center; gap: 10px;
+        }
+        .session-banner.visible { display: flex; }
+
+        @keyframes messageFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+        .chat-container::-webkit-scrollbar { width: 5px; }
+        .chat-container::-webkit-scrollbar-thumb { background: #ccc; border-radius: 10px; }
+    </style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="dashboard-container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <img src="logo.png" alt="Syra" class="sidebar-logo" onerror="this.style.display='none'">
+        </div>
+        <nav class="nav-group">
+            <a class="nav-item active" onclick="newSession()">Nova Solicitação</a>
+            <a href="slcc.html" class="nav-item">Solicitações em execução</a>
+            <a href="slce.html" class="nav-item">Soluções concluídas</a>
+            <a href="perfil.html" class="nav-item">Perfil</a>
+            <a href="config.html" class="nav-item">Configurações</a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="sidebar-footer-text">
+                SY-CORE V2.5.1<br>
+                <span id="sidebar-uid">---</span>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        <div class="session-banner" id="session-banner">
+            <span id="session-label">SESSAO_ID: ---</span>
+        </div>
+        <header class="top-info">
+            <div class="top-left">
+                <div class="status-badge" id="status-indicator">
+                    <div class="dot" id="status-dot"></div>
+                    <span id="status-text">SYRA_CORE // OPERATIONAL_MODE</span>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:20px;">
+                <button class="btn-finalize" id="btn-finalize" onclick="finalizeSession()">Finalizar Sessão</button>
+                <div class="clock" id="clock">00:00:00</div>
+            </div>
+        </header>
+
+        <div class="chat-container" id="chat-window">
+            <div class="empty-state" id="empty-state">
+                <h2>Terminal Operacional Syra</h2>
+                <p>A interface está pronta para receber suas instruções. Detalhe sua solicitação técnica para iniciar a operação.</p>
+            </div>
+        </div>
+
+        <footer class="input-area">
+            <div class="input-wrapper">
+                <input type="text" placeholder="Descreva sua solicitação técnica ou cole um código..." id="user-input" autocomplete="off">
+                <button class="send-btn" id="send-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </div>
+        </footer>
+    </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+    import {
+        getFirestore, doc, getDoc, addDoc, updateDoc,
+        collection, serverTimestamp, arrayUnion
+    } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDOrxvJTgiGUmycgFK3aku5bVY3CuUTzx8",
+        authDomain: "syra-a9ee0.firebaseapp.com",
+        projectId: "syra-a9ee0",
+        storageBucket: "syra-a9ee0.firebasestorage.app",
+        messagingSenderId: "817185680125",
+        appId: "1:817185680125:web:c12e463633183caa882c94"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // ---- CONFIGURAÇÃO SYRA ----
+    const API_KEY = "-"; // Cole sua Gemini API Key aqui
+    const SYSTEM_PRE_PROMPT = `Você é a Syra, uma IA sênior especialista em engenharia de software e resolução de problemas complexos.
+Seja concisa, direta e altamente técnica.
+Sempre que fornecer exemplos de código, envolva o código em crases triplas (markdown) e especifique a linguagem (ex: \`\`\`javascript).`;
+
+    // ---- ESTADO ----
+    let currentUser = null;
+    let currentSessionId = null;
+    let chatHistory = [];
+
+    // ---- MARKED CONFIG ----
+    marked.setOptions({
+        highlight: function(code, lang) {
+            const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+            return hljs.highlight(code, { language }).value;
+        },
+        breaks: true
+    });
+
+    // ---- REFS DOM ----
+    const chatWindow = document.getElementById('chat-window');
+    const emptyState = document.getElementById('empty-state');
+    const userInput = document.getElementById('user-input');
+    const sendBtn = document.getElementById('send-btn');
+    const statusText = document.getElementById('status-text');
+    const statusDot = document.getElementById('status-dot');
+    const btnFinalize = document.getElementById('btn-finalize');
+    const sessionBanner = document.getElementById('session-banner');
+    const sessionLabel = document.getElementById('session-label');
+
+    // ---- AUTH GUARD ----
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = "index.html"; return; }
+        currentUser = user;
+
+        // Carregar dados do usuário para o sidebar
+        try {
+            const snap = await getDoc(doc(db, "users", user.uid));
+            if (snap.exists()) {
+                const data = snap.data();
+                document.getElementById('sidebar-uid').textContent = data.username || user.email;
+            }
+        } catch (e) {}
+
+        // Verificar se há sessão na URL
+        const params = new URLSearchParams(window.location.search);
+        const sessionId = params.get('session');
+        if (sessionId) { await loadSession(sessionId); }
+    });
+
+    // ---- CARREGAR SESSÃO EXISTENTE ----
+    async function loadSession(sessionId) {
+        try {
+            const snap = await getDoc(doc(db, `users/${currentUser.uid}/sessions`, sessionId));
+            if (!snap.exists()) return;
+            const data = snap.data();
+            currentSessionId = sessionId;
+
+            emptyState.style.display = 'none';
+            sessionBanner.classList.add('visible');
+            sessionLabel.textContent = `SESSAO_ATIVA: ${sessionId.substring(0,8).toUpperCase()}`;
+            btnFinalize.classList.add('visible');
+
+            chatHistory = [];
+            const messages = data.messages || [];
+            messages.forEach(msg => {
+                chatHistory.push({ role: msg.role === 'model' ? 'model' : 'user', parts: [{ text: msg.text }] });
+                appendMessage(msg.role, msg.text);
+            });
+        } catch (e) {
+            console.error("Erro ao carregar sessão:", e);
+        }
+    }
+
+    // ---- NOVA SESSÃO ----
+    window.newSession = function() {
+        chatHistory = [];
+        chatWindow.innerHTML = '';
+        chatWindow.appendChild(emptyState);
+        emptyState.style.display = 'block';
+        currentSessionId = null;
+        btnFinalize.classList.remove('visible');
+        sessionBanner.classList.remove('visible');
+        // Remover param da URL sem recarregar
+        window.history.replaceState({}, '', 'home.html');
+    };
+
+    // ---- FINALIZAR SESSÃO ----
+    window.finalizeSession = async function() {
+        if (!currentSessionId || !currentUser) return;
+        try {
+            await updateDoc(doc(db, `users/${currentUser.uid}/sessions`, currentSessionId), {
+                status: "concluida",
+                updatedAt: serverTimestamp()
+            });
+        } catch (e) { console.error(e); }
+        newSession();
+    };
+
+    // ---- ENVIAR MENSAGEM ----
+    window.handleSend = async function() {
+        const text = userInput.value.trim();
+        if (!text || !currentUser) return;
+
+        if (!API_KEY || API_KEY === "-") {
+            appendMessage('model', '**Erro de Configuração:** Insira a `API_KEY` do Gemini no código-fonte para continuar.');
+            return;
+        }
+
+        emptyState.style.display = 'none';
+        userInput.value = '';
+        sendBtn.disabled = true;
+        appendMessage('user', text);
+        chatHistory.push({ role: "user", parts: [{ text }] });
+
+        // Criar sessão no Firestore se ainda não existe
+        if (!currentSessionId) {
+            try {
+                const title = text.length > 70 ? text.substring(0, 70) + "..." : text;
+                const ref = await addDoc(collection(db, `users/${currentUser.uid}/sessions`), {
+                    title,
+                    status: "em_execucao",
+                    messages: [{ role: "user", text, ts: Date.now() }],
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                    messageCount: 1
+                });
+                currentSessionId = ref.id;
+                btnFinalize.classList.add('visible');
+                sessionBanner.classList.add('visible');
+                sessionLabel.textContent = `SESSAO_ATIVA: ${ref.id.substring(0,8).toUpperCase()}`;
+                window.history.replaceState({}, '', `home.html?session=${ref.id}`);
+            } catch (e) { console.error(e); }
+        } else {
+            // Append mensagem do usuário
+            try {
+                await updateDoc(doc(db, `users/${currentUser.uid}/sessions`, currentSessionId), {
+                    messages: arrayUnion({ role: "user", text, ts: Date.now() }),
+                    updatedAt: serverTimestamp(),
+                    messageCount: chatHistory.length
+                });
+            } catch (e) { console.error(e); }
+        }
+
+        const loaderId = appendLoader();
+
+        try {
+            const response = await callGeminiAPI();
+            const modelText = response.candidates[0].content.parts[0].text;
+            document.getElementById(loaderId).remove();
+            appendMessage('model', modelText);
+            chatHistory.push({ role: "model", parts: [{ text: modelText }] });
+
+            // Salvar resposta do modelo
+            if (currentSessionId) {
+                try {
+                    await updateDoc(doc(db, `users/${currentUser.uid}/sessions`, currentSessionId), {
+                        messages: arrayUnion({ role: "model", text: modelText, ts: Date.now() }),
+                        updatedAt: serverTimestamp(),
+                        messageCount: chatHistory.length
+                    });
+                } catch (e) { console.error(e); }
+            }
+        } catch (error) {
+            document.getElementById(loaderId).remove();
+            appendMessage('model', `**Erro de Conexão:** ${error.message}`);
+        } finally {
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+    };
+
+    async function callGeminiAPI() {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+        const payload = {
+            systemInstruction: { parts: [{ text: SYSTEM_PRE_PROMPT }] },
+            contents: chatHistory,
+            generationConfig: { temperature: 0.5 }
+        };
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            const err = await response.json();
+            throw new Error(err.error?.message || "Erro desconhecido na API.");
+        }
+        return await response.json();
+    }
+
+    function appendMessage(role, text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${role}`;
+        const parsedHTML = marked.parse(text);
+        msgDiv.innerHTML = `
+            <span class="label">${role === 'user' ? '@USER_OP' : '@SYRA_CORE'}</span>
+            <div class="content-box">${parsedHTML}</div>
+        `;
+        chatWindow.appendChild(msgDiv);
+        scrollToBottom();
+    }
+
+    function appendLoader() {
+        const id = 'loader-' + Date.now();
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message model';
+        msgDiv.id = id;
+        msgDiv.innerHTML = `
+            <span class="label">@SYRA_CORE</span>
+            <div class="content-box"><div class="loader"><span></span><span></span><span></span></div></div>
+        `;
+        chatWindow.appendChild(msgDiv);
+        scrollToBottom();
+        return id;
+    }
+
+    function scrollToBottom() {
+        setTimeout(() => { chatWindow.scrollTop = chatWindow.scrollHeight; }, 50);
+    }
+
+    // Relógio
+    setInterval(() => {
+        document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-BR') + " UTC-3";
+    }, 1000);
+
+    // Enter para enviar
+    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+    sendBtn.addEventListener('click', () => handleSend());
+</script>
+</body>
+</html>
