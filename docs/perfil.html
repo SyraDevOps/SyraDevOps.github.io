@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYRA | Operational Identity</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-white: #ffffff;
+            --bg-light: #fcfcfc;
+            --sidebar-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #888;
+            --accent-border: rgba(0, 0, 0, 0.06);
+            --sidebar-width: 280px;
+            --transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        /* Camada de Ruído Digital */
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.015;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .dashboard-container { display: flex; height: 100vh; width: 100vw; opacity: 0; transition: opacity 1s ease; }
+        .dashboard-container.loaded { opacity: 1; }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 0;
+            z-index: 10;
+            border-right: 1px solid var(--accent-border);
+        }
+        .sidebar-header { padding: 0 40px 60px 40px; }
+        .sidebar-logo { max-width: 100px; filter: grayscale(1); }
+        .nav-group { flex-grow: 1; display: flex; flex-direction: column; }
+        .nav-item {
+            padding: 16px 40px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .nav-item:hover { color: var(--text-main); padding-left: 45px; }
+        .nav-item.active { color: var(--text-main); font-weight: 700; border-left: 3px solid var(--text-main); }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 40px 60px;
+            gap: 30px;
+            position: relative;
+        }
+
+        /* Alerta de Perfil Incompleto */
+        #profile-alert {
+            display: none;
+            background: #fff;
+            border: 1px solid #ffaa00;
+            border-left: 5px solid #ffaa00;
+            padding: 20px 25px;
+            border-radius: 12px;
+            animation: slideDown 0.6s ease;
+            margin-bottom: 10px;
+        }
+        .alert-content h4 { font-family: 'Space Grotesk'; font-size: 11px; color: #ffaa00; text-transform: uppercase; letter-spacing: 1px; }
+        .alert-content p { font-size: 0.85rem; color: #555; margin: 5px 0; }
+        .btn-complete { 
+            background: #000; color: #fff; border: none; padding: 8px 15px; 
+            border-radius: 4px; cursor: pointer; font-family: 'Space Grotesk'; font-size: 9px; 
+            margin-top: 10px; transition: 0.3s;
+        }
+        .btn-complete:hover { opacity: 0.8; }
+
+        /* Cabeçalho */
+        .header-identity {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--accent-border);
+        }
+        .user-info { display: flex; gap: 25px; align-items: center; }
+        .avatar {
+            width: 70px; height: 70px;
+            background: #f0f0f0; border-radius: 50%;
+            border: 1px solid var(--accent-border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 20px; color: #aaa; font-weight: 300;
+        }
+        .user-details h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.5rem; letter-spacing: -0.5px; }
+        .user-details p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .operational-status { text-align: right; font-family: 'Space Grotesk', sans-serif; font-size: 10px; color: #bbb; }
+        .operational-status strong { color: var(--text-main); display: block; font-size: 12px; margin-top: 4px; }
+
+        /* Stats Row */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; }
+        .stat-box {
+            background: #fff; border: 1px solid var(--accent-border);
+            padding: 18px; border-radius: 14px; text-align: center;
+            transition: var(--transition);
+        }
+        .stat-box:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.02); }
+        .stat-box span { font-size: 9px; color: #bbb; text-transform: uppercase; letter-spacing: 1px; }
+        .stat-box div { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 600; margin-top: 6px; }
+
+        /* Grid */
+        .grid-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .card { background: #fff; border: 1px solid var(--accent-border); border-radius: 16px; padding: 25px; }
+        .card-title { font-family: 'Space Grotesk', sans-serif; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #aaa; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center;}
+
+        /* Feed */
+        .feed-item { display: flex; gap: 15px; margin-bottom: 20px; font-size: 0.85rem; position: relative; }
+        .feed-time { color: #bbb; font-family: 'Space Grotesk', sans-serif; min-width: 45px; }
+        .feed-content { color: #555; line-height: 1.4; }
+
+        /* Insight */
+        .insight-card { background: #1a1a1a; color: #fff; border-radius: 14px; padding: 25px; }
+        .insight-card h4 { font-size: 0.8rem; margin-bottom: 12px; color: #00ff00; font-family: 'Space Grotesk'; text-transform: uppercase; }
+        .insight-card p { font-size: 0.85rem; opacity: 0.8; line-height: 1.6; font-weight: 300; }
+
+        /* Módulos */
+        .module-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f8f8f8; font-size: 0.85rem; }
+        .module-check { color: #00ff00; font-weight: bold; }
+
+        /* Heatmap */
+        .heatmap { display: grid; grid-template-columns: repeat(20, 1fr); gap: 4px; margin-top: 10px; }
+        .heat-cell { width: 10px; height: 10px; border-radius: 2px; background: #f0f0f0; }
+        .heat-cell.active { background: #000; }
+
+        /* Animações */
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Responsividade */
+        @media (max-width: 1024px) {
+            .grid-layout { grid-template-columns: 1fr; }
+            .sidebar { width: 80px; }
+            .nav-item span, .sidebar-logo { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <div class="dashboard-container" id="container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="Syra" class="sidebar-logo">
+            </div>
+            <nav class="nav-group">
+                <a href="home.html" class="nav-item">Nova Solicitação</a>
+                <a href="#" class="nav-item">Execução</a>
+                <a href="#" class="nav-item">Concluídas</a>
+                <a href="#" class="nav-item active">Perfil</a>
+                <a href="config.html" class="nav-item">Configurações</a>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            
+            <!-- Notificação de Perfil Incompleto -->
+            <div id="profile-alert">
+                <div class="alert-content">
+                    <h4>Perfil Incompleto</h4>
+                    <p>Sua ID operacional requer dados adicionais para liberar todos os módulos.</p>
+                    <p style="font-size: 0.75rem; color: #999;">Pendentes: <span id="missing-fields">---</span></p>
+                    <button class="btn-complete" onclick="window.location.href='config.html'">COMPLETAR PERFIL</button>
+                </div>
+            </div>
+
+            <!-- Cabeçalho -->
+            <section class="header-identity">
+                <div class="user-info">
+                    <div class="avatar" id="user-initial">U</div>
+                    <div class="user-details">
+                        <h1 id="user-name">Identificando...</h1>
+                        <p>SYRA_ID: <strong id="user-syra-id">----</strong> // Member since <span id="user-member-since">----</span></p>
+                    </div>
+                </div>
+                <div class="operational-status">
+                    CURRENT_PLAN <strong id="user-plan">----</strong>
+                    SYSTEM_STATUS <strong id="user-status-text" style="color: #00ff00;">ONLINE</strong>
+                </div>
+            </section>
+
+            <!-- Stats -->
+            <div class="stats-row">
+                <div class="stat-box"><span>Projetos Ativos</span><div id="stat-active">0</div></div>
+                <div class="stat-box"><span>Prioridade IA</span><div id="stat-priority">NORMAL</div></div>
+                <div class="stat-box"><span>Latência</span><div id="stat-latency">--ms</div></div>
+                <div class="stat-box"><span>Taxa Operacional</span><div id="stat-completion">0%</div></div>
+            </div>
+
+            <div class="grid-layout">
+                <div class="left-col">
+                    <!-- Operational Feed -->
+                    <div class="card" style="margin-bottom: 30px;">
+                        <div class="card-title">Operational Feed <span style="color: #00ff00;">● VIVO</span></div>
+                        <div id="feed-container">
+                            <p style="color: #ccc; font-size: 0.8rem;">Sincronizando atividades...</p>
+                        </div>
+                    </div>
+
+                    <!-- Activity Heatmap -->
+                    <div class="card">
+                        <div class="card-title">Activity Heatmap</div>
+                        <div class="heatmap" id="heatmap">
+                            <!-- Gerado via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="right-col">
+                    <!-- Insights -->
+                    <div class="card" style="margin-bottom: 30px; border: none; background: #f4f4f4;">
+                        <div class="card-title">Smart Insight</div>
+                        <div id="insight-container">
+                            <div class="insight-card">
+                                <h4>Análise de Sistema</h4>
+                                <p>Sincronizando com o núcleo SYRA para gerar recomendações...</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Módulos -->
+                    <div class="card">
+                        <div class="card-title">Ecosystem Modules</div>
+                        <div class="module-item"><span>AI Planning</span><span class="module-check">✓</span></div>
+                        <div class="module-item"><span>Technical Analysis</span><span class="module-check">✓</span></div>
+                        <div class="module-item"><span>Adaptive Support</span><span class="module-check">✓</span></div>
+                        <div class="module-item" style="color: #ccc;"><span>Hardware Integration</span><span>LOCKED</span></div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- FIREBASE MODULES -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, collection, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+        // Configuração do seu Projeto
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOrxvJTgiGUmycgFK3aku5bVY3CuUTzx8",
+            authDomain: "syra-a9ee0.firebaseapp.com",
+            projectId: "syra-a9ee0",
+            storageBucket: "syra-a9ee0.firebasestorage.app",
+            messagingSenderId: "817185680125",
+            appId: "1:817185680125:web:c12e463633183caa882c94"
+        };
+
+        // Inicialização
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Verificação de Autenticação
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                document.getElementById('container').classList.add('loaded');
+                startLiveSubscriptions(user.uid);
+            } else {
+                window.location.href = "login.html";
+            }
+        });
+
+        // Subscrições em Tempo Real (onSnapshot)
+        function startLiveSubscriptions(uid) {
+            
+            // 1. Perfil do Usuário
+            onSnapshot(doc(db, "users", uid), (snap) => {
+                if (snap.exists()) {
+                    const data = snap.data();
+                    updateProfileUI(data);
+                    handleProfileAlert(data);
+                }
+            });
+
+            // 2. Feed Operacional
+            const qFeed = query(collection(db, `users/${uid}/activities`), orderBy("timestamp", "desc"), limit(4));
+            onSnapshot(qFeed, (snap) => {
+                const feedContainer = document.getElementById('feed-container');
+                if (snap.empty) {
+                    feedContainer.innerHTML = '<p style="color:#bbb; font-size:0.8rem;">Aguardando primeira atividade...</p>';
+                    return;
+                }
+                feedContainer.innerHTML = snap.docs.map(doc => {
+                    const act = doc.data();
+                    const time = act.timestamp ? new Date(act.timestamp.seconds * 1000).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                    return `
+                        <div class="feed-item">
+                            <div class="feed-time">${time}</div>
+                            <div class="feed-content">${act.content}</div>
+                        </div>
+                    `;
+                }).join('');
+            });
+
+            // 3. Insights Inteligentes
+            const qInsight = query(collection(db, "notifications"), orderBy("createdAt", "desc"), limit(1));
+            onSnapshot(qInsight, (snap) => {
+                if (!snap.empty) {
+                    const insight = snap.docs[0].data();
+                    document.getElementById('insight-container').innerHTML = `
+                        <div class="insight-card">
+                            <h4>${insight.title || 'IA Insight'}</h4>
+                            <p>${insight.message}</p>
+                        </div>
+                    `;
+                }
+            });
+        }
+
+        // Atualização da Interface
+        function updateProfileUI(data) {
+            document.getElementById('user-name').innerText = data.displayName || "Operador Syra";
+            document.getElementById('user-initial').innerText = (data.displayName || "U").charAt(0);
+            document.getElementById('user-syra-id').innerText = data.syraId || "ID_PENDING";
+            document.getElementById('user-plan').innerText = data.plan || "CORE_PLUS";
+            document.getElementById('stat-active').innerText = data.activeProjects || "00";
+            document.getElementById('stat-priority').innerText = data.priority || "NORMAL";
+            document.getElementById('stat-latency').innerText = (data.latency || "12") + "ms";
+            document.getElementById('stat-completion').innerText = (data.completionRate || "0") + "%";
+            
+            if(data.createdAt) {
+                const year = new Date(data.createdAt.seconds * 1000).getFullYear();
+                document.getElementById('user-member-since').innerText = year;
+            }
+        }
+
+        function handleProfileAlert(data) {
+            const alert = document.getElementById('profile-alert');
+            if (data.profileCompleted === false) {
+                alert.style.display = 'block';
+                document.getElementById('missing-fields').innerText = data.missingFields?.join(', ') || 'Dados de contato';
+            } else {
+                alert.style.display = 'none';
+            }
+        }
+
+        // Heatmap Generator (Visual)
+        const heatmap = document.getElementById('heatmap');
+        for (let i = 0; i < 60; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'heat-cell' + (Math.random() > 0.7 ? ' active' : '');
+            heatmap.appendChild(cell);
+        }
+
+        // Relógio
+        setInterval(() => {
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ":" + 
+                         now.getMinutes().toString().padStart(2, '0') + ":" + 
+                         now.getSeconds().toString().padStart(2, '0');
+            const clock = document.querySelector('.operational-status');
+            // Apenas atualiza o clock se quiser manter o UTC-3
+        }, 1000);
+    </script>
+</body>
+</html>

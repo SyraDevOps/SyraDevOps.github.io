@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYRA | System Configuration</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@300;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-white: #ffffff;
+            --bg-light: #fcfcfc;
+            --sidebar-bg: #ffffff;
+            --text-main: #1a1a1a;
+            --text-muted: #888;
+            --accent-border: rgba(0, 0, 0, 0.06);
+            --sidebar-width: 280px;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            overflow: hidden;
+        }
+
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.015;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        .dashboard-container { display: flex; height: 100vh; width: 100vw; }
+
+        /* Sidebar (Consistente com Home e Perfil) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 0;
+            z-index: 10;
+            border-right: 1px solid var(--accent-border);
+        }
+        .sidebar-header { padding: 0 40px 60px 40px; }
+        .sidebar-logo { max-width: 100px; filter: grayscale(1); }
+        .nav-group { flex-grow: 1; display: flex; flex-direction: column; }
+        .nav-item {
+            padding: 16px 40px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.75rem;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .nav-item:hover { color: var(--text-main); }
+        .nav-item.active { color: var(--text-main); font-weight: 700; border-left: 3px solid var(--text-main); }
+
+        /* Main Content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 60px 10%;
+        }
+
+        /* Títulos de Seção */
+        .config-header { margin-bottom: 50px; }
+        .config-header h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; letter-spacing: -0.8px; }
+        .config-header p { font-size: 0.85rem; color: var(--text-muted); margin-top: 5px; }
+
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #bbb;
+            margin: 40px 0 20px 0;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--accent-border);
+        }
+
+        /* Config Rows */
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.02);
+        }
+
+        .setting-info h4 { font-size: 0.95rem; font-weight: 500; }
+        .setting-info p { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; }
+
+        /* Toggles e Botões */
+        .switch {
+            width: 36px; height: 18px;
+            background: #eee;
+            border-radius: 20px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .switch::after {
+            content: '';
+            position: absolute; top: 3px; left: 3px;
+            width: 12px; height: 12px;
+            background: #fff; border-radius: 50%;
+            transition: 0.3s;
+        }
+        .switch.on { background: #000; }
+        .switch.on::after { left: 21px; }
+
+        .btn-text {
+            background: none; border: none;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px; font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer; text-decoration: underline;
+            text-transform: uppercase;
+        }
+
+        /* Developer Card */
+        .dev-card {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .dev-badge { font-family: 'Space Grotesk', sans-serif; font-size: 9px; background: #333; padding: 4px 8px; border-radius: 4px; color: #00ff00; }
+
+        /* Logout Section */
+        .logout-section {
+            margin-top: 60px;
+            padding: 40px 0;
+            border-top: 1px solid var(--accent-border);
+        }
+        .btn-terminate {
+            background: transparent;
+            border: 1px solid #ff4444;
+            color: #ff4444;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-terminate:hover { background: #ff4444; color: #fff; }
+
+        /* System Info */
+        .system-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            font-size: 0.8rem;
+        }
+        .info-box { background: #fff; border: 1px solid var(--accent-border); padding: 15px; border-radius: 8px; }
+        .info-box span { color: #bbb; display: block; margin-bottom: 5px; font-size: 9px; text-transform: uppercase; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .main-content { animation: fadeIn 0.8s ease; }
+
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="logo.png" alt="Syra" class="sidebar-logo">
+            </div>
+            <nav class="nav-group">
+                <a href="home.html" class="nav-item">Nova Solicitação</a>
+                <a href="#" class="nav-item">Solicitações em execução</a>
+                <a href="#" class="nav-item">Soluções concluídas</a>
+                <a href="perfil.html" class="nav-item">Perfil</a>
+                <a href="#" class="nav-item active">Configurações</a>
+            </nav>
+            <div class="sidebar-footer" style="padding: 40px; border-top: 1px solid var(--accent-border);">
+                <div style="font-family: 'Space Grotesk', sans-serif; font-size: 10px; color: #999;">
+                    SY-CORE V2.5.1<br>
+                    ID: KAYQ-771A
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <header class="config-header">
+                <h1>Core Parameters</h1>
+                <p>Gerencie as preferências de sistema e identidade operacional.</p>
+            </header>
+
+            <!-- 1. Identity & Account -->
+            <div class="section-title">Identity & Account</div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h4>Nível Operacional</h4>
+                    <p>Prioridade de processamento do Workspace atual.</p>
+                </div>
+                <div style="font-family: 'Space Grotesk', sans-serif; font-size: 12px; font-weight: 600;">LEVEL_04</div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h4>Assinatura do Ecossistema</h4>
+                    <p>Plano Core Plus ativo desde Janeiro de 2024.</p>
+                </div>
+                <button class="btn-text">Gerenciar</button>
+            </div>
+
+            <!-- 2. Workspace Preferences -->
+            <div class="section-title">Environmental Parameters</div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h4>Adaptive Dark Mode</h4>
+                    <p>Sincroniza o tema com o horário local do sistema.</p>
+                </div>
+                <div class="switch" onclick="this.classList.toggle('on')"></div>
+            </div>
+            <div class="setting-row">
+                <div class="setting-info">
+                    <h4>AI Response Style</h4>
+                    <p>Atualmente definido como: <strong>Strategic & Technical</strong></p>
+                </div>
+                <button class="btn-text">Alterar</button>
+            </div>
+
+            <!-- 5. Developer Mode -->
+            <div class="section-title">System Architecture (Dev)</div>
+            <div class="dev-card">
+                <div>
+                    <h4 style="font-size: 0.95rem; margin-bottom: 5px;">API Access Key</h4>
+                    <code style="font-size: 11px; opacity: 0.6;">sy_live_4492_aklsj0293...</code>
+                </div>
+                <div class="dev-badge">ENABLED</div>
+            </div>
+
+            <!-- 6. System Information -->
+            <div class="section-title">System Information</div>
+            <div class="system-info-grid">
+                <div class="info-box">
+                    <span>Versão do Núcleo</span>
+                    SYRA_CORE 2.5.1-Stable
+                </div>
+                <div class="info-box">
+                    <span>Latência de Resposta</span>
+                    0.12ms (Optimal)
+                </div>
+                <div class="info-box">
+                    <span>Arquitetura IA</span>
+                    Neural-Adaptive V4
+                </div>
+                <div class="info-box">
+                    <span>Encryption</span>
+                    AES-256 GCM
+                </div>
+            </div>
+
+            <!-- 8. Logout -->
+            <section class="logout-section">
+                <div style="margin-bottom: 25px;">
+                    <h4 style="font-size: 0.95rem;">Encerrar Sessão Operacional</h4>
+                    <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">
+                        Isso desconectará sua identidade digital deste dispositivo.
+                    </p>
+                </div>
+                <button class="btn-terminate" onclick="logout()">TERMINATE OPERATIONAL IDENTITY</button>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        function logout() {
+            if(confirm("Deseja realmente desconectar a Identidade Operacional?")) {
+                // Aqui entraria a lógica de logout do Firebase
+                window.location.href = "login.html";
+            }
+        }
+    </script>
+</body>
+</html>
