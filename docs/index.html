@@ -1,47 +1,718 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2547921887453012"
-     crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SyraDevOps</title>
-    <link rel="stylesheet" href="style.css">
+    <title>SYRA | Operational AI Core</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-white: #ffffff;
+            --primary-black: #050505;
+            --accent-blue: #0066ff;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --border-light: rgba(255, 255, 255, 0.1);
+            --border-lighter: rgba(255, 255, 255, 0.05);
+            --transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            --transition-fast: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body, html {
+            height: 100%;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary-black);
+            color: var(--primary-white);
+            overflow: hidden;
+        }
+
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .container { display: flex; height: 100vh; width: 100vw; position: relative; }
+
+        /* Lado Esquerdo - Identidade */
+        .left-side {
+            position: absolute;
+            width: 58%; height: 100%;
+            background: var(--primary-white);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 0 10%;
+            z-index: 2;
+            clip-path: polygon(0 0, 100% 0, 82% 100%, 0% 100%);
+            color: var(--primary-black);
+        }
+
+        .system-status {
+            position: absolute; top: 50px; left: 10%;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px; letter-spacing: 3px;
+            display: flex; align-items: center; gap: 12px;
+            opacity: 0.5; text-transform: uppercase;
+        }
+
+        .pulse-dot {
+            width: 6px; height: 6px; background: var(--primary-black);
+            border-radius: 50%; animation: pulse 2s infinite;
+        }
+
+        .logo-wrapper { animation: fadeIn 1.5s ease-out; max-width: 400px; }
+        .main-logo { max-width: 200px; margin-bottom: 60px; }
+
+        .description { max-width: 360px; font-size: 0.95rem; line-height: 1.8; font-weight: 300; color: #666; }
+        .description strong { display: block; margin-bottom: 12px; font-size: 1.2rem; color: var(--primary-black); font-weight: 600; }
+
+        /* Lado Direito - Acesso */
+        .right-side {
+            position: absolute; right: 0; width: 48%; height: 100%;
+            background: radial-gradient(circle at 70% 50%, #0c0c0c 0%, #000 100%);
+            display: flex; justify-content: center; align-items: center; z-index: 1;
+            overflow-y: auto;
+        }
+
+        .login-panel {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(30px);
+            padding: 50px 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            width: 100%; max-width: 360px;
+            text-align: center; margin-left: 15%;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        .time-display {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px; color: #666; margin-bottom: 30px; letter-spacing: 2px;
+        }
+
+        .panel-title {
+            font-size: 13px; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; margin-bottom: 35px; color: #aaa;
+        }
+
+        /* Botões Iniciais */
+        #auth-choice { display: flex; flex-direction: column; gap: 15px; }
+
+        /* Formulários */
+        #login-form, #register-form { display: none; flex-direction: column; gap: 12px; animation: fadeIn 0.4s ease; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-row.full { grid-template-columns: 1fr; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 11px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #888;
+            font-weight: 600;
+        }
+
+        input, select {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border-light);
+            padding: 14px 16px;
+            border-radius: 10px;
+            color: white;
+            font-size: 13px;
+            outline: none;
+            transition: var(--transition-fast);
+            font-family: 'Inter', sans-serif;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-blue);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
+        }
+
+        input:invalid:not(:placeholder-shown) {
+            border-color: var(--error-red);
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        select option {
+            background: var(--primary-black);
+            color: white;
+        }
+
+        .password-toggle {
+            position: relative;
+        }
+
+        .toggle-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .toggle-icon:hover {
+            color: var(--accent-blue);
+        }
+
+        .btn {
+            width: 100%; padding: 16px; border-radius: 10px;
+            font-size: 12px; font-weight: 600; cursor: pointer;
+            transition: var(--transition-fast); text-transform: uppercase;
+            letter-spacing: 1.5px; border: none;
+        }
+
+        .btn-primary { 
+            background: var(--accent-blue);
+            color: var(--primary-white);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0052cc;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 102, 255, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--primary-white);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary-white);
+        }
+
+        .back-link {
+            font-size: 11px; color: #666; margin-top: 20px; cursor: pointer; transition: color 0.3s;
+        }
+
+        .back-link:hover {
+            color: var(--accent-blue);
+        }
+
+        .error-message, .success-message {
+            font-size: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #fca5a5;
+        }
+
+        .success-message {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #86efac;
+        }
+
+        .password-requirements {
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 6px;
+            display: none;
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 4px 0;
+        }
+
+        .requirement-icon {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: #666;
+        }
+
+        .requirement.met .requirement-icon {
+            background: var(--success-green);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            animation: loadingDot 1.5s infinite;
+        }
+
+        @keyframes loadingDot {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(30px); } to { opacity: 1; transform: translateX(0); } }
+
+        @media (max-width: 1024px) {
+            .container { flex-direction: column; overflow-y: auto; }
+            .left-side { position: relative; width: 100%; height: auto; padding: 80px 10%; clip-path: none; }
+            .right-side { position: relative; width: 100%; height: auto; padding: 60px 0; margin-left: 0; }
+            .login-panel { margin-left: 0; border: none; background: transparent; }
+            .form-row { grid-template-columns: 1fr; }
+        }
+    </style>
 </head>
 <body>
-    <!-- Ícone hambúrguer -->
-    <div class="hamburger" onclick="toggleMenu()">
-        <span></span>
-        <span></span>
-        <span></span>
-    </div>
 
-    <!-- Overlay -->
-    <div class="overlay" onclick="closeMenu()"></div>
-
-    <!-- Menu lateral -->
-    <nav class="sidebar">
-        <a href="index.html" class="menu-item">Início</a>
-        <a href="./SyraOS/" class="menu-item">Syra OS</a>
-        <a href="lunagpt.html" class="menu-item">LunaGPT</a>
-        <a href="sobre.html" class="menu-item">Sobre</a>
-        <a href="contato.html" class="menu-item">Contato</a>
-        <a href="colabs/colabs.html" class="menu-item">Colabs</a>
-        <div class="menu-footer">
-            Desenvolvido pela @SyraDevOps
-        </div>
-    </nav>
+    <div class="noise"></div>
 
     <div class="container">
-        <div class="orbit-container">
-            <div class="orbit-ball"></div>
-        </div>
-        <h1 class="brand-name">@SyraDevOps</h1>
-        <p class="slogan">Desenvolvendo soluções inovadoras com elegância e precisão</p>
+        <section class="left-side">
+            <div class="system-status"><div class="pulse-dot"></div>Operational AI Core // Active</div>
+            <div class="logo-wrapper">
+                <img src="logo.png" alt="Syra Logo" class="main-logo" onerror="this.style.display='none'">
+                <p class="description">
+                    <strong>Operational AI para soluções contínuas.</strong>
+                    Syra transforma requisições, infraestrutura e suporte em sistemas adaptativos baseados em assinatura.
+                </p>
+            </div>
+        </section>
+
+        <section class="right-side">
+            <div class="login-panel">
+                <div class="time-display" id="clock">SECURE_ACCESS_PORT: 00:00:00</div>
+                
+                <!-- Escolha Inicial -->
+                <div id="auth-choice">
+                    <div class="panel-title">Selecione uma opção</div>
+                    <button class="btn btn-primary" onclick="showForm('login')">Acessar Terminal</button>
+                    <button class="btn btn-outline" onclick="showForm('register')">Gerar Nova ID</button>
+                </div>
+
+                <!-- Formulário de Login -->
+                <div id="login-form">
+                    <div class="panel-title">Terminal de Acesso</div>
+                    <div class="error-message" id="login-error"></div>
+                    
+                    <div class="form-group full">
+                        <label for="login-email">E-mail</label>
+                        <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email">
+                    </div>
+
+                    <div class="form-group full">
+                        <label for="login-password">Chave de Acesso</label>
+                        <div class="password-toggle">
+                            <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password">
+                            <span class="toggle-icon" onclick="togglePassword('login-password')">👁️</span>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="login-submit" onclick="handleLogin()">AUTENTICAR</button>
+                    <div class="back-link" onclick="hideForm()">← VOLTAR</div>
+                </div>
+
+                <!-- Formulário de Registro -->
+                <div id="register-form">
+                    <div class="panel-title">Registrar Nova ID</div>
+                    <div class="error-message" id="register-error"></div>
+                    <div class="success-message" id="register-success"></div>
+                    
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="register-name">Nome Completo</label>
+                            <input type="text" id="register-name" placeholder="João Silva" autocomplete="name">
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="register-username">Nome de Usuário</label>
+                            <input type="text" id="register-username" placeholder="joaosilva" autocomplete="username">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="register-email">E-mail</label>
+                            <input type="email" id="register-email" placeholder="seu@email.com" autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-birth">Data de Nascimento</label>
+                            <input type="date" id="register-birth" max="">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="register-phone">Telefone (Opcional)</label>
+                            <input type="tel" id="register-phone" placeholder="(11) 99999-9999" autocomplete="tel">
+                        </div>
+                        <div class="form-group">
+                            <label for="register-gender">Gênero</label>
+                            <select id="register-gender">
+                                <option value="">Selecione</option>
+                                <option value="masculino">Masculino</option>
+                                <option value="feminino">Feminino</option>
+                                <option value="outro">Outro</option>
+                                <option value="nao-informar">Prefiro não informar</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="register-password">Chave de Acesso</label>
+                            <div class="password-toggle">
+                                <input type="password" id="register-password" placeholder="••••••••" autocomplete="new-password">
+                                <span class="toggle-icon" onclick="togglePassword('register-password')">👁️</span>
+                            </div>
+                            <div class="password-requirements" id="password-requirements">
+                                <div class="requirement" id="req-length">
+                                    <div class="requirement-icon"></div>
+                                    <span>Mínimo 8 caracteres</span>
+                                </div>
+                                <div class="requirement" id="req-uppercase">
+                                    <div class="requirement-icon"></div>
+                                    <span>Pelo menos 1 letra maiúscula</span>
+                                </div>
+                                <div class="requirement" id="req-number">
+                                    <div class="requirement-icon"></div>
+                                    <span>Pelo menos 1 número</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row full">
+                        <div class="form-group">
+                            <label for="register-password-confirm">Confirmar Chave</label>
+                            <div class="password-toggle">
+                                <input type="password" id="register-password-confirm" placeholder="••••••••" autocomplete="new-password">
+                                <span class="toggle-icon" onclick="togglePassword('register-password-confirm')">👁️</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="register-submit" onclick="handleRegister()">REGISTRAR ID</button>
+                    <div class="back-link" onclick="hideForm()">← VOLTAR</div>
+                </div>
+            </div>
+        </section>
     </div>
 
-    <script src="script.js"></script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInWithEmailAndPassword, 
+            createUserWithEmailAndPassword,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            collection
+        } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDOrxvJTgiGUmycgFK3aku5bVY3CuUTzx8",
+            authDomain: "syra-a9ee0.firebaseapp.com",
+            projectId: "syra-a9ee0",
+            storageBucket: "syra-a9ee0.firebasestorage.app",
+            messagingSenderId: "817185680125",
+            appId: "1:817185680125:web:c12e463633183caa882c94"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Verificar se já está autenticado
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                window.location.href = "home.html";
+            }
+        });
+
+        // Funções Globais
+        window.showForm = (mode) => {
+            document.getElementById('auth-choice').style.display = 'none';
+            if (mode === 'login') {
+                document.getElementById('login-form').style.display = 'flex';
+            } else {
+                document.getElementById('register-form').style.display = 'flex';
+                // Setar data máxima de nascimento (hoje)
+                document.getElementById('register-birth').max = new Date().toISOString().split('T')[0];
+            }
+        };
+
+        window.hideForm = () => {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('auth-choice').style.display = 'flex';
+            // Limpar erros e inputs
+            document.getElementById('login-error').style.display = 'none';
+            document.getElementById('register-error').style.display = 'none';
+            document.getElementById('register-success').style.display = 'none';
+        };
+
+        window.togglePassword = (inputId) => {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        };
+
+        // Validar força da senha
+        document.getElementById('register-password')?.addEventListener('input', (e) => {
+            const password = e.target.value;
+            const requirements = document.getElementById('password-requirements');
+            requirements.style.display = 'block';
+
+            const hasLength = password.length >= 8;
+            const hasUppercase = /[A-Z]/.test(password);
+            const hasNumber = /\d/.test(password);
+
+            updateRequirement('req-length', hasLength);
+            updateRequirement('req-uppercase', hasUppercase);
+            updateRequirement('req-number', hasNumber);
+        });
+
+        function updateRequirement(id, met) {
+            const req = document.getElementById(id);
+            if (met) {
+                req.classList.add('met');
+            } else {
+                req.classList.remove('met');
+            }
+        }
+
+        // Validações
+        function validateEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        function validatePassword(password) {
+            return password.length >= 8 && /[A-Z]/.test(password) && /\d/.test(password);
+        }
+
+        function calculateAge(birthDate) {
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        function showSuccess(elementId, message) {
+            const element = document.getElementById(elementId);
+            element.textContent = message;
+            element.style.display = 'block';
+        }
+
+        // LOGIN
+        window.handleLogin = async () => {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const submitBtn = document.getElementById('login-submit');
+
+            document.getElementById('login-error').style.display = 'none';
+
+            if (!email || !password) {
+                showError('login-error', 'E-mail e senha são obrigatórios');
+                return;
+            }
+
+            if (!validateEmail(email)) {
+                showError('login-error', 'E-mail inválido');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span>';
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                setTimeout(() => {
+                    window.location.href = "home.html";
+                }, 500);
+            } catch (error) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'AUTENTICAR';
+                
+                let message = 'Erro ao autenticar';
+                if (error.code === 'auth/user-not-found') {
+                    message = 'Usuário não encontrado';
+                } else if (error.code === 'auth/wrong-password') {
+                    message = 'Senha incorreta';
+                } else if (error.code === 'auth/invalid-email') {
+                    message = 'E-mail inválido';
+                } else if (error.code === 'auth/too-many-requests') {
+                    message = 'Muitas tentativas. Tente mais tarde';
+                }
+                showError('login-error', message);
+            }
+        };
+
+        // REGISTRO
+        window.handleRegister = async () => {
+            const name = document.getElementById('register-name').value;
+            const username = document.getElementById('register-username').value;
+            const email = document.getElementById('register-email').value;
+            const birthDate = document.getElementById('register-birth').value;
+            const phone = document.getElementById('register-phone').value;
+            const gender = document.getElementById('register-gender').value;
+            const password = document.getElementById('register-password').value;
+            const passwordConfirm = document.getElementById('register-password-confirm').value;
+            const submitBtn = document.getElementById('register-submit');
+
+            document.getElementById('register-error').style.display = 'none';
+            document.getElementById('register-success').style.display = 'none';
+
+            // Validações
+            if (!name || !username || !email || !birthDate || !password || !passwordConfirm) {
+                showError('register-error', 'Por favor, preencha todos os campos obrigatórios');
+                return;
+            }
+
+            if (!validateEmail(email)) {
+                showError('register-error', 'E-mail inválido');
+                return;
+            }
+
+            if (username.length < 3) {
+                showError('register-error', 'Nome de usuário deve ter no mínimo 3 caracteres');
+                return;
+            }
+
+            if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+                showError('register-error', 'Nome de usuário pode conter apenas letras, números, _ e -');
+                return;
+            }
+
+            if (!validatePassword(password)) {
+                showError('register-error', 'Senha fraca. Mín. 8 caracteres, 1 maiúscula e 1 número');
+                return;
+            }
+
+            if (password !== passwordConfirm) {
+                showError('register-error', 'As senhas não correspondem');
+                return;
+            }
+
+            const birth = new Date(birthDate);
+            const age = calculateAge(birth);
+            if (age < 13) {
+                showError('register-error', 'Você deve ter pelo menos 13 anos');
+                return;
+            }
+
+            if (phone && !/^[\d\s()+-]*$/.test(phone)) {
+                showError('register-error', 'Formato de telefone inválido');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<span class="loading"></span>';
+
+            try {
+                // Criar usuário no Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const uid = userCredential.user.uid;
+
+                // Salvar dados adicionais no Firestore
+                await setDoc(doc(db, 'users', uid), {
+                    uid: uid,
+                    name: name,
+                    username: username,
+                    email: email,
+                    birthDate: new Date(birthDate),
+                    age: age,
+                    phone: phone || null,
+                    gender: gender || null,
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                    profileComplete: true,
+                    emailVerified: false
+                });
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'REGISTRAR ID';
+                
+                showSuccess('register-success', 'ID Syra criada com sucesso! Redirecionando...');
+                
+                setTimeout(() => {
+                    window.location.href = "home.html";
+                }, 2000);
+
+            } catch (error) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'REGISTRAR ID';
+
+                let message = 'Erro ao criar conta';
+                if (error.code === 'auth/email-already-in-use') {
+                    message = 'E-mail já está em uso';
+                } else if (error.code === 'auth/invalid-email') {
+                    message = 'E-mail inválido';
+                } else if (error.code === 'auth/weak-password') {
+                    message = 'Senha muito fraca';
+                }
+                showError('register-error', message);
+            }
+        };
+
+        // Relógio
+        function updateClock() {
+            const now = new Date();
+            const time = now.getHours().toString().padStart(2, '0') + ":" + 
+                         now.getMinutes().toString().padStart(2, '0') + ":" + 
+                         now.getSeconds().toString().padStart(2, '0');
+            document.getElementById('clock').innerText = `SECURE_ACCESS_PORT: ${time} UTC-3`;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+    </script>
 </body>
 </html>
-
-
