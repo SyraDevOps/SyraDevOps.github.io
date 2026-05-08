@@ -32,12 +32,91 @@
         }
         .dashboard-container { display: flex; height: 100vh; width: 100vw; }
 
-        /* SIDEBAR */
+        /* ─── MODAL SYRA_KEY ─── */
+        .modal-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: rgba(10,10,10,0.55);
+            backdrop-filter: blur(12px) saturate(120%);
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.hidden { display: none; }
+        .modal-box {
+            background: #fff;
+            border-radius: 20px;
+            padding: 52px 48px;
+            max-width: 460px; width: 92%;
+            box-shadow: 0 60px 120px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.05);
+            animation: modalSlide 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes modalSlide {
+            from { opacity:0; transform: translateY(24px) scale(0.97); }
+            to   { opacity:1; transform: translateY(0) scale(1); }
+        }
+        .modal-syra-badge {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px; letter-spacing: 3px; font-weight: 600;
+            color: #bbb; text-transform: uppercase; margin-bottom: 28px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .modal-syra-badge::before {
+            content: ''; width: 20px; height: 1px; background: #ccc;
+        }
+        .modal-box h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.55rem; font-weight: 600; letter-spacing: -0.5px;
+            margin-bottom: 10px; color: #1a1a1a;
+        }
+        .modal-box p {
+            font-size: 0.875rem; color: #888; line-height: 1.65;
+            margin-bottom: 32px; font-weight: 300;
+        }
+        .modal-input-group { position: relative; margin-bottom: 16px; }
+        .modal-input-label {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 9px; letter-spacing: 2px; color: #aaa;
+            text-transform: uppercase; font-weight: 600;
+            display: block; margin-bottom: 8px;
+        }
+        .modal-input-group input {
+            width: 100%; padding: 14px 18px;
+            background: #f7f7f7; border: 1.5px solid transparent;
+            border-radius: 10px; font-family: 'Inter', sans-serif;
+            font-size: 0.9rem; color: #1a1a1a; outline: none;
+            transition: all 0.25s; letter-spacing: 0.5px;
+        }
+        .modal-input-group input:focus {
+            border-color: #1a1a1a; background: #fff;
+            box-shadow: 0 0 0 4px rgba(0,0,0,0.05);
+        }
+        .modal-input-group input::placeholder { color: #bbb; letter-spacing: 1px; }
+        .modal-submit-btn {
+            width: 100%; padding: 15px;
+            background: #1a1a1a; color: #fff;
+            border: none; border-radius: 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 11px; font-weight: 600; letter-spacing: 2px;
+            text-transform: uppercase; cursor: pointer;
+            transition: all 0.25s; margin-top: 8px;
+        }
+        .modal-submit-btn:hover { background: #000; box-shadow: 0 8px 24px rgba(0,0,0,0.15); }
+        .modal-submit-btn:active { transform: scale(0.99); }
+        .modal-note {
+            font-size: 10px; color: #ccc; text-align: center;
+            margin-top: 20px !important; margin-bottom: 0 !important;
+            line-height: 1.5;
+        }
+        .modal-error {
+            font-size: 11px; color: #e53e3e; margin-top: 8px;
+            display: none; font-weight: 500; letter-spacing: 0.3px;
+        }
+        .modal-error.visible { display: block; }
+
+        /* ─── SIDEBAR ─── */
         .sidebar {
             width: var(--sidebar-width);
             background: var(--sidebar-bg);
-            height: 100%;
-            display: flex; flex-direction: column;
+            height: 100%; display: flex; flex-direction: column;
             padding: 40px 0; z-index: 10;
             border-right: 1px solid var(--accent-border);
         }
@@ -45,22 +124,29 @@
         .sidebar-logo { max-width: 100px; filter: grayscale(1); }
         .nav-group { flex-grow: 1; display: flex; flex-direction: column; }
         .nav-item {
-            padding: 16px 40px;
-            color: var(--text-muted);
-            text-decoration: none;
-            font-size: 0.75rem;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-            font-weight: 500;
-            transition: var(--transition);
-            cursor: pointer;
+            padding: 16px 40px; color: var(--text-muted);
+            text-decoration: none; font-size: 0.75rem;
+            letter-spacing: 1.2px; text-transform: uppercase;
+            font-weight: 500; transition: var(--transition); cursor: pointer;
+            display: block;
         }
         .nav-item:hover { color: var(--text-main); }
         .nav-item.active { color: var(--text-main); font-weight: 700; border-left: 3px solid var(--text-main); }
+        .nav-divider {
+            height: 1px; background: var(--accent-border);
+            margin: 10px 40px;
+        }
         .sidebar-footer { padding: 40px; border-top: 1px solid var(--accent-border); }
         .sidebar-footer-text { font-family: 'Space Grotesk', sans-serif; font-size: 10px; color: #999; line-height: 1.5; }
+        .key-indicator {
+            display: flex; align-items: center; gap: 6px;
+            margin-top: 8px; cursor: pointer;
+        }
+        .key-indicator-dot { width: 5px; height: 5px; border-radius: 50%; background: #00e676; }
+        .key-indicator-text { font-family: 'Space Grotesk', sans-serif; font-size: 9px; color: #bbb; letter-spacing: 1px; }
+        .key-indicator:hover .key-indicator-text { color: #888; }
 
-        /* MAIN CONTENT */
+        /* ─── MAIN CONTENT ─── */
         .main-content {
             flex-grow: 1; display: flex; flex-direction: column;
             background-color: var(--bg-light); position: relative;
@@ -77,18 +163,26 @@
         .dot { width: 6px; height: 6px; background: #00e676; border-radius: 50%; box-shadow: 0 0 8px #00e676; }
         .dot.offline { background: #ff3d00; box-shadow: 0 0 8px #ff3d00; }
         .clock { font-size: 11px; color: #999; }
+        .phase-badge {
+            font-family: 'Space Grotesk', sans-serif; font-size: 9px;
+            letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600;
+            padding: 4px 10px; border-radius: 20px; border: 1px solid #e5e5e5;
+            color: #888; display: none;
+        }
+        .phase-badge.visible { display: block; }
+        .phase-badge.phase-q { border-color: #ffd700; color: #b8960c; background: #fffdf0; }
+        .phase-badge.phase-s { border-color: #90cdf4; color: #2b6cb0; background: #ebf8ff; }
+        .phase-badge.phase-v { border-color: #9ae6b4; color: #276749; background: #f0fff4; }
         .btn-finalize {
-            display: none;
-            background: transparent; border: 1px solid #1a1a1a;
+            display: none; background: transparent; border: 1px solid #1a1a1a;
             color: #1a1a1a; padding: 7px 16px; border-radius: 6px;
             font-family: 'Space Grotesk', sans-serif; font-size: 9px; font-weight: 600;
-            letter-spacing: 1px; text-transform: uppercase; cursor: pointer;
-            transition: 0.3s;
+            letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: 0.3s;
         }
         .btn-finalize:hover { background: #1a1a1a; color: #fff; }
         .btn-finalize.visible { display: block; }
 
-        /* CHAT */
+        /* ─── CHAT ─── */
         .chat-container {
             flex-grow: 1; padding: 40px 10%; overflow-y: auto;
             display: flex; flex-direction: column; gap: 40px; scroll-behavior: smooth;
@@ -108,12 +202,21 @@
         .message.user { align-self: flex-end; }
         .message.user .content-box { background: #1a1a1a; color: #fff; border-top-right-radius: 2px; }
         .message.user .label { text-align: right; }
+        .message.system-notice { align-self: center; }
+        .message.system-notice .content-box {
+            background: #f0fff4; border-color: #9ae6b4; color: #276749;
+            text-align: center; font-family: 'Space Grotesk', sans-serif;
+            font-size: 0.875rem; letter-spacing: 0.3px;
+        }
 
         .content-box p { margin-bottom: 12px; }
         .content-box p:last-child { margin-bottom: 0; }
         .content-box h1, .content-box h2, .content-box h3 { margin: 20px 0 10px 0; font-family: 'Space Grotesk', sans-serif; }
         .content-box ul, .content-box ol { margin: 10px 0 10px 20px; }
         .content-box li { margin-bottom: 5px; }
+        .content-box table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 0.88rem; }
+        .content-box th { background: #f5f5f5; padding: 10px 14px; text-align: left; font-weight: 600; border-bottom: 2px solid #e5e5e5; }
+        .content-box td { padding: 9px 14px; border-bottom: 1px solid #f0f0f0; }
         .content-box pre {
             background-color: #0d1117 !important; color: #c9d1d9 !important;
             border-radius: 8px; padding: 16px; margin: 15px 0; overflow-x: auto;
@@ -127,7 +230,32 @@
         }
         .message.user .content-box p code { background: rgba(255,255,255,0.15); color: #ffb7b7; }
 
-        /* INPUT */
+        /* ─── VALIDATION ACTIONS ─── */
+        .validation-actions {
+            display: flex; gap: 12px; margin-top: 16px; align-items: center; flex-wrap: wrap;
+        }
+        .btn-action {
+            padding: 11px 22px; border-radius: 8px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+            text-transform: uppercase; cursor: pointer; transition: all 0.25s;
+        }
+        .btn-validate-plan {
+            background: #1a1a1a; color: #fff; border: none;
+        }
+        .btn-validate-plan:hover { background: #000; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.15); }
+        .btn-reject-plan {
+            background: transparent; border: 1.5px solid #ddd; color: #888;
+        }
+        .btn-reject-plan:hover { border-color: #aaa; color: #555; }
+        .btn-download-pdf {
+            background: transparent; border: 1.5px solid #1a1a1a; color: #1a1a1a;
+            display: flex; align-items: center; gap: 7px;
+        }
+        .btn-download-pdf:hover { background: #f5f5f5; }
+        .btn-download-pdf svg { width: 12px; height: 12px; }
+
+        /* ─── INPUT ─── */
         .input-area { padding: 30px 10%; background: linear-gradient(to top, var(--bg-light) 70%, transparent); }
         .input-wrapper {
             max-width: 1000px; margin: 0 auto; background: #fff;
@@ -140,6 +268,7 @@
             flex-grow: 1; background: transparent; border: none; color: var(--text-main);
             padding: 15px; font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none;
         }
+        input#user-input:disabled { opacity: 0.4; cursor: not-allowed; }
         .send-btn {
             background: #1a1a1a; border: none; width: 40px; height: 40px; border-radius: 10px;
             cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition);
@@ -160,6 +289,13 @@
         }
         .session-banner.visible { display: flex; }
 
+        .input-hint {
+            max-width: 1000px; margin: 8px auto 0;
+            font-family: 'Space Grotesk', sans-serif; font-size: 9px;
+            color: #ccc; letter-spacing: 1px; text-align: center; display: none;
+        }
+        .input-hint.visible { display: block; }
+
         @keyframes messageFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
@@ -168,6 +304,25 @@
     </style>
 </head>
 <body>
+
+<!-- ═══════════════════════════ MODAL SYRA_KEY ═══════════════════════════ -->
+<div class="modal-overlay" id="key-modal">
+    <div class="modal-box">
+        <div class="modal-syra-badge">SY-CORE V2.5.1</div>
+        <h2>Autenticação Necessária</h2>
+        <p>Para acessar o Terminal Operacional Syra, insira sua <strong>Syra_Key</strong>. A chave é armazenada localmente no seu dispositivo e nunca transmitida a terceiros.</p>
+        <div class="modal-input-group">
+            <label class="modal-input-label" for="syra-key-field">Syra_Key</label>
+            <input type="password" id="syra-key-field" placeholder="SK-••••••••••••••••••••••••••••••••" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="modal-error" id="key-error">Chave inválida. Por favor, verifique e tente novamente.</div>
+        <button class="modal-submit-btn" id="key-submit-btn" onclick="submitSyraKey()">
+            Autenticar Acesso
+        </button>
+        <p class="modal-note">Não possui uma Syra_Key? Solicite junto ao administrador do sistema.</p>
+    </div>
+</div>
+
 <div class="noise"></div>
 <div class="dashboard-container">
     <aside class="sidebar">
@@ -178,6 +333,9 @@
             <a class="nav-item active" onclick="newSession()">Nova Solicitação</a>
             <a href="slcc.html" class="nav-item">Solicitações em execução</a>
             <a href="slce.html" class="nav-item">Soluções concluídas</a>
+            <div class="nav-divider"></div>
+            <a href="apps.html" class="nav-item">Apps e Programas</a>
+            <div class="nav-divider"></div>
             <a href="perfil.html" class="nav-item">Perfil</a>
             <a href="config.html" class="nav-item">Configurações</a>
         </nav>
@@ -185,6 +343,10 @@
             <div class="sidebar-footer-text">
                 SY-CORE V2.5.1<br>
                 <span id="sidebar-uid">---</span>
+            </div>
+            <div class="key-indicator" onclick="resetSyraKey()" title="Clique para redefinir a Syra_Key">
+                <div class="key-indicator-dot" id="key-dot"></div>
+                <span class="key-indicator-text" id="key-status-text">SYRA_KEY ATIVA</span>
             </div>
         </div>
     </aside>
@@ -199,6 +361,7 @@
                     <div class="dot" id="status-dot"></div>
                     <span id="status-text">SYRA_CORE // OPERATIONAL_MODE</span>
                 </div>
+                <span class="phase-badge" id="phase-badge"></span>
             </div>
             <div style="display:flex; align-items:center; gap:20px;">
                 <button class="btn-finalize" id="btn-finalize" onclick="finalizeSession()">Finalizar Sessão</button>
@@ -209,7 +372,7 @@
         <div class="chat-container" id="chat-window">
             <div class="empty-state" id="empty-state">
                 <h2>Terminal Operacional Syra</h2>
-                <p>A interface está pronta para receber suas instruções. Detalhe sua solicitação técnica para iniciar a operação.</p>
+                <p>A interface está pronta para receber suas instruções. Detalhe sua solicitação técnica para iniciar o planejamento do projeto.</p>
             </div>
         </div>
 
@@ -220,12 +383,14 @@
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                 </button>
             </div>
+            <div class="input-hint" id="input-hint">FASE DE PLANEJAMENTO — Responda as 15 questões acima para gerar o plano do projeto</div>
         </footer>
     </main>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
@@ -248,18 +413,95 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // ---- CONFIGURAÇÃO SYRA ----
-    const API_KEY = "-"; // Cole sua Gemini API Key aqui
-    const SYSTEM_PRE_PROMPT = `Você é a Syra, uma IA sênior especialista em engenharia de software e resolução de problemas complexos.
-Seja concisa, direta e altamente técnica.
-Sempre que fornecer exemplos de código, envolva o código em crases triplas (markdown) e especifique a linguagem (ex: \`\`\`javascript).`;
+    // ════════════════════════════════════════════════════
+    //  SYSTEM PROMPTS POR FASE
+    // ════════════════════════════════════════════════════
 
-    // ---- ESTADO ----
+    const PROMPT_QUESTIONING = `Você é a Syra, uma IA sênior especialista em engenharia de software e gestão de projetos.
+O usuário acabou de descrever uma nova solicitação de desenvolvimento ou sistema. Sua única tarefa agora é elaborar EXATAMENTE 15 perguntas de planejamento estratégico, numeradas de 1 a 15, para mapear completamente o escopo do projeto.
+
+As 15 perguntas DEVEM cobrir obrigatoriamente estes tópicos (adapte a linguagem ao contexto da solicitação):
+1. Objetivos principais e resultados esperados do projeto
+2. Público-alvo / perfil dos usuários finais
+3. **Modalidade de execução**: o projeto será desenvolvido de forma **presencial**, **parcial/híbrida** (parte presencial, parte remota) ou **totalmente online/remota**? Justifique a escolha.
+4. Tecnologias, frameworks ou plataformas preferidas (ou já em uso)
+5. Prazo estimado para entrega e marcos importantes
+6. Orçamento disponível ou estimado para o projeto
+7. Tamanho e composição da equipe atual
+8. Integrações com APIs, sistemas legados ou bancos de dados
+9. Requisitos de segurança, autenticação e conformidade (LGPD, GDPR etc.)
+10. Dispositivos e ambientes suportados (mobile, desktop, navegadores)
+11. Escala esperada: número de usuários simultâneos e volume de dados
+12. Estratégia de manutenção, suporte e atualizações pós-entrega
+13. Experiência técnica da equipe com as tecnologias envolvidas
+14. Restrições, limitações técnicas ou dependências conhecidas
+15. Critérios de sucesso e KPIs para medir o desempenho do projeto
+
+Apresente as 15 perguntas de forma clara, numerada e direta. Seja conciso e profissional.
+Ao final, escreva exatamente: "Por favor, responda as 15 questões acima para que eu possa elaborar o seu **Plano de Projeto Syra** completo."`;
+
+    const PROMPT_SYNTHESIS = `Você é a Syra, uma IA sênior especialista em engenharia de software e gestão de projetos.
+Com base na solicitação inicial do usuário e nas respostas às 15 perguntas de planejamento, elabore um PLANO DE PROJETO COMPLETO, DETALHADO E PROFISSIONAL em formato markdown.
+
+O plano deve conter OBRIGATORIAMENTE os seguintes capítulos:
+
+# PLANO DE PROJETO SYRA
+
+## 1. Sumário Executivo
+(Visão geral concisa do projeto, seu propósito e valor estratégico)
+
+## 2. Objetivos e Resultados Esperados
+(Liste os objetivos principais e os resultados mensuráveis)
+
+## 3. Escopo do Projeto
+(O que está incluído e o que está explicitamente fora do escopo)
+
+## 4. Modalidade de Execução
+(Defina claramente: **Presencial** / **Híbrido-Parcial** / **Online-Remoto**. Descreva a estrutura de trabalho, encontros, cerimônias e comunicação)
+
+## 5. Arquitetura Técnica Proposta
+(Stack tecnológico, diagrama textual de arquitetura, justificativas das escolhas)
+
+## 6. Cronograma e Fases
+(Use uma tabela com fases, atividades, responsáveis e duração)
+
+## 7. Equipe e Responsabilidades
+(Papéis necessários, responsabilidades e matriz RACI simplificada)
+
+## 8. Estimativa de Custos
+(Tabela com categorias de custo, estimativas e total)
+
+## 9. Riscos e Estratégias de Mitigação
+(Tabela com riscos identificados, probabilidade, impacto e plano de mitigação)
+
+## 10. Critérios de Aceitação e KPIs
+(Como o sucesso será medido e validado)
+
+## 11. Próximos Passos Imediatos
+(Lista priorizada das ações para iniciar o projeto)
+
+---
+Seja extremamente detalhado, use tabelas markdown sempre que possível e mantenha um tom profissional.
+IMPORTANTE: Ao final do plano, insira a marcação exata: [[PLANO_PRONTO]]`;
+
+    const PROMPT_FOLLOWUP = `Você é a Syra, uma IA sênior especialista em engenharia de software.
+Responda de forma técnica e concisa às dúvidas ou comentários do usuário. O plano já foi gerado e validado. Seja direto e útil.`;
+
+    // ════════════════════════════════════════════════════
+    //  ESTADO DA APLICAÇÃO
+    // ════════════════════════════════════════════════════
+
+    // flowState: 'idle' | 'questioning' | 'synthesizing' | 'validating' | 'completed'
+    let flowState = 'idle';
     let currentUser = null;
     let currentSessionId = null;
     let chatHistory = [];
+    let currentPlanText = '';
+    let initialRequest = '';
 
-    // ---- MARKED CONFIG ----
+    // ════════════════════════════════════════════════════
+    //  MARKED CONFIG
+    // ════════════════════════════════════════════════════
     marked.setOptions({
         highlight: function(code, lang) {
             const language = hljs.getLanguage(lang) ? lang : 'plaintext';
@@ -268,23 +510,127 @@ Sempre que fornecer exemplos de código, envolva o código em crases triplas (ma
         breaks: true
     });
 
-    // ---- REFS DOM ----
-    const chatWindow = document.getElementById('chat-window');
-    const emptyState = document.getElementById('empty-state');
-    const userInput = document.getElementById('user-input');
-    const sendBtn = document.getElementById('send-btn');
-    const statusText = document.getElementById('status-text');
-    const statusDot = document.getElementById('status-dot');
-    const btnFinalize = document.getElementById('btn-finalize');
+    // ════════════════════════════════════════════════════
+    //  DOM REFS
+    // ════════════════════════════════════════════════════
+    const chatWindow    = document.getElementById('chat-window');
+    const emptyState    = document.getElementById('empty-state');
+    const userInput     = document.getElementById('user-input');
+    const sendBtn       = document.getElementById('send-btn');
+    const btnFinalize   = document.getElementById('btn-finalize');
     const sessionBanner = document.getElementById('session-banner');
-    const sessionLabel = document.getElementById('session-label');
+    const sessionLabel  = document.getElementById('session-label');
+    const phaseBadge    = document.getElementById('phase-badge');
+    const inputHint     = document.getElementById('input-hint');
+    const keyModal      = document.getElementById('key-modal');
 
-    // ---- AUTH GUARD ----
+    // ════════════════════════════════════════════════════
+    //  SYRA_KEY MANAGEMENT
+    // ════════════════════════════════════════════════════
+
+    function getSyraKey() {
+        return localStorage.getItem('syra_key') || '';
+    }
+
+    window.submitSyraKey = function() {
+        const keyField = document.getElementById('syra-key-field');
+        const keyError = document.getElementById('key-error');
+        const key = keyField.value.trim();
+
+        if (!key || key.length < 8) {
+            keyError.classList.add('visible');
+            keyField.style.borderColor = '#e53e3e';
+            return;
+        }
+
+        localStorage.setItem('syra_key', key);
+        keyModal.classList.add('hidden');
+        keyError.classList.remove('visible');
+        keyField.style.borderColor = '';
+
+        document.getElementById('key-dot').style.background = '#00e676';
+        document.getElementById('key-status-text').textContent = 'SYRA_KEY ATIVA';
+    };
+
+    window.resetSyraKey = function() {
+        if (confirm('Deseja redefinir sua Syra_Key?')) {
+            localStorage.removeItem('syra_key');
+            document.getElementById('syra-key-field').value = '';
+            document.getElementById('key-error').classList.remove('visible');
+            keyModal.classList.remove('hidden');
+            document.getElementById('key-dot').style.background = '#ff3d00';
+            document.getElementById('key-status-text').textContent = 'SYRA_KEY AUSENTE';
+        }
+    };
+
+    // Verificar key ao carregar
+    if (!getSyraKey()) {
+        keyModal.classList.remove('hidden');
+    } else {
+        keyModal.classList.add('hidden');
+    }
+
+    // Enter no modal
+    document.getElementById('syra-key-field').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') window.submitSyraKey();
+    });
+
+    // ════════════════════════════════════════════════════
+    //  PHASE BADGE
+    // ════════════════════════════════════════════════════
+
+    function setPhase(phase) {
+        flowState = phase;
+        phaseBadge.className = 'phase-badge';
+        inputHint.classList.remove('visible');
+
+        switch(phase) {
+            case 'idle':
+                phaseBadge.classList.remove('visible');
+                userInput.placeholder = 'Descreva sua solicitação técnica...';
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                break;
+            case 'questioning':
+                phaseBadge.classList.add('visible', 'phase-q');
+                phaseBadge.textContent = '⬡ FASE 1 — PLANEJAMENTO';
+                userInput.placeholder = 'Responda as 15 questões de planejamento...';
+                inputHint.classList.add('visible');
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                break;
+            case 'synthesizing':
+                phaseBadge.classList.add('visible', 'phase-s');
+                phaseBadge.textContent = '⬡ FASE 2 — SÍNTESE';
+                userInput.placeholder = 'Aguardando síntese do plano...';
+                userInput.disabled = true;
+                sendBtn.disabled = true;
+                break;
+            case 'validating':
+                phaseBadge.classList.add('visible', 'phase-v');
+                phaseBadge.textContent = '⬡ FASE 3 — VALIDAÇÃO';
+                userInput.placeholder = 'Aguardando sua validação do plano...';
+                userInput.disabled = true;
+                sendBtn.disabled = true;
+                break;
+            case 'completed':
+                phaseBadge.classList.add('visible');
+                phaseBadge.style.borderColor = '#e5e5e5';
+                phaseBadge.textContent = '✓ PLANO ENCAMINHADO';
+                userInput.placeholder = 'Sessão encerrada. Inicie uma nova solicitação.';
+                userInput.disabled = true;
+                sendBtn.disabled = true;
+                break;
+        }
+    }
+
+    // ════════════════════════════════════════════════════
+    //  AUTH GUARD
+    // ════════════════════════════════════════════════════
     onAuthStateChanged(auth, async (user) => {
         if (!user) { window.location.href = "index.html"; return; }
         currentUser = user;
 
-        // Carregar dados do usuário para o sidebar
         try {
             const snap = await getDoc(doc(db, "users", user.uid));
             if (snap.exists()) {
@@ -293,68 +639,67 @@ Sempre que fornecer exemplos de código, envolva o código em crases triplas (ma
             }
         } catch (e) {}
 
-        // Verificar se há sessão na URL
         const params = new URLSearchParams(window.location.search);
         const sessionId = params.get('session');
         if (sessionId) { await loadSession(sessionId); }
     });
 
-    // ---- CARREGAR SESSÃO EXISTENTE ----
+    // ════════════════════════════════════════════════════
+    //  LOAD / NEW / FINALIZE SESSION
+    // ════════════════════════════════════════════════════
     async function loadSession(sessionId) {
         try {
             const snap = await getDoc(doc(db, `users/${currentUser.uid}/sessions`, sessionId));
             if (!snap.exists()) return;
             const data = snap.data();
             currentSessionId = sessionId;
-
             emptyState.style.display = 'none';
             sessionBanner.classList.add('visible');
             sessionLabel.textContent = `SESSAO_ATIVA: ${sessionId.substring(0,8).toUpperCase()}`;
             btnFinalize.classList.add('visible');
-
             chatHistory = [];
             const messages = data.messages || [];
             messages.forEach(msg => {
                 chatHistory.push({ role: msg.role === 'model' ? 'model' : 'user', parts: [{ text: msg.text }] });
                 appendMessage(msg.role, msg.text);
             });
-        } catch (e) {
-            console.error("Erro ao carregar sessão:", e);
-        }
+        } catch (e) { console.error("Erro ao carregar sessão:", e); }
     }
 
-    // ---- NOVA SESSÃO ----
     window.newSession = function() {
         chatHistory = [];
+        currentPlanText = '';
+        initialRequest = '';
         chatWindow.innerHTML = '';
         chatWindow.appendChild(emptyState);
         emptyState.style.display = 'block';
         currentSessionId = null;
         btnFinalize.classList.remove('visible');
         sessionBanner.classList.remove('visible');
-        // Remover param da URL sem recarregar
+        setPhase('idle');
         window.history.replaceState({}, '', 'home.html');
     };
 
-    // ---- FINALIZAR SESSÃO ----
     window.finalizeSession = async function() {
         if (!currentSessionId || !currentUser) return;
         try {
             await updateDoc(doc(db, `users/${currentUser.uid}/sessions`, currentSessionId), {
-                status: "concluida",
-                updatedAt: serverTimestamp()
+                status: "concluida", updatedAt: serverTimestamp()
             });
         } catch (e) { console.error(e); }
-        newSession();
+        window.newSession();
     };
 
-    // ---- ENVIAR MENSAGEM ----
+    // ════════════════════════════════════════════════════
+    //  ENVIAR MENSAGEM — MÁQUINA DE ESTADOS
+    // ════════════════════════════════════════════════════
     window.handleSend = async function() {
         const text = userInput.value.trim();
         if (!text || !currentUser) return;
 
-        if (!API_KEY || API_KEY === "-") {
-            appendMessage('model', '**Erro de Configuração:** Insira a `API_KEY` do Gemini no código-fonte para continuar.');
+        const syraKey = getSyraKey();
+        if (!syraKey) {
+            keyModal.classList.remove('hidden');
             return;
         }
 
@@ -364,17 +709,17 @@ Sempre que fornecer exemplos de código, envolva o código em crases triplas (ma
         appendMessage('user', text);
         chatHistory.push({ role: "user", parts: [{ text }] });
 
-        // Criar sessão no Firestore se ainda não existe
+        // Guardar solicitação inicial
+        if (flowState === 'idle') { initialRequest = text; }
+
+        // Criar/atualizar sessão no Firestore
         if (!currentSessionId) {
             try {
                 const title = text.length > 70 ? text.substring(0, 70) + "..." : text;
                 const ref = await addDoc(collection(db, `users/${currentUser.uid}/sessions`), {
-                    title,
-                    status: "em_execucao",
+                    title, status: "em_execucao",
                     messages: [{ role: "user", text, ts: Date.now() }],
-                    createdAt: serverTimestamp(),
-                    updatedAt: serverTimestamp(),
-                    messageCount: 1
+                    createdAt: serverTimestamp(), updatedAt: serverTimestamp(), messageCount: 1
                 });
                 currentSessionId = ref.id;
                 btnFinalize.classList.add('visible');
@@ -383,48 +728,79 @@ Sempre que fornecer exemplos de código, envolva o código em crases triplas (ma
                 window.history.replaceState({}, '', `home.html?session=${ref.id}`);
             } catch (e) { console.error(e); }
         } else {
-            // Append mensagem do usuário
             try {
                 await updateDoc(doc(db, `users/${currentUser.uid}/sessions`, currentSessionId), {
                     messages: arrayUnion({ role: "user", text, ts: Date.now() }),
-                    updatedAt: serverTimestamp(),
-                    messageCount: chatHistory.length
+                    updatedAt: serverTimestamp(), messageCount: chatHistory.length
                 });
             } catch (e) { console.error(e); }
         }
 
+        // Determinar qual prompt usar com base no estado atual
+        let systemPrompt;
+        let nextState;
+
+        if (flowState === 'idle') {
+            systemPrompt = PROMPT_QUESTIONING;
+            nextState = 'questioning';
+        } else if (flowState === 'questioning') {
+            systemPrompt = PROMPT_SYNTHESIS;
+            nextState = 'synthesizing';
+        } else {
+            systemPrompt = PROMPT_FOLLOWUP;
+            nextState = flowState;
+        }
+
+        // Atualizar fase antes de chamar API
+        if (flowState !== 'synthesizing') setPhase(nextState);
+
         const loaderId = appendLoader();
 
         try {
-            const response = await callGeminiAPI();
-            const modelText = response.candidates[0].content.parts[0].text;
+            const modelText = await callGeminiAPI(syraKey, systemPrompt);
             document.getElementById(loaderId).remove();
-            appendMessage('model', modelText);
-            chatHistory.push({ role: "model", parts: [{ text: modelText }] });
 
-            // Salvar resposta do modelo
-            if (currentSessionId) {
-                try {
-                    await updateDoc(doc(db, `users/${currentUser.uid}/sessions`, currentSessionId), {
-                        messages: arrayUnion({ role: "model", text: modelText, ts: Date.now() }),
-                        updatedAt: serverTimestamp(),
-                        messageCount: chatHistory.length
-                    });
-                } catch (e) { console.error(e); }
+            // Verificar se o plano está pronto
+            if (modelText.includes('[[PLANO_PRONTO]]')) {
+                currentPlanText = modelText.replace('[[PLANO_PRONTO]]', '').trim();
+                appendMessage('model', currentPlanText);
+                chatHistory.push({ role: "model", parts: [{ text: currentPlanText }] });
+                await saveModelMessage(currentPlanText);
+
+                // Mostrar ações de validação
+                appendValidationActions();
+                setPhase('validating');
+            } else {
+                appendMessage('model', modelText);
+                chatHistory.push({ role: "model", parts: [{ text: modelText }] });
+                await saveModelMessage(modelText);
+
+                if (flowState === 'synthesizing') {
+                    // Se o modelo não inseriu o marcador mas estamos sintetizando
+                    setPhase('validating');
+                } else if (nextState === 'questioning') {
+                    setPhase('questioning');
+                }
             }
         } catch (error) {
             document.getElementById(loaderId).remove();
             appendMessage('model', `**Erro de Conexão:** ${error.message}`);
+            setPhase(flowState === 'idle' ? 'idle' : flowState);
         } finally {
-            sendBtn.disabled = false;
+            if (flowState !== 'synthesizing' && flowState !== 'validating' && flowState !== 'completed') {
+                sendBtn.disabled = false;
+            }
             userInput.focus();
         }
     };
 
-    async function callGeminiAPI() {
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+    // ════════════════════════════════════════════════════
+    //  GEMINI API CALL
+    // ════════════════════════════════════════════════════
+    async function callGeminiAPI(apiKey, systemPrompt) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
         const payload = {
-            systemInstruction: { parts: [{ text: SYSTEM_PRE_PROMPT }] },
+            systemInstruction: { parts: [{ text: systemPrompt }] },
             contents: chatHistory,
             generationConfig: { temperature: 0.5 }
         };
@@ -437,9 +813,234 @@ Sempre que fornecer exemplos de código, envolva o código em crases triplas (ma
             const err = await response.json();
             throw new Error(err.error?.message || "Erro desconhecido na API.");
         }
-        return await response.json();
+        const data = await response.json();
+        return data.candidates[0].content.parts[0].text;
     }
 
+    async function saveModelMessage(text) {
+        if (!currentSessionId || !currentUser) return;
+        try {
+            await updateDoc(doc(db, `users/${currentUser.uid}/sessions`, currentSessionId), {
+                messages: arrayUnion({ role: "model", text, ts: Date.now() }),
+                updatedAt: serverTimestamp(), messageCount: chatHistory.length
+            });
+        } catch (e) { console.error(e); }
+    }
+
+    // ════════════════════════════════════════════════════
+    //  VALIDATION ACTIONS UI
+    // ════════════════════════════════════════════════════
+    function appendValidationActions() {
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = 'message model';
+        actionsDiv.id = 'validation-block';
+        actionsDiv.innerHTML = `
+            <span class="label">@SYRA_CORE // VALIDAÇÃO NECESSÁRIA</span>
+            <div class="content-box" style="border-color: #c3dafe; background: #f0f4ff;">
+                <p style="margin:0; font-weight: 500;">O Plano de Projeto foi sintetizado com sucesso. Revise o documento acima e confirme se está de acordo com suas expectativas.</p>
+                <div class="validation-actions">
+                    <button class="btn-action btn-download-pdf" onclick="downloadPlanPDF()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        Baixar PDF
+                    </button>
+                    <button class="btn-action btn-validate-plan" onclick="validatePlan()">
+                        ✓ Validar e Encaminhar
+                    </button>
+                    <button class="btn-action btn-reject-plan" onclick="rejectPlan()">
+                        ✗ Rejeitar Plano
+                    </button>
+                </div>
+            </div>
+        `;
+        chatWindow.appendChild(actionsDiv);
+        scrollToBottom();
+    }
+
+    // ════════════════════════════════════════════════════
+    //  AÇÕES DE VALIDAÇÃO
+    // ════════════════════════════════════════════════════
+    window.validatePlan = function() {
+        const block = document.getElementById('validation-block');
+        if (block) block.remove();
+
+        // Mensagem de confirmação
+        const msgDiv = document.createElement('div');
+        msgDiv.className = 'message system-notice';
+        msgDiv.innerHTML = `
+            <div class="content-box">
+                <p style="margin:0; font-size:0.9rem;">
+                    ✅ <strong>Plano validado com sucesso.</strong><br>
+                    Sua solicitação e o plano de projeto foram encaminhados à <strong>equipe de desenvolvimento</strong>. Em breve você receberá um retorno com os próximos passos. Obrigado!
+                </p>
+            </div>
+        `;
+        chatWindow.appendChild(msgDiv);
+        scrollToBottom();
+        setPhase('completed');
+
+        // Atualizar no Firestore
+        if (currentSessionId && currentUser) {
+            updateDoc(doc(db, `users/${currentUser.uid}/sessions`, currentSessionId), {
+                status: "aguardando_desenvolvimento", updatedAt: serverTimestamp()
+            }).catch(console.error);
+        }
+    };
+
+    window.rejectPlan = function() {
+        const block = document.getElementById('validation-block');
+        if (block) block.remove();
+
+        appendMessage('model', `O plano foi **rejeitado**. Para gerar um novo plano revisado, inicie uma nova solicitação com as alterações desejadas. Clique em **Nova Solicitação** no menu lateral.`);
+        setPhase('completed');
+    };
+
+    // ════════════════════════════════════════════════════
+    //  PDF DOWNLOAD
+    // ════════════════════════════════════════════════════
+    window.downloadPlanPDF = function() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+
+        const pageW = doc.internal.pageSize.getWidth();
+        const pageH = doc.internal.pageSize.getHeight();
+        const margin = 20;
+        const contentW = pageW - margin * 2;
+        let y = margin;
+
+        // ── HEADER ──
+        doc.setFillColor(26, 26, 26);
+        doc.rect(0, 0, pageW, 30, 'F');
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(14);
+        doc.setTextColor(255, 255, 255);
+        doc.text('SYRA', margin, 13);
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(180, 180, 180);
+        doc.text('SY-CORE V2.5.1  //  PLANO DE PROJETO', margin, 20);
+        const now = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+        doc.text(`Gerado em: ${now}`, pageW - margin, 20, { align: 'right' });
+
+        y = 42;
+
+        // ── PROCESSAR TEXTO DO PLANO ──
+        const lines = currentPlanText.split('\n');
+        doc.setTextColor(26, 26, 26);
+
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+
+            if (y > pageH - margin) {
+                doc.addPage();
+                // Header nas páginas seguintes
+                doc.setFillColor(26, 26, 26);
+                doc.rect(0, 0, pageW, 18, 'F');
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.setTextColor(255, 255, 255);
+                doc.text('SYRA // PLANO DE PROJETO', margin, 12);
+                doc.setTextColor(26, 26, 26);
+                y = 28;
+            }
+
+            // Título H1
+            if (line.startsWith('# ')) {
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(16);
+                doc.setTextColor(26, 26, 26);
+                doc.text(line.replace(/^# /, ''), margin, y);
+                y += 2;
+                // Linha decorativa
+                doc.setDrawColor(26, 26, 26);
+                doc.setLineWidth(0.5);
+                doc.line(margin, y + 2, pageW - margin, y + 2);
+                y += 10;
+            }
+            // H2
+            else if (line.startsWith('## ')) {
+                if (y > margin + 20) y += 4;
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(12);
+                doc.setTextColor(26, 26, 26);
+                doc.text(line.replace(/^## /, ''), margin, y);
+                y += 2;
+                doc.setDrawColor(200, 200, 200);
+                doc.setLineWidth(0.3);
+                doc.line(margin, y + 1, pageW - margin, y + 1);
+                y += 7;
+            }
+            // H3
+            else if (line.startsWith('### ')) {
+                y += 2;
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.setTextColor(60, 60, 60);
+                doc.text(line.replace(/^### /, ''), margin, y);
+                y += 6;
+            }
+            // Linha separadora ---
+            else if (/^-{3,}$/.test(line.trim())) {
+                doc.setDrawColor(220, 220, 220);
+                doc.setLineWidth(0.3);
+                doc.line(margin, y, pageW - margin, y);
+                y += 5;
+            }
+            // Item de lista
+            else if (line.match(/^[\*\-] /)) {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9.5);
+                doc.setTextColor(50, 50, 50);
+                const bulletText = line.replace(/^[\*\-] /, '');
+                const cleanText = bulletText.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/`(.*?)`/g, '$1');
+                const wrapped = doc.splitTextToSize('• ' + cleanText, contentW - 5);
+                doc.text(wrapped, margin + 4, y);
+                y += wrapped.length * 5 + 1;
+            }
+            // Linha numerada
+            else if (line.match(/^\d+\. /)) {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9.5);
+                doc.setTextColor(50, 50, 50);
+                const cleanText = line.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/`(.*?)`/g, '$1');
+                const wrapped = doc.splitTextToSize(cleanText, contentW - 5);
+                doc.text(wrapped, margin + 4, y);
+                y += wrapped.length * 5 + 1;
+            }
+            // Parágrafo normal
+            else if (line.trim() !== '') {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(9.5);
+                doc.setTextColor(50, 50, 50);
+                const cleanText = line.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1').replace(/`(.*?)`/g, '$1').replace(/\[(.*?)\]\(.*?\)/g, '$1');
+                const wrapped = doc.splitTextToSize(cleanText, contentW);
+                doc.text(wrapped, margin, y);
+                y += wrapped.length * 5 + 2;
+            }
+            // Linha em branco
+            else {
+                y += 3;
+            }
+        }
+
+        // ── FOOTER em todas as páginas ──
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let p = 1; p <= totalPages; p++) {
+            doc.setPage(p);
+            doc.setFillColor(248, 248, 248);
+            doc.rect(0, pageH - 14, pageW, 14, 'F');
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.setTextColor(160, 160, 160);
+            doc.text('Documento gerado pela plataforma SYRA — Confidencial', margin, pageH - 5);
+            doc.text(`Página ${p} de ${totalPages}`, pageW - margin, pageH - 5, { align: 'right' });
+        }
+
+        doc.save('plano_projeto_syra.pdf');
+    };
+
+    // ════════════════════════════════════════════════════
+    //  HELPERS
+    // ════════════════════════════════════════════════════
     function appendMessage(role, text) {
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${role}`;
@@ -470,14 +1071,18 @@ Sempre que fornecer exemplos de código, envolva o código em crases triplas (ma
         setTimeout(() => { chatWindow.scrollTop = chatWindow.scrollHeight; }, 50);
     }
 
-    // Relógio
+    // ════════════════════════════════════════════════════
+    //  RELÓGIO + EVENTOS
+    // ════════════════════════════════════════════════════
     setInterval(() => {
         document.getElementById('clock').innerText = new Date().toLocaleTimeString('pt-BR') + " UTC-3";
     }, 1000);
 
-    // Enter para enviar
-    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSend(); });
+    userInput.addEventListener('keypress', (e) => { if (e.key === 'Enter' && !sendBtn.disabled) handleSend(); });
     sendBtn.addEventListener('click', () => handleSend());
+
+    // Expor handleSend globalmente
+    window.handleSend = window.handleSend;
 </script>
 </body>
 </html>
