@@ -296,6 +296,30 @@
         }
         .input-hint.visible { display: block; }
 
+        /* ─── PROGRESS BAR ─── */
+        .progress-wrap {
+            max-width: 1000px; margin: 0 auto 12px;
+        }
+        .progress-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 5px;
+        }
+        .progress-label-left {
+            font-family: 'Space Grotesk', sans-serif; font-size: 8px;
+            letter-spacing: 2px; color: #ccc; font-weight: 600; text-transform: uppercase;
+        }
+        .progress-label-right {
+            font-family: 'Space Grotesk', sans-serif; font-size: 8px;
+            letter-spacing: 1px; color: #aaa; font-weight: 700;
+        }
+        .progress-track {
+            height: 3px; background: #eeeeee; border-radius: 10px; overflow: hidden;
+        }
+        .progress-bar-fill {
+            height: 100%; background: #1a1a1a; border-radius: 10px;
+            transition: width 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
         @keyframes messageFade { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
@@ -377,6 +401,15 @@
         </div>
 
         <footer class="input-area">
+            <div class="progress-wrap" id="progress-wrap" style="opacity:0; transition: opacity 0.4s;">
+                <div class="progress-header">
+                    <span class="progress-label-left">PLANEJAMENTO</span>
+                    <span class="progress-label-right" id="progress-label">0/15</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-bar-fill" id="progress-bar-fill" style="width:0%"></div>
+                </div>
+            </div>
             <div class="input-wrapper">
                 <input type="text" placeholder="Descreva sua solicitação técnica ou cole um código..." id="user-input" autocomplete="off">
                 <button class="send-btn" id="send-btn">
@@ -417,28 +450,44 @@
     //  SYSTEM PROMPTS POR FASE
     // ════════════════════════════════════════════════════
 
-    const PROMPT_QUESTIONING = `Você é a Syra, uma IA sênior especialista em engenharia de software e gestão de projetos.
-O usuário acabou de descrever uma nova solicitação de desenvolvimento ou sistema. Sua única tarefa agora é elaborar EXATAMENTE 15 perguntas de planejamento estratégico, numeradas de 1 a 15, para mapear completamente o escopo do projeto.
+    // ════════════════════════════════════════════════════
+    //  15 QUESTÕES — uma por vez
+    // ════════════════════════════════════════════════════
+    const QUESTION_TOPICS = [
+        { tema: "Objetivos",        pergunta: "Quais são os **objetivos principais** do projeto e quais resultados concretos são esperados ao final?" },
+        { tema: "Público-alvo",     pergunta: "Quem são os **usuários finais**? Descreva o perfil deles, nível de familiaridade com tecnologia e necessidades principais." },
+        { tema: "Modalidade",       pergunta: "O projeto será executado de forma **presencial**, **híbrida/parcial** (parte presencial, parte remota) ou **totalmente online/remota**? Por quê essa escolha faz sentido para o contexto?" },
+        { tema: "Tecnologias",      pergunta: "Quais **tecnologias, frameworks ou plataformas** são preferidas ou já estão em uso na organização? Existe alguma restrição de stack?" },
+        { tema: "Prazo",            pergunta: "Qual é o **prazo estimado** para entrega do projeto? Existem marcos intermediários ou datas críticas que não podem ser movidas?" },
+        { tema: "Orçamento",        pergunta: "Qual é o **orçamento disponível** (ou a faixa estimada) para o desenvolvimento e implantação do projeto?" },
+        { tema: "Equipe",           pergunta: "Qual é o **tamanho e a composição** da equipe disponível? Existem desenvolvedores, designers, PMs, ou o projeto depende de contratação externa?" },
+        { tema: "Integrações",      pergunta: "O sistema precisará se **integrar** com alguma API externa, sistema legado, banco de dados existente ou ferramenta de terceiros?" },
+        { tema: "Segurança",        pergunta: "Quais são os **requisitos de segurança, autenticação e conformidade** necessários? O projeto precisa seguir alguma regulamentação (LGPD, GDPR, HIPAA, etc.)?" },
+        { tema: "Dispositivos",     pergunta: "Em quais **dispositivos e ambientes** o sistema precisa funcionar? (mobile iOS/Android, desktop, navegadores específicos, PWA, etc.)" },
+        { tema: "Escala",           pergunta: "Qual é a **escala esperada** de uso? Estime o número de usuários simultâneos, volume de dados armazenados e picos de acesso." },
+        { tema: "Manutenção",       pergunta: "Como será a **manutenção e o suporte** após a entrega? Haverá equipe interna, contrato de suporte externo ou o cliente absorverá a operação?" },
+        { tema: "Experiência",      pergunta: "Qual é o **nível de experiência técnica** da equipe com as tecnologias envolvidas? Serão necessários treinamentos ou capacitações?" },
+        { tema: "Restrições",       pergunta: "Existem **restrições técnicas, limitações de infraestrutura ou dependências** já conhecidas que podem impactar o desenvolvimento?" },
+        { tema: "Sucesso",          pergunta: "Como o sucesso do projeto será medido? Quais são os **critérios de aceitação** e os **KPIs** que indicarão que o projeto atingiu seus objetivos?" }
+    ];
 
-As 15 perguntas DEVEM cobrir obrigatoriamente estes tópicos (adapte a linguagem ao contexto da solicitação):
-1. Objetivos principais e resultados esperados do projeto
-2. Público-alvo / perfil dos usuários finais
-3. **Modalidade de execução**: o projeto será desenvolvido de forma **presencial**, **parcial/híbrida** (parte presencial, parte remota) ou **totalmente online/remota**? Justifique a escolha.
-4. Tecnologias, frameworks ou plataformas preferidas (ou já em uso)
-5. Prazo estimado para entrega e marcos importantes
-6. Orçamento disponível ou estimado para o projeto
-7. Tamanho e composição da equipe atual
-8. Integrações com APIs, sistemas legados ou bancos de dados
-9. Requisitos de segurança, autenticação e conformidade (LGPD, GDPR etc.)
-10. Dispositivos e ambientes suportados (mobile, desktop, navegadores)
-11. Escala esperada: número de usuários simultâneos e volume de dados
-12. Estratégia de manutenção, suporte e atualizações pós-entrega
-13. Experiência técnica da equipe com as tecnologias envolvidas
-14. Restrições, limitações técnicas ou dependências conhecidas
-15. Critérios de sucesso e KPIs para medir o desempenho do projeto
+    function buildQuestionPrompt(qIndex, initialRequest) {
+        const q = QUESTION_TOPICS[qIndex];
+        const isLast = qIndex === 14;
+        return `Você é a Syra, uma IA sênior especialista em engenharia de software e gestão de projetos.
+A solicitação inicial do usuário é: "${initialRequest}"
+Você está conduzindo o planejamento estratégico do projeto. Esta é a questão ${qIndex + 1} de 15 (tema: ${q.tema}).
 
-Apresente as 15 perguntas de forma clara, numerada e direta. Seja conciso e profissional.
-Ao final, escreva exatamente: "Por favor, responda as 15 questões acima para que eu possa elaborar o seu **Plano de Projeto Syra** completo."`;
+Faça APENAS esta pergunta ao usuário, adaptando-a naturalmente ao contexto da solicitação dele:
+"${q.pergunta}"
+
+Regras obrigatórias:
+- Faça SOMENTE esta pergunta. Não faça outras perguntas adicionais.
+- Seja direto e profissional.
+- Inicie sua resposta com o indicador de progresso: "**Questão ${qIndex + 1}/15 — ${q.tema}**"
+- Depois do indicador, formule a pergunta de forma contextualizada.
+${isLast ? '- Esta é a última questão. Ao formulá-la, informe que após a resposta o plano completo será sintetizado.' : ''}`;
+    }
 
     const PROMPT_SYNTHESIS = `Você é a Syra, uma IA sênior especialista em engenharia de software e gestão de projetos.
 Com base na solicitação inicial do usuário e nas respostas às 15 perguntas de planejamento, elabore um PLANO DE PROJETO COMPLETO, DETALHADO E PROFISSIONAL em formato markdown.
@@ -493,6 +542,7 @@ Responda de forma técnica e concisa às dúvidas ou comentários do usuário. O
 
     // flowState: 'idle' | 'questioning' | 'synthesizing' | 'validating' | 'completed'
     let flowState = 'idle';
+    let currentQuestion = 0;   // 0 = nenhuma, 1–15 = questão atual aguardando resposta
     let currentUser = null;
     let currentSessionId = null;
     let chatHistory = [];
@@ -579,7 +629,7 @@ Responda de forma técnica e concisa às dúvidas ou comentários do usuário. O
     //  PHASE BADGE
     // ════════════════════════════════════════════════════
 
-    function setPhase(phase) {
+    function setPhase(phase, qNum) {
         flowState = phase;
         phaseBadge.className = 'phase-badge';
         inputHint.classList.remove('visible');
@@ -590,38 +640,57 @@ Responda de forma técnica e concisa às dúvidas ou comentários do usuário. O
                 userInput.placeholder = 'Descreva sua solicitação técnica...';
                 userInput.disabled = false;
                 sendBtn.disabled = false;
+                updateProgress(0);
                 break;
             case 'questioning':
                 phaseBadge.classList.add('visible', 'phase-q');
-                phaseBadge.textContent = '⬡ FASE 1 — PLANEJAMENTO';
-                userInput.placeholder = 'Responda as 15 questões de planejamento...';
+                phaseBadge.textContent = `⬡ QUESTÃO ${qNum}/15`;
+                userInput.placeholder = `Responda a questão ${qNum} de 15...`;
+                inputHint.textContent = `PLANEJAMENTO — Questão ${qNum} de 15 · Tema: ${QUESTION_TOPICS[qNum-1].tema.toUpperCase()}`;
                 inputHint.classList.add('visible');
                 userInput.disabled = false;
                 sendBtn.disabled = false;
+                updateProgress(qNum);
                 break;
             case 'synthesizing':
                 phaseBadge.classList.add('visible', 'phase-s');
-                phaseBadge.textContent = '⬡ FASE 2 — SÍNTESE';
+                phaseBadge.textContent = '⬡ SINTETIZANDO PLANO';
                 userInput.placeholder = 'Aguardando síntese do plano...';
                 userInput.disabled = true;
                 sendBtn.disabled = true;
+                updateProgress(15);
                 break;
             case 'validating':
                 phaseBadge.classList.add('visible', 'phase-v');
-                phaseBadge.textContent = '⬡ FASE 3 — VALIDAÇÃO';
+                phaseBadge.textContent = '⬡ VALIDAÇÃO';
                 userInput.placeholder = 'Aguardando sua validação do plano...';
                 userInput.disabled = true;
                 sendBtn.disabled = true;
+                updateProgress(15);
                 break;
             case 'completed':
                 phaseBadge.classList.add('visible');
-                phaseBadge.style.borderColor = '#e5e5e5';
-                phaseBadge.textContent = '✓ PLANO ENCAMINHADO';
+                phaseBadge.textContent = '✓ ENCAMINHADO';
                 userInput.placeholder = 'Sessão encerrada. Inicie uma nova solicitação.';
                 userInput.disabled = true;
                 sendBtn.disabled = true;
                 break;
         }
+    }
+
+    function updateProgress(qNum) {
+        const bar = document.getElementById('progress-bar-fill');
+        const label = document.getElementById('progress-label');
+        const wrap = document.getElementById('progress-wrap');
+        if (!bar) return;
+        if (qNum === 0) {
+            wrap.style.opacity = '0';
+            return;
+        }
+        wrap.style.opacity = '1';
+        const pct = Math.round((qNum / 15) * 100);
+        bar.style.width = pct + '%';
+        label.textContent = qNum <= 15 ? `${qNum}/15` : '15/15';
     }
 
     // ════════════════════════════════════════════════════
@@ -670,13 +739,14 @@ Responda de forma técnica e concisa às dúvidas ou comentários do usuário. O
         chatHistory = [];
         currentPlanText = '';
         initialRequest = '';
+        currentQuestion = 0;
         chatWindow.innerHTML = '';
         chatWindow.appendChild(emptyState);
         emptyState.style.display = 'block';
         currentSessionId = null;
         btnFinalize.classList.remove('visible');
         sessionBanner.classList.remove('visible');
-        setPhase('idle');
+        setPhase('idle', 0);
         window.history.replaceState({}, '', 'home.html');
     };
 
@@ -691,17 +761,14 @@ Responda de forma técnica e concisa às dúvidas ou comentários do usuário. O
     };
 
     // ════════════════════════════════════════════════════
-    //  ENVIAR MENSAGEM — MÁQUINA DE ESTADOS
+    //  ENVIAR MENSAGEM — MÁQUINA DE ESTADOS (1 questão/vez)
     // ════════════════════════════════════════════════════
     window.handleSend = async function() {
         const text = userInput.value.trim();
         if (!text || !currentUser) return;
 
         const syraKey = getSyraKey();
-        if (!syraKey) {
-            keyModal.classList.remove('hidden');
-            return;
-        }
+        if (!syraKey) { keyModal.classList.remove('hidden'); return; }
 
         emptyState.style.display = 'none';
         userInput.value = '';
@@ -736,60 +803,67 @@ Responda de forma técnica e concisa às dúvidas ou comentários do usuário. O
             } catch (e) { console.error(e); }
         }
 
-        // Determinar qual prompt usar com base no estado atual
-        let systemPrompt;
-        let nextState;
-
-        if (flowState === 'idle') {
-            systemPrompt = PROMPT_QUESTIONING;
-            nextState = 'questioning';
-        } else if (flowState === 'questioning') {
-            systemPrompt = PROMPT_SYNTHESIS;
-            nextState = 'synthesizing';
-        } else {
-            systemPrompt = PROMPT_FOLLOWUP;
-            nextState = flowState;
-        }
-
-        // Atualizar fase antes de chamar API
-        if (flowState !== 'synthesizing') setPhase(nextState);
-
         const loaderId = appendLoader();
 
         try {
+            let systemPrompt;
+
+            if (flowState === 'idle') {
+                // Solicitação inicial recebida → perguntar questão 1
+                currentQuestion = 1;
+                systemPrompt = buildQuestionPrompt(0, initialRequest);
+                setPhase('questioning', 1);
+
+            } else if (flowState === 'questioning') {
+                if (currentQuestion < 15) {
+                    // Usuário respondeu a questão N → perguntar questão N+1
+                    currentQuestion += 1;
+                    systemPrompt = buildQuestionPrompt(currentQuestion - 1, initialRequest);
+                    setPhase('questioning', currentQuestion);
+                } else {
+                    // Usuário respondeu a questão 15 → sintetizar plano
+                    setPhase('synthesizing', 15);
+                    systemPrompt = PROMPT_SYNTHESIS;
+                }
+            } else {
+                systemPrompt = PROMPT_FOLLOWUP;
+            }
+
             const modelText = await callGeminiAPI(syraKey, systemPrompt);
             document.getElementById(loaderId).remove();
 
-            // Verificar se o plano está pronto
             if (modelText.includes('[[PLANO_PRONTO]]')) {
                 currentPlanText = modelText.replace('[[PLANO_PRONTO]]', '').trim();
                 appendMessage('model', currentPlanText);
                 chatHistory.push({ role: "model", parts: [{ text: currentPlanText }] });
                 await saveModelMessage(currentPlanText);
-
-                // Mostrar ações de validação
                 appendValidationActions();
-                setPhase('validating');
+                setPhase('validating', 15);
             } else {
                 appendMessage('model', modelText);
                 chatHistory.push({ role: "model", parts: [{ text: modelText }] });
                 await saveModelMessage(modelText);
 
+                // Se sintetizando mas não veio marcador, tratar como validação
                 if (flowState === 'synthesizing') {
-                    // Se o modelo não inseriu o marcador mas estamos sintetizando
-                    setPhase('validating');
-                } else if (nextState === 'questioning') {
-                    setPhase('questioning');
+                    currentPlanText = modelText;
+                    appendValidationActions();
+                    setPhase('validating', 15);
+                } else if (flowState !== 'validating' && flowState !== 'completed') {
+                    // Reabilitar input para resposta
+                    sendBtn.disabled = false;
+                    userInput.focus();
                 }
             }
         } catch (error) {
             document.getElementById(loaderId).remove();
             appendMessage('model', `**Erro de Conexão:** ${error.message}`);
-            setPhase(flowState === 'idle' ? 'idle' : flowState);
-        } finally {
-            if (flowState !== 'synthesizing' && flowState !== 'validating' && flowState !== 'completed') {
-                sendBtn.disabled = false;
-            }
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+
+        if (flowState === 'questioning') {
+            sendBtn.disabled = false;
             userInput.focus();
         }
     };
@@ -876,9 +950,7 @@ Responda de forma técnica e concisa às dúvidas ou comentários do usuário. O
         `;
         chatWindow.appendChild(msgDiv);
         scrollToBottom();
-        setPhase('completed');
-
-        // Atualizar no Firestore
+        setPhase('completed', 15);
         if (currentSessionId && currentUser) {
             updateDoc(doc(db, `users/${currentUser.uid}/sessions`, currentSessionId), {
                 status: "aguardando_desenvolvimento", updatedAt: serverTimestamp()
@@ -891,7 +963,7 @@ Responda de forma técnica e concisa às dúvidas ou comentários do usuário. O
         if (block) block.remove();
 
         appendMessage('model', `O plano foi **rejeitado**. Para gerar um novo plano revisado, inicie uma nova solicitação com as alterações desejadas. Clique em **Nova Solicitação** no menu lateral.`);
-        setPhase('completed');
+        setPhase('completed', 15);
     };
 
     // ════════════════════════════════════════════════════
