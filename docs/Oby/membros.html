@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBY — Torne-se Membro</title>
+    
+    <!-- Fontes Premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================= VARIÁVEIS ================= */
+        :root {
+            --bg: #ffffff;
+            --text: #000000;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --accent: #000000;
+            --gold: #c8a050;
+            --dark-bg: #1a1a14;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* ================= BASE ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Textura de Papel Premium */
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* ================= HEADER ================= */
+        header {
+            padding: 40px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            padding: 10px 0;
+        }
+
+        nav a:hover { opacity: 0.6; }
+
+        /* ================= HERO SECTION ================= */
+        .hero {
+            padding-top: 140px;
+            padding-bottom: 80px;
+            text-align: center;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 4rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 20px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 8px 18px;
+            margin-top: 20px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #00ff00;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* ================= PILLS ================= */
+        .pills {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 50px 0 60px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            padding: 8px 20px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pill:hover {
+            border-color: var(--text);
+            color: var(--text);
+        }
+
+        /* ================= PRICING GRID ================= */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-bottom: 100px;
+        }
+
+        .card {
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            padding: 40px 30px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+            transform: translateY(-4px);
+            border-color: var(--text-muted);
+        }
+
+        /* Featured Card (Middle) */
+        .card.featured {
+            background: var(--dark-bg);
+            border-color: var(--dark-bg);
+            color: #f5f0e6;
+            transform: scale(1.05);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .card.featured:hover {
+            box-shadow: 0 16px 50px rgba(0,0,0,0.25);
+            transform: scale(1.05) translateY(-4px);
+        }
+
+        .card.featured .label { color: #8a8070; }
+        .card.featured .plan-name { color: #f5f0e6; }
+        .card.featured .val { color: #f5f0e6; }
+        .card.featured .cur { color: #8a8070; }
+        .card.featured .plan-desc { color: #9a9580; }
+        .card.featured .price-note { color: #8a8070; }
+        .card.featured .sep { background: #2e2e26; }
+        .card.featured .benefits li { background: #22221a; color: #d5cfc0; }
+        .card.featured .check { background: var(--gold); color: var(--dark-bg); }
+        .card.featured .btn { background: var(--gold); color: var(--dark-bg); border-color: var(--gold); }
+
+        /* Fundador Card (Premium) */
+        .card.fundador {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 1px var(--gold), 0 8px 32px rgba(200,160,80,0.1);
+        }
+
+        .card.fundador:hover {
+            box-shadow: 0 0 0 1px var(--gold), 0 16px 48px rgba(200,160,80,0.15);
+        }
+
+        .card.fundador .label { color: #9a7030; }
+        .card.fundador .check { background: #9a7030; color: #fff; }
+        .card.fundador .benefits li { background: #fdf6e8; color: #3a2e10; }
+        .card.fundador .btn { border-color: var(--gold); color: #7a5820; }
+        .card.fundador .btn:hover { background: var(--gold); color: var(--dark-bg); }
+
+        /* Badge */
+        .badge {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 6px 16px;
+            border-radius: 100px;
+            white-space: nowrap;
+            background: var(--gold);
+            color: var(--dark-bg);
+        }
+
+        .badge-fundador {
+            background: var(--dark-bg);
+            color: var(--gold);
+            border: 1px solid var(--gold);
+        }
+
+        /* ================= CARD CONTENT ================= */
+        .label {
+            font-size: 0.65rem;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            color: #4a7c20;
+        }
+
+        .plan-name {
+            font-family: var(--font-serif);
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--text);
+            margin: 0 0 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .plan-desc {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+
+        /* Price Block */
+        .price-block { margin-bottom: 25px; }
+
+        .price-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 4px;
+            line-height: 1;
+        }
+
+        .cur {
+            font-family: var(--font-serif);
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            margin-top: 8px;
+        }
+
+        .val {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            font-weight: 400;
+            letter-spacing: -0.03em;
+            color: var(--text);
+        }
+
+        .price-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+            font-style: italic;
+        }
+
+        .sep {
+            height: 1px;
+            background: var(--border);
+            margin: 25px 0;
+        }
+
+        /* Benefits List */
+        .benefits {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .benefits li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            color: var(--text);
+            line-height: 1.5;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        .check {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 700;
+            flex-shrink: 0;
+            background: #4a7c20;
+            color: #fff;
+        }
+
+        /* Button */
+        .btn {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text);
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--text);
+            color: var(--bg);
+            transform: translateY(-2px);
+        }
+
+        /* ================= FOOTER ================= */
+        .footer {
+            text-align: center;
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .footer-main { margin-bottom: 12px; letter-spacing: 0.05em; }
+        .footer-sub { font-size: 0.7rem; color: #999; }
+
+        /* ================= ANIMAÇÕES ================= */
+        .reveal { opacity: 0; transform: translateY(30px); transition: all 0.8s ease; }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* ================= RESPONSIVO ================= */
+        @media (max-width: 1024px) {
+            .pricing-grid { grid-template-columns: 1fr; }
+            .card.featured { transform: scale(1); }
+            .card.featured:hover { transform: translateY(-4px); }
+            .hero h1 { font-size: 2.5rem; }
+            .container { padding: 0 24px; }
+        }
+
+        @media (max-width: 768px) {
+            .pills { gap: 8px; }
+            .pill { font-size: 0.65rem; padding: 6px 14px; }
+            .plan-name { font-size: 1.4rem; }
+            .val { font-size: 2.2rem; }
+            .benefits li { font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">OBY_</a>
+            <nav style="display: flex; gap: 30px; align-items: center;">
+                <a href="como-funciona.html" style="text-decoration: none; color: var(--text); font-family: var(--font-sans); font-size: 0.9rem; transition: opacity 0.3s ease; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">Como Funciona?</a>
+                <a href="/" style="text-decoration: none; color: var(--text); font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; transition: opacity 0.3s ease; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">← Voltar</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section class="hero">
+            <div class="container">
+                <span class="label">Acessos Disponíveis</span>
+                <h1>Torne-se Membro</h1>
+                <p><strong>Você não lê apenas um livro.</strong><br>Você acompanha um universo em movimento.</p>
+                <div class="status-badge">
+                    <div class="dot"></div>
+                    <span>Novos fragmentos adicionados semanalmente</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- PILLS -->
+        <div class="container">
+            <div class="pills">
+                <span class="pill">Semanal</span>
+                <span class="pill">Mensal</span>
+                <span class="pill">Semestral</span>
+            </div>
+        </div>
+
+        <!-- PRICING CARDS -->
+        <section class="container">
+            <div class="pricing-grid">
+
+                <!-- EXPLORADOR -->
+                <div class="card reveal">
+                    <span class="label">Semanal</span>
+                    <h2 class="plan-name">Explorador</h2>
+                    <p class="plan-desc">Uma entrada por semana. A voz do autor, o fragmento da semana.</p>
+                    
+                    <div class="price-block">
+                        <div class="price-row">
+                            <span class="cur">R$</span>
+                            <span class="val">9,90</span>
+                        </div>
+                        <p class="price-note">por semana</p>
+                    </div>
+
+                    <div class="sep"></div>
+
+                    <ul class="benefits">
+                        <li><span class="check">✓</span> 1 volume digital por semana</li>
+                        <li><span class="check">✓</span> Notas exclusivas do autor</li>
+                        <li><span class="check">✓</span> Acesso imediato após assinatura</li>
+                        <li><span class="check">✓</span> Permaneça enquanto desejar</li>
+                    </ul>
+
+                    <a href="https://www.asaas.com/c/6eskzyiys01qimdh" target="_blank" class="btn">
+                        Entrar como Explorador →
+                    </a>
+                </div>
+
+                <!-- TEMPORADA (Featured) -->
+                <div class="card featured reveal">
+                    <span class="badge">✦ Mais Escolhido</span>
+                    <span class="label">Mensal</span>
+                    <h2 class="plan-name">Temporada</h2>
+                    <p class="plan-desc">Como acompanhar uma série — volumes, extras e a biblioteca crescendo ao seu lado.</p>
+                    
+                    <div class="price-block">
+                        <div class="price-row">
+                            <span class="cur">R$</span>
+                            <span class="val">29,90</span>
+                        </div>
+                        <p class="price-note">por mês</p>
+                    </div>
+
+                    <div class="sep"></div>
+
+                    <ul class="benefits">
+                        <li><span class="check">✓</span> Acesso completo aos 4 volumes mensais</li>
+                        <li><span class="check">✓</span> Notas exclusivas do autor</li>
+                        <li><span class="check">✓</span> Conteúdos extras da temporada</li>
+                        <li><span class="check">✓</span> Biblioteca da temporada completa</li>
+                        <li><span class="check">✓</span> A biblioteca evolui continuamente</li>
+                    </ul>
+
+                    <a href="https://www.asaas.com/c/20jdig16joua96zs" target="_blank" class="btn">
+                        Assinar a Temporada →
+                    </a>
+                </div>
+
+                <!-- FUNDADOR (Premium) -->
+                <div class="card fundador reveal">
+                    <span class="badge badge-fundador">✦ Acesso Fundador</span>
+                    <span class="label">Semestral</span>
+                    <h2 class="plan-name">Fundador</h2>
+                    <p class="plan-desc">Para quem está desde o início. Pertencimento, não apenas acesso.</p>
+                    
+                    <div class="price-block">
+                        <div class="price-row">
+                            <span class="cur">R$</span>
+                            <span class="val">99,90</span>
+                        </div>
+                        <p class="price-note">por 6 meses · equivale a R$ 16,65/mês</p>
+                    </div>
+
+                    <div class="sep"></div>
+
+                    <ul class="benefits">
+                        <li><span class="check">✓</span> Tudo do plano Temporada</li>
+                        <li><span class="check">✓</span> Desconto especial de Fundador</li>
+                        <li><span class="check">✓</span> Acesso premium por 6 meses</li>
+                        <li><span class="check">✓</span> Biblioteca da temporada completa</li>
+                        <li><span class="check">✓</span> Presente desde o primeiro capítulo</li>
+                    </ul>
+
+                    <a href="https://www.asaas.com/c/ap8v35x6pyewh0eo" target="_blank" class="btn">
+                        Tornar-se Fundador →
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="footer">
+            <p class="footer-main">Atualizações contínuas · Novas entradas semanais · Universo em expansão</p>
+            <p class="footer-sub">Pagamento seguro via Asaas · Sua entrada pode ser encerrada a qualquer momento</p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            reveals.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

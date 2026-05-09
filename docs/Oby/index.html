@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBY — Infraestrutura Editorial em Construção</title>
+    
+    <!-- Fontes Premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================= VARIÁVEIS ================= */
+        :root {
+            --bg: #ffffff;
+            --text: #000000;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --accent: #000000;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --container-width: 1100px;
+        }
+
+        /* ================= BASE ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Textura de Papel Premium */
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        section { padding: 120px 0; border-bottom: 1px solid var(--border); }
+        section:last-child { border-bottom: none; }
+
+        /* ================= TIPOGRAFIA ================= */
+        h1, h2, h3 { font-family: var(--font-serif); font-weight: 400; line-height: 1.1; }
+        
+        .label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        p { font-size: 1.1rem; color: var(--text-muted); max-width: 600px; }
+        strong { color: var(--text); font-weight: 500; }
+
+        /* ================= HEADER ================= */
+        header {
+            padding: 40px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        /* ================= HERO ================= */
+        #hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            padding-top: 100px;
+        }
+
+        .hero-content { max-width: 800px; }
+        
+        #hero h1 {
+            font-size: 5rem;
+            margin-bottom: 40px;
+            letter-spacing: -0.03em;
+        }
+
+        #hero p { font-size: 1.4rem; line-height: 1.5; }
+
+        /* ================= GRID DE CONTEÚDO ================= */
+        .editorial-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: start;
+        }
+
+        .editorial-side-title {
+            position: sticky;
+            top: 140px;
+        }
+
+        .editorial-side-title h2 { font-size: 3.5rem; margin-bottom: 20px; }
+
+        /* ================= CARDS / PRINCÍPIOS ================= */
+        .principles-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .principle-item {
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .principle-item h3 {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        /* ================= META FUNDADORA ================= */
+        .goal-box {
+            background: #fafafa;
+            padding: 60px;
+            margin-top: 40px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-wrapper { margin-top: 40px; }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            margin-bottom: 15px;
+        }
+
+        .progress-track {
+            height: 1px;
+            background: var(--border);
+            width: 100%;
+            position: relative;
+        }
+
+        .progress-fill {
+            position: absolute;
+            height: 3px;
+            background: var(--text);
+            top: -1px;
+            width: 0;
+            transition: width 2s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            margin-top: 20px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: #00ff00;
+            border-radius: 50%;
+            margin-right: 10px;
+            animation: pulse 2s infinite;
+        }
+
+        /* ================= SYRA LABS ================= */
+        #syra { background: #000; color: #fff; border: none; }
+        #syra p { color: #999; }
+        #syra strong { color: #fff; }
+        #syra .label { color: #555; }
+        #syra .btn { border-color: #333; color: #fff; }
+        #syra .btn:hover { background: #fff; color: #000; }
+
+        /* ================= TIMELINE ================= */
+        .timeline { margin-top: 60px; }
+        
+        .timeline-row {
+            display: grid;
+            grid-template-columns: 150px 1fr;
+            padding: 30px 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .timeline-year { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); }
+        .timeline-content { font-size: 1.1rem; }
+        .timeline-row.active { border-top: 2px solid var(--text); }
+        .timeline-row.active .timeline-content { font-weight: 500; color: var(--text); }
+
+        /* ================= BOTÕES ================= */
+        .btn {
+            display: inline-block;
+            padding: 18px 35px;
+            border: 1px solid var(--text);
+            text-decoration: none;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .btn:hover {
+            background: var(--text);
+            color: var(--bg);
+            transform: translateY(-2px);
+        }
+
+        .btn-large { font-size: 0.9rem; padding: 25px 50px; }
+
+        /* ================= ANIMAÇÕES ================= */
+        .reveal { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.19, 1, 0.22, 1); }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.5; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ================= RESPONSIVO ================= */
+        @media (max-width: 900px) {
+            #hero h1 { font-size: 3rem; }
+            .editorial-grid { grid-template-columns: 1fr; gap: 40px; }
+            .editorial-side-title { position: static; }
+            .principles-list { grid-template-columns: 1fr; }
+            .container { padding: 0 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">OBY_</a>
+            <nav style="display: flex; gap: 30px; align-items: center;">
+                <a href="como-funciona.html" style="text-decoration: none; color: var(--text); font-family: var(--font-sans); font-size: 0.9rem; transition: opacity 0.3s ease; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">Como Funciona?</a>
+                <a href="membros.html" class="btn" style="border: 1px solid var(--text); padding: 12px 24px; font-size: 0.75rem;">Torne-se membro</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section id="hero">
+            <div class="container">
+                <div class="hero-content reveal">
+                    <span class="label">Manifesto 01</span>
+                    <h1>Alguns sistemas começam pequenos.</h1>
+                    <p>OBY não é apenas um catálogo. É uma infraestrutura editorial em construção para preservar o que realmente importa.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- O QUE É -->
+        <section id="como-funciona">
+            <div class="container editorial-grid">
+                <div class="editorial-side-title reveal">
+                    <span class="label">A Essência</span>
+                    <h2>O que é a OBY</h2>
+                </div>
+                <div class="editorial-main-content reveal">
+                    <p>OBY é um ambiente digital criado para organizar, distribuir e preservar conhecimento, experiências e projetos independentes.</p>
+                    <br>
+                    <p>Construímos a plataforma com foco em minimalismo, acesso contínuo e evolução constante. Fugindo do padrão de consumo rápido da internet atual.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- DESTAQUE -->
+        <section id="highlight" style="background: #fafafa;">
+            <div class="container">
+                <div class="reveal" style="text-align: center; padding: 60px 0;">
+                    <h2 style="font-size: 4.5rem; font-style: italic;">Sem algoritmos viciantes.</h2>
+                    <h2 style="font-size: 4.5rem; margin-top: -10px;">Apenas clareza e substância.</h2>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRINCÍPIOS -->
+        <section id="principles">
+            <div class="container">
+                <span class="label">Nossos Valores</span>
+                <div class="principles-list">
+                    <div class="principle-item reveal">
+                        <h3>01. Curadoria</h3>
+                        <p>Menos ruído, mais sinal. Acima do excesso e da saturação digital que consome a atenção moderna.</p>
+                    </div>
+                    <div class="principle-item reveal">
+                        <h3>02. Sustentabilidade</h3>
+                        <p>Crescimento orgânico e silencioso. Focado exclusivamente no longo prazo e na perenidade do conteúdo.</p>
+                    </div>
+                    <div class="principle-item reveal">
+                        <h3>03. Autoralidade</h3>
+                        <p>Tecnologia própria, arquitetada à mão, sem dependências frágeis de grandes corporações.</p>
+                    </div>
+                    <div class="principle-item reveal">
+                        <h3>04. Minimalismo</h3>
+                        <p>Design estritamente funcional. Nenhuma distração entre você e o conteúdo que você busca.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- META -->
+        <section id="goal">
+            <div class="container">
+                <div class="editorial-grid">
+                    <div class="editorial-side-title reveal">
+                        <span class="label">Comunidade</span>
+                        <h2>A Meta Fundadora</h2>
+                    </div>
+                    <div class="editorial-main-content reveal">
+                        <p>Nossa primeira meta é alcançar <strong>50 membros ativos</strong>. Esse marco valida a infraestrutura, torna a plataforma sustentável e acelera o desenvolvimento de novas funcionalidades.</p>
+                        
+                        <div class="goal-box">
+                            <div class="progress-wrapper">
+                                <div class="progress-header">
+                                    <span>MEMBROS FUNDADORES</span>
+                                    <span>17 / 50</span>
+                                </div>
+                                <div class="progress-track">
+                                    <div class="progress-fill" data-width="34%"></div>
+                                </div>
+                                <div class="status-indicator">
+                                    <div class="dot"></div>
+                                    <span>STATUS: RECRUTAMENTO INICIAL ABERTO</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SYRA LABS -->
+        <section id="syra">
+            <div class="container editorial-grid">
+                <div class="editorial-side-title reveal">
+                    <span class="label">Pesquisa // SYRA_LABS</span>
+                    <h2 style="color: #fff;">Laboratório e Expansão</h2>
+                </div>
+                <div class="editorial-main-content reveal">
+                    <p>Parte do crescimento da OBY é direcionado ao desenvolvimento da <strong>SYRA</strong> — uma iniciativa experimental de bastidores focada em sistemas inteligentes e automação.</p>
+                    <br>
+                    <p>Ao se tornar membro fundador, você financia não apenas uma biblioteca de conteúdo, mas a pesquisa de tecnologias autorais que serão integradas silenciosamente ao nosso ecossistema.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- TIMELINE -->
+        <section id="history">
+            <div class="container">
+                <span class="label">Arquivo</span>
+                <h2>Evolução da Estrutura</h2>
+                <div class="timeline">
+                    <div class="timeline-row reveal">
+                        <div class="timeline-year">Fase 01</div>
+                        <div class="timeline-content">Idealização como sistema de organização pessoal.</div>
+                    </div>
+                    <div class="timeline-row reveal">
+                        <div class="timeline-year">Fase 02</div>
+                        <div class="timeline-content">Maturação como arquivo digital privado.</div>
+                    </div>
+                    <div class="timeline-row reveal">
+                        <div class="timeline-year">Fase 03</div>
+                        <div class="timeline-content">Evolução arquitetural para ecossistema distribuído.</div>
+                    </div>
+                    <div class="timeline-row reveal active">
+                        <div class="timeline-year">Fase 04</div>
+                        <div class="timeline-content">Abertura dos servidores para os primeiros membros fundadores.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section id="cta" style="text-align: center; padding: 200px 0;">
+            <div class="container reveal">
+                <h2 style="font-size: 4rem; margin-bottom: 30px;">Os primeiros moldam a estrutura.</h2>
+                <p style="margin: 0 auto 40px; font-size: 1.3rem;">A fase inicial está aberta. Garanta seu acesso vitalício à raiz do projeto.</p>
+                <a href="#" class="btn btn-large">Entrar no Ecossistema</a>
+            </div>
+        </section>
+    </main>
+
+    <footer style="padding: 60px 0; border-top: 1px solid var(--border); font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-align: center;">
+        <div class="container">
+            OBY_EDITOR — © 2026 — TODOS OS DIREITOS RESERVADOS
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reveals = document.querySelectorAll('.reveal');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                        
+                        // Animação da barra de progresso
+                        const progressBar = entry.target.querySelector('.progress-fill');
+                        if (progressBar) {
+                            setTimeout(() => {
+                                progressBar.style.width = progressBar.getAttribute('data-width');
+                            }, 500);
+                        }
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            reveals.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>

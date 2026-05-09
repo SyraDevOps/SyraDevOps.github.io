@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OBY — Como Funciona</title>
+    
+    <!-- Fontes Premium -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+    <style>
+        /* ================= VARIÁVEIS ================= */
+        :root {
+            --bg: #ffffff;
+            --text: #000000;
+            --text-muted: #666666;
+            --border: #e5e5e5;
+            --accent: #000000;
+            --font-serif: 'Playfair Display', serif;
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* ================= BASE ================= */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: var(--font-sans);
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+        }
+
+        /* Textura de Papel Premium */
+        .noise {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0.04;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        /* ================= HEADER ================= */
+        header {
+            padding: 40px 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--text);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            transition: opacity 0.3s ease;
+            opacity: 0.7;
+        }
+
+        nav a:hover { opacity: 1; }
+
+        /* ================= HERO ================= */
+        .hero {
+            padding-top: 140px;
+            padding-bottom: 100px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .label {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 4rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin-bottom: 20px;
+        }
+
+        /* ================= JOURNEY SECTION ================= */
+        .journey {
+            padding: 120px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            font-weight: 400;
+            margin-bottom: 60px;
+            line-height: 1.1;
+        }
+
+        /* ================= STEP CARDS ================= */
+        .steps {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 50px;
+        }
+
+        .step {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            gap: 40px;
+            align-items: start;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .step.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-number {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            line-height: 1;
+            opacity: 0.3;
+        }
+
+        .step-content h3 {
+            font-family: var(--font-serif);
+            font-size: 1.5rem;
+            font-weight: 400;
+            margin-bottom: 15px;
+            letter-spacing: -0.01em;
+        }
+
+        .step-content p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .step-content ul {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0 0;
+        }
+
+        .step-content li {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            padding: 8px 0;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .step-content li::before {
+            content: '→';
+            position: absolute;
+            left: 0;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        /* ================= HIGHLIGHT SECTION ================= */
+        .highlight-section {
+            padding: 120px 0;
+            background: #fafafa;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .highlight-box {
+            background: var(--bg);
+            border: 1px solid var(--border);
+            padding: 50px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .highlight-box h2 {
+            font-family: var(--font-serif);
+            font-size: 2.2rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .highlight-box p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* ================= WEEKLY CONTENT SECTION ================= */
+        .weekly-section {
+            padding: 120px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-top: 50px;
+        }
+
+        .content-item {
+            padding: 30px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .content-item.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .content-item:hover {
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+            transform: translateY(-4px);
+        }
+
+        .content-item h4 {
+            font-family: var(--font-serif);
+            font-size: 1.2rem;
+            font-weight: 400;
+            margin-bottom: 12px;
+        }
+
+        .content-item p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* ================= CTA SECTION ================= */
+        .cta-section {
+            padding: 120px 0;
+            text-align: center;
+        }
+
+        .cta-section h2 {
+            font-family: var(--font-serif);
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 30px;
+            line-height: 1.1;
+        }
+
+        .cta-section p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 16px 40px;
+            border: 1px solid var(--text);
+            text-decoration: none;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .btn:hover {
+            background: var(--text);
+            color: var(--bg);
+            transform: translateY(-2px);
+        }
+
+        /* ================= FOOTER ================= */
+        footer {
+            padding: 60px 0;
+            border-top: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* ================= RESPONSIVO ================= */
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 2.5rem; }
+            .section-title { font-size: 1.8rem; }
+            .step { grid-template-columns: 1fr; }
+            .step-number { font-size: 2.5rem; }
+            .content-grid { grid-template-columns: 1fr; }
+            .cta-section h2 { font-size: 2rem; }
+            .container { padding: 0 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="/" class="logo">OBY_</a>
+            <nav style="display: flex; gap: 30px; align-items: center;">
+                <a href="membros.html" class="btn" style="border: 1px solid var(--text); padding: 12px 24px; font-size: 0.75rem;">Torne-se membro</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <!-- HERO -->
+        <section class="hero">
+            <div class="container">
+                <span class="label">Guia de Experiência</span>
+                <h1>Como Funciona a OBY</h1>
+                <p>Descubra a jornada completa desde o primeiro acesso até a experiência contínua de crescimento editorial.</p>
+            </div>
+        </section>
+
+        <!-- JOURNEY STEPS -->
+        <section class="journey">
+            <div class="container">
+                <h2 class="section-title">Sua Jornada na OBY</h2>
+                
+                <div class="steps">
+                    <!-- Step 1 -->
+                    <div class="step reveal">
+                        <div class="step-number">01</div>
+                        <div class="step-content">
+                            <h3>Confirmação da Assinatura</h3>
+                            <p>Após confirmar seu plano, o acesso é ativado automaticamente. Você não precisa esperar — sua experiência começa imediatamente.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="step reveal">
+                        <div class="step-number">02</div>
+                        <div class="step-content">
+                            <h3>E-mail de Ativação</h3>
+                            <p>Você receberá um e-mail contendo as instruções de acesso à biblioteca digital da OBY. Nele, encontrará um link único para sua conta.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="step reveal">
+                        <div class="step-number">03</div>
+                        <div class="step-content">
+                            <h3>Mensagem de Boas-vindas</h3>
+                            <p>No primeiro acesso, você receberá uma mensagem de boas-vindas apresentando a proposta da plataforma, seu funcionamento e como aproveitar ao máximo sua experiência.</p>
+                        </div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="step reveal">
+                        <div class="step-number">04</div>
+                        <div class="step-content">
+                            <h3>Acesso Dinâmico e Contínuo</h3>
+                            <p>O link de acesso à biblioteca é atualizado semanalmente como parte da infraestrutura dinâmica da OBY. Isso garante organização contínua do acervo e distribuição dos conteúdos ativos da edição vigente.</p>
+                            <p style="margin-top: 15px; font-style: italic; color: var(--text);"><strong>Importante:</strong> Todos os seus livros, registros, favoritos e conteúdos associados à conta permanecem vinculados ao seu perfil, mesmo com as atualizações periódicas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- HIGHLIGHT -->
+        <section class="highlight-section">
+            <div class="container">
+                <div class="highlight-box reveal">
+                    <h2>Um Acervo Editorial em Expansão Permanente</h2>
+                    <p>A OBY funciona como um universo vivo, onde cada semana adiciona novos registros à sua experiência. Você não apenas consome conteúdo — você acompanha uma evolução contínua.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- WEEKLY CONTENT -->
+        <section class="weekly-section">
+            <div class="container">
+                <h2 class="section-title">O Que Você Recebe Semanalmente</h2>
+                
+                <div class="content-grid">
+                    <div class="content-item reveal">
+                        <h4>📚 Novos Livros e Conteúdos</h4>
+                        <p>Acesso a novos livros ou conteúdos exclusivos adicionados à biblioteca, expandindo continuamente seu acervo.</p>
+                    </div>
+
+                    <div class="content-item reveal">
+                        <h4>✍️ Notas do Autor</h4>
+                        <p>Notas exclusivas do autor e bastidores editoriais, oferecendo perspectivas únicas sobre o processo criativo.</p>
+                    </div>
+
+                    <div class="content-item reveal">
+                        <h4>🎁 Arquivos Especiais</h4>
+                        <p>Arquivos especiais e brindes digitais exclusivos para membros, enriquecendo sua experiência.</p>
+                    </div>
+
+                    <div class="content-item reveal">
+                        <h4>📡 Atualizações e Transmissões</h4>
+                        <p>Atualizações do acervo e transmissões da semana, mantendo você sempre conectado ao universo OBY.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA -->
+        <section class="cta-section">
+            <div class="container reveal">
+                <h2>Pronto para Começar?</h2>
+                <p>Escolha seu plano e inicie sua jornada no universo editorial da OBY hoje mesmo.</p>
+                <a href="membros.html" class="btn">Ver Planos de Assinatura</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            OBY_EDITOR — © 2026 — TODOS OS DIREITOS RESERVADOS
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const reveals = document.querySelectorAll('.reveal, .step, .content-item');
+            
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('active');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            reveals.forEach(el => observer.observe(el));
+        });
+    </script>
+</body>
+</html>
