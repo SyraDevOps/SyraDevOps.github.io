@@ -151,8 +151,9 @@ body {
 /* ── CENTRO ───────────────────────────────────────────── */
 .center-container {
     flex:1; display:flex; flex-direction:column;
-    align-items:center; justify-content:center;
+    align-items:center; justify-content:flex-start;
     gap:32px; width:100%; position:relative;
+    padding-top: 60px;
 }
 
 /* Wrapper das esferas */
@@ -230,34 +231,27 @@ body {
 
 /* ── RESPOSTA ────────────────────────────────────────────── */
 .response-area {
-    width:100%; max-width:540px; text-align:center;
-    opacity:0; transform:translateY(14px);
-    transition: opacity .5s ease, transform .5s ease, margin-top .5s ease;
+    width:100%; max-width:540px;
+    opacity:0; transform:translateY(-20px);
+    transition: opacity .5s ease, transform .5s ease;
     pointer-events:none; display:none;
     position: relative;
-    margin-top: 0;
+    order: 3;
 }
 .response-area.visible {
     display:block; opacity:1; transform:translateY(0); pointer-events:auto;
 }
 
-.response-area.thinking {
-    margin-top: 40px;
-}
-
-.response-area.thinking.no-dots {
-    margin-top: 0;
-}
-
 /* Esferas verticais ao lado durante pensamento */
 .thinking-dots-vertical {
     position: absolute;
-    right: -70px;
-    top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: -60px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
+    align-items: center;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease;
@@ -269,55 +263,49 @@ body {
 }
 
 .thinking-dots-vertical .dot {
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
     left: 0 !important;
     top: 0 !important;
     margin: 0 !important;
     animation: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .thinking-dots-vertical .dot:nth-child(1) { 
     background: #1B5E20; 
-    animation: slideUp 0.6s ease-in-out infinite;
+    animation: floatUp 1.2s ease-in-out infinite;
 }
 .thinking-dots-vertical .dot:nth-child(2) { 
     background: #2E7D32; 
-    animation: slideUp 0.6s ease-in-out infinite 0.1s;
+    animation: floatUp 1.2s ease-in-out infinite 0.15s;
 }
 .thinking-dots-vertical .dot:nth-child(3) { 
     background: #4CAF50; 
-    animation: slideUp 0.6s ease-in-out infinite 0.2s;
+    animation: floatUp 1.2s ease-in-out infinite 0.3s;
 }
 .thinking-dots-vertical .dot:nth-child(4) { 
     background: #81C784; 
-    animation: slideUp 0.6s ease-in-out infinite 0.3s;
+    animation: floatUp 1.2s ease-in-out infinite 0.45s;
 }
 
-@keyframes slideUp {
-    0% { 
-        transform: translateY(0) scale(1);
-        opacity: 0.6;
+@keyframes floatUp {
+    0%, 100% { 
+        transform: translateY(0);
+        opacity: 0.7;
     }
     50% { 
-        transform: translateY(-20px) scale(1.2);
+        transform: translateY(-15px);
         opacity: 1;
-    }
-    100% { 
-        transform: translateY(0) scale(1);
-        opacity: 0.6;
     }
 }
 
 @media (max-width: 768px) {
     .thinking-dots-vertical {
-        right: auto;
         bottom: -50px;
-        top: auto;
-        transform: translateY(0);
         flex-direction: row;
-        gap: 8px;
+        gap: 10px;
     }
 }
 .response-bubble {
@@ -1229,11 +1217,12 @@ function showResponseText(text) {
         // Cancelar qualquer timer anterior
         clearTimeout(window.__yraIdleTimer);
         
-        // Bolinhas desaparecem após 4 segundos, deixando só a mensagem
+        // Bolinhas desaparecem após 5 segundos, deixando só a mensagem visível
+        // A mensagem só some quando: enviar nova msg, clicar nas bolinhas, ou ativar modo voz
         window.__yraIdleTimer = setTimeout(() => {
             thinkingDots.classList.remove("visible");
             responseArea.classList.remove("thinking");
-        }, 4000);
+        }, 5000);
     }
 }
 
