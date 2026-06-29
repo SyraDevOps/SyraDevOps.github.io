@@ -24,58 +24,129 @@ body {
     color: var(--text-dark);
     height: 100vh;
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 30px;
     overflow: hidden;
     position: relative;
 }
 
+.main-wrapper {
+    margin-left: 260px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 30px;
+    height: 100vh;
+    overflow: hidden;
+    transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 900px) {
+    .main-wrapper {
+        margin-left: 70px;
+    }
+}
+
 /* ── SIDEBAR ─────────────────────────────────────────── */
-.menu-btn {
-    position:absolute; top:30px; left:30px;
-    width:30px; height:20px;
-    display:flex; flex-direction:column; justify-content:space-between;
-    cursor:pointer; z-index:1000;
-}
-.menu-btn span {
-    display:block; width:100%; height:2px;
-    background:var(--text-dark); border-radius:2px;
-    transition: all .3s cubic-bezier(.4,0,.2,1);
-}
-.menu-btn.open span:nth-child(1){ transform:translateY(9px) rotate(45deg);  background:var(--primary); }
-.menu-btn.open span:nth-child(2){ opacity:0; transform:translateX(-10px); }
-.menu-btn.open span:nth-child(3){ transform:translateY(-9px) rotate(-45deg); background:var(--primary); }
+--sidebar-width: 260px;
 
 .sidebar {
-    position:fixed; top:0; left:-280px; width:280px; height:100%;
-    background:var(--white); z-index:999;
-    display:flex; flex-direction:column; justify-content:space-between;
-    padding:80px 30px 40px; box-shadow:10px 0 30px rgba(0,0,0,.02);
-    border-right:1px solid rgba(46,125,50,.05);
-    transition: left .4s cubic-bezier(.4,0,.2,1);
+    width: var(--sidebar-width);
+    background: var(--white);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
 }
-.sidebar.open { left:0; }
-.sidebar-top { display:flex; flex-direction:column; gap:35px; }
-.user-profile { border-bottom:1px solid var(--border); padding-bottom:20px; }
-.user-profile .label { font-size:11px; text-transform:uppercase; letter-spacing:1px; color:var(--text-light); }
-.user-profile .name  { font-size:16px; font-weight:600; color:var(--text-dark); margin-top:5px; word-break:break-all; }
-.nav-links { list-style:none; display:flex; flex-direction:column; gap:20px; }
-.nav-links a {
-    color:var(--text-dark); text-decoration:none; font-size:15px; font-weight:500;
-    display:flex; align-items:center; gap:12px; transition:color .2s;
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-left: 10px;
 }
-.nav-links a:hover { color:var(--primary); }
-.sidebar-footer { font-size:11px; color:var(--text-light); letter-spacing:.5px; }
-.sidebar-footer a { color:var(--text-light); text-decoration:none; font-weight:600; transition:color .2s; }
-.sidebar-footer a:hover { color:var(--primary); }
-.overlay {
-    position:fixed; top:0; left:0; width:100vw; height:100vh;
-    background:rgba(0,0,0,.05); backdrop-filter:blur(2px); z-index:998;
-    opacity:0; visibility:hidden; transition:all .3s;
+
+.scene-sidebar {
+    position: relative;
+    width: 40px;
+    height: 40px;
 }
-.overlay.visible { opacity:1; visibility:visible; }
+
+.dot-sidebar {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    margin-left: -4px;
+    margin-top: -4px;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dot-sidebar:nth-child(1) { background: #1B5E20; }
+.dot-sidebar:nth-child(2) { background: #2E7D32; }
+.dot-sidebar:nth-child(3) { background: #4CAF50; }
+.dot-sidebar:nth-child(4) { background: #81C784; }
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1B5E20;
+    letter-spacing: 0.5px;
+}
+
+.menu-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.menu-item a:hover, .menu-item.active a {
+    background: var(--primary-ultra);
+    color: var(--primary);
+}
+
+.menu-item a svg {
+    stroke: currentColor;
+    fill: none;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+@media (max-width: 900px) {
+    .sidebar {
+        width: 70px;
+        padding: 20px 10px;
+    }
+    .brand-name, .menu-item span {
+        display: none;
+    }
+    .brand {
+        justify-content: center;
+    }
+}
 
 /* ── CENTRO ───────────────────────────────────────────── */
 .center-container {
@@ -340,38 +411,54 @@ body {
 </head>
 <body>
 
-<!-- Hamburguer -->
-<div class="menu-btn" id="menuBtn"><span></span><span></span><span></span></div>
-<div class="overlay" id="overlay"></div>
-
-<!-- Sidebar -->
-<aside class="sidebar" id="sidebar">
-    <div class="sidebar-top">
-        <div class="user-profile">
-            <span class="label">Assistente ativo para</span>
-            <div class="name" id="userNameDisplay">Carregando...</div>
+<!-- Sidebar Fixa -->
+<div class="sidebar">
+    <div class="brand">
+        <div class="scene-sidebar" id="sceneSidebar">
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
         </div>
-        <nav>
-            <ul class="nav-links">
-                <li><a href="notes.html">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
-                    Notes</a></li>
-                <li><a href="memory.html">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-                    Memory</a></li>
-                <li><a href="plugins.html">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
-                    Plugins</a></li>
-                <li><a href="settings.html">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
-                    Configurações</a></li>
-            </ul>
-        </nav>
+        <span class="brand-name">YRA Assistant</span>
     </div>
-    <div class="sidebar-footer">
-        Powered by <a href="https://github.com/Syradevops" target="_blank">@Syradevops</a>
-    </div>
-</aside>
+
+    <ul class="menu-list">
+        <li class="menu-item active">
+            <a href="center.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Chat</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="plugins.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>Plugins</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="notes.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Notas</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="memory.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                <span>Memória</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="config.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Configurações</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Conteúdo Principal -->
+<div class="main-wrapper">
 
 <!-- ÁREA CENTRAL -->
 <main class="center-container" id="centerContainer">
@@ -425,6 +512,8 @@ body {
     </button>
 </footer>
 
+</div><!-- fim .main-wrapper -->
+
 <!-- FIREBASE -->
 <script type="module">
 import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
@@ -448,19 +537,8 @@ const db   = getFirestore(app);
 window.__yraFirestore = db;
 window.__yraAuth      = auth;
 
-const userNameDisplay = document.getElementById("userNameDisplay");
-
 onAuthStateChanged(auth, async (user) => {
     if (user) {
-        try {
-            const snap = await getDoc(doc(db, "Users", user.uid));
-            userNameDisplay.innerText =
-                (snap.exists() && snap.data().username)
-                ? snap.data().username
-                : (user.displayName || user.email);
-        } catch(e) {
-            userNameDisplay.innerText = user.displayName || user.email;
-        }
         try {
             const q = query(
                 collection(db, "Keys"),
@@ -480,18 +558,35 @@ onAuthStateChanged(auth, async (user) => {
 
 <script>
 /* ================================================================
-   SIDEBAR
+   ANIMAÇÃO DO LOGO LATERAL (BOLINHAS)
 ================================================================ */
-const menuBtn = document.getElementById("menuBtn");
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const toggleMenu = () => {
-    menuBtn.classList.toggle("open");
-    sidebar.classList.toggle("open");
-    overlay.classList.toggle("visible");
-};
-menuBtn.onclick = toggleMenu;
-overlay.onclick = toggleMenu;
+const sidebarDots = document.querySelectorAll(".dot-sidebar");
+const sidebarPositions = [
+    {x: 0, y: -10},
+    {x: 10, y: 0},
+    {x: 0, y: 10},
+    {x: -10, y: 0}
+];
+
+function shuffleSidebarArray(arr) {
+    let a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function startSidebarAnimation() {
+    setInterval(() => {
+        const p = shuffleSidebarArray(sidebarPositions);
+        sidebarDots.forEach((dot, i) => {
+            dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
+        });
+    }, 1000);
+}
+
+startSidebarAnimation();
 
 /* ================================================================
    PLACEHOLDERS
