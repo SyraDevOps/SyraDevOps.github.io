@@ -232,23 +232,32 @@ body {
 .response-area {
     width:100%; max-width:540px; text-align:center;
     opacity:0; transform:translateY(14px);
-    transition: opacity .5s ease, transform .5s ease;
+    transition: opacity .5s ease, transform .5s ease, margin-top .5s ease;
     pointer-events:none; display:none;
     position: relative;
+    margin-top: 0;
 }
 .response-area.visible {
     display:block; opacity:1; transform:translateY(0); pointer-events:auto;
 }
 
+.response-area.thinking {
+    margin-top: 40px;
+}
+
+.response-area.thinking.no-dots {
+    margin-top: 0;
+}
+
 /* Esferas verticais ao lado durante pensamento */
 .thinking-dots-vertical {
     position: absolute;
-    right: -80px;
+    right: -70px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s ease;
@@ -260,8 +269,8 @@ body {
 }
 
 .thinking-dots-vertical .dot {
-    width: 12px;
-    height: 12px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     left: 0 !important;
     top: 0 !important;
@@ -269,19 +278,35 @@ body {
     animation: none;
 }
 
-.thinking-dots-vertical .dot:nth-child(1) { background: #1B5E20; animation: thinkPulse 1.2s ease-in-out infinite; }
-.thinking-dots-vertical .dot:nth-child(2) { background: #2E7D32; animation: thinkPulse 1.2s ease-in-out infinite 0.2s; }
-.thinking-dots-vertical .dot:nth-child(3) { background: #4CAF50; animation: thinkPulse 1.2s ease-in-out infinite 0.4s; }
-.thinking-dots-vertical .dot:nth-child(4) { background: #81C784; animation: thinkPulse 1.2s ease-in-out infinite 0.6s; }
+.thinking-dots-vertical .dot:nth-child(1) { 
+    background: #1B5E20; 
+    animation: slideUp 0.6s ease-in-out infinite;
+}
+.thinking-dots-vertical .dot:nth-child(2) { 
+    background: #2E7D32; 
+    animation: slideUp 0.6s ease-in-out infinite 0.1s;
+}
+.thinking-dots-vertical .dot:nth-child(3) { 
+    background: #4CAF50; 
+    animation: slideUp 0.6s ease-in-out infinite 0.2s;
+}
+.thinking-dots-vertical .dot:nth-child(4) { 
+    background: #81C784; 
+    animation: slideUp 0.6s ease-in-out infinite 0.3s;
+}
 
-@keyframes thinkPulse {
-    0%, 100% { 
-        transform: scale(0.8); 
-        opacity: 0.5;
+@keyframes slideUp {
+    0% { 
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
     }
     50% { 
-        transform: scale(1.3); 
+        transform: translateY(-20px) scale(1.2);
         opacity: 1;
+    }
+    100% { 
+        transform: translateY(0) scale(1);
+        opacity: 0.6;
     }
 }
 
@@ -290,8 +315,9 @@ body {
         right: auto;
         bottom: -50px;
         top: auto;
+        transform: translateY(0);
         flex-direction: row;
-        gap: 6px;
+        gap: 8px;
     }
 }
 .response-bubble {
@@ -299,10 +325,29 @@ body {
     border-radius:20px; padding:20px 26px;
     font-size:15px; line-height:1.65; color:var(--text-dark);
     box-shadow:0 4px 24px rgba(46,125,50,.06);
-    text-align:left; max-height:260px; overflow-y:auto;
+    text-align:left; max-height:320px; overflow-y:auto;
+    cursor: pointer;
 }
-.response-bubble::-webkit-scrollbar { width:4px; }
-.response-bubble::-webkit-scrollbar-thumb { background:var(--primary-ultra); border-radius:2px; }
+.response-bubble::-webkit-scrollbar { width:6px; }
+.response-bubble::-webkit-scrollbar-track { background:transparent; }
+.response-bubble::-webkit-scrollbar-thumb { background:var(--primary-light); border-radius:3px; }
+.response-bubble::-webkit-scrollbar-thumb:hover { background:var(--primary); }
+
+/* Markdown styles */
+.response-bubble h1 { font-size:18px; font-weight:600; margin:12px 0 8px; color:var(--primary-color); }
+.response-bubble h2 { font-size:16px; font-weight:600; margin:10px 0 6px; color:var(--primary-color); }
+.response-bubble h3 { font-size:14px; font-weight:600; margin:8px 0 4px; color:var(--primary-color); }
+.response-bubble p { margin:8px 0; }
+.response-bubble ul, .response-bubble ol { margin:8px 0; padding-left:20px; }
+.response-bubble li { margin:4px 0; }
+.response-bubble code { background:rgba(46,125,50,0.1); padding:2px 6px; border-radius:4px; font-family:'Courier New', monospace; font-size:13px; color:#1B5E20; }
+.response-bubble pre { background:rgba(46,125,50,0.08); padding:12px; border-radius:8px; overflow-x:auto; margin:8px 0; border-left:3px solid var(--primary-color); }
+.response-bubble pre code { background:none; padding:0; color:inherit; }
+.response-bubble blockquote { border-left:3px solid var(--primary-light); padding-left:12px; margin:8px 0; color:var(--text-light); font-style:italic; }
+.response-bubble strong { font-weight:600; color:var(--text-dark); }
+.response-bubble em { font-style:italic; }
+.response-bubble a { color:var(--primary-color); text-decoration:none; border-bottom:1px solid var(--primary-light); }
+.response-bubble a:hover { border-bottom:1px solid var(--primary-color); }
 
 .typing-dots { display:inline-flex; gap:5px; align-items:center; }
 .typing-dots span {
@@ -617,6 +662,8 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
 /* ================================================================
@@ -1135,8 +1182,20 @@ async function submitMessage(text) {
 }
 
 function showResponseText(text) {
-    responseBubble.textContent = text;
-    responseArea.classList.add("visible");
+    // Converter markdown para HTML
+    let html;
+    try {
+        if (typeof marked !== 'undefined') {
+            html = marked.parse(text);
+        } else {
+            html = text.replace(/\n/g, '<br>');
+        }
+    } catch(e) {
+        html = text.replace(/\n/g, '<br>');
+    }
+    
+    responseBubble.innerHTML = html;
+    responseArea.classList.add("visible", "thinking");
     setState("responding");
 
     const thinkingDots = document.getElementById("thinkingDotsVertical");
@@ -1144,6 +1203,7 @@ function showResponseText(text) {
     if (voiceModeActive) {
         // Esferas somem, círculo volta com modo resposta
         thinkingDots.classList.remove("visible");
+        responseArea.classList.remove("thinking");
         sceneWrapper.classList.add("hidden");
 
         setTimeout(() => {
@@ -1160,15 +1220,33 @@ function showResponseText(text) {
             }
         }, 300);
     } else {
-        // Modo texto — thinking dots ficam visíveis pulsando por 3 segundos
-        // Depois desaparecem e volta ao idle
+        // Modo texto — bolinhas ficam visíveis pulsando
+        // A resposta fica visível até:
+        // 1. Enviar outra mensagem
+        // 2. Clicar nas bolinhas
+        // 3. Ativar modo voz
         
+        // Cancelar qualquer timer anterior
         clearTimeout(window.__yraIdleTimer);
+        
+        // Bolinhas desaparecem após 4 segundos, deixando só a mensagem
         window.__yraIdleTimer = setTimeout(() => {
             thinkingDots.classList.remove("visible");
-            setTimeout(resetToIdle, 500);
-        }, 3000);
+            responseArea.classList.remove("thinking");
+        }, 4000);
     }
+}
+
+// Fazer bolinhas serem clicáveis para fechar resposta
+function setupThinkingDotsClick() {
+    const thinkingDots = document.getElementById("thinkingDotsVertical");
+    if (!thinkingDots) return;
+    
+    thinkingDots.style.cursor = "pointer";
+    thinkingDots.onclick = (e) => {
+        e.stopPropagation();
+        resetToIdle();
+    };
 }
 
 function leaveRespondingMode() {
@@ -1189,8 +1267,13 @@ function leaveRespondingMode() {
 }
 
 function clearResponse() {
-    responseArea.classList.remove("visible");
-    document.getElementById("thinkingDotsVertical").classList.remove("visible");
+    if (responseArea) {
+        responseArea.classList.remove("visible", "thinking");
+    }
+    const thinkingDots = document.getElementById("thinkingDotsVertical");
+    if (thinkingDots) {
+        thinkingDots.classList.remove("visible");
+    }
     clearTimeout(window.__yraIdleTimer);
 }
 
@@ -1230,6 +1313,9 @@ function initMessageListeners() {
     responseArea.addEventListener("click", () => {
         if (!voiceModeActive) resetToIdle();
     });
+    
+    // Setup clicking on thinking dots to close response
+    setupThinkingDotsClick();
 }
 
 if (document.readyState === 'loading') {
