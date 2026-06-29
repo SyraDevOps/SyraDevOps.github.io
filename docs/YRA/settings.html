@@ -12,6 +12,7 @@
     --primary-light: #81C784;
     --primary-ultra: #E8F5E9;
     --primary-mid:   #4CAF50;
+    --primary-dark:  #1B5E20;
     --text-dark:     #2C3E50;
     --text-mid:      #4A5568;
     --text-light:    #7F8C8D;
@@ -67,9 +68,36 @@ html, body {
     text-decoration: none;
     color: var(--text-dark);
     transition: color .2s;
+    position: relative;
 }
 .sidebar-back:hover { color: var(--primary); }
 .sidebar-back:hover .back-icon { background: var(--primary-ultra); color: var(--primary); }
+
+/* ── BOLINHAS ANIMADAS NO SIDEBAR ───────────────────────── */
+.sidebar-dots {
+    position: relative;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+}
+
+.dot-sidebar {
+    position: absolute;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    margin-left: -3.5px;
+    margin-top: -3.5px;
+    box-shadow: 0 2px 6px rgba(46,125,50,.12);
+    transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.dot-sidebar:nth-child(1) { background: #1B5E20; }
+.dot-sidebar:nth-child(2) { background: #2E7D32; }
+.dot-sidebar:nth-child(3) { background: #4CAF50; }
+.dot-sidebar:nth-child(4) { background: #81C784; }
 
 .back-icon {
     width: 30px; height: 30px; border-radius: 8px;
@@ -296,6 +324,8 @@ html, body {
 .card-icon.purple { background: #F3E5F5; }
 .card-icon.slate  { background: #ECEFF1; }
 .card-icon.indigo { background: #E8EAF6; }
+.card-icon.green  { background: #E8F5E9; }
+.card-icon.gold   { background: #FFF8E1; }
 
 .card-icon svg { position: relative; z-index: 1; }
 
@@ -349,6 +379,10 @@ html, body {
     width: 7px; height: 7px; border-radius: 50%;
     background: var(--primary-mid);
     box-shadow: 0 0 0 2px rgba(76,175,80,.2);
+}
+.status-dot.inactive {
+    background: #e0e0e0;
+    box-shadow: 0 0 0 2px rgba(0,0,0,.05);
 }
 
 /* ── API KEY CONTROLS ───────────────────────────────────── */
@@ -486,6 +520,12 @@ html, body {
     <!-- ── SIDEBAR ──────────────────────────────────────── -->
     <aside class="sidebar">
         <a href="center.html" class="sidebar-back">
+            <div class="sidebar-dots" id="sidebarDots">
+                <div class="dot-sidebar"></div>
+                <div class="dot-sidebar"></div>
+                <div class="dot-sidebar"></div>
+                <div class="dot-sidebar"></div>
+            </div>
             <div class="back-icon">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
                      stroke="currentColor" stroke-width="2.5"
@@ -668,7 +708,7 @@ html, body {
                 </div>
             </section>
 
-            <!-- Seção: Plano & uso -->
+            <!-- Seção: Plano & uso (NOVA: Planos e Meios de Pagamento) -->
             <section class="settings-section">
                 <div class="section-header">
                     <span class="section-eyebrow">Plano & uso</span>
@@ -694,6 +734,51 @@ html, body {
                         </div>
                     </div>
 
+                    <!-- NOVO: Planos -->
+                    <div class="card-row clickable" id="plansBtn">
+                        <div class="card-icon gold">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#F57F17" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Planos disponíveis</div>
+                            <div class="card-desc">Conheça todos os planos e benefícios do Yra</div>
+                        </div>
+                        <div class="card-right">
+                            <span class="value-pill" style="color:#F57F17; border-color:#F57F17;">Ver planos</span>
+                            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- NOVO: Meios de Pagamento -->
+                    <div class="card-row clickable" id="paymentMethodsBtn">
+                        <div class="card-icon green">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#2E7D32" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+                                <line x1="1" y1="10" x2="23" y2="10"/>
+                                <circle cx="6" cy="14" r="1.5" fill="currentColor"/>
+                                <path d="M18 14h4"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Meios de pagamento</div>
+                            <div class="card-desc">Gerencie cartões e formas de pagamento</div>
+                        </div>
+                        <div class="card-right">
+                            <span class="value-pill" id="paymentMethodStatus">Nenhum</span>
+                            <svg class="chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                        </div>
+                    </div>
+
                     <div class="card-row">
                         <div class="card-icon slate">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -709,16 +794,12 @@ html, body {
                         <div class="card-right">
                             <div class="api-key-wrapper">
                                 <div class="api-key-display" id="apiKeyDisplay">••••••••••••••••</div>
-                                
-                                <!-- Botão de Visualização (Olho) -->
                                 <button class="action-icon-btn" id="toggleApiKeyBtn" title="Visualizar chave">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                         <circle cx="12" cy="12" r="3"/>
                                     </svg>
                                 </button>
-                                
-                                <!-- Botão de Cópia -->
                                 <button class="action-icon-btn" id="copyApiKeyBtn" title="Copiar chave">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                         <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
@@ -835,7 +916,6 @@ html, body {
                         </div>
                     </div>
 
-                    <!-- NOVO: Documentação -->
                     <div class="card-row clickable" id="documentationBtn">
                         <div class="card-icon indigo">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -859,7 +939,6 @@ html, body {
                         </div>
                     </div>
 
-                    <!-- NOVO: Integrações -->
                     <div class="card-row clickable" id="integrationsBtn">
                         <div class="card-icon purple">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
@@ -997,6 +1076,14 @@ onAuthStateChanged(auth, async (user) => {
                 infoBirthDate.textContent = formatBirthDate(userData.birth_date) || "—";
                 infoMonthlyCost.textContent = formatCurrency(userData.monthly_cost);
                 infoRole.textContent      = userData.role ? userData.role.toUpperCase() : "USER";
+
+                // Atualiza status do método de pagamento se houver
+                const paymentStatus = document.getElementById("paymentMethodStatus");
+                if (userData.payment_method) {
+                    paymentStatus.textContent = userData.payment_method;
+                } else {
+                    paymentStatus.textContent = "Nenhum";
+                }
             } else {
                 // Caso o registro seja parcial no auth
                 profileName.textContent  = user.displayName || "Usuário";
@@ -1034,6 +1121,16 @@ document.getElementById("documentationBtn").addEventListener("click", () => {
 
 document.getElementById("integrationsBtn").addEventListener("click", () => {
     window.location.href = "integrations.html";
+});
+
+// Navegação para Planos
+document.getElementById("plansBtn").addEventListener("click", () => {
+    window.location.href = "prices.html";
+});
+
+// Navegação para Meios de Pagamento
+document.getElementById("paymentMethodsBtn").addEventListener("click", () => {
+    window.location.href = "payment-methods.html";
 });
 
 // Manipuladores de Visualização e Cópia da API Key
@@ -1127,6 +1224,27 @@ function formatBirthDate(rawDate) {
     }
     return rawDate;
 }
+</script>
+
+<script>
+// ── ANIMAÇÃO DAS BOLINHAS NO SIDEBAR ──────────────────────
+const sidebarDots = document.querySelectorAll('.dot-sidebar');
+let dotAngle = 0;
+
+function animateSidebarDots() {
+    const radius = 9;
+    sidebarDots.forEach((dot, i) => {
+        const angle = (i / sidebarDots.length) * Math.PI * 2 + dotAngle;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        dot.style.transform = `translate(${x}px, ${y}px)`;
+    });
+    dotAngle += 0.008;
+    requestAnimationFrame(animateSidebarDots);
+}
+
+// Inicia a animação quando a página carregar
+animateSidebarDots();
 </script>
 
 </body>
