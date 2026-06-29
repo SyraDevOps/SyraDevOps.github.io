@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yra Assistant - Dashboard</title>
+<style>
+:root {
+    --primary-color: #2E7D32;
+    --primary-light: #81C784;
+    --primary-ultra-light: #E8F5E9;
+    --text-dark: #2C3E50;
+    --text-light: #7F8C8D;
+    --bg-light: #F9FBF9;
+    --border-color: #E0E0E0;
+    --white: #ffffff;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+/* Container Principal */
+.container {
+    width: 100%;
+    max-width: 650px;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Header de Marca com as Bolinhas no Canto Superior Esquerdo */
+.brand-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 35px;
+}
+
+.scene-mini { 
+    position: relative;
+    width: 60px; 
+    height: 60px; 
+}
+
+.dot-mini { 
+    position: absolute; 
+    width: 12px; 
+    height: 12px; 
+    border-radius: 50%; 
+    left: 50%; 
+    top: 50%; 
+    margin-left: -6px; 
+    margin-top: -6px; 
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dot-mini:nth-child(1) { background: #1B5E20; }
+.dot-mini:nth-child(2) { background: #2E7D32; }
+.dot-mini:nth-child(3) { background: #4CAF50; }
+.dot-mini:nth-child(4) { background: #81C784; }
+
+.brand-text h1 {
+    font-size: 18px;
+    color: #1B5E20;
+    font-weight: 600;
+}
+
+.brand-text p {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+/* Área de Carregamento Inicial */
+.loading-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--primary-ultra-light);
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Formulário de Onboarding */
+.onboarding-title {
+    font-size: 22px;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+}
+
+.subtitle {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 30px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-dark);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    background: #FAFAFA;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+.input-group input:disabled {
+    background: #F0F2F0;
+    color: var(--text-light);
+    cursor: not-allowed;
+}
+
+/* Checkbox de Termos */
+.terms-group {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.terms-group input {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+    margin-top: 2px;
+}
+
+.terms-group label {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.4;
+}
+
+.terms-group a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.terms-group a:hover {
+    text-decoration: underline;
+}
+
+/* Botão de Envio */
+.btn-submit {
+    grid-column: 1 / -1;
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 14px;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    margin-top: 15px;
+}
+
+.btn-submit:hover {
+    background: #1B5E20;
+}
+
+#status {
+    margin-top: 15px;
+    font-size: 13px;
+    text-align: center;
+    color: #c0392b;
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- Header Fixo com Animação das Bolinhas -->
+    <div class="brand-header">
+        <div class="scene-mini" id="sceneMini">
+            <div class="dot-mini"></div>
+            <div class="dot-mini"></div>
+            <div class="dot-mini"></div>
+            <div class="dot-mini"></div>
+        </div>
+        <div class="brand-text">
+            <h1>Yra Assistant</h1>
+            <p>Verificando credenciais...</p>
+        </div>
+    </div>
+
+    <!-- Caixa de Carregamento Provisório -->
+    <div class="loading-box" id="loadingState">
+        <div class="spinner"></div>
+        <p style="font-size: 14px; color: var(--text-light);">Buscando informações do perfil no banco de dados...</p>
+    </div>
+
+    <!-- Formulário de Coleta de Dados (Oculto Inicialmente) -->
+    <div id="onboardingState" class="hidden">
+        <h2 class="onboarding-title">Atualize seu Perfil</h2>
+        <p class="subtitle">Identificamos que esta é sua primeira visita. Por favor, forneça as informações para continuar.</p>
+
+        <div class="form-grid">
+            <div class="input-group">
+                <label for="username">Nome de Usuário</label>
+                <input id="username" type="text" placeholder="Como deseja ser chamado?">
+            </div>
+
+            <div class="input-group">
+                <label for="email">E-mail</label>
+                <input id="email" type="email" disabled>
+            </div>
+
+            <div class="input-group">
+                <label for="phone">Telefone</label>
+                <input id="phone" type="tel" placeholder="(00) 00000-0000">
+            </div>
+
+            <div class="input-group">
+                <label for="birthDate">Data de Nascimento</label>
+                <input id="birthDate" type="date">
+            </div>
+
+            <div class="input-group" style="grid-column: 1 / -1;">
+                <label for="securityCode">Código de Segurança (6 dígitos)</label>
+                <input id="securityCode" type="password" maxlength="6" placeholder="Insira 6 números para sua segurança">
+            </div>
+
+            <div class="terms-group">
+                <input id="termsCheckbox" type="checkbox">
+                <label for="termsCheckbox">
+                    Li e concordo com os <a href="termos.html" target="_blank">Termos de Uso e Política de Privacidade</a> do ecossistema YRA.
+                </label>
+            </div>
+
+            <button class="btn-submit" id="submitBtn">Finalizar Configuração</button>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+</div>
+
+<script type="module">
+// Firebase SDKs
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+    authDomain: "yra-syra.firebaseapp.com",
+    projectId: "yra-syra",
+    storageBucket: "yra-syra.firebasestorage.app",
+    messagingSenderId: "555145505684",
+    appId: "1:555145505684:web:aa1ef14072653e41057d81"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Coleções (Padrão miu.py)
+const USERS = "Users";
+const KEYS = "Keys";
+const SYSTEM = "System";
+
+// Elementos
+const loadingState = document.getElementById("loadingState");
+const onboardingState = document.getElementById("onboardingState");
+const emailInput = document.getElementById("email");
+const usernameInput = document.getElementById("username");
+const phoneInput = document.getElementById("phone");
+const birthDateInput = document.getElementById("birthDate");
+const securityCodeInput = document.getElementById("securityCode");
+const termsCheckbox = document.getElementById("termsCheckbox");
+const submitBtn = document.getElementById("submitBtn");
+const statusDiv = document.getElementById("status");
+
+let currentUser = null;
+
+// Escuta estado do usuário
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        try {
+            // Verifica se o usuário já existe na coleção 'Users'
+            const userDocRef = doc(db, USERS, user.uid);
+            const userDocSnap = await getDoc(userDocRef);
+
+            if (userDocSnap.exists()) {
+                // Usuário já está na base de dados, encaminha diretamente para center.html
+                window.location.href = "center.html";
+            } else {
+                // Usuário não listado na db, exibe formulário de configuração
+                emailInput.value = user.email || "";
+                loadingState.classList.add("hidden");
+                onboardingState.classList.remove("hidden");
+            }
+        } catch (error) {
+            console.error("Erro ao verificar Firestore: ", error);
+            statusDiv.innerText = "Erro ao conectar com o serviço de dados. Tente novamente mais tarde.";
+        }
+    } else {
+        // Sem sessão ativa, retorna para index.html (página de login)
+        window.location.href = "index.html";
+    }
+});
+
+// Ação de Cadastro de dados no banco de dados
+submitBtn.onclick = async () => {
+    statusDiv.innerText = "";
+    
+    const username = usernameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const birthDate = birthDateInput.value;
+    const securityCode = securityCodeInput.value.trim();
+    
+    // Validações
+    if (!username || !phone || !birthDate || !securityCode) {
+        statusDiv.innerText = "Por favor, preencha todos os campos obrigatórios.";
+        return;
+    }
+
+    if (securityCode.length !== 6 || isNaN(securityCode)) {
+        statusDiv.innerText = "O código de segurança deve conter exatamente 6 dígitos numéricos.";
+        return;
+    }
+
+    if (!termsCheckbox.checked) {
+        statusDiv.innerText = "Você precisa aceitar os termos e condições para continuar.";
+        return;
+    }
+
+    if (!currentUser) return;
+
+    try {
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Salvando informações...";
+
+        const uid = currentUser.uid;
+
+        // 1. Criar Documento na coleção 'Users'
+        const userRef = doc(db, USERS, uid);
+        await setDoc(userRef, {
+            username: username,
+            email: currentUser.email || "",
+            phone: phone,
+            birth_date: birthDate,
+            security_code: securityCode,
+            monthly_cost: 0.0,
+            status: "active",
+            role: "user",
+            created_at: serverTimestamp(),
+            updated_at: serverTimestamp()
+        });
+
+        // 2. Criar Documento correspondente na coleção 'Keys'
+        const keyId = "key_" + uid;
+        const keyRef = doc(db, KEYS, keyId);
+        await setDoc(keyRef, {
+            user_id: uid,
+            key: "",
+            description: "Chave gerada automaticamente no cadastro",
+            enabled: true,
+            created_at: serverTimestamp(),
+            last_used: null
+        });
+
+        // 3. Criar Documento correspondente na coleção 'System'
+        const systemRef = doc(db, SYSTEM, uid);
+        await setDoc(systemRef, {
+            admin_rules: "",
+            memories: "",
+            notes: "",
+            updated_at: serverTimestamp()
+        });
+
+        // Redireciona com sucesso
+        window.location.href = "center.html";
+
+    } catch (error) {
+        console.error("Erro ao registrar estrutura de coleções: ", error);
+        statusDiv.innerText = "Erro ao processar o registro no banco de dados. Tente novamente.";
+        submitBtn.disabled = false;
+        submitBtn.innerText = "Finalizar Configuração";
+    }
+};
+</script>
+
+<script>
+// ============ ANIMAÇÃO DE MINI BOLINHAS (Topo Esquerdo) ============
+const miniDots = document.querySelectorAll(".dot-mini");
+const miniPositions = [
+    {x: 0, y: -15}, 
+    {x: 15, y: 0}, 
+    {x: 0, y: 15}, 
+    {x: -15, y: 0}
+];
+
+function shuffleArray(arr) {
+    let a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function startMiniAnimation() {
+    setInterval(() => {
+        const p = shuffleArray(miniPositions);
+        miniDots.forEach((dot, i) => {
+            dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
+        });
+    }, 900);
+}
+
+startMiniAnimation();
+</script>
+
+</body>
+</html>

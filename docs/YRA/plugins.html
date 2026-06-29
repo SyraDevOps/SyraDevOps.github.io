@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yra Assistant - Plugins</title>
+<style>
+:root {
+    --primary-color: #2E7D32;
+    --primary-light: #81C784;
+    --primary-ultra-light: #E8F5E9;
+    --text-dark: #2C3E50;
+    --text-light: #7F8C8D;
+    --bg-light: #F9FBF9;
+    --border-color: #EAEAEA;
+    --white: #ffffff;
+    --sidebar-width: 260px;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+}
+
+/* ==================== MENU LATERAL (SIDEBAR) ==================== */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--white);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-left: 10px;
+}
+
+/* Mini Bolinhas Animadas */
+.scene-sidebar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+.dot-sidebar {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    margin-left: -4px;
+    margin-top: -4px;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dot-sidebar:nth-child(1) { background: #1B5E20; }
+.dot-sidebar:nth-child(2) { background: #2E7D32; }
+.dot-sidebar:nth-child(3) { background: #4CAF50; }
+.dot-sidebar:nth-child(4) { background: #81C784; }
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1B5E20;
+    letter-spacing: 0.5px;
+}
+
+/* Itens do Menu */
+.menu-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.menu-item a:hover, .menu-item.active a {
+    background: var(--primary-ultra-light);
+    color: var(--primary-color);
+}
+
+.menu-item a svg {
+    stroke: currentColor;
+    fill: none;
+    width: 20px;
+    height: 20px;
+}
+
+/* ==================== ÁREA DE CONTEÚDO PRINCIPAL ==================== */
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 40px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Superior */
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+    gap: 20px;
+}
+
+/* Barra de Pesquisa */
+.search-container {
+    position: relative;
+    width: 100%;
+    max-width: 450px;
+}
+
+.search-input {
+    width: 100%;
+    padding: 12px 16px 12px 45px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--white);
+    outline: none;
+    font-size: 14px;
+    transition: all 0.2s ease;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.08);
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-light);
+    pointer-events: none;
+}
+
+/* Botão Chat no Topo */
+.btn-chat {
+    background: var(--primary-color);
+    color: var(--white);
+    padding: 10px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s ease;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
+}
+
+.btn-chat:hover {
+    background: #1B5E20;
+}
+
+/* Banner de Destaque (Card Especial) */
+.featured-card {
+    background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 100%);
+    border-radius: 16px;
+    padding: 35px;
+    color: var(--white);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(27, 94, 32, 0.15);
+}
+
+.featured-info {
+    max-width: 60%;
+}
+
+.featured-tag {
+    background: rgba(255, 255, 255, 0.18);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+
+.featured-title {
+    font-size: 26px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    line-height: 1.2;
+}
+
+.featured-desc {
+    font-size: 14px;
+    opacity: 0.9;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+.btn-featured {
+    background: var(--white);
+    color: var(--primary-color);
+    border: none;
+    padding: 11px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s ease;
+}
+
+.btn-featured:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.featured-graphic {
+    font-size: 90px;
+    opacity: 0.15;
+    position: absolute;
+    right: 40px;
+    bottom: -10px;
+    user-select: none;
+}
+
+/* Catálogo e Grid de Cards */
+.catalog-section h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 20px;
+}
+
+.plugins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+/* Card Individual de Plugin */
+.plugin-card {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+}
+
+.plugin-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.04);
+    border-color: var(--primary-light);
+}
+
+.plugin-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.plugin-icon-box {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: var(--primary-ultra-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    font-size: 20px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.plugin-meta {
+    overflow: hidden;
+}
+
+.plugin-category {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--primary-color);
+    margin-bottom: 3px;
+    letter-spacing: 0.5px;
+}
+
+.plugin-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-dark);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.plugin-body {
+    font-size: 13px;
+    color: var(--text-light);
+    line-height: 1.4;
+    margin-bottom: 20px;
+    height: 56px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.plugin-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid var(--border-color);
+    padding-top: 15px;
+}
+
+.plugin-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #F39C12;
+}
+
+.plugin-status-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.plugin-status-badge.active {
+    background: var(--primary-ultra-light);
+    color: var(--primary-color);
+}
+
+.plugin-status-badge.inactive {
+    background: #F5F5F5;
+    color: var(--text-light);
+}
+
+/* ==================== MODAL DE DETALHES ==================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.modal-box {
+    background: var(--white);
+    width: 90%;
+    max-width: 550px;
+    border-radius: 20px;
+    padding: 35px;
+    position: relative;
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+}
+
+.modal-overlay.open .modal-box {
+    transform: translateY(0);
+}
+
+.modal-close-btn {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+    color: var(--text-dark);
+}
+
+.modal-header {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-bottom: 25px;
+}
+
+.modal-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    background: var(--primary-ultra-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: var(--primary-color);
+}
+
+.modal-title-desc h3 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.modal-title-desc p {
+    font-size: 12px;
+    color: var(--primary-color);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-top: 2px;
+}
+
+.modal-details {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.6;
+    margin-bottom: 30px;
+}
+
+.modal-action-row {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-secondary {
+    background: #F5F5F5;
+    border: none;
+    color: var(--text-dark);
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s ease;
+}
+
+.btn-secondary:hover {
+    background: #EAEAEA;
+}
+
+.btn-action {
+    background: var(--primary-color);
+    border: none;
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s ease;
+}
+
+.btn-action:hover {
+    background: #1B5E20;
+}
+
+/* Responsividade Geral */
+@media (max-width: 900px) {
+    .sidebar {
+        width: 70px;
+        padding: 20px 10px;
+    }
+    .brand-name, .menu-item span {
+        display: none;
+    }
+    .brand {
+        justify-content: center;
+        padding-left: 0;
+    }
+    .main-content {
+        margin-left: 70px;
+        padding: 20px;
+    }
+    .featured-info {
+        max-width: 100%;
+    }
+    .featured-graphic {
+        display: none;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar Menu Lateral -->
+<div class="sidebar">
+    <div class="brand">
+        <div class="scene-sidebar" id="sceneSidebar">
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+        </div>
+        <span class="brand-name">YRA Assistant</span>
+    </div>
+
+    <ul class="menu-list">
+        <li class="menu-item">
+            <a href="center.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Chat</span>
+            </a>
+        </li>
+        <li class="menu-item active">
+            <a href="plugins.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>Plugins</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="config.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Configurações</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Área Principal -->
+<div class="main-content">
+    
+    <!-- Top Header -->
+    <div class="top-header">
+        <div class="search-container">
+            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="Buscar extensões ou integrações...">
+        </div>
+        <a href="center.html" class="btn-chat">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Ir para o Chat
+        </a>
+    </div>
+
+    <!-- Banner Principal (Card Especial) -->
+    <div class="featured-card">
+        <div class="featured-info">
+            <span class="featured-tag">Destaque</span>
+            <h1 class="featured-title">Automação de WhatsApp</h1>
+            <p class="featured-desc">Conecte o cérebro da Yra diretamente ao seu número comercial. Envie relatórios, responda clientes e gerencie fluxos de trabalho automaticamente.</p>
+            <button class="btn-featured" onclick="openFeaturedDetails()">Ver Detalhes</button>
+        </div>
+        <div class="featured-graphic">💬</div>
+    </div>
+
+    <!-- Catálogo de Plugins -->
+    <div class="catalog-section">
+        <h2>Coleções de Integrações</h2>
+        <div class="plugins-grid" id="pluginsGrid">
+            <!-- Os cards serão criados de forma dinâmica via script para permitir filtragem -->
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal Detalhes do Plugin -->
+<div class="modal-overlay" id="pluginModal">
+    <div class="modal-box">
+        <button class="modal-close-btn" id="closeModalBtn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+        <div class="modal-header">
+            <div class="modal-icon" id="modalIcon"></div>
+            <div class="modal-title-desc">
+                <h3 id="modalTitle">Nome do Plugin</h3>
+                <p id="modalCategory">Categoria</p>
+            </div>
+        </div>
+        <div class="modal-details" id="modalDescription">
+            Descrição detalhada do plugin...
+        </div>
+        <div class="modal-action-row">
+            <button class="btn-secondary" id="closeModalActionBtn">Fechar</button>
+            <button class="btn-action" id="modalPrimaryAction">Ativar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============ LISTA DE PLUGINS (SIMULADOR DE DATABASE) ============
+const pluginsData = [
+    {
+        id: "whatsapp",
+        name: "WhatsApp Automator",
+        category: "Comunicação",
+        icon: "💬",
+        shortDesc: "Responda clientes de forma automatizada com a lógica avançada do Yra.",
+        fullDesc: "O WhatsApp Automator permite a você conectar a inteligência da YRA à sua conta comercial ou pessoal do WhatsApp. Responda perguntas frequentes, execute fluxos inteligentes de conversação e envie atualizações agendadas para seus clientes com total elegância.",
+        rating: "4.9",
+        active: true
+    },
+    {
+        id: "gcal",
+        name: "Google Calendar Sync",
+        category: "Produtividade",
+        icon: "📅",
+        shortDesc: "Agende reuniões e compromissos diretamente pela conversa com a IA.",
+        fullDesc: "Sincronize a YRA com sua agenda do Google. Com este plugin, o assistente pode consultar seus horários livres, agendar compromissos, enviar lembretes personalizados e reagendar compromissos diretamente a partir das suas solicitações verbais ou textuais.",
+        rating: "4.8",
+        active: false
+    },
+    {
+        id: "finance",
+        name: "Finance Tracker",
+        category: "Finanças",
+        icon: "📈",
+        shortDesc: "Controle de despesas e relatórios analíticos de faturamento.",
+        fullDesc: "Mantenha o controle da sua vida financeira. O Finance Tracker ajuda a monitorar despesas operacionais ou pessoais, faturamentos, custos mensais fixos e gera lindos relatórios visuais sob demanda, tudo interpretado pela inteligência analítica do sistema.",
+        rating: "4.7",
+        active: false
+    },
+    {
+        id: "websearch",
+        name: "Web Browser Engine",
+        category: "Utilitário",
+        icon: "🌐",
+        shortDesc: "Permita que a Yra pesquise na web em tempo real por novas atualizações.",
+        fullDesc: "Adicione recursos de pesquisa em tempo real à sua Inteligência Artificial. Com a pesquisa na web integrada, seu assistente é capaz de extrair as notícias mais recentes do mercado, cotações de ações e soluções atualizadas diretamente do buscador.",
+        rating: "4.9",
+        active: true
+    },
+    {
+        id: "notion",
+        name: "Notion Sync Pro",
+        category: "Organização",
+        icon: "📝",
+        shortDesc: "Organize notas e tarefas em seus quadros e tabelas do Notion.",
+        fullDesc: "Conecte seus bancos de dados e documentos do Notion diretamente ao ecossistema YRA. Crie novas páginas, adicione tarefas ao seu quadro Kanban pessoal e recupere informações de anotações passadas em poucos segundos.",
+        rating: "4.6",
+        active: false
+    },
+    {
+        id: "email",
+        name: "Email Automator",
+        category: "Comunicação",
+        icon: "✉️",
+        shortDesc: "Esboce respostas de e-mails importantes de forma semântica.",
+        fullDesc: "O Email Automator conecta-se com suas caixas de entrada Outlook ou Gmail. A IA ajuda a resumir newsletters, filtrar prioridades e redigir rascunhos de e-mails profissionais com perfeição estrutural, economizando horas do seu dia.",
+        rating: "4.5",
+        active: false
+    }
+];
+
+// ============ INICIALIZAR E POPULAR CATALOGO ============
+const pluginsGrid = document.getElementById("pluginsGrid");
+const searchInput = document.getElementById("searchInput");
+
+function renderPlugins(filterText = "") {
+    pluginsGrid.innerHTML = "";
+    
+    const filtered = pluginsData.filter(plugin => 
+        plugin.name.toLowerCase().includes(filterText.toLowerCase()) || 
+        plugin.shortDesc.toLowerCase().includes(filterText.toLowerCase()) ||
+        plugin.category.toLowerCase().includes(filterText.toLowerCase())
+    );
+
+    if (filtered.length === 0) {
+        pluginsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-light); padding: 30px;">Nenhum plugin localizado para sua pesquisa.</p>`;
+        return;
+    }
+
+    filtered.forEach(plugin => {
+        const card = document.createElement("div");
+        card.className = "plugin-card";
+        card.onclick = () => openModal(plugin);
+
+        card.innerHTML = `
+            <div>
+                <div class="plugin-header">
+                    <div class="plugin-icon-box">${plugin.icon}</div>
+                    <div class="plugin-meta">
+                        <div class="plugin-category">${plugin.category}</div>
+                        <h3 class="plugin-name" title="${plugin.name}">${plugin.name}</h3>
+                    </div>
+                </div>
+                <div class="plugin-body">
+                    ${plugin.shortDesc}
+                </div>
+            </div>
+            <div class="plugin-footer">
+                <div class="plugin-rating">
+                    <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    <span>${plugin.rating}</span>
+                </div>
+                <span class="plugin-status-badge ${plugin.active ? 'active' : 'inactive'}">
+                    ${plugin.active ? 'Ativo' : 'Inativo'}
+                </span>
+            </div>
+        `;
+        pluginsGrid.appendChild(card);
+    });
+}
+
+// Filtro em tempo real na busca
+searchInput.oninput = (e) => {
+    renderPlugins(e.target.value);
+};
+
+// ============ CONTROLE DO MODAL DE DETALHES ============
+const modal = document.getElementById("pluginModal");
+const modalIcon = document.getElementById("modalIcon");
+const modalTitle = document.getElementById("modalTitle");
+const modalCategory = document.getElementById("modalCategory");
+const modalDescription = document.getElementById("modalDescription");
+const modalPrimaryAction = document.getElementById("modalPrimaryAction");
+
+let currentSelectedPlugin = null;
+
+function openModal(plugin) {
+    currentSelectedPlugin = plugin;
+    modalIcon.innerText = plugin.icon;
+    modalTitle.innerText = plugin.name;
+    modalCategory.innerText = plugin.category;
+    modalDescription.innerText = plugin.fullDesc;
+    
+    updateModalButtonState(plugin.active);
+    
+    modal.classList.add("open");
+}
+
+function updateModalButtonState(isActive) {
+    if (isActive) {
+        modalPrimaryAction.innerText = "Desativar";
+        modalPrimaryAction.style.background = "#c0392b";
+    } else {
+        modalPrimaryAction.innerText = "Ativar";
+        modalPrimaryAction.style.background = "var(--primary-color)";
+    }
+}
+
+// Alternar status ativo/inativo
+modalPrimaryAction.onclick = () => {
+    if (currentSelectedPlugin) {
+        currentSelectedPlugin.active = !currentSelectedPlugin.active;
+        updateModalButtonState(currentSelectedPlugin.active);
+        renderPlugins(searchInput.value);
+        closeModal();
+    }
+};
+
+function closeModal() {
+    modal.classList.remove("open");
+}
+
+document.getElementById("closeModalBtn").onclick = closeModal;
+document.getElementById("closeModalActionBtn").onclick = closeModal;
+window.onclick = (e) => {
+    if (e.target === modal) closeModal();
+};
+
+// Abre detalhes do banner de destaque
+function openFeaturedDetails() {
+    const featured = pluginsData.find(p => p.id === "whatsapp");
+    if (featured) openModal(featured);
+}
+
+// Renderizar Inicialmente
+renderPlugins();
+</script>
+
+<script>
+// ============ ANIMAÇÃO DO LOGO LATERAL (BOLINHAS) ============
+const sidebarDots = document.querySelectorAll(".dot-sidebar");
+const positions = [
+    {x: 0, y: -10}, 
+    {x: 10, y: 0}, 
+    {x: 0, y: 10}, 
+    {x: -10, y: 0}
+];
+
+function shuffleArray(arr) {
+    let a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function startSidebarAnimation() {
+    setInterval(() => {
+        const p = shuffleArray(positions);
+        sidebarDots.forEach((dot, i) => {
+            dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
+        });
+    }, 1000);
+}
+
+startSidebarAnimation();
+</script>
+</body>
+</html>

@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yra — Configurações</title>
+<style>
+
+/* ── TOKENS ──────────────────────────────────────────────── */
+:root {
+    --primary:       #2E7D32;
+    --primary-light: #81C784;
+    --primary-ultra: #E8F5E9;
+    --primary-mid:   #4CAF50;
+    --text-dark:     #2C3E50;
+    --text-mid:      #4A5568;
+    --text-light:    #7F8C8D;
+    --text-xlight:   #B0BEC5;
+    --bg:            #F9FBF9;
+    --bg-card:       #ffffff;
+    --border:        rgba(46,125,50,.07);
+    --border-strong: rgba(46,125,50,.14);
+    --shadow-soft:   0 2px 16px rgba(46,125,50,.05);
+    --shadow-card:   0 4px 24px rgba(46,125,50,.06);
+    --radius-card:   18px;
+    --radius-pill:   100px;
+}
+
+/* ── RESET ───────────────────────────────────────────────── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html, body {
+    height: 100%;
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ── LAYOUT RAIZ ─────────────────────────────────────────── */
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ── SIDEBAR DE NAVEGAÇÃO ────────────────────────────────── */
+.sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    padding: 36px 0 32px;
+    z-index: 100;
+}
+
+.sidebar-back {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 24px 32px;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: var(--text-dark);
+    transition: color .2s;
+}
+.sidebar-back:hover { color: var(--primary); }
+.sidebar-back:hover .back-icon { background: var(--primary-ultra); color: var(--primary); }
+
+.back-icon {
+    width: 30px; height: 30px; border-radius: 8px;
+    background: var(--bg); border: 1px solid var(--border-strong);
+    display: flex; align-items: center; justify-content: center;
+    transition: all .2s;
+    flex-shrink: 0;
+}
+
+.sidebar-back-label {
+    font-size: 13px; font-weight: 600; letter-spacing: .01em;
+}
+
+.sidebar-nav {
+    flex: 1;
+    padding: 24px 12px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.nav-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    color: var(--text-xlight);
+    padding: 0 12px;
+    margin: 16px 0 6px;
+}
+.nav-section-label:first-child { margin-top: 0; }
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: 10px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text-mid);
+    text-decoration: none;
+    cursor: pointer;
+    transition: background .15s, color .15s;
+    position: relative;
+    user-select: none;
+}
+.nav-item:hover {
+    background: var(--primary-ultra);
+    color: var(--primary);
+}
+.nav-item.active {
+    background: var(--primary-ultra);
+    color: var(--primary);
+    font-weight: 600;
+}
+.nav-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 50%;
+    transform: translateY(-50%);
+    width: 3px; height: 18px;
+    background: var(--primary);
+    border-radius: 0 3px 3px 0;
+}
+
+.nav-icon {
+    width: 16px; height: 16px; flex-shrink: 0;
+    opacity: .65;
+    transition: opacity .15s;
+}
+.nav-item:hover   .nav-icon,
+.nav-item.active  .nav-icon { opacity: 1; }
+
+.sidebar-footer {
+    padding: 0 24px;
+    font-size: 11px;
+    color: var(--text-xlight);
+    letter-spacing: .3px;
+}
+.sidebar-footer a {
+    color: var(--text-xlight);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color .2s;
+}
+.sidebar-footer a:hover { color: var(--primary); }
+
+/* ── CONTEÚDO PRINCIPAL ──────────────────────────────────── */
+.main {
+    margin-left: 220px;
+    flex: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-inner {
+    flex: 1;
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 52px 40px 80px;
+}
+
+.page-header {
+    margin-bottom: 44px;
+}
+
+.page-eyebrow {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 10px;
+}
+
+.page-title {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -.4px;
+    color: var(--text-dark);
+    line-height: 1.2;
+}
+
+.page-subtitle {
+    margin-top: 8px;
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+/* ── SEÇÕES ──────────────────────────────────────────────── */
+.settings-section {
+    margin-bottom: 40px;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+
+.section-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--text-xlight);
+    flex: 1;
+}
+
+.section-badge {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    background: var(--primary-ultra);
+    color: var(--primary);
+    letter-spacing: .3px;
+}
+
+/* ── CARDS ───────────────────────────────────────────────── */
+.card-group {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    border-radius: var(--radius-card);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+}
+
+.card-row {
+    background: var(--bg-card);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 22px;
+    position: relative;
+    transition: background .15s;
+    cursor: default;
+}
+.card-row:hover { background: #FAFCFA; }
+.card-row + .card-row::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 22px; right: 22px;
+    height: 1px;
+    background: var(--border);
+}
+
+.card-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: var(--primary-ultra);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+    overflow: hidden;
+}
+.card-icon::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(
+        circle at 40% 35%,
+        rgba(255,255,255,.55) 0%,
+        transparent 65%
+    );
+}
+.card-icon.teal   { background: #E0F2F1; }
+.card-icon.blue   { background: #E3F2FD; }
+.card-icon.amber  { background: #FFF8E1; }
+.card-icon.rose   { background: #FCE4EC; }
+.card-icon.purple { background: #F3E5F5; }
+.card-icon.slate  { background: #ECEFF1; }
+
+.card-icon svg { position: relative; z-index: 1; }
+
+.card-body { flex: 1; min-width: 0; }
+.card-title {
+    font-size: 14px; font-weight: 600;
+    color: var(--text-dark); line-height: 1.3;
+}
+.card-desc {
+    margin-top: 2px;
+    font-size: 12.5px; color: var(--text-light); line-height: 1.4;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+.card-right {
+    display: flex; align-items: center; gap: 8px; flex-shrink: 0;
+}
+
+.chevron {
+    color: var(--text-xlight);
+    transition: color .15s;
+}
+.card-row:hover .chevron { color: var(--text-light); }
+
+.value-pill {
+    font-size: 12px; font-weight: 500;
+    color: var(--text-light);
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    padding: 4px 10px;
+    border-radius: var(--radius-pill);
+    white-space: nowrap;
+}
+
+.select-native {
+    font-size: 12px; font-weight: 500;
+    color: var(--text-dark);
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    padding: 4px 24px 4px 10px;
+    border-radius: var(--radius-pill);
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%237F8C8D' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+}
+
+.status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--primary-mid);
+    box-shadow: 0 0 0 2px rgba(76,175,80,.2);
+}
+
+/* ── API KEY CONTROLS ───────────────────────────────────── */
+.api-key-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.api-key-display {
+    font-family: monospace;
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: var(--text-mid);
+    background: var(--bg);
+    padding: 3px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.action-icon-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    transition: background 0.2s, color 0.2s;
+}
+.action-icon-btn:hover {
+    background: var(--primary-ultra);
+    color: var(--primary);
+}
+
+/* ── SKELETON SHIMMER ────────────────────────────────────── */
+.skel {
+    border-radius: 6px;
+    background: linear-gradient(
+        90deg,
+        var(--border) 25%,
+        rgba(46,125,50,.04) 50%,
+        var(--border) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2.4s ease-in-out infinite;
+}
+@keyframes shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+.skel-sm  { width: 80px;  height: 10px; }
+.skel-md  { width: 140px; height: 10px; }
+.skel-lg  { width: 200px; height: 10px; }
+.skel-xl  { width: 260px; height: 10px; }
+
+/* ── CARD PERFIL ────────────────────────────────────────── */
+.profile-card {
+    background: var(--bg-card);
+    border-radius: var(--radius-card);
+    padding: 28px 28px 24px;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.profile-card::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(46,125,50,.06) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.avatar {
+    width: 60px; height: 60px; border-radius: 18px;
+    background: var(--primary-ultra);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    position: relative; overflow: hidden;
+}
+.avatar::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at 38% 32%, rgba(255,255,255,.6) 0%, transparent 60%);
+}
+.avatar svg { position: relative; z-index: 1; }
+
+.profile-info { flex: 1; min-width: 0; }
+.profile-name {
+    font-size: 16px; font-weight: 700; color: var(--text-dark); margin-bottom: 4px;
+}
+.profile-email {
+    font-size: 13px; color: var(--text-light); margin-bottom: 8px;
+}
+.profile-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 600; letter-spacing: .3px;
+    color: var(--primary);
+    background: var(--primary-ultra);
+    padding: 4px 10px; border-radius: var(--radius-pill);
+}
+.profile-tag-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: var(--primary-mid);
+}
+
+/* ── RESPONSIVO ──────────────────────────────────────────── */
+@media (max-width: 680px) {
+    .sidebar { width: 100%; height: auto; position: relative; flex-direction: row; padding: 0; }
+    .layout  { flex-direction: column; }
+    .main    { margin-left: 0; }
+    .main-inner { padding: 32px 20px 60px; }
+    .sidebar-nav { flex-direction: row; flex-wrap: wrap; padding: 12px; gap: 4px; }
+    .nav-section-label { display: none; }
+    .sidebar-back, .sidebar-footer { display: none; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- ── SIDEBAR ──────────────────────────────────────── -->
+    <aside class="sidebar">
+        <a href="center.html" class="sidebar-back">
+            <div class="back-icon">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2.5"
+                     stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"/>
+                </svg>
+            </div>
+            <span class="sidebar-back-label">Yra</span>
+        </a>
+
+        <nav class="sidebar-nav">
+            <span class="nav-section-label">Pessoal</span>
+
+            <div class="nav-item active">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                    <circle cx="12" cy="7" r="4"/>
+                </svg>
+                Perfil
+            </div>
+
+            <a href="security.html" class="nav-item" style="text-decoration: none;">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Segurança
+            </a>
+
+            <span class="nav-section-label">Assistente</span>
+
+            <a href="#comportamento-section" class="nav-item" style="text-decoration: none;">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"/>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06
+                             a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09
+                             A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83
+                             l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09
+                             A1.65 1.65 0 0 0 4.6 9"/>
+                </svg>
+                Comportamento
+            </a>
+
+            <span class="nav-section-label">Sistema</span>
+
+            <a href="#sobre-section" class="nav-item" style="text-decoration: none;">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="8" x2="12" y2="12"/>
+                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                </svg>
+                Sobre
+            </a>
+            
+            <div class="nav-item" id="logoutSidebarBtn">
+                <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                    <polyline points="16 17 21 12 16 7"/>
+                    <line x1="21" y1="12" x2="9" y2="12"/>
+                </svg>
+                Sair
+            </div>
+
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="https://github.com/Syradevops" target="_blank">@Syradevops</a>
+        </div>
+    </aside>
+
+    <!-- ── CONTEÚDO ──────────────────────────────────────── -->
+    <main class="main">
+        <div class="main-inner">
+
+            <!-- Cabeçalho -->
+            <header class="page-header">
+                <div class="page-eyebrow">Configurações</div>
+                <h1 class="page-title">Perfil</h1>
+                <p class="page-subtitle">Gerencie suas informações pessoais e preferências de conta.</p>
+            </header>
+
+            <!-- Card de perfil destacado -->
+            <div class="profile-card">
+                <div class="avatar">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+                         stroke="#2E7D32" stroke-width="1.8"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </div>
+                <div class="profile-info">
+                    <div id="profileName" class="profile-name"><span class="skel profile-name-skel" style="display:block;"></span></div>
+                    <div id="profileEmail" class="profile-email"><span class="skel profile-email-skel" style="display:block;"></span></div>
+                    <div class="profile-tag">
+                        <div class="profile-tag-dot"></div>
+                        Ativo
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção: Informações pessoais -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <span class="section-eyebrow">Informações pessoais</span>
+                </div>
+                <div class="card-group">
+
+                    <div class="card-row">
+                        <div class="card-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#2E7D32" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Nome</div>
+                            <div class="card-desc" id="infoUsername"><span class="skel skel-md" style="display:inline-block;vertical-align:middle;"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="card-row">
+                        <div class="card-icon blue">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#1565C0" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                                <polyline points="22,6 12,13 2,6"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">E-mail</div>
+                            <div class="card-desc" id="infoEmail"><span class="skel skel-xl" style="display:inline-block;vertical-align:middle;"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="card-row">
+                        <div class="card-icon teal">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#00695C" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07
+                                         A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.61 3.44
+                                         2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72
+                                         c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.92
+                                         a16 16 0 0 0 6 6l.92-.92a2 2 0 0 1 2.11-.45
+                                         c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16.92z"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Telefone</div>
+                            <div class="card-desc" id="infoPhone"><span class="skel skel-sm" style="display:inline-block;vertical-align:middle;"></span></div>
+                        </div>
+                    </div>
+
+                    <div class="card-row">
+                        <div class="card-icon amber">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#E65100" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                                <line x1="16" y1="2" x2="16" y2="6"/>
+                                <line x1="8"  y1="2" x2="8"  y2="6"/>
+                                <line x1="3"  y1="10" x2="21" y2="10"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Data de nascimento</div>
+                            <div class="card-desc" id="infoBirthDate"><span class="skel skel-md" style="display:inline-block;vertical-align:middle;"></span></div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Seção: Plano & uso -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <span class="section-eyebrow">Plano & uso</span>
+                    <span class="section-badge">Pro</span>
+                </div>
+                <div class="card-group">
+
+                    <div class="card-row">
+                        <div class="card-icon purple">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#6A1B9A" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="1" x2="12" y2="23"/>
+                                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Custo mensal</div>
+                            <div class="card-desc" id="infoMonthlyCost"><span class="skel skel-sm" style="display:inline-block;vertical-align:middle;"></span></div>
+                        </div>
+                        <div class="card-right">
+                            <div class="status-dot"></div>
+                        </div>
+                    </div>
+
+                    <div class="card-row">
+                        <div class="card-icon slate">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#455A64" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">API key</div>
+                            <div class="card-desc">Chave secreta de conexão externa</div>
+                        </div>
+                        <div class="card-right">
+                            <div class="api-key-wrapper">
+                                <div class="api-key-display" id="apiKeyDisplay">••••••••••••••••</div>
+                                
+                                <!-- Botão de Visualização (Olho) -->
+                                <button class="action-icon-btn" id="toggleApiKeyBtn" title="Visualizar chave">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
+                                
+                                <!-- Botão de Cópia -->
+                                <button class="action-icon-btn" id="copyApiKeyBtn" title="Copiar chave">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-row">
+                        <div class="card-icon">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#2E7D32" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Papel</div>
+                            <div class="card-desc">Nível de acesso no sistema</div>
+                        </div>
+                        <div class="card-right">
+                            <span class="value-pill" id="infoRole"><span class="skel skel-sm" style="display:inline-block;vertical-align:middle;"></span></span>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Seção: Preferências -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <span class="section-eyebrow">Preferências</span>
+                </div>
+                <div class="card-group">
+
+                    <div class="card-row">
+                        <div class="card-icon blue">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#1565C0" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="2"  y1="12" x2="22" y2="12"/>
+                                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10
+                                         15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Idioma</div>
+                            <div class="card-desc">Língua padrão da interface</div>
+                        </div>
+                        <div class="card-right">
+                            <select class="select-native" id="langSelect">
+                                <option value="pt">Português</option>
+                                <option value="en">Inglês</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Seção: Comportamento -->
+            <section class="settings-section" id="comportamento-section">
+                <div class="section-header">
+                    <span class="section-eyebrow">Comportamento</span>
+                </div>
+                <div class="card-group">
+                    <div class="card-row">
+                        <div class="card-icon purple">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#6A1B9A" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Personalidade</div>
+                            <div class="card-desc">Adapte o modo de resposta do assistente</div>
+                        </div>
+                        <div class="card-right">
+                            <span class="value-pill">Padrão</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção: Sobre -->
+            <section class="settings-section" id="sobre-section">
+                <div class="section-header">
+                    <span class="section-eyebrow">Sobre</span>
+                </div>
+                <div class="card-group">
+                    <div class="card-row">
+                        <div class="card-icon slate">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#455A64" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title">Yra Assistant</div>
+                            <div class="card-desc">Versão estável do ecossistema 1.4.0</div>
+                        </div>
+                        <div class="card-right">
+                            <span class="value-pill">v1.4.0</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Seção: Zona de perigo -->
+            <section class="settings-section">
+                <div class="section-header">
+                    <span class="section-eyebrow">Zona de perigo</span>
+                </div>
+                <div class="card-group">
+
+                    <div class="card-row" style="cursor: pointer;" id="clearMemoriesBtn">
+                        <div class="card-icon rose">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#C62828" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                <path d="M10 11v6"/><path d="M14 11v6"/>
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title" style="color:#C62828;">Apagar memórias</div>
+                            <div class="card-desc">Remove todo o histórico salvo pelo assistente</div>
+                        </div>
+                    </div>
+
+                    <div class="card-row" style="cursor: pointer;" id="logoutCardBtn">
+                        <div class="card-icon rose">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                 stroke="#C62828" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="16 17 21 12 16 7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
+                        </div>
+                        <div class="card-body">
+                            <div class="card-title" style="color:#C62828;">Sair da conta</div>
+                            <div class="card-desc">Encerra a sessão ativa de forma segura</div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+</div>
+
+<!-- FIREBASE INTEGRATION -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, doc, getDoc, updateDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey:            "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+    authDomain:        "yra-syra.firebaseapp.com",
+    projectId:         "yra-syra",
+    storageBucket:     "yra-syra.firebasestorage.app",
+    messagingSenderId: "555145505684",
+    appId:             "1:555145505684:web:aa1ef14072653e41057d81"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+
+// Armazenamento local da API Key carregada
+let currentApiKey = "";
+let apiKeyHidden = true;
+
+// Elementos de Informação do Perfil
+const profileName     = document.getElementById("profileName");
+const profileEmail    = document.getElementById("profileEmail");
+const infoUsername    = document.getElementById("infoUsername");
+const infoEmail       = document.getElementById("infoEmail");
+const infoPhone       = document.getElementById("infoPhone");
+const infoBirthDate   = document.getElementById("infoBirthDate");
+const infoMonthlyCost = document.getElementById("infoMonthlyCost");
+const infoRole        = document.getElementById("infoRole");
+
+// Elementos da API Key
+const apiKeyDisplay   = document.getElementById("apiKeyDisplay");
+const toggleApiKeyBtn = document.getElementById("toggleApiKeyBtn");
+const copyApiKeyBtn   = document.getElementById("copyApiKeyBtn");
+
+// Gerenciamento de Idioma no LocalStorage
+const langSelect = document.getElementById("langSelect");
+const savedLang  = localStorage.getItem("yra-lang") || "pt";
+langSelect.value = savedLang;
+
+langSelect.addEventListener("change", (e) => {
+    localStorage.setItem("yra-lang", e.target.value);
+});
+
+// Acompanhamento do estado de autenticação
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        try {
+            // Carrega dados da coleção de usuários
+            const userDocSnap = await getDoc(doc(db, "Users", user.uid));
+            if (userDocSnap.exists()) {
+                const userData = userDocSnap.data();
+                
+                // Renderização nos elementos visuais
+                profileName.textContent  = userData.username || user.displayName || "Usuário";
+                profileEmail.textContent = userData.email || user.email || "";
+                
+                infoUsername.textContent  = userData.username || "—";
+                infoEmail.textContent     = userData.email || user.email || "—";
+                infoPhone.textContent     = userData.phone || "—";
+                infoBirthDate.textContent = formatBirthDate(userData.birth_date) || "—";
+                infoMonthlyCost.textContent = formatCurrency(userData.monthly_cost);
+                infoRole.textContent      = userData.role ? userData.role.toUpperCase() : "USER";
+            } else {
+                // Caso o registro seja parcial no auth
+                profileName.textContent  = user.displayName || "Usuário";
+                profileEmail.textContent = user.email || "";
+                infoUsername.textContent  = user.displayName || "—";
+                infoEmail.textContent     = user.email || "—";
+            }
+        } catch(error) {
+            console.error("Erro ao carregar os dados de perfil:", error);
+        }
+
+        try {
+            // Busca o documento correspondente na coleção Keys
+            const keyQuery = query(
+                collection(db, "Keys"),
+                where("user_id", "==", user.uid),
+                where("enabled", "==", true)
+            );
+            const keyDocs = await getDocs(keyQuery);
+            if (!keyDocs.empty) {
+                currentApiKey = keyDocs.docs[0].data().key || "";
+            }
+        } catch(error) {
+            console.error("Erro ao carregar a chave de API:", error);
+        }
+    } else {
+        window.location.href = "index.html";
+    }
+});
+
+// Manipuladores de Visualização e Cópia da API Key
+toggleApiKeyBtn.addEventListener("click", () => {
+    if (apiKeyHidden) {
+        apiKeyDisplay.textContent = currentApiKey || "Chave ausente";
+        toggleApiKeyBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+            </svg>
+        `;
+    } else {
+        apiKeyDisplay.textContent = "••••••••••••••••";
+        toggleApiKeyBtn.innerHTML = `
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+        `;
+    }
+    apiKeyHidden = !apiKeyHidden;
+});
+
+copyApiKeyBtn.addEventListener("click", () => {
+    if (currentApiKey) {
+        navigator.clipboard.writeText(currentApiKey).then(() => {
+            const tempIcon = copyApiKeyBtn.innerHTML;
+            copyApiKeyBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            `;
+            setTimeout(() => {
+                copyApiKeyBtn.innerHTML = tempIcon;
+            }, 1500);
+        }).catch(err => {
+            console.error("Erro ao copiar o texto: ", err);
+        });
+    }
+});
+
+// Ação de apagar memórias na coleção System do Firestore
+document.getElementById("clearMemoriesBtn").addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+    
+    const confirmAction = confirm("Tem certeza de que deseja apagar todas as memórias salvas do assistente? Esta ação é permanente.");
+    if (confirmAction) {
+        try {
+            await updateDoc(doc(db, "System", user.uid), {
+                memories: "",
+                notes: ""
+            });
+            alert("Memórias apagadas.");
+        } catch (error) {
+            console.error("Erro ao limpar memórias:", error);
+            alert("Houve uma falha ao tentar limpar as informações.");
+        }
+    }
+});
+
+// Processo de encerramento de sessão (Logout)
+async function handleLogout() {
+    const confirmLogout = confirm("Deseja realmente encerrar a sessão?");
+    if (confirmLogout) {
+        try {
+            await signOut(auth);
+            window.location.href = "index.html";
+        } catch(error) {
+            console.error("Erro ao efetuar logout:", error);
+        }
+    }
+}
+
+document.getElementById("logoutCardBtn").addEventListener("click", handleLogout);
+document.getElementById("logoutSidebarBtn").addEventListener("click", handleLogout);
+
+// Auxiliares de formatação
+function formatCurrency(val) {
+    const num = Number(val);
+    if (isNaN(num)) return "R$ 0,00";
+    return num.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function formatBirthDate(rawDate) {
+    if (!rawDate) return "";
+    const parts = rawDate.split("-");
+    if (parts.length === 3) {
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
+    }
+    return rawDate;
+}
+</script>
+
+</body>
+</html>

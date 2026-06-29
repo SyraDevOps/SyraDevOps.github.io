@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yra Assistant - Notas</title>
+<style>
+:root {
+    --primary-color: #2E7D32;
+    --primary-light: #81C784;
+    --primary-ultra-light: #E8F5E9;
+    --text-dark: #2C3E50;
+    --text-light: #7F8C8D;
+    --bg-light: #F9FBF9;
+    --border-color: #EAEAEA;
+    --white: #ffffff;
+    --sidebar-width: 260px;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+}
+
+/* ==================== MENU LATERAL (SIDEBAR) ==================== */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--white);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-left: 10px;
+}
+
+.scene-sidebar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+.dot-sidebar {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    margin-left: -4px;
+    margin-top: -4px;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dot-sidebar:nth-child(1) { background: #1B5E20; }
+.dot-sidebar:nth-child(2) { background: #2E7D32; }
+.dot-sidebar:nth-child(3) { background: #4CAF50; }
+.dot-sidebar:nth-child(4) { background: #81C784; }
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1B5E20;
+    letter-spacing: 0.5px;
+}
+
+.menu-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.menu-item a:hover, .menu-item.active a {
+    background: var(--primary-ultra-light);
+    color: var(--primary-color);
+}
+
+.menu-item a svg {
+    stroke: currentColor;
+    fill: none;
+    width: 20px;
+    height: 20px;
+}
+
+/* ==================== ÁREA DE CONTEÚDO PRINCIPAL ==================== */
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 40px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.page-title h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.page-title p {
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+/* Estrutura das Notas (Split) */
+.notes-container {
+    display: flex;
+    flex: 1;
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    overflow: hidden;
+    height: calc(100vh - 150px);
+}
+
+/* Coluna Esquerda: Lista de Notas */
+.notes-list-pane {
+    width: 300px;
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    background: #FAFAFA;
+}
+
+.notes-pane-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.btn-new-note {
+    width: 100%;
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 12px;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: background 0.2s ease;
+}
+
+.btn-new-note:hover {
+    background: #1B5E20;
+}
+
+.notes-search {
+    margin-top: 15px;
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s ease;
+}
+
+.notes-search:focus {
+    border-color: var(--primary-color);
+}
+
+.notes-list-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.note-item {
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.note-item:hover {
+    background: rgba(46, 125, 50, 0.05);
+}
+
+.note-item.active {
+    background: var(--primary-ultra-light);
+    border-left: 4px solid var(--primary-color);
+}
+
+.note-item-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.note-item-snippet {
+    font-size: 12px;
+    color: var(--text-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Coluna Direita: Editor de Notas */
+.note-editor-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 30px;
+    background: var(--white);
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.editor-status {
+    font-size: 12px;
+    color: var(--text-light);
+}
+
+.editor-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-editor {
+    border: none;
+    background: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    color: var(--text-light);
+    transition: all 0.2s ease;
+}
+
+.btn-editor:hover {
+    background: #F5F5F5;
+    color: var(--text-dark);
+}
+
+.btn-editor-delete:hover {
+    background: #FCE4D6;
+    color: #c0392b;
+}
+
+.note-title-input {
+    font-size: 22px;
+    font-weight: 600;
+    border: none;
+    outline: none;
+    width: 100%;
+    margin-bottom: 20px;
+    color: var(--text-dark);
+}
+
+.note-textarea {
+    flex: 1;
+    border: none;
+    outline: none;
+    resize: none;
+    width: 100%;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--text-dark);
+}
+
+.empty-editor-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    color: var(--text-light);
+}
+
+.empty-editor-message svg {
+    margin-bottom: 15px;
+    stroke: var(--border-color);
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+    .sidebar {
+        width: 70px;
+        padding: 20px 10px;
+    }
+    .brand-name, .menu-item span {
+        display: none;
+    }
+    .brand {
+        justify-content: center;
+    }
+    .main-content {
+        margin-left: 70px;
+        padding: 20px;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar Menu Lateral -->
+<div class="sidebar">
+    <div class="brand">
+        <div class="scene-sidebar" id="sceneSidebar">
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+        </div>
+        <span class="brand-name">YRA Assistant</span>
+    </div>
+
+    <ul class="menu-list">
+        <li class="menu-item">
+            <a href="center.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Chat</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="plugins.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>Plugins</span>
+            </a>
+        </li>
+        <li class="menu-item active">
+            <a href="notes.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Notas</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="memory.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                <span>Memória</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="config.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Configurações</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Conteúdo Principal -->
+<div class="main-content">
+    <div class="top-header">
+        <div class="page-title">
+            <h2>Bloco de Notas</h2>
+            <p>Guarde pensamentos, instruções e rascunhos rápidos.</p>
+        </div>
+    </div>
+
+    <div class="notes-container">
+        <!-- Listagem de Notas -->
+        <div class="notes-list-pane">
+            <div class="notes-pane-header">
+                <button class="btn-new-note" id="newNoteBtn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Nova Nota
+                </button>
+                <input type="text" class="notes-search" id="noteSearchInput" placeholder="Procurar nota...">
+            </div>
+            <div class="notes-list-scroll" id="notesListContainer">
+                <!-- Inserido dinamicamente -->
+            </div>
+        </div>
+
+        <!-- Painel de Edição -->
+        <div class="note-editor-pane">
+            <div id="editorContent" class="hidden" style="display: flex; flex-direction: column; flex: 1;">
+                <div class="editor-header">
+                    <div class="editor-status" id="saveStatus">Todas as alterações salvas</div>
+                    <div class="editor-actions">
+                        <button class="btn-editor btn-editor-delete" id="deleteNoteBtn" title="Excluir Nota">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                        </button>
+                    </div>
+                </div>
+                <input type="text" class="note-title-input" id="noteTitleInput" placeholder="Sem título">
+                <textarea class="note-textarea" id="noteTextInput" placeholder="Comece a escrever..."></textarea>
+            </div>
+            
+            <div class="empty-editor-message" id="emptyEditorState">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>
+                <p>Selecione ou crie uma nota para começar.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============ DATABASE LOCAL (LOCAL STORAGE) ============
+let notes = JSON.parse(localStorage.getItem('yra-notes')) || [
+    { id: 1, title: 'Ideias de Projetos', text: 'Desenvolver automação para atendimento...\n- Integrar com banco de dados\n- Melhorar design da UI' },
+    { id: 2, title: 'Instruções do Sistema', text: 'Evitar o uso de termos genéricos no chat com clientes.' }
+];
+
+let activeNoteId = null;
+let saveTimeout = null;
+
+const notesListContainer = document.getElementById("notesListContainer");
+const emptyEditorState = document.getElementById("emptyEditorState");
+const editorContent = document.getElementById("editorContent");
+const noteTitleInput = document.getElementById("noteTitleInput");
+const noteTextInput = document.getElementById("noteTextInput");
+const saveStatus = document.getElementById("saveStatus");
+const noteSearchInput = document.getElementById("noteSearchInput");
+
+function renderNotesList(filter = "") {
+    notesListContainer.innerHTML = "";
+    const filteredNotes = notes.filter(n => n.title.toLowerCase().includes(filter.toLowerCase()) || n.text.toLowerCase().includes(filter.toLowerCase()));
+
+    filteredNotes.forEach(note => {
+        const item = document.createElement("div");
+        item.className = `note-item ${note.id === activeNoteId ? 'active' : ''}`;
+        item.onclick = () => selectNote(note.id);
+
+        const snippet = note.text ? note.text.substring(0, 35) + "..." : "Sem descrição...";
+
+        item.innerHTML = `
+            <div class="note-item-title">${note.title || "Sem título"}</div>
+            <div class="note-item-snippet">${snippet}</div>
+        `;
+        notesListContainer.appendChild(item);
+    });
+}
+
+function selectNote(id) {
+    activeNoteId = id;
+    const note = notes.find(n => n.id === id);
+    if (!note) return;
+
+    emptyEditorState.classList.add("hidden");
+    editorContent.style.display = "flex";
+
+    noteTitleInput.value = note.title;
+    noteTextInput.value = note.text;
+    saveStatus.innerText = "Salvo localmente";
+
+    renderNotesList(noteSearchInput.value);
+}
+
+// Criar nova nota
+document.getElementById("newNoteBtn").onclick = () => {
+    const newNote = {
+        id: Date.now(),
+        title: "Nova Nota",
+        text: ""
+    };
+    notes.unshift(newNote);
+    saveNotes();
+    selectNote(newNote.id);
+};
+
+// Excluir Nota
+document.getElementById("deleteNoteBtn").onclick = () => {
+    if (!activeNoteId) return;
+    notes = notes.filter(n => n.id !== activeNoteId);
+    saveNotes();
+    activeNoteId = null;
+    editorContent.style.display = "none";
+    emptyEditorState.classList.remove("hidden");
+    renderNotesList(noteSearchInput.value);
+};
+
+// Salvamento Automático por debounce
+function autoSave() {
+    if (!activeNoteId) return;
+    saveStatus.innerText = "Escrevendo...";
+    
+    clearTimeout(saveTimeout);
+    saveTimeout = setTimeout(() => {
+        const note = notes.find(n => n.id === activeNoteId);
+        if (note) {
+            note.title = noteTitleInput.value;
+            note.text = noteTextInput.value;
+            saveNotes();
+            saveStatus.innerText = "Alterações salvas";
+            renderNotesList(noteSearchInput.value);
+        }
+    }, 1000);
+}
+
+noteTitleInput.oninput = autoSave;
+noteTextInput.oninput = autoSave;
+noteSearchInput.oninput = (e) => renderNotesList(e.target.value);
+
+function saveNotes() {
+    localStorage.setItem('yra-notes', JSON.stringify(notes));
+}
+
+// Carregamento inicial
+renderNotesList();
+</script>
+
+<script>
+// ============ ANIMAÇÃO DO LOGO LATERAL (BOLINHAS) ============
+const sidebarDots = document.querySelectorAll(".dot-sidebar");
+const positions = [
+    {x: 0, y: -10}, 
+    {x: 10, y: 0}, 
+    {x: 0, y: 10}, 
+    {x: -10, y: 0}
+];
+
+function shuffleArray(arr) {
+    let a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function startSidebarAnimation() {
+    setInterval(() => {
+        const p = shuffleArray(positions);
+        sidebarDots.forEach((dot, i) => {
+            dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
+        });
+    }, 1000);
+}
+
+startSidebarAnimation();
+</script>
+</body>
+</html>

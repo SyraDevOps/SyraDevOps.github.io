@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yra Assistant - Autenticação</title>
+<style>
+:root {
+    --primary-color: #2E7D32;
+    --primary-light: #81C784;
+    --primary-ultra-light: #E8F5E9;
+    --text-dark: #2C3E50;
+    --text-light: #7F8C8D;
+    --bg-light: #F9FBF9;
+    --border-color: #E0E0E0;
+    --white: #ffffff;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+}
+
+/* Container Duplo */
+.container {
+    display: flex;
+    width: 100%;
+    max-width: 1100px;
+    height: 650px;
+    background: var(--white);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    margin: 20px;
+    transition: all 0.3s ease;
+}
+
+/* Painel Esquerdo: Animação */
+.left-panel {
+    flex: 1.1;
+    background: var(--primary-ultra-light);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding: 40px;
+}
+
+.scene { 
+    position: relative;
+    width: 160px; 
+    height: 160px; 
+    margin-bottom: 30px;
+}
+
+.dot { 
+    position: absolute; 
+    width: 32px; 
+    height: 32px; 
+    border-radius: 50%; 
+    left: 50%; 
+    top: 50%; 
+    margin-left: -16px; 
+    margin-top: -16px; 
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.15);
+}
+
+.dot:nth-child(1) { background: #1B5E20; }
+.dot:nth-child(2) { background: #2E7D32; }
+.dot:nth-child(3) { background: #4CAF50; }
+.dot:nth-child(4) { background: #81C784; }
+
+.left-panel-text {
+    text-align: center;
+    max-width: 280px;
+}
+
+.left-panel-text h2 {
+    font-size: 22px;
+    color: #1B5E20;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.left-panel-text p {
+    font-size: 14px;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+/* Painel Direito: Formulários */
+.right-panel {
+    flex: 1;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+}
+
+.form-box {
+    width: 100%;
+    max-width: 340px;
+    margin: 0 auto;
+}
+
+.form-box h3 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: var(--text-dark);
+}
+
+.subtitle {
+    font-size: 14px;
+    color: var(--text-light);
+    margin-bottom: 24px;
+}
+
+/* Inputs */
+.input-group {
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.input-group label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-dark);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    background: #FAFAFA;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--primary-color);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.1);
+}
+
+/* Botões */
+.btn {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    color: var(--white);
+    margin-top: 20px;
+}
+
+.btn-primary:hover {
+    background: #1B5E20;
+}
+
+.btn-outline {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    color: var(--text-dark);
+    margin-top: 10px;
+}
+
+.btn-outline:hover {
+    background: #F5F5F5;
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    margin: 20px 0;
+    color: var(--text-light);
+    font-size: 12px;
+}
+
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.divider:not(:empty)::before {
+    margin-right: .5em;
+}
+
+.divider:not(:empty)::after {
+    margin-left: .5em;
+}
+
+/* Alternância entre Login e Cadastro */
+.switch-text {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+.switch-text a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.switch-text a:hover {
+    text-decoration: underline;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Estado de Carregamento e Status */
+#status {
+    margin-top: 15px;
+    font-size: 13px;
+    text-align: center;
+    min-height: 18px;
+    color: #c0392b;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        height: auto;
+        max-width: 480px;
+    }
+    .left-panel {
+        padding: 30px 20px;
+    }
+    .scene {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 15px;
+    }
+    .dot {
+        width: 24px;
+        height: 24px;
+        margin-left: -12px;
+        margin-top: -12px;
+    }
+    .right-panel {
+        padding: 30px 20px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- Painel Esquerdo (Animação das Bolinhas) -->
+    <div class="left-panel">
+        <div class="scene" id="scene">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
+        <div class="left-panel-text">
+            <h2>Yra Assistant</h2>
+            <p>Mantenha sua rotina organizada com a nossa inteligência auxiliar.</p>
+        </div>
+    </div>
+
+    <!-- Painel Direito (Login / Cadastro) -->
+    <div class="right-panel">
+        
+        <!-- Tela de Login -->
+        <div class="form-box" id="loginFormContainer">
+            <h3>Seja bem-vindo</h3>
+            <p class="subtitle">Insira suas credenciais para continuar.</p>
+            
+            <div class="input-group">
+                <label for="loginEmail">E-mail</label>
+                <input id="loginEmail" type="email" placeholder="exemplo@email.com">
+            </div>
+
+            <div class="input-group">
+                <label for="loginPassword">Senha</label>
+                <input id="loginPassword" type="password" placeholder="Sua senha secreta">
+            </div>
+
+            <button class="btn btn-primary" id="loginBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                Entrar com E-mail
+            </button>
+
+            <div class="divider">ou</div>
+
+            <button class="btn btn-outline" id="googleBtn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/>
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.53 6-4.53z" fill="#EA4335"/>
+                </svg>
+                Entrar com Google
+            </button>
+
+            <p class="switch-text">
+                Não tem uma conta? <a href="#" id="toRegister">Cadastre-se</a>
+            </p>
+        </div>
+
+        <!-- Tela de Cadastro -->
+        <div class="form-box hidden" id="registerFormContainer">
+            <h3>Criar Conta</h3>
+            <p class="subtitle">Preencha os campos para iniciar o cadastro.</p>
+            
+            <div class="input-group">
+                <label for="registerName">Nome Completo</label>
+                <input id="registerName" type="text" placeholder="Seu nome">
+            </div>
+
+            <div class="input-group">
+                <label for="registerEmail">E-mail</label>
+                <input id="registerEmail" type="email" placeholder="exemplo@email.com">
+            </div>
+
+            <div class="input-group">
+                <label for="registerPassword">Senha</label>
+                <input id="registerPassword" type="password" placeholder="Mínimo 6 caracteres">
+            </div>
+
+            <div class="input-group">
+                <label for="registerConfirmPassword">Confirmar Senha</label>
+                <input id="registerConfirmPassword" type="password" placeholder="Repita a senha">
+            </div>
+
+            <button class="btn btn-primary" id="registerBtn">
+                Cadastrar Nova Conta
+            </button>
+
+            <p class="switch-text">
+                Já possui uma conta? <a href="#" id="toLogin">Faça Login</a>
+            </p>
+        </div>
+
+        <!-- Mensagens de Feedback -->
+        <div id="status"></div>
+
+    </div>
+</div>
+
+<script type="module">
+// Firebase SDKs
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signOut,
+    onAuthStateChanged,
+    updateProfile
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+// Configurações do Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+    authDomain: "yra-syra.firebaseapp.com",
+    projectId: "yra-syra",
+    storageBucket: "yra-syra.firebasestorage.app",
+    messagingSenderId: "555145505684",
+    appId: "1:555145505684:web:aa1ef14072653e41057d81"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+// Elementos do DOM
+const loginFormContainer = document.getElementById("loginFormContainer");
+const registerFormContainer = document.getElementById("registerFormContainer");
+const toRegister = document.getElementById("toRegister");
+const toLogin = document.getElementById("toLogin");
+
+const loginEmailInput = document.getElementById("loginEmail");
+const loginPasswordInput = document.getElementById("loginPassword");
+const registerNameInput = document.getElementById("registerName");
+const registerEmailInput = document.getElementById("registerEmail");
+const registerPasswordInput = document.getElementById("registerPassword");
+const registerConfirmPasswordInput = document.getElementById("registerConfirmPassword");
+
+const statusDiv = document.getElementById("status");
+
+// Alternar entre Login e Cadastro
+toRegister.onclick = (e) => {
+    e.preventDefault();
+    loginFormContainer.classList.add("hidden");
+    registerFormContainer.classList.remove("hidden");
+    statusDiv.innerText = "";
+};
+
+toLogin.onclick = (e) => {
+    e.preventDefault();
+    registerFormContainer.classList.add("hidden");
+    loginFormContainer.classList.remove("hidden");
+    statusDiv.innerText = "";
+};
+
+// Limpar mensagens de erro após alguns segundos
+function showMessage(msg, isError = true) {
+    statusDiv.style.color = isError ? "#d32f2f" : "#2E7D32";
+    statusDiv.innerText = msg;
+}
+
+// Cadastro com E-mail e Senha
+document.getElementById("registerBtn").onclick = async () => {
+    const name = registerNameInput.value.trim();
+    const email = registerEmailInput.value.trim();
+    const password = registerPasswordInput.value;
+    const confirmPassword = registerConfirmPasswordInput.value;
+
+    if (!name || !email || !password || !confirmPassword) {
+        showMessage("Por favor, preencha todos os campos.");
+        return;
+    }
+
+    if (password !== confirmPassword) {
+        showMessage("As senhas informadas não coincidem.");
+        return;
+    }
+
+    try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Atualiza o nome do perfil no Firebase Auth
+        await updateProfile(userCredential.user, {
+            displayName: name
+        });
+        showMessage("Registro efetuado com sucesso! Redirecionando...", false);
+    } catch (e) {
+        showMessage(mapErrorMsg(e.code));
+    }
+};
+
+// Login com E-mail e Senha
+document.getElementById("loginBtn").onclick = async () => {
+    const email = loginEmailInput.value.trim();
+    const password = loginPasswordInput.value;
+
+    if (!email || !password) {
+        showMessage("Preencha o e-mail e a senha.");
+        return;
+    }
+
+    try {
+        await signInWithEmailAndPassword(auth, email, password);
+        showMessage("Conectado com sucesso! Redirecionando...", false);
+    } catch (e) {
+        showMessage(mapErrorMsg(e.code));
+    }
+};
+
+// Login com Google
+document.getElementById("googleBtn").onclick = async () => {
+    try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+        showMessage("Conectado com sucesso! Redirecionando...", false);
+    } catch (e) {
+        showMessage(mapErrorMsg(e.code));
+    }
+};
+
+// Monitoramento de Estado de Autenticação
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        // Redireciona o usuário autenticado para a página dash.html
+        setTimeout(() => {
+            window.location.href = "dash.html";
+        }, 800);
+    }
+});
+
+// Tradução amigável de erros comuns do Firebase Auth
+function mapErrorMsg(code) {
+    switch(code) {
+        case 'auth/invalid-email':
+            return 'O endereço de e-mail inserido é inválido.';
+        case 'auth/user-disabled':
+            return 'Esta conta de usuário foi desativada.';
+        case 'auth/user-not-found':
+            return 'Nenhuma conta correspondente a este e-mail foi encontrada.';
+        case 'auth/wrong-password':
+            return 'Senha incorreta. Verifique suas credenciais.';
+        case 'auth/email-already-in-use':
+            return 'Este e-mail já está sendo utilizado por outra conta.';
+        case 'auth/weak-password':
+            return 'A senha fornecida é muito fraca (mínimo de 6 caracteres).';
+        case 'auth/popup-closed-by-user':
+            return 'A janela de autenticação foi fechada antes do término.';
+        default:
+            return 'Ocorreu um erro inesperado. Tente novamente.';
+    }
+}
+</script>
+
+<script>
+// ============ ANIMAÇÃO DAS BOLINHAS (Painel Esquerdo) ============
+const dots = document.querySelectorAll(".dot");
+const positions = [
+    {x: 0, y: -45}, 
+    {x: 45, y: 0}, 
+    {x: 0, y: 45}, 
+    {x: -45, y: 0}
+];
+
+function shuffle(arr) {
+    let a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function startAnimation() {
+    setInterval(() => {
+        const p = shuffle(positions);
+        dots.forEach((dot, i) => {
+            dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
+        });
+    }, 1000);
+}
+
+startAnimation();
+</script>
+</body>
+</html>

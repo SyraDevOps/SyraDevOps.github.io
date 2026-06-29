@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yra Assistant - Memória</title>
+<style>
+:root {
+    --primary-color: #2E7D32;
+    --primary-light: #81C784;
+    --primary-ultra-light: #E8F5E9;
+    --text-dark: #2C3E50;
+    --text-light: #7F8C8D;
+    --bg-light: #F9FBF9;
+    --border-color: #EAEAEA;
+    --white: #ffffff;
+    --sidebar-width: 260px;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+}
+
+/* ==================== MENU LATERAL (SIDEBAR) ==================== */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--white);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-left: 10px;
+}
+
+.scene-sidebar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+.dot-sidebar {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    margin-left: -4px;
+    margin-top: -4px;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dot-sidebar:nth-child(1) { background: #1B5E20; }
+.dot-sidebar:nth-child(2) { background: #2E7D32; }
+.dot-sidebar:nth-child(3) { background: #4CAF50; }
+.dot-sidebar:nth-child(4) { background: #81C784; }
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1B5E20;
+    letter-spacing: 0.5px;
+}
+
+.menu-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.menu-item a:hover, .menu-item.active a {
+    background: var(--primary-ultra-light);
+    color: var(--primary-color);
+}
+
+.menu-item a svg {
+    stroke: currentColor;
+    fill: none;
+    width: 20px;
+    height: 20px;
+}
+
+/* ==================== ÁREA DE CONTEÚDO PRINCIPAL ==================== */
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 40px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.page-title h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.page-title p {
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+/* Estrutura de Seções do Painel */
+.memory-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 30px;
+}
+
+@media (max-width: 950px) {
+    .memory-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.panel-card {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-card-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel-card-title svg {
+    stroke: var(--primary-color);
+}
+
+/* Caixa de Regras Cognitivas */
+.rules-textarea {
+    width: 100%;
+    min-height: 250px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: #FAFBFa;
+    font-size: 14px;
+    line-height: 1.6;
+    outline: none;
+    resize: vertical;
+    transition: border-color 0.2s;
+    color: var(--text-dark);
+}
+
+.rules-textarea:focus {
+    border-color: var(--primary-color);
+    background: var(--white);
+}
+
+.btn-save-rules {
+    align-self: flex-end;
+    background: var(--primary-color);
+    color: var(--white);
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    margin-top: 15px;
+    transition: background 0.2s;
+}
+
+.btn-save-rules:hover {
+    background: #1B5E20;
+}
+
+/* Sistema de Fatos Individuais */
+.add-fact-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.add-fact-input {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-size: 13px;
+    outline: none;
+}
+
+.add-fact-input:focus {
+    border-color: var(--primary-color);
+}
+
+.btn-add-fact {
+    background: var(--primary-ultra-light);
+    color: var(--primary-color);
+    border: none;
+    padding: 0 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s ease;
+}
+
+.btn-add-fact:hover {
+    background: var(--primary-color);
+    color: var(--white);
+}
+
+.facts-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 380px;
+    overflow-y: auto;
+}
+
+.fact-item {
+    background: #FAFAFA;
+    border: 1px solid var(--border-color);
+    padding: 12px 15px;
+    border-radius: 10px;
+    font-size: 13px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    transition: all 0.2s;
+}
+
+.fact-item:hover {
+    border-color: var(--primary-light);
+}
+
+.fact-text {
+    line-height: 1.4;
+}
+
+.btn-delete-fact {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-light);
+    transition: color 0.2s;
+}
+
+.btn-delete-fact:hover {
+    color: #c0392b;
+}
+
+#feedbackMsg {
+    margin-top: 10px;
+    font-size: 13px;
+    color: var(--primary-color);
+    text-align: right;
+    min-height: 20px;
+}
+
+/* Responsividade */
+@media (max-width: 900px) {
+    .sidebar {
+        width: 70px;
+        padding: 20px 10px;
+    }
+    .brand-name, .menu-item span {
+        display: none;
+    }
+    .brand {
+        justify-content: center;
+    }
+    .main-content {
+        margin-left: 70px;
+        padding: 20px;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar Menu Lateral -->
+<div class="sidebar">
+    <div class="brand">
+        <div class="scene-sidebar" id="sceneSidebar">
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+        </div>
+        <span class="brand-name">YRA Assistant</span>
+    </div>
+
+    <ul class="menu-list">
+        <li class="menu-item">
+            <a href="center.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Chat</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="plugins.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>Plugins</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="notes.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <span>Notas</span>
+            </a>
+        </li>
+        <li class="menu-item active">
+            <a href="memory.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                <span>Memória</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="config.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <span>Configurações</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Conteúdo Principal -->
+<div class="main-content">
+    <div class="top-header">
+        <div class="page-title">
+            <h2>Memória Cognitiva</h2>
+            <p>Gerencie as regras operacionais e as memórias de longo prazo da sua IA.</p>
+        </div>
+    </div>
+
+    <div class="memory-grid">
+        <!-- Coluna Esquerda: Instruções do Sistema -->
+        <div class="panel-card">
+            <div class="panel-card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                Instruções Globais de Operação (System Prompts)
+            </div>
+            <textarea class="rules-textarea" id="systemRulesInput" placeholder="Ex: Você é um assistente financeiro sênior. Responda sempre em tom formal..."></textarea>
+            <div id="feedbackMsg"></div>
+            <button class="btn-save-rules" id="saveRulesBtn">Salvar Diretrizes</button>
+        </div>
+
+        <!-- Coluna Direita: Gerenciador de Fatos/Memórias -->
+        <div class="panel-card">
+            <div class="panel-card-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>
+                Fatos Aprendidos pela IA
+            </div>
+            
+            <div class="add-fact-row">
+                <input type="text" class="add-fact-input" id="newFactInput" placeholder="Adicionar um novo fato sobre você ou seu negócio...">
+                <button class="btn-add-fact" id="addFactBtn">Adicionar</button>
+            </div>
+
+            <div class="facts-list" id="factsListContainer">
+                <!-- Inserido via Javascript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// ============ DATABASE DE FATOS (LOCAL STORAGE) ============
+let localRules = localStorage.getItem('yra-system-rules') || "Você é a YRA, uma assistente pessoal inteligente voltada a otimização de rotina, automações de negócios e gestão de dados.";
+let facts = JSON.parse(localStorage.getItem('yra-facts')) || [
+    { id: 1, text: "O usuário prefere respostas diretas, estruturadas e sem formalidade excessiva." },
+    { id: 2, text: "A empresa do usuário atua no ramo de desenvolvimento de software e soluções Cloud." }
+];
+
+const systemRulesInput = document.getElementById("systemRulesInput");
+const newFactInput = document.getElementById("newFactInput");
+const factsListContainer = document.getElementById("factsListContainer");
+const feedbackMsg = document.getElementById("feedbackMsg");
+
+// Inicializar regras na textarea
+systemRulesInput.value = localRules;
+
+function renderFacts() {
+    factsListContainer.innerHTML = "";
+    facts.forEach(fact => {
+        const item = document.createElement("div");
+        item.className = "fact-item";
+        item.innerHTML = `
+            <span class="fact-text">${fact.text}</span>
+            <button class="btn-delete-fact" onclick="deleteFact(${fact.id})" title="Remover fato">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+        `;
+        factsListContainer.appendChild(item);
+    });
+}
+
+// Salvar as regras do sistema
+document.getElementById("saveRulesBtn").onclick = () => {
+    localStorage.setItem('yra-system-rules', systemRulesInput.value);
+    feedbackMsg.innerText = "Diretrizes salvas com sucesso!";
+    setTimeout(() => { feedbackMsg.innerText = ""; }, 3000);
+};
+
+// Adicionar Fato
+document.getElementById("addFactBtn").onclick = () => {
+    const text = newFactInput.value.trim();
+    if (!text) return;
+
+    facts.unshift({
+        id: Date.now(),
+        text: text
+    });
+    localStorage.setItem('yra-facts', JSON.stringify(facts));
+    newFactInput.value = "";
+    renderFacts();
+};
+
+// Permitir adicionar apertando Enter
+newFactInput.onkeydown = (e) => {
+    if (e.key === "Enter") {
+        document.getElementById("addFactBtn").click();
+    }
+};
+
+// Deletar Fato
+window.deleteFact = (id) => {
+    facts = facts.filter(f => f.id !== id);
+    localStorage.setItem('yra-facts', JSON.stringify(facts));
+    renderFacts();
+};
+
+// Carregar fatos no início
+renderFacts();
+</script>
+
+<script>
+// ============ ANIMAÇÃO DO LOGO LATERAL (BOLINHAS) ============
+const sidebarDots = document.querySelectorAll(".dot-sidebar");
+const positions = [
+    {x: 0, y: -10}, 
+    {x: 10, y: 0}, 
+    {x: 0, y: 10}, 
+    {x: -10, y: 0}
+];
+
+function shuffleArray(arr) {
+    let a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function startSidebarAnimation() {
+    setInterval(() => {
+        const p = shuffleArray(positions);
+        sidebarDots.forEach((dot, i) => {
+            dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
+        });
+    }, 1000);
+}
+
+startSidebarAnimation();
+</script>
+</body>
+</html>
