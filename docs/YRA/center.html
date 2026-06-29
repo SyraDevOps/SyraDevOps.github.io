@@ -9,12 +9,18 @@
     --primary-color: #2E7D32;
     --primary-light: #81C784;
     --primary-ultra-light: #E8F5E9;
+    --primary-dark: #1B5E20;
     --text-dark: #2C3E50;
     --text-light: #7F8C8D;
+    --text-xlight: #B0BEC5;
     --bg-light: #F9FBF9;
     --border-color: #EAEAEA;
     --white: #ffffff;
     --sidebar-width: 260px;
+    --shadow-soft: 0 4px 24px rgba(46,125,50,.06);
+    --shadow-card: 0 8px 32px rgba(46,125,50,.08);
+    --radius-lg: 20px;
+    --radius-md: 12px;
 }
 
 * {
@@ -45,6 +51,7 @@ body {
     left: 0;
     top: 0;
     z-index: 100;
+    transition: width 0.3s ease;
 }
 
 .brand {
@@ -53,24 +60,27 @@ body {
     gap: 12px;
     margin-bottom: 40px;
     padding-left: 10px;
+    cursor: default;
 }
 
 .scene-sidebar {
     position: relative;
     width: 40px;
     height: 40px;
+    flex-shrink: 0;
 }
 
 .dot-sidebar {
     position: absolute;
-    width: 8px;
-    height: 8px;
+    width: 9px;
+    height: 9px;
     border-radius: 50%;
     left: 50%;
     top: 50%;
-    margin-left: -4px;
-    margin-top: -4px;
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    margin-left: -4.5px;
+    margin-top: -4.5px;
+    transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 2px 8px rgba(46,125,50,.15);
 }
 
 .dot-sidebar:nth-child(1) { background: #1B5E20; }
@@ -80,16 +90,21 @@ body {
 
 .brand-name {
     font-size: 18px;
-    font-weight: 600;
-    color: #1B5E20;
+    font-weight: 700;
+    color: var(--primary-dark);
     letter-spacing: 0.5px;
+}
+.brand-name span {
+    color: var(--text-light);
+    font-weight: 400;
 }
 
 .menu-list {
     list-style: none;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
+    flex: 1;
 }
 
 .menu-item a {
@@ -101,13 +116,32 @@ body {
     text-decoration: none;
     font-size: 14px;
     font-weight: 500;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     transition: all 0.2s ease;
+    position: relative;
 }
 
-.menu-item a:hover, .menu-item.active a {
+.menu-item a:hover {
     background: var(--primary-ultra-light);
     color: var(--primary-color);
+}
+
+.menu-item.active a {
+    background: var(--primary-ultra-light);
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.menu-item.active a::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3px;
+    height: 24px;
+    background: var(--primary-color);
+    border-radius: 0 3px 3px 0;
 }
 
 .menu-item a svg {
@@ -115,45 +149,82 @@ body {
     fill: none;
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
+}
+
+.sidebar-footer {
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+    font-size: 11px;
+    color: var(--text-xlight);
+    text-align: center;
+}
+.sidebar-footer a {
+    color: var(--text-xlight);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+.sidebar-footer a:hover {
+    color: var(--primary-color);
 }
 
 /* ==================== ÁREA DE CONTEÚDO PRINCIPAL ==================== */
 .main-content {
     margin-left: var(--sidebar-width);
     flex: 1;
-    padding: 40px;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+    padding: 30px 40px 30px;
 }
 
 .top-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 35px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
 }
 
 .page-title h2 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 600;
     color: var(--text-dark);
 }
-
 .page-title p {
     font-size: 13px;
     color: var(--text-light);
 }
 
+.user-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-light);
+}
+.user-status .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+@keyframes pulse-dot {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+}
+
 /* ── CENTRO ───────────────────────────────────────────── */
-.center-container {
+.center-wrapper {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 32px;
-    width: 100%;
+    gap: 28px;
+    padding: 10px 0;
     position: relative;
 }
 
@@ -162,144 +233,126 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 22px;
-    transition: transform .7s cubic-bezier(.4,0,.2,1),
-                opacity   .7s cubic-bezier(.4,0,.2,1),
-                margin-top .7s cubic-bezier(.4,0,.2,1);
+    gap: 20px;
+    transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.6s ease,
+                margin-top 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.scene-wrapper.top-mode { margin-top: -200px; }
-.scene-wrapper.hidden   { opacity:0; pointer-events:none; transform:scale(.85); }
+.scene-wrapper.top-mode { margin-top: -180px; }
+.scene-wrapper.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.85);
+}
 
-/* Esferas */
+/* Esferas centrais */
 .scene {
     position: relative;
-    width: 180px;
-    height: 180px;
+    width: 160px;
+    height: 160px;
 }
 .dot {
     position: absolute;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     left: 50%;
     top: 50%;
-    margin-left: -18px;
-    margin-top: -18px;
-    transition: transform .8s cubic-bezier(.4,0,.2,1),
-                background .6s ease;
-    box-shadow: 0 4px 12px rgba(46,125,50,.1);
+    margin-left: -16px;
+    margin-top: -16px;
+    transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 0.6s ease;
+    box-shadow: 0 4px 16px rgba(46,125,50,.12);
 }
-.dot:nth-child(1){ background:#1B5E20; }
-.dot:nth-child(2){ background:#2E7D32; }
-.dot:nth-child(3){ background:#4CAF50; }
-.dot:nth-child(4){ background:#81C784; }
+.dot:nth-child(1){ background: #1B5E20; }
+.dot:nth-child(2){ background: #2E7D32; }
+.dot:nth-child(3){ background: #4CAF50; }
+.dot:nth-child(4){ background: #81C784; }
 
 /* Órbita pensando */
-.scene.thinking .dot:nth-child(1){ animation:orbit1 1.4s linear infinite; }
-.scene.thinking .dot:nth-child(2){ animation:orbit2 1.4s linear infinite; }
-.scene.thinking .dot:nth-child(3){ animation:orbit3 1.4s linear infinite; }
-.scene.thinking .dot:nth-child(4){ animation:orbit4 1.4s linear infinite; }
+.scene.thinking .dot:nth-child(1){ animation:orbit1 1.4s ease-in-out infinite; }
+.scene.thinking .dot:nth-child(2){ animation:orbit2 1.4s ease-in-out infinite; }
+.scene.thinking .dot:nth-child(3){ animation:orbit3 1.4s ease-in-out infinite; }
+.scene.thinking .dot:nth-child(4){ animation:orbit4 1.4s ease-in-out infinite; }
+
 @keyframes orbit1 {
-    0%  { transform:translate(  0px,-55px); }
-    25% { transform:translate( 55px,  0px); }
-    50% { transform:translate(  0px, 55px); }
-    75% { transform:translate(-55px,  0px); }
-    100%{ transform:translate(  0px,-55px); }
+    0%  { transform:translate(  0px,-48px); }
+    25% { transform:translate( 48px,  0px); }
+    50% { transform:translate(  0px, 48px); }
+    75% { transform:translate(-48px,  0px); }
+    100%{ transform:translate(  0px,-48px); }
 }
 @keyframes orbit2 {
-    0%  { transform:translate( 55px,  0px); }
-    25% { transform:translate(  0px, 55px); }
-    50% { transform:translate(-55px,  0px); }
-    75% { transform:translate(  0px,-55px); }
-    100%{ transform:translate( 55px,  0px); }
+    0%  { transform:translate( 48px,  0px); }
+    25% { transform:translate(  0px, 48px); }
+    50% { transform:translate(-48px,  0px); }
+    75% { transform:translate(  0px,-48px); }
+    100%{ transform:translate( 48px,  0px); }
 }
 @keyframes orbit3 {
-    0%  { transform:translate(  0px, 55px); }
-    25% { transform:translate(-55px,  0px); }
-    50% { transform:translate(  0px,-55px); }
-    75% { transform:translate( 55px,  0px); }
-    100%{ transform:translate(  0px, 55px); }
+    0%  { transform:translate(  0px, 48px); }
+    25% { transform:translate(-48px,  0px); }
+    50% { transform:translate(  0px,-48px); }
+    75% { transform:translate( 48px,  0px); }
+    100%{ transform:translate(  0px, 48px); }
 }
 @keyframes orbit4 {
-    0%  { transform:translate(-55px,  0px); }
-    25% { transform:translate(  0px,-55px); }
-    50% { transform:translate( 55px,  0px); }
-    75% { transform:translate(  0px, 55px); }
-    100%{ transform:translate(-55px,  0px); }
+    0%  { transform:translate(-48px,  0px); }
+    25% { transform:translate(  0px,-48px); }
+    50% { transform:translate( 48px,  0px); }
+    75% { transform:translate(  0px, 48px); }
+    100%{ transform:translate(-48px,  0px); }
 }
 
-/* ── PLACEHOLDER / TRANSCRIÇÃO ─────────────────────────── */
-.subtitle-area { min-height:28px; text-align:center; max-width:380px; }
+/* ── PLACEHOLDER ─────────────────────────────────────────── */
+.subtitle-area {
+    min-height: 28px;
+    text-align: center;
+    max-width: 420px;
+}
 .placeholder-text {
-    font-size:14px; color:var(--text-light); font-style:italic;
-    opacity:1; transition:opacity .5s ease;
+    font-size: 14px;
+    color: var(--text-light);
+    font-style: italic;
+    opacity: 1;
+    transition: opacity 0.5s ease;
 }
-.placeholder-text.fade { opacity:0; }
+.placeholder-text.fade { opacity: 0; }
 
-.transcript-text {
-    font-size:15px; color:var(--primary-color); font-weight:500;
-    text-align:center; max-width:380px;
-    opacity:0; transition:opacity .4s ease;
-}
-.transcript-text.visible { opacity:1; }
-
-/* ── RESPOSTA ────────────────────────────────────────────── */
-.response-area {
-    width:100%; max-width:540px; text-align:center;
-    opacity:0; transform:translateY(14px);
-    transition: opacity .5s ease, transform .5s ease;
-    pointer-events:none; display:none;
-}
-.response-area.visible {
-    display:block; opacity:1; transform:translateY(0); pointer-events:auto;
-}
-.response-bubble {
-    background:var(--white); border:1px solid rgba(46,125,50,.10);
-    border-radius:20px; padding:20px 26px;
-    font-size:15px; line-height:1.65; color:var(--text-dark);
-    box-shadow:0 4px 24px rgba(46,125,50,.06);
-    text-align:left; max-height:260px; overflow-y:auto;
-}
-.response-bubble::-webkit-scrollbar { width:4px; }
-.response-bubble::-webkit-scrollbar-thumb { background:var(--primary-ultra-light); border-radius:2px; }
-
-.typing-dots { display:inline-flex; gap:5px; align-items:center; }
-.typing-dots span {
-    width:7px; height:7px; border-radius:50%; background:var(--primary-light);
-    animation:blink 1.2s ease-in-out infinite;
-}
-.typing-dots span:nth-child(2){ animation-delay:.2s; }
-.typing-dots span:nth-child(3){ animation-delay:.4s; }
-@keyframes blink {
-    0%,80%,100%{ opacity:.25; transform:scale(.8); }
-    40%        { opacity:1;   transform:scale(1);   }
-}
-
-/* ── MODO ESCUTA ATIVA — círculo central ─────────────────── */
+/* ── CÍRCULO DE ESCUTA ATIVA ────────────────────────────── */
 .listen-circle {
-    position:relative;
-    width:160px; height:160px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    opacity:0; pointer-events:none;
-    transform:scale(.8);
-    transition: opacity .6s cubic-bezier(.4,0,.2,1),
-                transform .6s cubic-bezier(.4,0,.2,1);
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+    transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.listen-circle.visible { opacity:1; pointer-events:auto; transform:scale(1); }
+.listen-circle.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
 
-/* Anel externo */
 .listen-ring {
-    position:absolute; inset:0; border-radius:50%;
-    border:2px solid rgba(46,125,50,.15);
-    box-shadow:0 0 0 0 rgba(46,125,50,.1);
-    animation:none;
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid rgba(46,125,50,.12);
+    box-shadow: 0 0 0 0 rgba(46,125,50,.08);
+    animation: none;
 }
 .listen-circle.active .listen-ring {
-    animation:ringPulse 2s ease-in-out infinite;
+    animation: ringPulse 2s ease-in-out infinite;
 }
-/* Gradiente verde→rosa quando respondendo */
 .listen-circle.responding .listen-ring {
-    border-color:transparent;
+    border-color: transparent;
     background: conic-gradient(
         from 0deg,
         #2E7D32 0%,
@@ -310,120 +363,351 @@ body {
     );
     mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0);
     -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0);
-    animation:spinGradient 2.5s linear infinite;
+    animation: spinGradient 2.5s linear infinite;
 }
 @keyframes ringPulse {
-    0%,100%{ box-shadow:0 0 0 0   rgba(46,125,50,.15); }
-    50%    { box-shadow:0 0 0 12px rgba(46,125,50,0);   }
+    0%, 100% { box-shadow: 0 0 0 0 rgba(46,125,50,.15); }
+    50% { box-shadow: 0 0 0 16px rgba(46,125,50,0); }
 }
 @keyframes spinGradient {
-    to { transform:rotate(360deg); }
+    to { transform: rotate(360deg); }
 }
 
-/* Canvas da faixa de áudio dentro do círculo */
 #waveCanvas {
-    position:absolute; inset:0;
-    width:100%; height:100%;
-    border-radius:50%;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
 }
 
-/* Fundo do círculo */
 .listen-bg {
-    position:absolute; inset:6px;
-    border-radius:50%; background:var(--white);
-    box-shadow:0 8px 32px rgba(46,125,50,.08);
+    position: absolute;
+    inset: 6px;
+    border-radius: 50%;
+    background: var(--white);
+    box-shadow: inset 0 2px 12px rgba(46,125,50,.04);
+}
+
+/* ── TRANSCRIÇÃO ─────────────────────────────────────────── */
+.transcript-text {
+    font-size: 15px;
+    color: var(--primary-color);
+    font-weight: 500;
+    text-align: center;
+    max-width: 400px;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    min-height: 24px;
+}
+.transcript-text.visible { opacity: 1; }
+
+/* ── RESPOSTA ELEGANTE ────────────────────────────────────── */
+.response-area {
+    width: 100%;
+    max-width: 620px;
+    opacity: 0;
+    transform: translateY(20px) scale(0.97);
+    transition: opacity 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+                transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    pointer-events: none;
+    display: none;
+}
+.response-area.visible {
+    display: block;
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.response-container {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    padding: 24px 28px;
+    box-shadow: var(--shadow-card);
+    border: 1px solid rgba(46,125,50,.06);
+    position: relative;
+    overflow: hidden;
+}
+
+.response-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #2E7D32, #81C784, #4CAF50);
+    opacity: 0.6;
+}
+
+.response-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.response-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--primary-ultra-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.response-avatar svg {
+    stroke: var(--primary-color);
+}
+
+.response-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-light);
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+}
+
+.response-body {
+    font-size: 15px;
+    line-height: 1.7;
+    color: var(--text-dark);
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+.response-body::-webkit-scrollbar {
+    width: 4px;
+}
+.response-body::-webkit-scrollbar-thumb {
+    background: var(--primary-ultra-light);
+    border-radius: 2px;
+}
+.response-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.response-body .typing-dots {
+    display: inline-flex;
+    gap: 6px;
+    align-items: center;
+    padding: 4px 0;
+}
+.response-body .typing-dots span {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--primary-light);
+    animation: blink 1.2s ease-in-out infinite;
+}
+.response-body .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.response-body .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes blink {
+    0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+}
+
+.response-footer {
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.response-footer .time {
+    font-size: 11px;
+    color: var(--text-xlight);
+}
+
+.response-footer .action-btn {
+    background: none;
+    border: none;
+    color: var(--text-xlight);
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+}
+.response-footer .action-btn:hover {
+    color: var(--primary-color);
+    background: var(--primary-ultra-light);
 }
 
 /* ── INPUT RODAPÉ ──────────────────────────────────────── */
+.input-wrapper {
+    width: 100%;
+    max-width: 620px;
+    flex-shrink: 0;
+    padding: 10px 0 0;
+}
+
 .input-container {
-    width:100%; max-width:600px;
-    display:flex; align-items:center;
-    background:var(--white); border-radius:30px;
-    padding:8px 10px 8px 20px;
-    box-shadow:0 4px 20px rgba(0,0,0,.02);
-    border:1px solid rgba(46,125,50,.08);
-    transition:all .3s; gap:6px;
+    display: flex;
+    align-items: center;
+    background: var(--white);
+    border-radius: 50px;
+    padding: 6px 6px 6px 20px;
+    box-shadow: var(--shadow-soft);
+    border: 1.5px solid rgba(46,125,50,.06);
+    transition: all 0.3s ease;
+    gap: 4px;
 }
 .input-container:focus-within {
-    border-color:var(--primary-color);
-    box-shadow:0 6px 24px rgba(46,125,50,.05);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 24px rgba(46,125,50,.08);
 }
-.message-input {
-    flex:1; border:none; outline:none; background:transparent;
-    font-size:15px; color:var(--text-dark); padding:8px 0;
-}
-.message-input::placeholder { color:var(--text-light); }
 
-/* Botão modo escuta — círculo com mini waveform SVG */
+.message-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 15px;
+    color: var(--text-dark);
+    padding: 10px 0;
+    min-width: 0;
+}
+.message-input::placeholder {
+    color: var(--text-xlight);
+}
+
+.input-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+/* Botão modo escuta */
 .voice-mode-btn {
-    width:44px; height:44px; border-radius:50%;
-    background:var(--white); border:1.5px solid rgba(46,125,50,.15);
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; flex-shrink:0;
-    transition:all .25s ease;
-    box-shadow:0 2px 8px rgba(46,125,50,.04);
-    position:relative; overflow:hidden;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 1.5px solid rgba(46,125,50,.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
 }
 .voice-mode-btn:hover {
-    border-color:var(--primary-light);
-    box-shadow:0 3px 12px rgba(46,125,50,.12);
+    border-color: var(--primary-light);
+    background: var(--primary-ultra-light);
 }
 .voice-mode-btn.active {
-    background:var(--primary-color);
-    border-color:var(--primary-color);
-    box-shadow:0 4px 16px rgba(46,125,50,.3);
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 16px rgba(46,125,50,.25);
 }
 .voice-mode-btn .btn-wave {
-    display:flex; align-items:center; gap:2px; height:16px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 16px;
 }
 .voice-mode-btn .btn-wave span {
-    display:block; width:2.5px; border-radius:2px;
-    background:var(--text-light); transition:background .25s;
+    display: block;
+    width: 2.5px;
+    border-radius: 2px;
+    background: var(--text-light);
+    transition: background 0.25s;
 }
-.voice-mode-btn.active .btn-wave span { background:var(--white); }
-/* Alturas dos 5 tracinhos (waveform miniaturo) */
-.voice-mode-btn .btn-wave span:nth-child(1){ height:6px;  }
-.voice-mode-btn .btn-wave span:nth-child(2){ height:12px; }
-.voice-mode-btn .btn-wave span:nth-child(3){ height:16px; }
-.voice-mode-btn .btn-wave span:nth-child(4){ height:10px; }
-.voice-mode-btn .btn-wave span:nth-child(5){ height:5px;  }
-/* Animação quando ativo */
-.voice-mode-btn.active .btn-wave span:nth-child(1){ animation:bw 0.9s ease-in-out infinite; }
-.voice-mode-btn.active .btn-wave span:nth-child(2){ animation:bw 0.9s ease-in-out infinite .15s; }
-.voice-mode-btn.active .btn-wave span:nth-child(3){ animation:bw 0.9s ease-in-out infinite .05s; }
-.voice-mode-btn.active .btn-wave span:nth-child(4){ animation:bw 0.9s ease-in-out infinite .2s; }
-.voice-mode-btn.active .btn-wave span:nth-child(5){ animation:bw 0.9s ease-in-out infinite .1s; }
+.voice-mode-btn.active .btn-wave span {
+    background: var(--white);
+}
+.voice-mode-btn .btn-wave span:nth-child(1) { height: 6px; }
+.voice-mode-btn .btn-wave span:nth-child(2) { height: 12px; }
+.voice-mode-btn .btn-wave span:nth-child(3) { height: 16px; }
+.voice-mode-btn .btn-wave span:nth-child(4) { height: 10px; }
+.voice-mode-btn .btn-wave span:nth-child(5) { height: 5px; }
+
+.voice-mode-btn.active .btn-wave span:nth-child(1) { animation: bw 0.9s ease-in-out infinite; }
+.voice-mode-btn.active .btn-wave span:nth-child(2) { animation: bw 0.9s ease-in-out infinite 0.15s; }
+.voice-mode-btn.active .btn-wave span:nth-child(3) { animation: bw 0.9s ease-in-out infinite 0.05s; }
+.voice-mode-btn.active .btn-wave span:nth-child(4) { animation: bw 0.9s ease-in-out infinite 0.2s; }
+.voice-mode-btn.active .btn-wave span:nth-child(5) { animation: bw 0.9s ease-in-out infinite 0.1s; }
 @keyframes bw {
-    0%,100%{ transform:scaleY(.5); }
-    50%    { transform:scaleY(1);   }
+    0%, 100% { transform: scaleY(0.5); }
+    50% { transform: scaleY(1); }
 }
 
 /* Botão enviar */
 .send-btn {
-    background:var(--primary-ultra-light); border:none;
-    width:40px; height:40px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; transition:all .2s; flex-shrink:0;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: var(--primary-ultra-light);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
 }
-.send-btn svg { color:var(--primary-color); transition:transform .2s; }
-.send-btn:hover { background:var(--primary-color); }
-.send-btn:hover svg { color:var(--white); transform:translateX(2px); }
-.send-btn:disabled { opacity:.4; cursor:not-allowed; }
+.send-btn svg {
+    color: var(--primary-color);
+    transition: transform 0.25s ease;
+}
+.send-btn:hover {
+    background: var(--primary-color);
+}
+.send-btn:hover svg {
+    color: var(--white);
+    transform: translateX(2px);
+}
+.send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+.send-btn:disabled:hover {
+    background: var(--primary-ultra-light);
+}
+.send-btn:disabled:hover svg {
+    color: var(--primary-color);
+    transform: none;
+}
 
-/* Responsividade */
+/* ==================== RESPONSIVIDADE ==================== */
 @media (max-width: 900px) {
     .sidebar {
-        width: 70px;
-        padding: 20px 10px;
+        width: 72px;
+        padding: 20px 12px;
     }
-    .brand-name, .menu-item span {
+    .brand-name {
         display: none;
     }
     .brand {
         justify-content: center;
+        padding-left: 0;
+    }
+    .menu-item a span {
+        display: none;
+    }
+    .menu-item a {
+        justify-content: center;
+        padding: 12px;
+    }
+    .menu-item.active a::before {
+        display: none;
+    }
+    .sidebar-footer {
+        display: none;
     }
     .main-content {
-        margin-left: 70px;
+        margin-left: 72px;
         padding: 20px;
     }
     .scene {
@@ -437,43 +721,128 @@ body {
         margin-top: -12px;
     }
     @keyframes orbit1 {
-        0%  { transform:translate(  0px,-38px); }
-        25% { transform:translate( 38px,  0px); }
-        50% { transform:translate(  0px, 38px); }
-        75% { transform:translate(-38px,  0px); }
-        100%{ transform:translate(  0px,-38px); }
+        0%  { transform:translate(  0px,-36px); }
+        25% { transform:translate( 36px,  0px); }
+        50% { transform:translate(  0px, 36px); }
+        75% { transform:translate(-36px,  0px); }
+        100%{ transform:translate(  0px,-36px); }
     }
     @keyframes orbit2 {
-        0%  { transform:translate( 38px,  0px); }
-        25% { transform:translate(  0px, 38px); }
-        50% { transform:translate(-38px,  0px); }
-        75% { transform:translate(  0px,-38px); }
-        100%{ transform:translate( 38px,  0px); }
+        0%  { transform:translate( 36px,  0px); }
+        25% { transform:translate(  0px, 36px); }
+        50% { transform:translate(-36px,  0px); }
+        75% { transform:translate(  0px,-36px); }
+        100%{ transform:translate( 36px,  0px); }
     }
     @keyframes orbit3 {
-        0%  { transform:translate(  0px, 38px); }
-        25% { transform:translate(-38px,  0px); }
-        50% { transform:translate(  0px,-38px); }
-        75% { transform:translate( 38px,  0px); }
-        100%{ transform:translate(  0px, 38px); }
+        0%  { transform:translate(  0px, 36px); }
+        25% { transform:translate(-36px,  0px); }
+        50% { transform:translate(  0px,-36px); }
+        75% { transform:translate( 36px,  0px); }
+        100%{ transform:translate(  0px, 36px); }
     }
     @keyframes orbit4 {
-        0%  { transform:translate(-38px,  0px); }
-        25% { transform:translate(  0px,-38px); }
-        50% { transform:translate( 38px,  0px); }
-        75% { transform:translate(  0px, 38px); }
-        100%{ transform:translate(-38px,  0px); }
+        0%  { transform:translate(-36px,  0px); }
+        25% { transform:translate(  0px,-36px); }
+        50% { transform:translate( 36px,  0px); }
+        75% { transform:translate(  0px, 36px); }
+        100%{ transform:translate(-36px,  0px); }
     }
     .listen-circle {
         width: 120px;
         height: 120px;
     }
+    .response-container {
+        padding: 18px 20px;
+    }
+    .input-container {
+        padding: 4px 4px 4px 16px;
+    }
+    .top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-content {
+        padding: 14px;
+    }
+    .scene {
+        width: 100px;
+        height: 100px;
+    }
+    .dot {
+        width: 20px;
+        height: 20px;
+        margin-left: -10px;
+        margin-top: -10px;
+    }
+    @keyframes orbit1 {
+        0%  { transform:translate(  0px,-30px); }
+        25% { transform:translate( 30px,  0px); }
+        50% { transform:translate(  0px, 30px); }
+        75% { transform:translate(-30px,  0px); }
+        100%{ transform:translate(  0px,-30px); }
+    }
+    @keyframes orbit2 {
+        0%  { transform:translate( 30px,  0px); }
+        25% { transform:translate(  0px, 30px); }
+        50% { transform:translate(-30px,  0px); }
+        75% { transform:translate(  0px,-30px); }
+        100%{ transform:translate( 30px,  0px); }
+    }
+    @keyframes orbit3 {
+        0%  { transform:translate(  0px, 30px); }
+        25% { transform:translate(-30px,  0px); }
+        50% { transform:translate(  0px,-30px); }
+        75% { transform:translate( 30px,  0px); }
+        100%{ transform:translate(  0px, 30px); }
+    }
+    @keyframes orbit4 {
+        0%  { transform:translate(-30px,  0px); }
+        25% { transform:translate(  0px,-30px); }
+        50% { transform:translate( 30px,  0px); }
+        75% { transform:translate(  0px, 30px); }
+        100%{ transform:translate(-30px,  0px); }
+    }
+    .listen-circle {
+        width: 100px;
+        height: 100px;
+    }
+    .response-container {
+        padding: 14px 16px;
+    }
+    .response-body {
+        font-size: 14px;
+    }
+    .input-container {
+        padding: 4px 4px 4px 12px;
+    }
+    .message-input {
+        font-size: 14px;
+        padding: 8px 0;
+    }
+    .voice-mode-btn,
+    .send-btn {
+        width: 36px;
+        height: 36px;
+    }
+    .voice-mode-btn .btn-wave {
+        height: 14px;
+    }
+    .voice-mode-btn .btn-wave span:nth-child(1) { height: 5px; }
+    .voice-mode-btn .btn-wave span:nth-child(2) { height: 10px; }
+    .voice-mode-btn .btn-wave span:nth-child(3) { height: 14px; }
+    .voice-mode-btn .btn-wave span:nth-child(4) { height: 8px; }
+    .voice-mode-btn .btn-wave span:nth-child(5) { height: 4px; }
 }
 </style>
 </head>
 <body>
 
-<!-- ==================== MENU LATERAL (SIDEBAR) ==================== -->
+<!-- ==================== MENU LATERAL ==================== -->
 <div class="sidebar">
     <div class="brand">
         <div class="scene-sidebar" id="sceneSidebar">
@@ -482,54 +851,62 @@ body {
             <div class="dot-sidebar"></div>
             <div class="dot-sidebar"></div>
         </div>
-        <span class="brand-name">YRA Assistant</span>
+        <span class="brand-name">YRA <span>Assistant</span></span>
     </div>
 
     <ul class="menu-list">
         <li class="menu-item active">
             <a href="center.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                 <span>Chat</span>
             </a>
         </li>
         <li class="menu-item">
             <a href="plugins.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
                 <span>Plugins</span>
             </a>
         </li>
         <li class="menu-item">
             <a href="notes.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
                 <span>Notas</span>
             </a>
         </li>
         <li class="menu-item">
             <a href="memory.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                 <span>Memória</span>
             </a>
         </li>
         <li class="menu-item">
             <a href="settings.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
                 <span>Configurações</span>
             </a>
         </li>
     </ul>
+
+    <div class="sidebar-footer">
+        <a href="https://github.com/Syradevops" target="_blank">@Syradevops</a>
+    </div>
 </div>
 
 <!-- ==================== CONTEÚDO PRINCIPAL ==================== -->
 <div class="main-content">
-    <div class="top-header">
+    <header class="top-header">
         <div class="page-title">
             <h2>Yra Assistant</h2>
             <p>Assistente pessoal inteligente</p>
         </div>
-    </div>
+        <div class="user-status">
+            <span class="dot"></span>
+            <span>Online</span>
+        </div>
+    </header>
 
     <!-- ÁREA CENTRAL -->
-    <div class="center-container" id="centerContainer">
+    <div class="center-wrapper" id="centerContainer">
 
         <!-- Esferas -->
         <div class="scene-wrapper" id="sceneWrapper">
@@ -541,7 +918,6 @@ body {
             </div>
             <div class="subtitle-area">
                 <div class="placeholder-text" id="placeholderText">Inicializando Yra...</div>
-                <div class="transcript-text" id="transcriptText"></div>
             </div>
         </div>
 
@@ -552,59 +928,81 @@ body {
             <canvas id="waveCanvas"></canvas>
         </div>
 
-        <!-- Transcrição no modo escuta -->
-        <div class="transcript-text" id="listenTranscript"
-             style="max-width:340px; font-size:14px; text-align:center; transition:opacity .4s; opacity:0;"></div>
+        <!-- Transcrição -->
+        <div class="transcript-text" id="listenTranscript"></div>
 
-        <!-- Resposta -->
+        <!-- Resposta Elegante -->
         <div class="response-area" id="responseArea">
-            <div class="response-bubble" id="responseBubble"></div>
+            <div class="response-container">
+                <div class="response-header">
+                    <div class="response-avatar">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 8v4l3 3"/>
+                        </svg>
+                    </div>
+                    <span class="response-label">Yra Respondeu</span>
+                </div>
+                <div class="response-body" id="responseBody"></div>
+                <div class="response-footer">
+                    <span class="time" id="responseTime">Agora mesmo</span>
+                    <button class="action-btn" id="closeResponseBtn" title="Fechar">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                        Fechar
+                    </button>
+                </div>
+            </div>
         </div>
 
     </div>
 
     <!-- INPUT RODAPÉ -->
-    <footer class="input-container">
-        <input type="text" class="message-input" id="messageInput" placeholder="Pergunte qualquer coisa ao Yra...">
+    <div class="input-wrapper">
+        <div class="input-container">
+            <input type="text" class="message-input" id="messageInput" placeholder="Pergunte qualquer coisa ao Yra...">
 
-        <!-- Botão modo escuta ativa -->
-        <button class="voice-mode-btn" id="voiceModeBtn" title="Modo escuta ativa" aria-label="Ativar modo de escuta contínua">
-            <div class="btn-wave">
-                <span></span><span></span><span></span><span></span><span></span>
+            <div class="input-actions">
+                <button class="voice-mode-btn" id="voiceModeBtn" title="Modo escuta ativa" aria-label="Ativar modo de escuta contínua">
+                    <div class="btn-wave">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                </button>
+
+                <button class="send-btn" id="sendBtn" aria-label="Enviar mensagem">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                </button>
             </div>
-        </button>
-
-        <!-- Botão enviar -->
-        <button class="send-btn" id="sendBtn" aria-label="Enviar mensagem">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-            </svg>
-        </button>
-    </footer>
+        </div>
+    </div>
 </div>
 
 <!-- FIREBASE -->
 <script type="module">
-import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs }
-       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey:            "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
-    authDomain:        "yra-syra.firebaseapp.com",
-    projectId:         "yra-syra",
-    storageBucket:     "yra-syra.firebasestorage.app",
+    apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+    authDomain: "yra-syra.firebaseapp.com",
+    projectId: "yra-syra",
+    storageBucket: "yra-syra.firebasestorage.app",
     messagingSenderId: "555145505684",
-    appId:             "1:555145505684:web:aa1ef14072653e41057d81"
+    appId: "1:555145505684:web:aa1ef14072653e41057d81"
 };
 
-const app  = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db   = getFirestore(app);
+const db = getFirestore(app);
 
 window.__yraFirestore = db;
-window.__yraAuth      = auth;
+window.__yraAuth = auth;
 
 onAuthStateChanged(auth, async (user) => {
     if (!user) {
@@ -614,48 +1012,49 @@ onAuthStateChanged(auth, async (user) => {
             const q = query(
                 collection(db, "Keys"),
                 where("user_id", "==", user.uid),
-                where("enabled",  "==", true)
+                where("enabled", "==", true)
             );
             const ks = await getDocs(q);
             if (!ks.empty) {
                 window.__yraApiKey = ks.docs[0].data().key;
             }
-        } catch(e) { console.error("Erro key:", e); }
+        } catch (e) {
+            console.error("Erro key:", e);
+        }
     }
 });
 </script>
 
 <script>
 /* ================================================================
-   ANIMAÇÃO DO LOGO LATERAL (BOLINHAS)
+   SIDEBAR — ANIMAÇÃO DAS BOLINHAS (PARADA E ELEGANTE)
 ================================================================ */
 const sidebarDots = document.querySelectorAll(".dot-sidebar");
-const positions = [
-    {x: 0, y: -10},
-    {x: 10, y: 0},
-    {x: 0, y: 10},
-    {x: -10, y: 0}
-];
+let sidebarAngle = 0;
 
-function shuffleArray(arr) {
-    let a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+function animateSidebarDots() {
+    const positions = [
+        { x: 0, y: -12 },
+        { x: 12, y: 0 },
+        { x: 0, y: 12 },
+        { x: -12, y: 0 }
+    ];
+
+    // Movimento suave e sincronizado com as esferas centrais
+    sidebarDots.forEach((dot, i) => {
+        const angle = (i / sidebarDots.length) * Math.PI * 2 + sidebarAngle;
+        const radius = 10;
+        const x = Math.cos(angle) * radius;
+        const y = Math.sin(angle) * radius;
+        dot.style.transform = `translate(${x}px, ${y}px)`;
+    });
+
+    sidebarAngle += 0.008;
+    requestAnimationFrame(animateSidebarDots);
 }
 
-function startSidebarAnimation() {
-    setInterval(() => {
-        const p = shuffleArray(positions);
-        sidebarDots.forEach((dot, i) => {
-            dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
-        });
-    }, 1000);
-}
-
-startSidebarAnimation();
+// Inicia a animação suave
+animateSidebarDots();
 
 /* ================================================================
    PLACEHOLDERS
@@ -683,13 +1082,12 @@ const PLACEHOLDERS = [
     "Lendo sobre buracos negros. Por diversão.",
 ];
 
-const placeholderEl   = document.getElementById("placeholderText");
-const transcriptEl    = document.getElementById("transcriptText");
-const listenTranscript= document.getElementById("listenTranscript");
+const placeholderEl = document.getElementById("placeholderText");
+const listenTranscript = document.getElementById("listenTranscript");
 
-let phIndex   = Math.floor(Math.random() * PLACEHOLDERS.length);
+let phIndex = Math.floor(Math.random() * PLACEHOLDERS.length);
 let phTimeout = null;
-let isIdle    = true;
+let isIdle = true;
 
 function showNextPlaceholder() {
     if (!isIdle) return;
@@ -701,14 +1099,15 @@ function showNextPlaceholder() {
     }, 500);
     phTimeout = setTimeout(showNextPlaceholder, 3500);
 }
+
 function startPlaceholders() {
     isIdle = true;
-    placeholderEl.style.display  = "block";
+    placeholderEl.style.display = "block";
     placeholderEl.classList.remove("fade");
-    transcriptEl.classList.remove("visible");
     clearTimeout(phTimeout);
     showNextPlaceholder();
 }
+
 function stopPlaceholders() {
     isIdle = false;
     clearTimeout(phTimeout);
@@ -719,40 +1118,32 @@ function stopPlaceholders() {
 setTimeout(startPlaceholders, 800);
 
 /* ================================================================
-   ESFERAS
+   ESFERAS CENTRAIS
 ================================================================ */
-const dots         = document.querySelectorAll(".dot");
-const scene        = document.getElementById("scene");
+const dots = document.querySelectorAll(".dot");
+const scene = document.getElementById("scene");
 const sceneWrapper = document.getElementById("sceneWrapper");
-
-const POS = [
-    {x:0,   y:-55},
-    {x:55,  y:0  },
-    {x:0,   y:55 },
-    {x:-55, y:0  }
-];
-
-function shuffle(arr) {
-    let a = [...arr];
-    for (let i = a.length-1; i > 0; i--) {
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]] = [a[j],a[i]];
-    }
-    return a;
-}
 
 let sphereInterval = null;
 
 function startIdleAnimation() {
     scene.classList.remove("thinking");
     clearInterval(sphereInterval);
+    // Movimento suave e aleatório
     sphereInterval = setInterval(() => {
-        const p = shuffle(POS);
+        const angle = Math.random() * Math.PI * 2;
+        const radius = 48;
+        const positions = [
+            { x: Math.cos(angle) * radius, y: Math.sin(angle) * radius },
+            { x: Math.cos(angle + Math.PI / 2) * radius, y: Math.sin(angle + Math.PI / 2) * radius },
+            { x: Math.cos(angle + Math.PI) * radius, y: Math.sin(angle + Math.PI) * radius },
+            { x: Math.cos(angle + 3 * Math.PI / 2) * radius, y: Math.sin(angle + 3 * Math.PI / 2) * radius }
+        ];
         dots.forEach((d, i) => {
-            d.style.transform = `translate(${p[i].x}px,${p[i].y}px)`;
-            d.style.animation  = "";
+            d.style.transform = `translate(${positions[i].x}px, ${positions[i].y}px)`;
+            d.style.animation = "";
         });
-    }, 1000);
+    }, 1200);
 }
 
 function startThinkingAnimation() {
@@ -766,6 +1157,7 @@ function startThinkingAnimation() {
 function hideSpheres() {
     sceneWrapper.classList.add("hidden");
 }
+
 function showSpheres(atTop = false) {
     sceneWrapper.classList.remove("hidden");
     if (atTop) {
@@ -778,32 +1170,32 @@ function showSpheres(atTop = false) {
 startIdleAnimation();
 
 /* ================================================================
-   WAVEFORM REAL — CANVAS NO CÍRCULO DE ESCUTA
+   WAVEFORM — CANVAS
 ================================================================ */
 const listenCircle = document.getElementById("listenCircle");
-const waveCanvas   = document.getElementById("waveCanvas");
-const waveCtx      = waveCanvas.getContext("2d");
+const waveCanvas = document.getElementById("waveCanvas");
+const waveCtx = waveCanvas.getContext("2d");
 
-let audioCtx    = null;
-let analyser    = null;
-let micSource   = null;
-let waveData    = null;
-let waveRAF     = null;
+let audioCtx = null;
+let analyser = null;
+let micSource = null;
+let waveData = null;
+let waveRAF = null;
 let isWaveReady = false;
 
 async function setupAudio() {
     if (isWaveReady) return true;
     try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio:true, video:false });
-        audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
-        analyser   = audioCtx.createAnalyser();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+        analyser = audioCtx.createAnalyser();
         analyser.fftSize = 256;
-        waveData   = new Uint8Array(analyser.frequencyBinCount);
-        micSource  = audioCtx.createMediaStreamSource(stream);
+        waveData = new Uint8Array(analyser.frequencyBinCount);
+        micSource = audioCtx.createMediaStreamSource(stream);
         micSource.connect(analyser);
         isWaveReady = true;
         return true;
-    } catch(e) {
+    } catch (e) {
         console.error("Mic:", e);
         return false;
     }
@@ -811,31 +1203,31 @@ async function setupAudio() {
 
 function resizeCanvas() {
     const size = listenCircle.offsetWidth;
-    waveCanvas.width  = size;
+    waveCanvas.width = size;
     waveCanvas.height = size;
 }
 
 function drawWave(isResponding = false) {
     cancelAnimationFrame(waveRAF);
     const size = waveCanvas.width;
-    const cx   = size / 2;
-    const cy   = size / 2;
-    const r    = size * 0.3;
+    const cx = size / 2;
+    const cy = size / 2;
+    const r = size * 0.28;
 
     function frame() {
         waveRAF = requestAnimationFrame(frame);
         waveCtx.clearRect(0, 0, size, size);
 
         if (isResponding) {
-            const now  = Date.now() / 1000;
+            const now = Date.now() / 1000;
             const bars = 40;
             for (let i = 0; i < bars; i++) {
                 const angle = (i / bars) * Math.PI * 2 + now * 1.2;
-                const t     = ((Math.sin(angle * 3 + now * 2) + 1) / 2);
-                const rc = Math.round(46  + (233-46)  * t);
-                const gc = Math.round(125 + (30-125)  * t);
-                const bc = Math.round(50  + (139-50)  * t);
-                const len = r * 0.22 + r * 0.18 * Math.abs(Math.sin(angle * 4 + now * 3));
+                const t = ((Math.sin(angle * 3 + now * 2) + 1) / 2);
+                const rc = Math.round(46 + (233 - 46) * t);
+                const gc = Math.round(125 + (30 - 125) * t);
+                const bc = Math.round(50 + (139 - 50) * t);
+                const len = r * 0.2 + r * 0.2 * Math.abs(Math.sin(angle * 4 + now * 3));
 
                 const x1 = cx + Math.cos(angle) * r;
                 const y1 = cy + Math.sin(angle) * r;
@@ -845,35 +1237,35 @@ function drawWave(isResponding = false) {
                 waveCtx.beginPath();
                 waveCtx.moveTo(x1, y1);
                 waveCtx.lineTo(x2, y2);
-                waveCtx.strokeStyle = `rgba(${rc},${gc},${bc},0.85)`;
-                waveCtx.lineWidth   = 2.5;
-                waveCtx.lineCap     = "round";
+                waveCtx.strokeStyle = `rgba(${rc},${gc},${bc},0.8)`;
+                waveCtx.lineWidth = 2.5;
+                waveCtx.lineCap = "round";
                 waveCtx.stroke();
             }
         } else {
             if (analyser) analyser.getByteFrequencyData(waveData);
 
-            const bars    = 36;
-            const step    = Math.floor(waveData ? waveData.length / bars : 1);
+            const bars = 36;
+            const step = Math.floor(waveData ? waveData.length / bars : 1);
 
             for (let i = 0; i < bars; i++) {
-                const angle   = (i / bars) * Math.PI * 2 - Math.PI / 2;
-                const raw     = waveData ? waveData[i * step] : 0;
-                const norm    = raw / 255;
-                const len     = r * 0.12 + r * 0.55 * norm;
+                const angle = (i / bars) * Math.PI * 2 - Math.PI / 2;
+                const raw = waveData ? waveData[i * step] : 0;
+                const norm = raw / 255;
+                const len = r * 0.1 + r * 0.5 * norm;
 
                 const x1 = cx + Math.cos(angle) * (r - 4);
                 const y1 = cy + Math.sin(angle) * (r - 4);
                 const x2 = cx + Math.cos(angle) * (r - 4 + len);
                 const y2 = cy + Math.sin(angle) * (r - 4 + len);
 
-                const alpha = 0.4 + 0.6 * norm;
+                const alpha = 0.3 + 0.7 * norm;
                 waveCtx.beginPath();
                 waveCtx.moveTo(x1, y1);
                 waveCtx.lineTo(x2, y2);
                 waveCtx.strokeStyle = `rgba(46,125,50,${alpha})`;
-                waveCtx.lineWidth   = 2.5;
-                waveCtx.lineCap     = "round";
+                waveCtx.lineWidth = 2.5;
+                waveCtx.lineCap = "round";
                 waveCtx.stroke();
             }
         }
@@ -888,38 +1280,30 @@ function stopWave() {
 }
 
 /* ================================================================
-   ESTADO GLOBAL
-================================================================ */
-let APP_STATE = "idle";
-
-function setState(newState) {
-    APP_STATE = newState;
-}
-
-/* ================================================================
    MODO ESCUTA ATIVA
 ================================================================ */
 const voiceModeBtn = document.getElementById("voiceModeBtn");
 let voiceModeActive = false;
 
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition   = null;
+let recognition = null;
 let isRecognizing = false;
-let silenceTimer  = null;
-const SILENCE_MS  = 2000;
+let silenceTimer = null;
+const SILENCE_MS = 2000;
 
 if (SpeechRecognition) {
     recognition = new SpeechRecognition();
-    recognition.continuous     = true;
+    recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang           = "pt-BR";
+    recognition.lang = "pt-BR";
 
     recognition.onresult = (event) => {
         if (!voiceModeActive) return;
-        let interim = "", final = "";
+        let interim = "",
+            final = "";
         for (let i = event.resultIndex; i < event.results.length; i++) {
-            if (event.results[i].isFinal) final   += event.results[i][0].transcript;
-            else                          interim  += event.results[i][0].transcript;
+            if (event.results[i].isFinal) final += event.results[i][0].transcript;
+            else interim += event.results[i][0].transcript;
         }
 
         const text = final || interim;
@@ -952,7 +1336,8 @@ if (SpeechRecognition) {
     recognition.onend = () => {
         isRecognizing = false;
         if (voiceModeActive && APP_STATE !== "thinking") {
-            try { recognition.start(); isRecognizing = true; } catch(_) {}
+            try { recognition.start();
+                isRecognizing = true; } catch (_) {}
         }
     };
 }
@@ -977,17 +1362,18 @@ async function activateVoiceMode() {
     drawWave(false);
 
     if (recognition && !isRecognizing) {
-        try { recognition.start(); isRecognizing = true; } catch(_) {}
+        try { recognition.start();
+            isRecognizing = true; } catch (_) {}
     }
 }
 
 function deactivateVoiceMode() {
     voiceModeActive = false;
-    isRecognizing   = false;
+    isRecognizing = false;
     voiceModeBtn.classList.remove("active");
     clearTimeout(silenceTimer);
 
-    if (recognition) try { recognition.stop(); } catch(_) {}
+    if (recognition) try { recognition.stop(); } catch (_) {}
 
     listenCircle.classList.remove("visible", "active", "responding");
     listenTranscript.style.opacity = "0";
@@ -1009,12 +1395,20 @@ voiceModeBtn.addEventListener("click", () => {
 });
 
 /* ================================================================
-   SUBMISSÃO DE MENSAGEM (texto ou voz)
+   ESTADO GLOBAL E SUBMISSÃO
 ================================================================ */
-const sendBtn      = document.getElementById("sendBtn");
+let APP_STATE = "idle";
+
+function setState(newState) {
+    APP_STATE = newState;
+}
+
+const sendBtn = document.getElementById("sendBtn");
 const messageInput = document.getElementById("messageInput");
 const responseArea = document.getElementById("responseArea");
-const responseBubble = document.getElementById("responseBubble");
+const responseBody = document.getElementById("responseBody");
+const responseTime = document.getElementById("responseTime");
+const closeResponseBtn = document.getElementById("closeResponseBtn");
 
 let isBusy = false;
 
@@ -1028,9 +1422,9 @@ async function submitMessage(text) {
     }
 
     isBusy = true;
-    messageInput.value    = "";
+    messageInput.value = "";
     messageInput.disabled = true;
-    sendBtn.disabled      = true;
+    sendBtn.disabled = true;
     setState("thinking");
 
     if (voiceModeActive) {
@@ -1041,43 +1435,45 @@ async function submitMessage(text) {
         startThinkingAnimation();
     } else {
         stopPlaceholders();
-        transcriptEl.classList.remove("visible");
         showSpheres(true);
         startThinkingAnimation();
     }
 
+    // Typing indicator
     responseArea.classList.add("visible");
-    responseBubble.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
+    responseBody.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
 
     try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+        const endpoint =
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=${apiKey}`;
         const res = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-                contents: [{ role:"user", parts:[{ text }] }],
-                generationConfig: { temperature:0.85, maxOutputTokens:512 }
+                contents: [{ role: "user", parts: [{ text }] }],
+                generationConfig: { temperature: 0.85, maxOutputTokens: 512 }
             })
         });
         const data = await res.json();
-        const reply = data.error
-            ? `⚠️ ${data.error.message}`
-            : (data.candidates?.[0]?.content?.parts?.[0]?.text || "Sem resposta.");
+        const reply = data.error ?
+            `⚠️ ${data.error.message}` :
+            (data.candidates?.[0]?.content?.parts?.[0]?.text || "Sem resposta.");
 
         showResponseText(reply);
 
-    } catch(err) {
+    } catch (err) {
         console.error(err);
         showResponseText("⚠️ Não foi possível conectar. Tente novamente.");
     } finally {
         isBusy = false;
         messageInput.disabled = false;
-        sendBtn.disabled      = false;
+        sendBtn.disabled = false;
     }
 }
 
 function showResponseText(text) {
-    responseBubble.textContent = text;
+    responseBody.textContent = text;
+    responseTime.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
     responseArea.classList.add("visible");
     setState("responding");
 
@@ -1093,7 +1489,8 @@ function showResponseText(text) {
             drawWave(true);
 
             if (recognition && !isRecognizing) {
-                try { recognition.start(); isRecognizing = true; } catch(_) {}
+                try { recognition.start();
+                    isRecognizing = true; } catch (_) {}
             }
         }, 300);
     } else {
@@ -1146,7 +1543,7 @@ async function sendTextMessage() {
 sendBtn.addEventListener("click", sendTextMessage);
 messageInput.addEventListener("keypress", e => { if (e.key === "Enter") sendTextMessage(); });
 
-responseArea.addEventListener("click", () => {
+closeResponseBtn.addEventListener("click", () => {
     if (!voiceModeActive) resetToIdle();
 });
 
