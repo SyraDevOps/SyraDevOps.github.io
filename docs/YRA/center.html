@@ -910,7 +910,7 @@ async function submitMessage(text) {
     responseBubble.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
 
     try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=${apiKey}`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
         const res = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
