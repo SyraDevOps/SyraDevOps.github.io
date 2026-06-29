@@ -38,7 +38,7 @@ body {
     overflow-x: hidden;
 }
 
-/* ==================== MENU LATERAL ==================== */
+/* ==================== SIDEBAR ==================== */
 .sidebar {
     width: var(--sidebar-width);
     background: var(--white);
@@ -82,7 +82,6 @@ body {
     transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow: 0 2px 8px rgba(46,125,50,.15);
 }
-
 .dot-sidebar:nth-child(1) { background: #1B5E20; }
 .dot-sidebar:nth-child(2) { background: #2E7D32; }
 .dot-sidebar:nth-child(3) { background: #4CAF50; }
@@ -120,18 +119,15 @@ body {
     transition: all 0.2s ease;
     position: relative;
 }
-
 .menu-item a:hover {
     background: var(--primary-ultra-light);
     color: var(--primary-color);
 }
-
 .menu-item.active a {
     background: var(--primary-ultra-light);
     color: var(--primary-color);
     font-weight: 600;
 }
-
 .menu-item.active a::before {
     content: '';
     position: absolute;
@@ -143,7 +139,6 @@ body {
     background: var(--primary-color);
     border-radius: 0 3px 3px 0;
 }
-
 .menu-item a svg {
     stroke: currentColor;
     fill: none;
@@ -186,7 +181,6 @@ body {
     margin-bottom: 20px;
     flex-shrink: 0;
 }
-
 .page-title h2 {
     font-size: 20px;
     font-weight: 600;
@@ -196,7 +190,6 @@ body {
     font-size: 13px;
     color: var(--text-light);
 }
-
 .user-status {
     display: flex;
     align-items: center;
@@ -228,7 +221,7 @@ body {
     position: relative;
 }
 
-/* Wrapper das esferas */
+/* Esferas */
 .scene-wrapper {
     display: flex;
     flex-direction: column;
@@ -249,7 +242,6 @@ body {
     margin-top: 0;
 }
 
-/* Esferas centrais */
 .scene {
     position: relative;
     width: 160px;
@@ -273,12 +265,11 @@ body {
 .dot:nth-child(3){ background: #4CAF50; }
 .dot:nth-child(4){ background: #81C784; }
 
-/* Órbita pensando - suave */
+/* Órbita pensando */
 .scene.thinking .dot:nth-child(1){ animation:orbit1 1.6s ease-in-out infinite; }
 .scene.thinking .dot:nth-child(2){ animation:orbit2 1.6s ease-in-out infinite; }
 .scene.thinking .dot:nth-child(3){ animation:orbit3 1.6s ease-in-out infinite; }
 .scene.thinking .dot:nth-child(4){ animation:orbit4 1.6s ease-in-out infinite; }
-
 @keyframes orbit1 {
     0%  { transform:translate(  0px,-48px); }
     25% { transform:translate( 48px,  0px); }
@@ -308,7 +299,6 @@ body {
     100%{ transform:translate(-48px,  0px); }
 }
 
-/* ── PLACEHOLDER ─────────────────────────────────────────── */
 .subtitle-area {
     min-height: 28px;
     text-align: center;
@@ -323,7 +313,7 @@ body {
 }
 .placeholder-text.fade { opacity: 0; }
 
-/* ── CÍRCULO DE ESCUTA ATIVA ────────────────────────────── */
+/* ── CÍRCULO DE ESCUTA ATIVA ────────────────────────── */
 .listen-circle {
     position: relative;
     width: 150px;
@@ -343,7 +333,6 @@ body {
     pointer-events: auto;
     transform: scale(1);
 }
-
 .listen-ring {
     position: absolute;
     inset: 0;
@@ -384,7 +373,6 @@ body {
     height: 100%;
     border-radius: 50%;
 }
-
 .listen-bg {
     position: absolute;
     inset: 6px;
@@ -393,7 +381,6 @@ body {
     box-shadow: inset 0 2px 12px rgba(46,125,50,.04);
 }
 
-/* ── TRANSCRIÇÃO ─────────────────────────────────────────── */
 .transcript-text {
     font-size: 15px;
     color: var(--primary-color);
@@ -406,7 +393,7 @@ body {
 }
 .transcript-text.visible { opacity: 1; }
 
-/* ── RESPOSTA ELEGANTE ────────────────────────────────────── */
+/* ── RESPOSTA ELEGANTE ────────────────────────────────── */
 .response-area {
     width: 100%;
     max-width: 620px;
@@ -423,7 +410,6 @@ body {
     transform: translateY(0) scale(1);
     pointer-events: auto;
 }
-
 .response-container {
     background: var(--white);
     border-radius: var(--radius-lg);
@@ -433,7 +419,6 @@ body {
     position: relative;
     overflow: hidden;
 }
-
 .response-container::before {
     content: '';
     position: absolute;
@@ -444,7 +429,6 @@ body {
     background: linear-gradient(90deg, #2E7D32, #81C784, #4CAF50);
     opacity: 0.6;
 }
-
 .response-header {
     display: flex;
     align-items: center;
@@ -453,7 +437,6 @@ body {
     padding-bottom: 12px;
     border-bottom: 1px solid var(--border-color);
 }
-
 .response-avatar {
     width: 32px;
     height: 32px;
@@ -467,7 +450,6 @@ body {
 .response-avatar svg {
     stroke: var(--primary-color);
 }
-
 .response-label {
     font-size: 12px;
     font-weight: 600;
@@ -475,7 +457,6 @@ body {
     letter-spacing: 0.3px;
     text-transform: uppercase;
 }
-
 .response-body {
     font-size: 15px;
     line-height: 1.7;
@@ -491,10 +472,6 @@ body {
     background: var(--primary-ultra-light);
     border-radius: 2px;
 }
-.response-body::-webkit-scrollbar-track {
-    background: transparent;
-}
-
 .response-body .typing-dots {
     display: inline-flex;
     gap: 6px;
@@ -514,7 +491,6 @@ body {
     0%, 80%, 100% { opacity: 0.25; transform: scale(0.8); }
     40% { opacity: 1; transform: scale(1); }
 }
-
 .response-footer {
     margin-top: 14px;
     padding-top: 12px;
@@ -523,12 +499,10 @@ body {
     justify-content: flex-end;
     gap: 8px;
 }
-
 .response-footer .time {
     font-size: 11px;
     color: var(--text-xlight);
 }
-
 .response-footer .action-btn {
     background: none;
     border: none;
@@ -547,7 +521,7 @@ body {
     background: var(--primary-ultra-light);
 }
 
-/* ── INPUT RODAPÉ ──────────────────────────────────────── */
+/* ── INPUT ────────────────────────────────────────────── */
 .input-wrapper {
     width: 100%;
     max-width: 620px;
@@ -555,7 +529,6 @@ body {
     padding: 10px 0 0;
     margin: 0 auto;
 }
-
 .input-container {
     display: flex;
     align-items: center;
@@ -572,7 +545,6 @@ body {
     border-color: var(--primary-color);
     box-shadow: 0 4px 24px rgba(46,125,50,.08);
 }
-
 .message-input {
     flex: 1;
     border: none;
@@ -587,7 +559,6 @@ body {
 .message-input::placeholder {
     color: var(--text-xlight);
 }
-
 .input-actions {
     display: flex;
     align-items: center;
@@ -595,7 +566,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Botão modo escuta */
 .voice-mode-btn {
     width: 42px;
     height: 42px;
@@ -650,7 +620,6 @@ body {
     50% { transform: scaleY(1); }
 }
 
-/* Botão enviar */
 .send-btn {
     width: 42px;
     height: 42px;
@@ -679,47 +648,24 @@ body {
     opacity: 0.4;
     cursor: not-allowed;
 }
-.send-btn:disabled:hover {
-    background: var(--primary-ultra-light);
-}
-.send-btn:disabled:hover svg {
-    color: var(--primary-color);
-    transform: none;
-}
 
-/* ==================== RESPONSIVIDADE ==================== */
+/* ==================== RESPONSIVO ==================== */
 @media (max-width: 900px) {
     .sidebar {
         width: 72px;
         padding: 20px 12px;
     }
-    .brand-name {
-        display: none;
-    }
-    .brand {
-        justify-content: center;
-        padding-left: 0;
-    }
-    .menu-item a span {
-        display: none;
-    }
-    .menu-item a {
-        justify-content: center;
-        padding: 12px;
-    }
-    .menu-item.active a::before {
-        display: none;
-    }
-    .sidebar-footer {
-        display: none;
-    }
+    .brand-name { display: none; }
+    .brand { justify-content: center; padding-left: 0; }
+    .menu-item a span { display: none; }
+    .menu-item a { justify-content: center; padding: 12px; }
+    .menu-item.active a::before { display: none; }
+    .sidebar-footer { display: none; }
     .main-content {
         margin-left: 72px;
         padding: 16px 16px 16px;
     }
-    .center-wrapper {
-        gap: 20px;
-    }
+    .center-wrapper { gap: 20px; }
     .scene {
         width: 120px;
         height: 120px;
@@ -782,14 +728,11 @@ body {
         transform: scale(0.85);
     }
 }
-
 @media (max-width: 480px) {
     .main-content {
         padding: 12px 12px 12px;
     }
-    .center-wrapper {
-        gap: 16px;
-    }
+    .center-wrapper { gap: 16px; }
     .scene {
         width: 100px;
         height: 100px;
@@ -872,7 +815,7 @@ body {
 </head>
 <body>
 
-<!-- ==================== MENU LATERAL ==================== -->
+<!-- ==================== SIDEBAR ==================== -->
 <div class="sidebar">
     <div class="brand">
         <div class="scene-sidebar" id="sceneSidebar">
@@ -989,7 +932,7 @@ body {
 
     </div>
 
-    <!-- INPUT RODAPÉ - PERFEITAMENTE CENTRALIZADO -->
+    <!-- INPUT -->
     <div class="input-wrapper">
         <div class="input-container">
             <input type="text" class="message-input" id="messageInput" placeholder="Pergunte qualquer coisa ao Yra...">
@@ -1012,73 +955,65 @@ body {
     </div>
 </div>
 
-<!-- FIREBASE -->
+<!-- ==================== FIREBASE + LÓGICA PRINCIPAL ==================== -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+// ── CONFIG ──────────────────────────────────────────────
 const firebaseConfig = {
-    apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
-    authDomain: "yra-syra.firebaseapp.com",
-    projectId: "yra-syra",
-    storageBucket: "yra-syra.firebasestorage.app",
+    apiKey:            "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+    authDomain:        "yra-syra.firebaseapp.com",
+    projectId:         "yra-syra",
+    storageBucket:     "yra-syra.firebasestorage.app",
     messagingSenderId: "555145505684",
-    appId: "1:555145505684:web:aa1ef14072653e41057d81"
+    appId:             "1:555145505684:web:aa1ef14072653e41057d81"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-window.__yraFirestore = db;
-window.__yraAuth = auth;
+// ── GLOBALS ─────────────────────────────────────────────
+let apiKey = '';
+let isBusy = false;
+let currentState = 'idle'; // idle | thinking | listening | responding
 
-onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-        window.location.href = "index.html";
-    } else {
-        try {
-            const q = query(
-                collection(db, "Keys"),
-                where("user_id", "==", user.uid),
-                where("enabled", "==", true)
-            );
-            const ks = await getDocs(q);
-            if (!ks.empty) {
-                window.__yraApiKey = ks.docs[0].data().key;
-            }
-        } catch (e) {
-            console.error("Erro key:", e);
-        }
-    }
-});
-</script>
+// ── DOM REFS ────────────────────────────────────────────
+const scene = document.getElementById('scene');
+const sceneWrapper = document.getElementById('sceneWrapper');
+const dots = document.querySelectorAll('.dot');
+const placeholderEl = document.getElementById('placeholderText');
+const listenCircle = document.getElementById('listenCircle');
+const waveCanvas = document.getElementById('waveCanvas');
+const waveCtx = waveCanvas.getContext('2d');
+const listenTranscript = document.getElementById('listenTranscript');
+const responseArea = document.getElementById('responseArea');
+const responseBody = document.getElementById('responseBody');
+const responseTime = document.getElementById('responseTime');
+const closeResponseBtn = document.getElementById('closeResponseBtn');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const voiceModeBtn = document.getElementById('voiceModeBtn');
 
-<script>
-/* ================================================================
-   SIDEBAR — ANIMAÇÃO DAS BOLINHAS
-================================================================ */
-const sidebarDots = document.querySelectorAll(".dot-sidebar");
-let sidebarAngle = 0;
-
+// ── SIDEBAR DOTS ANIMATION ────────────────────────────
+const sidebarDots = document.querySelectorAll('.dot-sidebar');
+let dotAngle = 0;
 function animateSidebarDots() {
+    const radius = 9;
     sidebarDots.forEach((dot, i) => {
-        const angle = (i / sidebarDots.length) * Math.PI * 2 + sidebarAngle;
-        const radius = 10;
+        const angle = (i / sidebarDots.length) * Math.PI * 2 + dotAngle;
         const x = Math.cos(angle) * radius;
         const y = Math.sin(angle) * radius;
         dot.style.transform = `translate(${x}px, ${y}px)`;
     });
-    sidebarAngle += 0.006;
+    dotAngle += 0.008;
     requestAnimationFrame(animateSidebarDots);
 }
-
 animateSidebarDots();
 
-/* ================================================================
-   PLACEHOLDERS
-================================================================ */
+// ── PLACEHOLDERS ──────────────────────────────────────
 const PLACEHOLDERS = [
     "Estudando o mercado cripto...",
     "Memorizando as leis de Newton...",
@@ -1102,28 +1037,25 @@ const PLACEHOLDERS = [
     "Lendo sobre buracos negros. Por diversão.",
 ];
 
-const placeholderEl = document.getElementById("placeholderText");
-const listenTranscript = document.getElementById("listenTranscript");
-
 let phIndex = Math.floor(Math.random() * PLACEHOLDERS.length);
 let phTimeout = null;
 let isIdle = true;
 
 function showNextPlaceholder() {
     if (!isIdle) return;
-    placeholderEl.classList.add("fade");
+    placeholderEl.classList.add('fade');
     setTimeout(() => {
         phIndex = (phIndex + 1) % PLACEHOLDERS.length;
         placeholderEl.textContent = PLACEHOLDERS[phIndex];
-        placeholderEl.classList.remove("fade");
+        placeholderEl.classList.remove('fade');
     }, 500);
     phTimeout = setTimeout(showNextPlaceholder, 3500);
 }
 
 function startPlaceholders() {
     isIdle = true;
-    placeholderEl.style.display = "block";
-    placeholderEl.classList.remove("fade");
+    placeholderEl.style.display = 'block';
+    placeholderEl.classList.remove('fade');
     clearTimeout(phTimeout);
     showNextPlaceholder();
 }
@@ -1131,75 +1063,63 @@ function startPlaceholders() {
 function stopPlaceholders() {
     isIdle = false;
     clearTimeout(phTimeout);
-    placeholderEl.classList.add("fade");
-    setTimeout(() => { placeholderEl.style.display = "none"; }, 500);
+    placeholderEl.classList.add('fade');
+    setTimeout(() => { placeholderEl.style.display = 'none'; }, 500);
 }
 
 setTimeout(startPlaceholders, 800);
 
-/* ================================================================
-   ESFERAS CENTRAIS - ANIMAÇÃO SUAVE
-================================================================ */
-const dots = document.querySelectorAll(".dot");
-const scene = document.getElementById("scene");
-const sceneWrapper = document.getElementById("sceneWrapper");
-
-let sphereInterval = null;
-let currentAngle = 0;
+// ── ESFERAS ─────────────────────────────────────────────
+let sphereRAF = null;
+let sphereAngle = 0;
+const RADIUS = 48;
 
 function startIdleAnimation() {
-    scene.classList.remove("thinking");
-    clearInterval(sphereInterval);
-    
-    // Movimento suave e contínuo das esferas
-    function animateIdle() {
-        const radius = 48;
+    scene.classList.remove('thinking');
+    cancelAnimationFrame(sphereRAF);
+    function frame() {
+        sphereRAF = requestAnimationFrame(frame);
         const positions = [
-            { x: Math.cos(currentAngle) * radius, y: Math.sin(currentAngle) * radius },
-            { x: Math.cos(currentAngle + Math.PI/2) * radius, y: Math.sin(currentAngle + Math.PI/2) * radius },
-            { x: Math.cos(currentAngle + Math.PI) * radius, y: Math.sin(currentAngle + Math.PI) * radius },
-            { x: Math.cos(currentAngle + 3*Math.PI/2) * radius, y: Math.sin(currentAngle + 3*Math.PI/2) * radius }
+            { x: Math.cos(sphereAngle) * RADIUS, y: Math.sin(sphereAngle) * RADIUS },
+            { x: Math.cos(sphereAngle + Math.PI/2) * RADIUS, y: Math.sin(sphereAngle + Math.PI/2) * RADIUS },
+            { x: Math.cos(sphereAngle + Math.PI) * RADIUS, y: Math.sin(sphereAngle + Math.PI) * RADIUS },
+            { x: Math.cos(sphereAngle + 3*Math.PI/2) * RADIUS, y: Math.sin(sphereAngle + 3*Math.PI/2) * RADIUS }
         ];
         dots.forEach((d, i) => {
             d.style.transform = `translate(${positions[i].x}px, ${positions[i].y}px)`;
-            d.style.animation = "";
+            d.style.animation = '';
         });
-        currentAngle += 0.025;
-        requestAnimationFrame(animateIdle);
+        sphereAngle += 0.02;
     }
-    animateIdle();
+    frame();
 }
 
 function startThinkingAnimation() {
-    clearInterval(sphereInterval);
-    dots.forEach(d => { d.style.transform = ""; d.style.animation = ""; });
+    cancelAnimationFrame(sphereRAF);
+    dots.forEach(d => { d.style.transform = ''; d.style.animation = ''; });
+    // Pequeno delay para garantir reflow
     requestAnimationFrame(() => {
-        requestAnimationFrame(() => { scene.classList.add("thinking"); });
+        requestAnimationFrame(() => {
+            scene.classList.add('thinking');
+        });
     });
 }
 
 function hideSpheres() {
-    sceneWrapper.classList.add("hidden");
+    sceneWrapper.classList.add('hidden');
 }
-
 function showSpheres(atTop = false) {
-    sceneWrapper.classList.remove("hidden");
+    sceneWrapper.classList.remove('hidden');
     if (atTop) {
-        sceneWrapper.classList.add("top-mode");
+        sceneWrapper.classList.add('top-mode');
     } else {
-        sceneWrapper.classList.remove("top-mode");
+        sceneWrapper.classList.remove('top-mode');
     }
 }
 
 startIdleAnimation();
 
-/* ================================================================
-   WAVEFORM — CANVAS
-================================================================ */
-const listenCircle = document.getElementById("listenCircle");
-const waveCanvas = document.getElementById("waveCanvas");
-const waveCtx = waveCanvas.getContext("2d");
-
+// ── WAVEFORM (CÍRCULO DE ESCUTA) ──────────────────────
 let audioCtx = null;
 let analyser = null;
 let micSource = null;
@@ -1211,7 +1131,7 @@ async function setupAudio() {
     if (isWaveReady) return true;
     try {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        audioCtx = new(window.AudioContext || window.webkitAudioContext)();
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         analyser = audioCtx.createAnalyser();
         analyser.fftSize = 256;
         waveData = new Uint8Array(analyser.frequencyBinCount);
@@ -1220,13 +1140,13 @@ async function setupAudio() {
         isWaveReady = true;
         return true;
     } catch (e) {
-        console.error("Mic:", e);
+        console.error('Erro ao acessar microfone:', e);
         return false;
     }
 }
 
 function resizeCanvas() {
-    const size = listenCircle.offsetWidth;
+    const size = listenCircle.offsetWidth || 150;
     waveCanvas.width = size;
     waveCanvas.height = size;
 }
@@ -1252,49 +1172,42 @@ function drawWave(isResponding = false) {
                 const gc = Math.round(125 + (30 - 125) * t);
                 const bc = Math.round(50 + (139 - 50) * t);
                 const len = r * 0.2 + r * 0.2 * Math.abs(Math.sin(angle * 4 + now * 3));
-
                 const x1 = cx + Math.cos(angle) * r;
                 const y1 = cy + Math.sin(angle) * r;
                 const x2 = cx + Math.cos(angle) * (r + len);
                 const y2 = cy + Math.sin(angle) * (r + len);
-
                 waveCtx.beginPath();
                 waveCtx.moveTo(x1, y1);
                 waveCtx.lineTo(x2, y2);
                 waveCtx.strokeStyle = `rgba(${rc},${gc},${bc},0.8)`;
                 waveCtx.lineWidth = 2.5;
-                waveCtx.lineCap = "round";
+                waveCtx.lineCap = 'round';
                 waveCtx.stroke();
             }
         } else {
             if (analyser) analyser.getByteFrequencyData(waveData);
-
             const bars = 36;
             const step = Math.floor(waveData ? waveData.length / bars : 1);
-
             for (let i = 0; i < bars; i++) {
                 const angle = (i / bars) * Math.PI * 2 - Math.PI / 2;
                 const raw = waveData ? waveData[i * step] : 0;
                 const norm = raw / 255;
                 const len = r * 0.1 + r * 0.5 * norm;
-
                 const x1 = cx + Math.cos(angle) * (r - 4);
                 const y1 = cy + Math.sin(angle) * (r - 4);
                 const x2 = cx + Math.cos(angle) * (r - 4 + len);
                 const y2 = cy + Math.sin(angle) * (r - 4 + len);
-
                 const alpha = 0.3 + 0.7 * norm;
                 waveCtx.beginPath();
                 waveCtx.moveTo(x1, y1);
                 waveCtx.lineTo(x2, y2);
                 waveCtx.strokeStyle = `rgba(46,125,50,${alpha})`;
                 waveCtx.lineWidth = 2.5;
-                waveCtx.lineCap = "round";
+                waveCtx.lineCap = 'round';
                 waveCtx.stroke();
             }
         }
     }
-
     frame();
 }
 
@@ -1303,12 +1216,8 @@ function stopWave() {
     waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
 }
 
-/* ================================================================
-   MODO ESCUTA ATIVA
-================================================================ */
-const voiceModeBtn = document.getElementById("voiceModeBtn");
+// ── MODO DE VOZ (RECONHECIMENTO) ──────────────────────
 let voiceModeActive = false;
-
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let isRecognizing = false;
@@ -1319,29 +1228,27 @@ if (SpeechRecognition) {
     recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = "pt-BR";
+    recognition.lang = 'pt-BR';
 
     recognition.onresult = (event) => {
         if (!voiceModeActive) return;
-        let interim = "",
-            final = "";
+        let interim = '', final = '';
         for (let i = event.resultIndex; i < event.results.length; i++) {
             if (event.results[i].isFinal) final += event.results[i][0].transcript;
             else interim += event.results[i][0].transcript;
         }
-
         const text = final || interim;
         listenTranscript.textContent = text;
-        listenTranscript.style.opacity = "1";
+        listenTranscript.style.opacity = '1';
 
-        if (APP_STATE === "responding") {
+        if (currentState === 'responding') {
             leaveRespondingMode();
         }
 
         clearTimeout(silenceTimer);
         if (final) {
             silenceTimer = setTimeout(() => {
-                if (voiceModeActive && APP_STATE === "listening") {
+                if (voiceModeActive && currentState === 'listening') {
                     submitFromVoice(final.trim());
                 }
             }, SILENCE_MS);
@@ -1349,26 +1256,25 @@ if (SpeechRecognition) {
     };
 
     recognition.onerror = (e) => {
-        if (e.error === "no-speech") return;
-        console.error("Speech error:", e.error);
-        if (e.error === "not-allowed") {
-            alert("Permissão de microfone negada.");
+        if (e.error === 'no-speech') return;
+        console.error('Speech error:', e.error);
+        if (e.error === 'not-allowed') {
+            alert('Permissão de microfone negada.');
             deactivateVoiceMode();
         }
     };
 
     recognition.onend = () => {
         isRecognizing = false;
-        if (voiceModeActive && APP_STATE !== "thinking") {
-            try { recognition.start();
-                isRecognizing = true; } catch (_) {}
+        if (voiceModeActive && currentState !== 'thinking') {
+            try { recognition.start(); isRecognizing = true; } catch (_) {}
         }
     };
 }
 
 async function activateVoiceMode() {
     voiceModeActive = true;
-    voiceModeBtn.classList.add("active");
+    voiceModeBtn.classList.add('active');
 
     const ok = await setupAudio();
     if (!ok) { deactivateVoiceMode(); return; }
@@ -1378,39 +1284,36 @@ async function activateVoiceMode() {
     clearResponse();
 
     resizeCanvas();
-    listenCircle.classList.add("visible", "active");
-    listenTranscript.textContent = "Ouvindo...";
-    listenTranscript.style.opacity = "1";
-
-    setState("listening");
+    listenCircle.classList.add('visible', 'active');
+    listenTranscript.textContent = 'Ouvindo...';
+    listenTranscript.style.opacity = '1';
+    currentState = 'listening';
     drawWave(false);
 
     if (recognition && !isRecognizing) {
-        try { recognition.start();
-            isRecognizing = true; } catch (_) {}
+        try { recognition.start(); isRecognizing = true; } catch (_) {}
     }
 }
 
 function deactivateVoiceMode() {
     voiceModeActive = false;
     isRecognizing = false;
-    voiceModeBtn.classList.remove("active");
+    voiceModeBtn.classList.remove('active');
     clearTimeout(silenceTimer);
-
     if (recognition) try { recognition.stop(); } catch (_) {}
 
-    listenCircle.classList.remove("visible", "active", "responding");
-    listenTranscript.style.opacity = "0";
+    listenCircle.classList.remove('visible', 'active', 'responding');
+    listenTranscript.style.opacity = '0';
     stopWave();
 
     clearResponse();
     showSpheres(false);
     startIdleAnimation();
     startPlaceholders();
-    setState("idle");
+    currentState = 'idle';
 }
 
-voiceModeBtn.addEventListener("click", () => {
+voiceModeBtn.addEventListener('click', () => {
     if (voiceModeActive) {
         deactivateVoiceMode();
     } else {
@@ -1418,43 +1321,25 @@ voiceModeBtn.addEventListener("click", () => {
     }
 });
 
-/* ================================================================
-   ESTADO GLOBAL E SUBMISSÃO
-================================================================ */
-let APP_STATE = "idle";
-
-function setState(newState) {
-    APP_STATE = newState;
-}
-
-const sendBtn = document.getElementById("sendBtn");
-const messageInput = document.getElementById("messageInput");
-const responseArea = document.getElementById("responseArea");
-const responseBody = document.getElementById("responseBody");
-const responseTime = document.getElementById("responseTime");
-const closeResponseBtn = document.getElementById("closeResponseBtn");
-
-let isBusy = false;
-
+// ── ENVIO DE MENSAGEM ──────────────────────────────────
 async function submitMessage(text) {
-    if (isBusy || !text) return;
-
-    const apiKey = window.__yraApiKey;
-    if (!apiKey) {
-        showResponseText("⚠️ Nenhuma API key encontrada. Configure em Settings.");
+    if (isBusy || !text || !apiKey) {
+        if (!apiKey) {
+            showResponseText('⚠️ Nenhuma API key encontrada. Configure em Settings.');
+        }
         return;
     }
 
     isBusy = true;
-    messageInput.value = "";
+    messageInput.value = '';
     messageInput.disabled = true;
     sendBtn.disabled = true;
-    setState("thinking");
+    currentState = 'thinking';
 
     if (voiceModeActive) {
-        listenCircle.classList.remove("active", "responding");
+        listenCircle.classList.remove('active', 'responding');
         stopWave();
-        listenTranscript.style.opacity = "0";
+        listenTranscript.style.opacity = '0';
         showSpheres(true);
         setTimeout(startThinkingAnimation, 100);
     } else {
@@ -1464,30 +1349,28 @@ async function submitMessage(text) {
     }
 
     // Typing indicator
-    responseArea.classList.add("visible");
+    responseArea.classList.add('visible');
     responseBody.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
 
     try {
         const endpoint =
             `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=${apiKey}`;
         const res = await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ role: "user", parts: [{ text }] }],
+                contents: [{ role: 'user', parts: [{ text }] }],
                 generationConfig: { temperature: 0.85, maxOutputTokens: 512 }
             })
         });
         const data = await res.json();
         const reply = data.error ?
             `⚠️ ${data.error.message}` :
-            (data.candidates?.[0]?.content?.parts?.[0]?.text || "Sem resposta.");
-
+            (data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta.');
         showResponseText(reply);
-
     } catch (err) {
         console.error(err);
-        showResponseText("⚠️ Não foi possível conectar. Tente novamente.");
+        showResponseText('⚠️ Não foi possível conectar. Tente novamente.');
     } finally {
         isBusy = false;
         messageInput.disabled = false;
@@ -1498,27 +1381,24 @@ async function submitMessage(text) {
 function showResponseText(text) {
     responseBody.textContent = text;
     responseTime.textContent = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    responseArea.classList.add("visible");
-    setState("responding");
+    responseArea.classList.add('visible');
+    currentState = 'responding';
 
     if (voiceModeActive) {
-        sceneWrapper.classList.add("hidden");
-
+        sceneWrapper.classList.add('hidden');
         setTimeout(() => {
-            listenCircle.classList.add("visible", "responding");
-            listenCircle.classList.remove("active");
-            listenTranscript.textContent = "Resposta pronta — fale para continuar...";
-            listenTranscript.style.opacity = "1";
+            listenCircle.classList.add('visible', 'responding');
+            listenCircle.classList.remove('active');
+            listenTranscript.textContent = 'Resposta pronta — fale para continuar...';
+            listenTranscript.style.opacity = '1';
             resizeCanvas();
             drawWave(true);
-
             if (recognition && !isRecognizing) {
-                try { recognition.start();
-                    isRecognizing = true; } catch (_) {}
+                try { recognition.start(); isRecognizing = true; } catch (_) {}
             }
         }, 300);
     } else {
-        // Volta ao idle suavemente após a resposta
+        // Modo texto: volta ao idle após alguns segundos
         setTimeout(() => {
             startIdleAnimation();
             showSpheres(false);
@@ -1529,18 +1409,18 @@ function showResponseText(text) {
 }
 
 function leaveRespondingMode() {
-    listenCircle.classList.remove("responding");
-    listenCircle.classList.add("active");
+    listenCircle.classList.remove('responding');
+    listenCircle.classList.add('active');
     stopWave();
     clearResponse();
     resizeCanvas();
     drawWave(false);
-    listenTranscript.textContent = "Ouvindo...";
-    setState("listening");
+    listenTranscript.textContent = 'Ouvindo...';
+    currentState = 'listening';
 }
 
 function clearResponse() {
-    responseArea.classList.remove("visible");
+    responseArea.classList.remove('visible');
     clearTimeout(window.__yraIdleTimer);
 }
 
@@ -1550,14 +1430,14 @@ function resetToIdle() {
         showSpheres(false);
         startIdleAnimation();
         startPlaceholders();
-        setState("idle");
+        currentState = 'idle';
     }, 400);
 }
 
 function submitFromVoice(text) {
     if (!text) return;
-    listenTranscript.style.opacity = "0";
-    setTimeout(() => { listenTranscript.textContent = ""; }, 300);
+    listenTranscript.style.opacity = '0';
+    setTimeout(() => { listenTranscript.textContent = ''; }, 300);
     submitMessage(text);
 }
 
@@ -1568,15 +1448,38 @@ async function sendTextMessage() {
     await submitMessage(text);
 }
 
-sendBtn.addEventListener("click", sendTextMessage);
-messageInput.addEventListener("keypress", e => { if (e.key === "Enter") sendTextMessage(); });
-
-closeResponseBtn.addEventListener("click", () => {
+sendBtn.addEventListener('click', sendTextMessage);
+messageInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendTextMessage(); });
+closeResponseBtn.addEventListener('click', () => {
     if (!voiceModeActive) resetToIdle();
 });
+window.addEventListener('resize', () => {
+    if (listenCircle.classList.contains('visible')) resizeCanvas();
+});
 
-window.addEventListener("resize", () => {
-    if (listenCircle.classList.contains("visible")) resizeCanvas();
+// ── FIREBASE AUTH ──────────────────────────────────────
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = 'index.html';
+        return;
+    }
+
+    try {
+        const q = query(
+            collection(db, 'Keys'),
+            where('user_id', '==', user.uid),
+            where('enabled', '==', true)
+        );
+        const ks = await getDocs(q);
+        if (!ks.empty) {
+            apiKey = ks.docs[0].data().key;
+            console.log('✅ API key carregada com sucesso.');
+        } else {
+            console.warn('⚠️ Nenhuma chave de API encontrada para este usuário.');
+        }
+    } catch (e) {
+        console.error('Erro ao buscar API key:', e);
+    }
 });
 </script>
 
