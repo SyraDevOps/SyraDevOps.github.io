@@ -234,9 +234,65 @@ body {
     opacity:0; transform:translateY(14px);
     transition: opacity .5s ease, transform .5s ease;
     pointer-events:none; display:none;
+    position: relative;
 }
 .response-area.visible {
     display:block; opacity:1; transform:translateY(0); pointer-events:auto;
+}
+
+/* Esferas verticais ao lado durante pensamento */
+.thinking-dots-vertical {
+    position: absolute;
+    right: -80px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+
+.thinking-dots-vertical.visible {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.thinking-dots-vertical .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    left: 0 !important;
+    top: 0 !important;
+    margin: 0 !important;
+    animation: none;
+}
+
+.thinking-dots-vertical .dot:nth-child(1) { background: #1B5E20; animation: thinkPulse 1.2s ease-in-out infinite; }
+.thinking-dots-vertical .dot:nth-child(2) { background: #2E7D32; animation: thinkPulse 1.2s ease-in-out infinite 0.2s; }
+.thinking-dots-vertical .dot:nth-child(3) { background: #4CAF50; animation: thinkPulse 1.2s ease-in-out infinite 0.4s; }
+.thinking-dots-vertical .dot:nth-child(4) { background: #81C784; animation: thinkPulse 1.2s ease-in-out infinite 0.6s; }
+
+@keyframes thinkPulse {
+    0%, 100% { 
+        transform: scale(0.8); 
+        opacity: 0.5;
+    }
+    50% { 
+        transform: scale(1.3); 
+        opacity: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .thinking-dots-vertical {
+        right: auto;
+        bottom: -50px;
+        top: auto;
+        flex-direction: row;
+        gap: 6px;
+    }
 }
 .response-bubble {
     background:var(--white); border:1px solid rgba(46,125,50,.10);
@@ -489,6 +545,12 @@ body {
     <!-- Resposta -->
     <div class="response-area" id="responseArea">
         <div class="response-bubble" id="responseBubble"></div>
+        <div class="thinking-dots-vertical" id="thinkingDotsVertical">
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+            <div class="dot"></div>
+        </div>
     </div>
 
 </main>
@@ -578,15 +640,27 @@ function shuffleSidebarArray(arr) {
 }
 
 function startSidebarAnimation() {
+    if (sidebarDots.length === 0) {
+        console.warn("Sidebar dots not found, animation skipped");
+        return;
+    }
+    
     setInterval(() => {
         const p = shuffleSidebarArray(sidebarPositions);
         sidebarDots.forEach((dot, i) => {
-            dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
+            if (p[i]) {
+                dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
+            }
         });
     }, 1000);
 }
 
-startSidebarAnimation();
+// Wait for DOM to be ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startSidebarAnimation);
+} else {
+    startSidebarAnimation();
+}
 
 /* ================================================================
    PLACEHOLDERS
@@ -675,18 +749,28 @@ function shuffle(arr) {
 let sphereInterval = null;
 
 function startIdleAnimation() {
+    if (!scene || dots.length === 0) {
+        console.warn("Scene elements not found, idle animation skipped");
+        return;
+    }
     scene.classList.remove("thinking");
     clearInterval(sphereInterval);
     sphereInterval = setInterval(() => {
         const p = shuffle(POS);
         dots.forEach((d, i) => {
-            d.style.transform = `translate(${p[i].x}px,${p[i].y}px)`;
-            d.style.animation  = "";
+            if (p[i]) {
+                d.style.transform = `translate(${p[i].x}px,${p[i].y}px)`;
+                d.style.animation  = "";
+            }
         });
     }, 1000);
 }
 
 function startThinkingAnimation() {
+    if (!scene || dots.length === 0) {
+        console.warn("Scene elements not found, thinking animation skipped");
+        return;
+    }
     clearInterval(sphereInterval);
     dots.forEach(d => { d.style.transform = ""; d.style.animation = ""; });
     // Pequeno delay para garantir que o browser reflow processe o reset
@@ -696,9 +780,12 @@ function startThinkingAnimation() {
 }
 
 function hideSpheres() {
-    sceneWrapper.classList.add("hidden");
+    if (sceneWrapper) {
+        sceneWrapper.classList.add("hidden");
+    }
 }
 function showSpheres(atTop = false) {
+    if (!sceneWrapper) return;
     sceneWrapper.classList.remove("hidden");
     if (atTop) {
         sceneWrapper.classList.add("top-mode");
@@ -707,7 +794,12 @@ function showSpheres(atTop = false) {
     }
 }
 
-startIdleAnimation();
+// Wait for DOM to be ready before starting animations
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', startIdleAnimation);
+} else {
+    startIdleAnimation();
+}
 
 /* ================================================================
    WAVEFORM REAL — CANVAS NO CÍRCULO DE ESCUTA
@@ -952,13 +1044,23 @@ function deactivateVoiceMode() {
     setState("idle");
 }
 
-voiceModeBtn.addEventListener("click", () => {
-    if (voiceModeActive) {
-        deactivateVoiceMode();
-    } else {
-        activateVoiceMode();
-    }
-});
+// Initialize voice mode button listener when DOM is ready
+function initVoiceListener() {
+    if (!voiceModeBtn) return;
+    voiceModeBtn.addEventListener("click", () => {
+        if (voiceModeActive) {
+            deactivateVoiceMode();
+        } else {
+            activateVoiceMode();
+        }
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initVoiceListener);
+} else {
+    initVoiceListener();
+}
 
 /* ================================================================
    SUBMISSÃO DE MENSAGEM (texto ou voz)
@@ -994,18 +1096,19 @@ async function submitMessage(text) {
         showSpheres(true);
         startThinkingAnimation();
     } else {
+        // Modo texto: esconde esferas e mostra thinking dots ao lado
         stopPlaceholders();
         transcriptEl.classList.remove("visible");
-        showSpheres(true);
-        startThinkingAnimation();
+        hideSpheres();
     }
 
-    // Typing indicator
+    // Typing indicator + thinking dots verticais
     responseArea.classList.add("visible");
+    document.getElementById("thinkingDotsVertical").classList.add("visible");
     responseBubble.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
 
     try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite-preview-06-17:generateContent?key=${apiKey}`;
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
         const res = await fetch(endpoint, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -1036,8 +1139,11 @@ function showResponseText(text) {
     responseArea.classList.add("visible");
     setState("responding");
 
+    const thinkingDots = document.getElementById("thinkingDotsVertical");
+
     if (voiceModeActive) {
         // Esferas somem, círculo volta com modo resposta
+        thinkingDots.classList.remove("visible");
         sceneWrapper.classList.add("hidden");
 
         setTimeout(() => {
@@ -1054,13 +1160,14 @@ function showResponseText(text) {
             }
         }, 300);
     } else {
-        // Modo texto — esferas voltam ao idle após exibir resposta
-        // Mas mantém esferas no topo elegantemente
-        startIdleAnimation();
-
-        // Auto reset após 14s
+        // Modo texto — thinking dots ficam visíveis pulsando por 3 segundos
+        // Depois desaparecem e volta ao idle
+        
         clearTimeout(window.__yraIdleTimer);
-        window.__yraIdleTimer = setTimeout(resetToIdle, 14000);
+        window.__yraIdleTimer = setTimeout(() => {
+            thinkingDots.classList.remove("visible");
+            setTimeout(resetToIdle, 500);
+        }, 3000);
     }
 }
 
@@ -1083,6 +1190,7 @@ function leaveRespondingMode() {
 
 function clearResponse() {
     responseArea.classList.remove("visible");
+    document.getElementById("thinkingDotsVertical").classList.remove("visible");
     clearTimeout(window.__yraIdleTimer);
 }
 
@@ -1111,17 +1219,28 @@ async function sendTextMessage() {
     await submitMessage(text);
 }
 
-sendBtn.addEventListener("click", sendTextMessage);
-messageInput.addEventListener("keypress", e => { if (e.key === "Enter") sendTextMessage(); });
+// Initialize message submission listeners when DOM is ready
+function initMessageListeners() {
+    if (!sendBtn || !messageInput || !responseArea) return;
+    
+    sendBtn.addEventListener("click", sendTextMessage);
+    messageInput.addEventListener("keypress", e => { if (e.key === "Enter") sendTextMessage(); });
 
-// Clique na resposta para fechar manualmente (modo texto)
-responseArea.addEventListener("click", () => {
-    if (!voiceModeActive) resetToIdle();
-});
+    // Clique na resposta para fechar manualmente (modo texto)
+    responseArea.addEventListener("click", () => {
+        if (!voiceModeActive) resetToIdle();
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initMessageListeners);
+} else {
+    initMessageListeners();
+}
 
 // Redimensiona canvas quando a janela muda
 window.addEventListener("resize", () => {
-    if (listenCircle.classList.contains("visible")) resizeCanvas();
+    if (listenCircle && listenCircle.classList.contains("visible")) resizeCanvas();
 });
 </script>
 </body>
