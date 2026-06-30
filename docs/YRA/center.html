@@ -5,1318 +5,1121 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Yra Assistant</title>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
 :root {
-    --primary:        #2E7D32;
-    --primary-light:  #81C784;
-    --primary-ultra:  #E8F5E9;
-    --text-dark:      #2C3E50;
-    --text-light:     #7F8C8D;
-    --bg:             #F9FBF9;
-    --border:         #E2E8F0;
-    --white:          #ffffff;
+  --g1: #1B5E20;
+  --g2: #2E7D32;
+  --g3: #4CAF50;
+  --g4: #81C784;
+  --g5: #A5D6A7;
+  --sidebar-w: 240px;
+  --text: #1a2a1a;
+  --text-muted: #6B7B6B;
+  --bg: #F4F8F4;
+  --white: #ffffff;
+  --border: rgba(46,125,50,0.10);
+  --shadow: 0 2px 20px rgba(46,125,50,0.07);
 }
 
-* { margin:0; padding:0; box-sizing:border-box;
-    font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
 body {
-    background: var(--bg);
-    color: var(--text-dark);
-    height: 100vh;
-    display: flex;
-    overflow: hidden;
-    position: relative;
+  font-family: 'Inter', 'Segoe UI', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.main-wrapper {
-    margin-left: 260px;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: space-between;
-    padding: 30px;
-    height: 100vh;
-    overflow: hidden;
-    transition: margin-left 0.3s ease;
-}
-
-@media (max-width: 900px) {
-    .main-wrapper {
-        margin-left: 70px;
-    }
-}
-
-/* ── SIDEBAR ─────────────────────────────────────────── */
---sidebar-width: 260px;
-
+/* ── SIDEBAR ─────────────────────────────────────── */
 .sidebar {
-    width: var(--sidebar-width);
-    background: var(--white);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 30px 20px;
-    height: 100vh;
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 100;
+  width: var(--sidebar-w);
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.sidebar-top {
+  padding: 28px 20px 24px;
+  border-bottom: 1px solid var(--border);
 }
 
 .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 40px;
-    padding-left: 10px;
+  display: flex;
+  align-items: center;
+  gap: 11px;
 }
 
-.scene-sidebar {
-    position: relative;
-    width: 40px;
-    height: 40px;
+/* Mini esferas — APENAS aqui */
+.brand-orb {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
 }
-
-.dot-sidebar {
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    left: 50%;
-    top: 50%;
-    margin-left: -4px;
-    margin-top: -4px;
-    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+.brand-orb .bd {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  left: 50%;
+  top: 50%;
+  margin: -5px 0 0 -5px;
+  transition: transform 0.9s cubic-bezier(.4,0,.2,1);
 }
+.brand-orb .bd:nth-child(1) { background: var(--g1); }
+.brand-orb .bd:nth-child(2) { background: var(--g2); }
+.brand-orb .bd:nth-child(3) { background: var(--g3); }
+.brand-orb .bd:nth-child(4) { background: var(--g4); }
 
-.dot-sidebar:nth-child(1) { background: #1B5E20; }
-.dot-sidebar:nth-child(2) { background: #2E7D32; }
-.dot-sidebar:nth-child(3) { background: #4CAF50; }
-.dot-sidebar:nth-child(4) { background: #81C784; }
-
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
 .brand-name {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1B5E20;
-    letter-spacing: 0.5px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--g1);
+  letter-spacing: 0.3px;
+}
+.brand-sub {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
 }
 
-.menu-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+/* NAV */
+.nav {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  overflow-y: auto;
 }
 
-.menu-item a {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 15px;
-    color: var(--text-light);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 500;
-    border-radius: 10px;
-    transition: all 0.2s ease;
+.nav-section-label {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  padding: 10px 10px 6px;
+  margin-top: 8px;
+}
+.nav-section-label:first-child { margin-top: 0; }
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-muted);
+  font-size: 13.5px;
+  font-weight: 450;
+  transition: all 0.18s ease;
+  letter-spacing: 0.1px;
+}
+.nav-item:hover {
+  background: rgba(46,125,50,0.06);
+  color: var(--g2);
+}
+.nav-item.active {
+  background: rgba(46,125,50,0.09);
+  color: var(--g1);
+  font-weight: 550;
+}
+.nav-item svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.85;
+}
+.nav-item .nav-label { flex: 1; }
+.nav-item .nav-badge {
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(46,125,50,0.12);
+  color: var(--g2);
+  padding: 1px 6px;
+  border-radius: 10px;
 }
 
-.menu-item a:hover, .menu-item.active a {
-    background: var(--primary-ultra);
-    color: var(--primary);
+/* Status dot */
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76,175,80,0.2);
+  animation: statusPulse 3s ease-in-out infinite;
+}
+@keyframes statusPulse {
+  0%,100% { box-shadow: 0 0 0 2px rgba(76,175,80,0.2); }
+  50%      { box-shadow: 0 0 0 5px rgba(76,175,80,0);   }
+}
+.status-label {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  font-weight: 450;
 }
 
-.menu-item a svg {
-    stroke: currentColor;
-    fill: none;
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
+/* ── MAIN ─────────────────────────────────────────── */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  position: relative;
 }
 
-@media (max-width: 900px) {
-    .sidebar {
-        width: 70px;
-        padding: 20px 10px;
-    }
-    .brand-name, .menu-item span {
-        display: none;
-    }
-    .brand {
-        justify-content: center;
-    }
+/* TOPBAR */
+.topbar {
+  padding: 20px 36px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+.topbar-title {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 450;
+  letter-spacing: 0.2px;
+}
+.topbar-actions {
+  display: flex;
+  gap: 8px;
+}
+.topbar-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: all 0.18s;
+}
+.topbar-btn:hover {
+  border-color: var(--g4);
+  color: var(--g2);
+}
+.topbar-btn svg {
+  width: 14px; height: 14px;
+  stroke: currentColor; fill: none;
+  stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
 }
 
-/* ── CENTRO ───────────────────────────────────────────── */
-.center-container {
-    flex:1; display:flex; flex-direction:column;
-    align-items:center; justify-content:flex-start;
-    gap:32px; width:100%; position:relative;
-    padding-top: 60px;
+/* CENTER STAGE */
+.stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 36px;
+  padding: 0 36px;
+  position: relative;
 }
 
-/* Wrapper das esferas */
-.scene-wrapper {
-    display:flex; flex-direction:column; align-items:center; gap:22px;
-    transition: transform .7s cubic-bezier(.4,0,.2,1),
-                opacity   .7s cubic-bezier(.4,0,.2,1),
-                margin-top .7s cubic-bezier(.4,0,.2,1);
-}
-.scene-wrapper.top-mode { margin-top: -200px; }
-.scene-wrapper.hidden   { opacity:0; pointer-events:none; transform:scale(.85); }
-
-/* Esferas */
-.scene { position:relative; width:180px; height:180px; }
-.dot {
-    position:absolute; width:36px; height:36px; border-radius:50%;
-    left:50%; top:50%; margin-left:-18px; margin-top:-18px;
-    transition: transform .8s cubic-bezier(.4,0,.2,1),
-                background .6s ease;
-    box-shadow:0 4px 12px rgba(46,125,50,.1);
-}
-.dot:nth-child(1){ background:#1B5E20; }
-.dot:nth-child(2){ background:#2E7D32; }
-.dot:nth-child(3){ background:#4CAF50; }
-.dot:nth-child(4){ background:#81C784; }
-
-/* Órbita pensando */
-.scene.thinking .dot:nth-child(1){ animation:orbit1 1.4s linear infinite; }
-.scene.thinking .dot:nth-child(2){ animation:orbit2 1.4s linear infinite; }
-.scene.thinking .dot:nth-child(3){ animation:orbit3 1.4s linear infinite; }
-.scene.thinking .dot:nth-child(4){ animation:orbit4 1.4s linear infinite; }
-@keyframes orbit1 {
-    0%  { transform:translate(  0px,-55px); }
-    25% { transform:translate( 55px,  0px); }
-    50% { transform:translate(  0px, 55px); }
-    75% { transform:translate(-55px,  0px); }
-    100%{ transform:translate(  0px,-55px); }
-}
-@keyframes orbit2 {
-    0%  { transform:translate( 55px,  0px); }
-    25% { transform:translate(  0px, 55px); }
-    50% { transform:translate(-55px,  0px); }
-    75% { transform:translate(  0px,-55px); }
-    100%{ transform:translate( 55px,  0px); }
-}
-@keyframes orbit3 {
-    0%  { transform:translate(  0px, 55px); }
-    25% { transform:translate(-55px,  0px); }
-    50% { transform:translate(  0px,-55px); }
-    75% { transform:translate( 55px,  0px); }
-    100%{ transform:translate(  0px, 55px); }
-}
-@keyframes orbit4 {
-    0%  { transform:translate(-55px,  0px); }
-    25% { transform:translate(  0px,-55px); }
-    50% { transform:translate( 55px,  0px); }
-    75% { transform:translate(  0px, 55px); }
-    100%{ transform:translate(-55px,  0px); }
+/* ── ORBE CENTRAL — GRADIENTE PERMANENTE ──────────── */
+.voice-orb-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
 }
 
-/* ── PLACEHOLDER / TRANSCRIÇÃO ─────────────────────────── */
-.subtitle-area { min-height:28px; text-align:center; max-width:380px; }
-.placeholder-text {
-    font-size:14px; color:var(--text-light); font-style:italic;
-    opacity:1; transition:opacity .5s ease;
-}
-.placeholder-text.fade { opacity:0; }
-
-.transcript-text {
-    font-size:15px; color:var(--primary); font-weight:500;
-    text-align:center; max-width:380px;
-    opacity:0; transition:opacity .4s ease;
-}
-.transcript-text.visible { opacity:1; }
-
-/* ── RESPOSTA ────────────────────────────────────────────── */
-.response-area {
-    width:100%; max-width:540px;
-    opacity:0; transform:translateY(-20px);
-    transition: opacity .5s ease, transform .5s ease;
-    pointer-events:none; display:none;
-    position: relative;
-    order: 3;
-}
-.response-area.visible {
-    display:block; opacity:1; transform:translateY(0); pointer-events:auto;
+.voice-orb {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Esferas verticais ao lado durante pensamento */
-.thinking-dots-vertical {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: -60px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    align-items: center;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.5s ease;
+/* Anel girante gradiente (permanente) */
+.orb-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    var(--g1) 0%,
+    var(--g3) 25%,
+    var(--g4) 45%,
+    #C8E6C9 55%,
+    var(--g4) 65%,
+    var(--g3) 75%,
+    var(--g1) 100%
+  );
+  animation: orbSpin 6s linear infinite;
+  opacity: 0.9;
+}
+.orb-ring::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--bg);
+}
+@keyframes orbSpin { to { transform: rotate(360deg); } }
+
+/* Halo exterior suave */
+.orb-halo {
+  position: absolute;
+  inset: -14px;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(76,175,80,0.10) 0%,
+    rgba(76,175,80,0.03) 60%,
+    transparent 100%
+  );
+  animation: haloBreath 4s ease-in-out infinite;
+}
+@keyframes haloBreath {
+  0%,100% { transform: scale(1);    opacity: 0.7; }
+  50%      { transform: scale(1.08); opacity: 1;   }
 }
 
-.thinking-dots-vertical.visible {
-    opacity: 1;
-    pointer-events: auto;
+/* Canvas dentro do orbe */
+#orbCanvas {
+  position: absolute;
+  inset: 3px;
+  width: calc(100% - 6px);
+  height: calc(100% - 6px);
+  border-radius: 50%;
+  z-index: 2;
 }
 
-.thinking-dots-vertical .dot {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    left: 0 !important;
-    top: 0 !important;
-    margin: 0 !important;
-    animation: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+/* Fundo branco do orbe */
+.orb-bg {
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background: var(--white);
+  box-shadow: 0 8px 32px rgba(46,125,50,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+  z-index: 1;
 }
 
-.thinking-dots-vertical .dot:nth-child(1) { 
-    background: #1B5E20; 
-    animation: floatUp 1.2s ease-in-out infinite;
+/* Ícone central quando idle */
+.orb-icon {
+  position: relative;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.35;
+  transition: opacity 0.4s;
 }
-.thinking-dots-vertical .dot:nth-child(2) { 
-    background: #2E7D32; 
-    animation: floatUp 1.2s ease-in-out infinite 0.15s;
+.orb-icon svg {
+  width: 32px; height: 32px;
+  stroke: var(--g2); fill: none;
+  stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round;
 }
-.thinking-dots-vertical .dot:nth-child(3) { 
-    background: #4CAF50; 
-    animation: floatUp 1.2s ease-in-out infinite 0.3s;
+.voice-orb.active .orb-icon { opacity: 0; }
+
+/* Modo ativo */
+.voice-orb.active .orb-ring {
+  animation: orbSpin 2.5s linear infinite;
+  opacity: 1;
 }
-.thinking-dots-vertical .dot:nth-child(4) { 
-    background: #81C784; 
-    animation: floatUp 1.2s ease-in-out infinite 0.45s;
+.voice-orb.active .orb-halo {
+  animation: haloBreath 1.5s ease-in-out infinite;
+}
+.voice-orb.responding .orb-ring {
+  background: conic-gradient(
+    from 0deg,
+    var(--g1) 0%,
+    var(--g3) 20%,
+    #A5D6A7 35%,
+    #F48FB1 55%,
+    #E91E8C 70%,
+    var(--g3) 85%,
+    var(--g1) 100%
+  );
+  animation: orbSpin 2s linear infinite;
 }
 
-@keyframes floatUp {
-    0%, 100% { 
-        transform: translateY(0);
-        opacity: 0.7;
-    }
-    50% { 
-        transform: translateY(-15px);
-        opacity: 1;
-    }
+/* Label abaixo do orbe */
+.orb-label {
+  text-align: center;
+}
+.orb-status {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--g2);
+  letter-spacing: 0.2px;
+  min-height: 20px;
+  transition: opacity 0.4s;
+}
+.orb-hint {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
 }
 
-@media (max-width: 768px) {
-    .thinking-dots-vertical {
-        bottom: -50px;
-        flex-direction: row;
-        gap: 10px;
-    }
+/* Placeholders rotativo */
+#placeholderText {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: center;
+  font-style: italic;
+  max-width: 280px;
+  transition: opacity 0.5s;
+  min-height: 18px;
+}
+#placeholderText.fade { opacity: 0; }
+
+/* ── RESPONSE BUBBLE ──────────────────────────────── */
+.response-wrap {
+  width: 100%;
+  max-width: 520px;
+  opacity: 0;
+  transform: translateY(12px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+  pointer-events: none;
+}
+.response-wrap.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 .response-bubble {
-    background:var(--white); border:1px solid rgba(46,125,50,.10);
-    border-radius:20px; padding:20px 26px;
-    font-size:15px; line-height:1.65; color:var(--text-dark);
-    box-shadow:0 4px 24px rgba(46,125,50,.06);
-    text-align:left; max-height:320px; overflow-y:auto;
-    cursor: pointer;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 22px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--text);
+  box-shadow: var(--shadow);
+  max-height: 240px;
+  overflow-y: auto;
+  cursor: pointer;
+  position: relative;
 }
-.response-bubble::-webkit-scrollbar { width:6px; }
-.response-bubble::-webkit-scrollbar-track { background:transparent; }
-.response-bubble::-webkit-scrollbar-thumb { background:var(--primary-light); border-radius:3px; }
-.response-bubble::-webkit-scrollbar-thumb:hover { background:var(--primary); }
+.response-bubble::-webkit-scrollbar { width: 4px; }
+.response-bubble::-webkit-scrollbar-thumb { background: var(--g5); border-radius: 4px; }
+.response-close {
+  position: absolute;
+  top: 10px; right: 12px;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: rgba(46,125,50,0.07);
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  line-height: 1;
+  transition: background 0.18s;
+}
+.response-close:hover { background: rgba(46,125,50,0.14); }
 
-/* Markdown styles */
-.response-bubble h1 { font-size:18px; font-weight:600; margin:12px 0 8px; color:var(--primary-color); }
-.response-bubble h2 { font-size:16px; font-weight:600; margin:10px 0 6px; color:var(--primary-color); }
-.response-bubble h3 { font-size:14px; font-weight:600; margin:8px 0 4px; color:var(--primary-color); }
-.response-bubble p { margin:8px 0; }
-.response-bubble ul, .response-bubble ol { margin:8px 0; padding-left:20px; }
-.response-bubble li { margin:4px 0; }
-.response-bubble code { background:rgba(46,125,50,0.1); padding:2px 6px; border-radius:4px; font-family:'Courier New', monospace; font-size:13px; color:#1B5E20; }
-.response-bubble pre { background:rgba(46,125,50,0.08); padding:12px; border-radius:8px; overflow-x:auto; margin:8px 0; border-left:3px solid var(--primary-color); }
-.response-bubble pre code { background:none; padding:0; color:inherit; }
-.response-bubble blockquote { border-left:3px solid var(--primary-light); padding-left:12px; margin:8px 0; color:var(--text-light); font-style:italic; }
-.response-bubble strong { font-weight:600; color:var(--text-dark); }
-.response-bubble em { font-style:italic; }
-.response-bubble a { color:var(--primary-color); text-decoration:none; border-bottom:1px solid var(--primary-light); }
-.response-bubble a:hover { border-bottom:1px solid var(--primary-color); }
+/* Markdown dentro da bolha */
+.response-bubble p { margin: 6px 0; }
+.response-bubble h1,.response-bubble h2,.response-bubble h3 {
+  font-weight: 600; margin: 10px 0 4px; color: var(--g1);
+}
+.response-bubble ul,.response-bubble ol { padding-left: 18px; margin: 6px 0; }
+.response-bubble li { margin: 3px 0; }
+.response-bubble code {
+  background: rgba(46,125,50,0.08);
+  padding: 2px 5px; border-radius: 4px;
+  font-size: 12.5px; font-family: 'Courier New', monospace;
+  color: var(--g1);
+}
+.response-bubble pre {
+  background: rgba(46,125,50,0.06);
+  padding: 12px; border-radius: 8px;
+  overflow-x: auto; margin: 8px 0;
+  border-left: 2px solid var(--g4);
+}
+.response-bubble pre code { background: none; padding: 0; }
+.response-bubble strong { font-weight: 600; }
+.response-bubble blockquote {
+  border-left: 2px solid var(--g4);
+  padding-left: 10px; margin: 6px 0;
+  color: var(--text-muted); font-style: italic;
+}
 
-.typing-dots { display:inline-flex; gap:5px; align-items:center; }
+/* Typing dots */
+.typing-dots { display: inline-flex; gap: 5px; align-items: center; padding: 4px 0; }
 .typing-dots span {
-    width:7px; height:7px; border-radius:50%; background:var(--primary-light);
-    animation:blink 1.2s ease-in-out infinite;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--g4);
+  animation: blink 1.2s ease-in-out infinite;
 }
-.typing-dots span:nth-child(2){ animation-delay:.2s; }
-.typing-dots span:nth-child(3){ animation-delay:.4s; }
+.typing-dots span:nth-child(2) { animation-delay: .2s; }
+.typing-dots span:nth-child(3) { animation-delay: .4s; }
 @keyframes blink {
-    0%,80%,100%{ opacity:.25; transform:scale(.8); }
-    40%        { opacity:1;   transform:scale(1);   }
+  0%,80%,100% { opacity:.25; transform:scale(.8); }
+  40%          { opacity:1;   transform:scale(1);   }
 }
 
-/* ── MODO ESCUTA ATIVA — círculo central ─────────────────── */
-.listen-circle {
-    position:relative;
-    width:160px; height:160px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    opacity:0; pointer-events:none;
-    transform:scale(.8);
-    transition: opacity .6s cubic-bezier(.4,0,.2,1),
-                transform .6s cubic-bezier(.4,0,.2,1);
+/* ── INPUT FOOTER ─────────────────────────────────── */
+.footer {
+  padding: 0 36px 28px;
+  flex-shrink: 0;
 }
-.listen-circle.visible { opacity:1; pointer-events:auto; transform:scale(1); }
+.input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  padding: 6px 8px 6px 20px;
+  box-shadow: var(--shadow);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.input-row:focus-within {
+  border-color: rgba(46,125,50,0.3);
+  box-shadow: 0 4px 24px rgba(46,125,50,0.10);
+}
+.msg-input {
+  flex: 1; border: none; outline: none;
+  background: transparent;
+  font-size: 14px; color: var(--text);
+  font-family: inherit;
+  padding: 8px 0;
+}
+.msg-input::placeholder { color: var(--text-muted); }
 
-/* Anel externo */
-.listen-ring {
-    position:absolute; inset:0; border-radius:50%;
-    border:2px solid rgba(46,125,50,.15);
-    box-shadow:0 0 0 0 rgba(46,125,50,.1);
-    animation:none;
+.icon-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  border: none; background: transparent;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-muted);
+  transition: all 0.18s;
+  flex-shrink: 0;
 }
-.listen-circle.active .listen-ring {
-    animation:ringPulse 2s ease-in-out infinite;
-}
-/* Gradiente verde→rosa quando respondendo */
-.listen-circle.responding .listen-ring {
-    border-color:transparent;
-    background: conic-gradient(
-        from 0deg,
-        #2E7D32 0%,
-        #81C784 30%,
-        #F48FB1 60%,
-        #E91E8C 80%,
-        #2E7D32 100%
-    );
-    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0);
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0);
-    animation:spinGradient 2.5s linear infinite;
-}
-@keyframes ringPulse {
-    0%,100%{ box-shadow:0 0 0 0   rgba(46,125,50,.15); }
-    50%    { box-shadow:0 0 0 12px rgba(46,125,50,0);   }
-}
-@keyframes spinGradient {
-    to { transform:rotate(360deg); }
-}
-
-/* Canvas da faixa de áudio dentro do círculo */
-#waveCanvas {
-    position:absolute; inset:0;
-    width:100%; height:100%;
-    border-radius:50%;
+.icon-btn:hover { background: rgba(46,125,50,0.07); color: var(--g2); }
+.icon-btn svg {
+  width: 17px; height: 17px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round;
 }
 
-/* Fundo do círculo */
-.listen-bg {
-    position:absolute; inset:6px;
-    border-radius:50%; background:var(--white);
-    box-shadow:0 8px 32px rgba(46,125,50,.08);
+.voice-btn {
+  border: 1.5px solid rgba(46,125,50,0.15);
+  background: transparent;
 }
+.voice-btn.active {
+  background: var(--g2);
+  border-color: var(--g2);
+  color: var(--white);
+  box-shadow: 0 3px 12px rgba(46,125,50,0.28);
+}
+.voice-btn .wv { display: flex; align-items: center; gap: 2px; height: 14px; }
+.voice-btn .wv span {
+  display: block; width: 2px; border-radius: 2px;
+  background: currentColor; transition: background 0.2s;
+}
+.voice-btn .wv span:nth-child(1) { height: 5px;  }
+.voice-btn .wv span:nth-child(2) { height: 10px; }
+.voice-btn .wv span:nth-child(3) { height: 14px; }
+.voice-btn .wv span:nth-child(4) { height: 9px;  }
+.voice-btn .wv span:nth-child(5) { height: 4px;  }
+.voice-btn.active .wv span:nth-child(1) { animation: bw .9s ease-in-out infinite; }
+.voice-btn.active .wv span:nth-child(2) { animation: bw .9s ease-in-out infinite .15s; }
+.voice-btn.active .wv span:nth-child(3) { animation: bw .9s ease-in-out infinite .05s; }
+.voice-btn.active .wv span:nth-child(4) { animation: bw .9s ease-in-out infinite .20s; }
+.voice-btn.active .wv span:nth-child(5) { animation: bw .9s ease-in-out infinite .10s; }
+@keyframes bw { 0%,100% { transform:scaleY(.45); } 50% { transform:scaleY(1); } }
 
-/* ── INPUT RODAPÉ ──────────────────────────────────────── */
-.input-container {
-    width:100%; max-width:600px;
-    display:flex; align-items:center;
-    background:var(--white); border-radius:30px;
-    padding:8px 10px 8px 20px;
-    box-shadow:0 4px 20px rgba(0,0,0,.02);
-    border:1px solid rgba(46,125,50,.08);
-    transition:all .3s; gap:6px;
-}
-.input-container:focus-within {
-    border-color:var(--primary);
-    box-shadow:0 6px 24px rgba(46,125,50,.05);
-}
-.message-input {
-    flex:1; border:none; outline:none; background:transparent;
-    font-size:15px; color:var(--text-dark); padding:8px 0;
-}
-.message-input::placeholder { color:var(--text-light); }
-
-/* Botão modo escuta — círculo com mini waveform SVG */
-.voice-mode-btn {
-    width:44px; height:44px; border-radius:50%;
-    background:var(--white); border:1.5px solid rgba(46,125,50,.15);
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; flex-shrink:0;
-    transition:all .25s ease;
-    box-shadow:0 2px 8px rgba(46,125,50,.04);
-    position:relative; overflow:hidden;
-}
-.voice-mode-btn:hover {
-    border-color:var(--primary-light);
-    box-shadow:0 3px 12px rgba(46,125,50,.12);
-}
-.voice-mode-btn.active {
-    background:var(--primary);
-    border-color:var(--primary);
-    box-shadow:0 4px 16px rgba(46,125,50,.3);
-}
-.voice-mode-btn .btn-wave {
-    display:flex; align-items:center; gap:2px; height:16px;
-}
-.voice-mode-btn .btn-wave span {
-    display:block; width:2.5px; border-radius:2px;
-    background:var(--text-light); transition:background .25s;
-}
-.voice-mode-btn.active .btn-wave span { background:var(--white); }
-/* Alturas dos 5 tracinhos (waveform miniaturo) */
-.voice-mode-btn .btn-wave span:nth-child(1){ height:6px;  }
-.voice-mode-btn .btn-wave span:nth-child(2){ height:12px; }
-.voice-mode-btn .btn-wave span:nth-child(3){ height:16px; }
-.voice-mode-btn .btn-wave span:nth-child(4){ height:10px; }
-.voice-mode-btn .btn-wave span:nth-child(5){ height:5px;  }
-/* Animação quando ativo */
-.voice-mode-btn.active .btn-wave span:nth-child(1){ animation:bw 0.9s ease-in-out infinite; }
-.voice-mode-btn.active .btn-wave span:nth-child(2){ animation:bw 0.9s ease-in-out infinite .15s; }
-.voice-mode-btn.active .btn-wave span:nth-child(3){ animation:bw 0.9s ease-in-out infinite .05s; }
-.voice-mode-btn.active .btn-wave span:nth-child(4){ animation:bw 0.9s ease-in-out infinite .2s; }
-.voice-mode-btn.active .btn-wave span:nth-child(5){ animation:bw 0.9s ease-in-out infinite .1s; }
-@keyframes bw {
-    0%,100%{ transform:scaleY(.5); }
-    50%    { transform:scaleY(1);   }
-}
-
-/* Botão microfone simples (mantido para o fluxo de voz sem modo ativo) */
-.mic-btn {
-    background:transparent; border:none; width:38px; height:38px;
-    border-radius:50%; display:flex; align-items:center; justify-content:center;
-    cursor:pointer; transition:all .2s; color:var(--text-light); flex-shrink:0;
-}
-.mic-btn:hover { background:var(--primary-ultra); color:var(--primary); }
-.mic-btn.recording { background:#FFEBEE; color:#C62828; animation:micPulse 1s ease-in-out infinite; }
-@keyframes micPulse {
-    0%,100%{ box-shadow:0 0 0 0   rgba(198,40,40,.2); }
-    50%    { box-shadow:0 0 0 6px rgba(198,40,40,0);   }
-}
-
-/* Botão enviar */
 .send-btn {
-    background:var(--primary-ultra); border:none;
-    width:40px; height:40px; border-radius:50%;
-    display:flex; align-items:center; justify-content:center;
-    cursor:pointer; transition:all .2s; flex-shrink:0;
+  background: linear-gradient(135deg, var(--g2), var(--g3));
+  color: var(--white);
+  border: none;
+  box-shadow: 0 2px 10px rgba(46,125,50,0.25);
 }
-.send-btn svg { color:var(--primary); transition:transform .2s; }
-.send-btn:hover { background:var(--primary); }
-.send-btn:hover svg { color:var(--white); transform:translateX(2px); }
-.send-btn:disabled { opacity:.4; cursor:not-allowed; }
+.send-btn:hover {
+  background: linear-gradient(135deg, var(--g1), var(--g2));
+  box-shadow: 0 4px 16px rgba(46,125,50,0.35);
+}
+.send-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.send-btn svg { width: 16px; height: 16px; stroke: white; }
+
+/* Transcrição flutuante sob orbe */
+#listenTranscript {
+  font-size: 13px;
+  color: var(--g2);
+  font-weight: 500;
+  text-align: center;
+  min-height: 18px;
+  opacity: 0;
+  transition: opacity 0.4s;
+  max-width: 300px;
+  letter-spacing: 0.1px;
+}
+#listenTranscript.vis { opacity: 1; }
+
 </style>
 </head>
 <body>
 
-<!-- Sidebar Fixa -->
-<div class="sidebar">
+<!-- ════ SIDEBAR ════ -->
+<aside class="sidebar">
+  <div class="sidebar-top">
     <div class="brand">
-        <div class="scene-sidebar" id="sceneSidebar">
-            <div class="dot-sidebar"></div>
-            <div class="dot-sidebar"></div>
-            <div class="dot-sidebar"></div>
-            <div class="dot-sidebar"></div>
+      <div class="brand-orb" id="brandOrb">
+        <div class="bd"></div>
+        <div class="bd"></div>
+        <div class="bd"></div>
+        <div class="bd"></div>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Yra</span>
+        <span class="brand-sub">Assistant</span>
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav">
+    <span class="nav-section-label">Principal</span>
+
+    <a class="nav-item active" href="#">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span class="nav-label">Chat</span>
+    </a>
+
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
+      <span class="nav-label">Plugins</span>
+      <span class="nav-badge">3</span>
+    </a>
+
+    <span class="nav-section-label">Organização</span>
+
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span class="nav-label">Notas</span>
+    </a>
+
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+      <span class="nav-label">Memória</span>
+    </a>
+
+    <span class="nav-section-label">Sistema</span>
+
+    <a class="nav-item" href="#">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
+      <span class="nav-label">Configurações</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="status-dot"></div>
+    <span class="status-label">Conectado</span>
+  </div>
+</aside>
+
+<!-- ════ MAIN ════ -->
+<div class="main">
+
+  <div class="topbar">
+    <span class="topbar-title">Assistente pessoal</span>
+    <div class="topbar-actions">
+      <button class="topbar-btn" title="Histórico">
+        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.9"/></svg>
+      </button>
+      <button class="topbar-btn" title="Nova conversa">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="stage">
+
+    <!-- ORBE CENTRAL PERMANENTE -->
+    <div class="voice-orb-wrap">
+      <div class="voice-orb" id="voiceOrb">
+        <div class="orb-halo"></div>
+        <div class="orb-ring"></div>
+        <div class="orb-bg"></div>
+        <canvas id="orbCanvas"></canvas>
+        <div class="orb-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
         </div>
-        <span class="brand-name">YRA Assistant</span>
+      </div>
+
+      <div class="orb-label">
+        <div class="orb-status" id="orbStatus">Pronto para ajudar</div>
+        <div id="listenTranscript"></div>
+      </div>
+      <div id="placeholderText"></div>
     </div>
 
-    <ul class="menu-list">
-        <li class="menu-item active">
-            <a href="center.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-                <span>Chat</span>
-            </a>
-        </li>
-        <li class="menu-item">
-            <a href="plugins.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-                <span>Plugins</span>
-            </a>
-        </li>
-        <li class="menu-item">
-            <a href="notes.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-                <span>Notas</span>
-            </a>
-        </li>
-        <li class="menu-item">
-            <a href="memory.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
-                <span>Memória</span>
-            </a>
-        </li>
-        <li class="menu-item">
-            <a href="settings.html">
-                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
-                <span>Configurações</span>
-            </a>
-        </li>
-    </ul>
+    <!-- RESPOSTA -->
+    <div class="response-wrap" id="responseWrap">
+      <div class="response-bubble" id="responseBubble">
+        <button class="response-close" id="responseClose" title="Fechar">✕</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER INPUT -->
+  <footer class="footer">
+    <div class="input-row">
+      <input type="text" class="msg-input" id="msgInput" placeholder="Pergunte qualquer coisa ao Yra…" autocomplete="off">
+
+      <button class="icon-btn voice-btn" id="voiceBtn" title="Modo voz">
+        <div class="wv"><span></span><span></span><span></span><span></span><span></span></div>
+      </button>
+
+      <button class="icon-btn send-btn" id="sendBtn" title="Enviar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </footer>
+
 </div>
-
-<!-- Conteúdo Principal -->
-<div class="main-wrapper">
-
-<!-- ÁREA CENTRAL -->
-<main class="center-container" id="centerContainer">
-
-    <!-- Esferas -->
-    <div class="scene-wrapper" id="sceneWrapper">
-        <div class="scene" id="scene">
-            <div class="dot"></div><div class="dot"></div>
-            <div class="dot"></div><div class="dot"></div>
-        </div>
-        <div class="subtitle-area">
-            <div class="placeholder-text" id="placeholderText">Inicializando Yra...</div>
-            <div class="transcript-text"  id="transcriptText"></div>
-        </div>
-    </div>
-
-    <!-- Círculo de escuta ativa -->
-    <div class="listen-circle" id="listenCircle">
-        <div class="listen-ring" id="listenRing"></div>
-        <div class="listen-bg"></div>
-        <canvas id="waveCanvas"></canvas>
-    </div>
-
-    <!-- Transcrição no modo escuta -->
-    <div class="transcript-text" id="listenTranscript"
-         style="max-width:340px; font-size:14px; text-align:center; transition:opacity .4s; opacity:0;"></div>
-
-    <!-- Resposta -->
-    <div class="response-area" id="responseArea">
-        <div class="response-bubble" id="responseBubble"></div>
-        <div class="thinking-dots-vertical" id="thinkingDotsVertical">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
-    </div>
-
-</main>
-
-<!-- INPUT RODAPÉ -->
-<footer class="input-container">
-    <input type="text" class="message-input" id="messageInput" placeholder="Pergunte qualquer coisa ao Yra...">
-
-    <!-- Botão modo escuta ativa -->
-    <button class="voice-mode-btn" id="voiceModeBtn" title="Modo escuta ativa" aria-label="Ativar modo de escuta contínua">
-        <div class="btn-wave">
-            <span></span><span></span><span></span><span></span><span></span>
-        </div>
-    </button>
-
-    <!-- Botão enviar -->
-    <button class="send-btn" id="sendBtn" aria-label="Enviar mensagem">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
-        </svg>
-    </button>
-</footer>
-
-</div><!-- fim .main-wrapper -->
 
 <!-- FIREBASE -->
 <script type="module">
-import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, collection, query, where, getDocs }
-       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey:            "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
-    authDomain:        "yra-syra.firebaseapp.com",
-    projectId:         "yra-syra",
-    storageBucket:     "yra-syra.firebasestorage.app",
-    messagingSenderId: "555145505684",
-    appId:             "1:555145505684:web:aa1ef14072653e41057d81"
+  apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+  authDomain: "yra-syra.firebaseapp.com",
+  projectId: "yra-syra",
+  storageBucket: "yra-syra.firebasestorage.app",
+  messagingSenderId: "555145505684",
+  appId: "1:555145505684:web:aa1ef14072653e41057d81"
 };
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db   = getFirestore(app);
-
 window.__yraFirestore = db;
-window.__yraAuth      = auth;
+window.__yraAuth = auth;
 
 onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        try {
-            const q = query(
-                collection(db, "Keys"),
-                where("user_id", "==", user.uid),
-                where("enabled",  "==", true)
-            );
-            const ks = await getDocs(q);
-            if (!ks.empty) {
-                window.__yraApiKey = ks.docs[0].data().key;
-            }
-        } catch(e) { console.error("Erro key:", e); }
-    } else {
-        window.location.href = "index.html";
-    }
+  if (user) {
+    try {
+      const q = query(collection(db, "Keys"), where("user_id","==",user.uid), where("enabled","==",true));
+      const ks = await getDocs(q);
+      if (!ks.empty) window.__yraApiKey = ks.docs[0].data().key;
+    } catch(e) { console.error("Erro key:", e); }
+  } else {
+    window.location.href = "index.html";
+  }
 });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
 <script>
-/* ================================================================
-   ANIMAÇÃO DO LOGO LATERAL (BOLINHAS)
-================================================================ */
-const sidebarDots = document.querySelectorAll(".dot-sidebar");
-const sidebarPositions = [
-    {x: 0, y: -10},
-    {x: 10, y: 0},
-    {x: 0, y: 10},
-    {x: -10, y: 0}
-];
-
-function shuffleSidebarArray(arr) {
-    let a = [...arr];
-    for (let i = a.length - 1; i > 0; i--) {
-        let j = Math.floor(Math.random() * (i + 1));
-        [a[i], a[j]] = [a[j], a[i]];
-    }
-    return a;
+/* ─── BRAND ORB IDLE ANIMATION ─────────────────────── */
+const brandDots = document.querySelectorAll('.brand-orb .bd');
+const brandPos  = [{x:0,y:-10},{x:10,y:0},{x:0,y:10},{x:-10,y:0}];
+function shuffleArr(arr) {
+  let a=[...arr]; for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;
 }
+setInterval(() => {
+  const p = shuffleArr(brandPos);
+  brandDots.forEach((d,i) => d.style.transform = `translate(${p[i].x}px,${p[i].y}px)`);
+}, 1200);
 
-function startSidebarAnimation() {
-    if (sidebarDots.length === 0) {
-        console.warn("Sidebar dots not found, animation skipped");
-        return;
-    }
-    
-    setInterval(() => {
-        const p = shuffleSidebarArray(sidebarPositions);
-        sidebarDots.forEach((dot, i) => {
-            if (p[i]) {
-                dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
-            }
-        });
-    }, 1000);
-}
-
-// Wait for DOM to be ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startSidebarAnimation);
-} else {
-    startSidebarAnimation();
-}
-
-/* ================================================================
-   PLACEHOLDERS
-================================================================ */
+/* ─── PLACEHOLDERS ────────────────────────────────── */
 const PLACEHOLDERS = [
-    "Estudando o mercado cripto...",
-    "Memorizando as leis de Newton...",
-    "Calculando a entropia do universo...",
-    "Lendo Kant por prazer. Sério.",
-    "Treinando para a Olimpíada de Xadrez...",
-    "Analisando padrões nas estrelas...",
-    "Bebendo café virtual. ☕",
-    "Processando 847 abas abertas...",
-    "Relendo 'O Guia do Mochileiro' pela 42ª vez...",
-    "Aprendendo suaíli por curiosidade...",
-    "Verificando se gatos entendem física quântica...",
-    "Simulando universos paralelos...",
-    "Otimizando algoritmos de procrastinação...",
-    "Traduzindo emojis para latim...",
-    "Pesquisando por vida inteligente. Ainda buscando.",
-    "Atualizando o mapa mental do cosmos...",
-    "Perguntando por que o céu é azul. Ainda.",
-    "Refatorando a teoria do tudo...",
-    "Sincronizando com o fuso horário de Marte...",
-    "Lendo sobre buracos negros. Por diversão.",
+  "Estudando o mercado cripto…","Memorizando as leis de Newton…",
+  "Calculando a entropia do universo…","Lendo Kant por prazer. Sério.",
+  "Analisando padrões nas estrelas…","Bebendo café virtual ☕",
+  "Processando 847 abas abertas…","Simulando universos paralelos…",
+  "Otimizando algoritmos de procrastinação…","Traduzindo emojis para latim…",
+  "Pesquisando por vida inteligente. Ainda buscando.",
+  "Atualizando o mapa mental do cosmos…","Refatorando a teoria do tudo…",
 ];
+const phEl = document.getElementById('placeholderText');
+let phIdx  = 0;
+let phTimer = null;
+let phActive = true;
 
-const placeholderEl   = document.getElementById("placeholderText");
-const transcriptEl    = document.getElementById("transcriptText"); // sob esferas (modo normal)
-const listenTranscript= document.getElementById("listenTranscript");
-
-let phIndex   = Math.floor(Math.random() * PLACEHOLDERS.length);
-let phTimeout = null;
-let isIdle    = true;
-
-function showNextPlaceholder() {
-    if (!isIdle) return;
-    placeholderEl.classList.add("fade");
-    setTimeout(() => {
-        phIndex = (phIndex + 1) % PLACEHOLDERS.length;
-        placeholderEl.textContent = PLACEHOLDERS[phIndex];
-        placeholderEl.classList.remove("fade");
-    }, 500);
-    phTimeout = setTimeout(showNextPlaceholder, 3500);
+function nextPlaceholder() {
+  if (!phActive) return;
+  phEl.classList.add('fade');
+  setTimeout(() => {
+    phIdx = (phIdx + 1) % PLACEHOLDERS.length;
+    phEl.textContent = PLACEHOLDERS[phIdx];
+    phEl.classList.remove('fade');
+  }, 500);
+  phTimer = setTimeout(nextPlaceholder, 3800);
 }
-function startPlaceholders() {
-    isIdle = true;
-    placeholderEl.style.display  = "block";
-    placeholderEl.classList.remove("fade");
-    transcriptEl.classList.remove("visible");
-    clearTimeout(phTimeout);
-    showNextPlaceholder();
+function startPH() {
+  phActive = true;
+  phEl.style.opacity = '';
+  phEl.textContent = PLACEHOLDERS[phIdx];
+  clearTimeout(phTimer);
+  phTimer = setTimeout(nextPlaceholder, 3800);
 }
-function stopPlaceholders() {
-    isIdle = false;
-    clearTimeout(phTimeout);
-    placeholderEl.classList.add("fade");
-    setTimeout(() => { placeholderEl.style.display = "none"; }, 500);
+function stopPH() {
+  phActive = false;
+  clearTimeout(phTimer);
+  phEl.textContent = '';
 }
+startPH();
 
-setTimeout(startPlaceholders, 800);
+/* ─── ORB CANVAS ─────────────────────────────────── */
+const orbEl     = document.getElementById('voiceOrb');
+const orbCanvas = document.getElementById('orbCanvas');
+const orbCtx    = orbCanvas.getContext('2d');
 
-/* ================================================================
-   ESFERAS
-================================================================ */
-const dots         = document.querySelectorAll(".dot");
-const scene        = document.getElementById("scene");
-const sceneWrapper = document.getElementById("sceneWrapper");
+let audioCtx=null, analyser=null, micSrc=null, waveData=null, isAudioReady=false;
+let rafId = null;
 
-const POS = [
-    {x:0,   y:-55},
-    {x:55,  y:0  },
-    {x:0,   y:55 },
-    {x:-55, y:0  }
-];
+function resizeOrbCanvas() {
+  const sz = orbEl.offsetWidth - 6;
+  orbCanvas.width  = sz;
+  orbCanvas.height = sz;
+}
+resizeOrbCanvas();
+window.addEventListener('resize', resizeOrbCanvas);
 
-function shuffle(arr) {
-    let a = [...arr];
-    for (let i = a.length-1; i > 0; i--) {
-        const j = Math.floor(Math.random()*(i+1));
-        [a[i],a[j]] = [a[j],a[i]];
+/* Waveform idle — ondas suaves simuladas */
+function drawIdle() {
+  cancelAnimationFrame(rafId);
+  const sz = orbCanvas.width;
+  const cx = sz/2, cy = sz/2, r = sz * 0.32;
+  const bars = 40;
+  let t = 0;
+  function frame() {
+    rafId = requestAnimationFrame(frame);
+    t += 0.025;
+    orbCtx.clearRect(0,0,sz,sz);
+    for (let i=0;i<bars;i++) {
+      const angle = (i/bars)*Math.PI*2 - Math.PI/2;
+      const wave  = 0.08 + 0.12 * Math.abs(Math.sin(angle*2.5 + t));
+      const len   = r * wave;
+      const alpha = 0.18 + 0.25 * Math.abs(Math.sin(angle*2 + t));
+      const x1 = cx + Math.cos(angle)*(r-2);
+      const y1 = cy + Math.sin(angle)*(r-2);
+      const x2 = cx + Math.cos(angle)*(r-2+len);
+      const y2 = cy + Math.sin(angle)*(r-2+len);
+      orbCtx.beginPath();
+      orbCtx.moveTo(x1,y1);
+      orbCtx.lineTo(x2,y2);
+      orbCtx.strokeStyle = `rgba(46,125,50,${alpha})`;
+      orbCtx.lineWidth   = 2.5;
+      orbCtx.lineCap     = 'round';
+      orbCtx.stroke();
     }
-    return a;
+  }
+  frame();
 }
 
-let sphereInterval = null;
-
-function startIdleAnimation() {
-    if (!scene || dots.length === 0) {
-        console.warn("Scene elements not found, idle animation skipped");
-        return;
+/* Waveform mic real */
+function drawMic() {
+  cancelAnimationFrame(rafId);
+  const sz = orbCanvas.width;
+  const cx = sz/2, cy = sz/2, r = sz*0.32;
+  const bars = 40;
+  const step = Math.floor(waveData.length/bars);
+  function frame() {
+    rafId = requestAnimationFrame(frame);
+    if (analyser) analyser.getByteFrequencyData(waveData);
+    orbCtx.clearRect(0,0,sz,sz);
+    for (let i=0;i<bars;i++) {
+      const angle = (i/bars)*Math.PI*2 - Math.PI/2;
+      const norm  = (waveData[i*step]||0)/255;
+      const len   = r*(0.08 + 0.55*norm);
+      const alpha = 0.35 + 0.65*norm;
+      const x1 = cx+Math.cos(angle)*(r-2), y1 = cy+Math.sin(angle)*(r-2);
+      const x2 = cx+Math.cos(angle)*(r-2+len), y2 = cy+Math.sin(angle)*(r-2+len);
+      orbCtx.beginPath(); orbCtx.moveTo(x1,y1); orbCtx.lineTo(x2,y2);
+      orbCtx.strokeStyle = `rgba(46,125,50,${alpha})`;
+      orbCtx.lineWidth = 2.5; orbCtx.lineCap = 'round'; orbCtx.stroke();
     }
-    scene.classList.remove("thinking");
-    clearInterval(sphereInterval);
-    sphereInterval = setInterval(() => {
-        const p = shuffle(POS);
-        dots.forEach((d, i) => {
-            if (p[i]) {
-                d.style.transform = `translate(${p[i].x}px,${p[i].y}px)`;
-                d.style.animation  = "";
-            }
-        });
-    }, 1000);
+  }
+  frame();
 }
 
-function startThinkingAnimation() {
-    if (!scene || dots.length === 0) {
-        console.warn("Scene elements not found, thinking animation skipped");
-        return;
+/* Waveform responding — gradiente verde→rosa */
+function drawResponding() {
+  cancelAnimationFrame(rafId);
+  const sz = orbCanvas.width;
+  const cx = sz/2, cy = sz/2, r = sz*0.32;
+  const bars = 44;
+  let t = 0;
+  function frame() {
+    rafId = requestAnimationFrame(frame);
+    t += 0.03;
+    orbCtx.clearRect(0,0,sz,sz);
+    for (let i=0;i<bars;i++) {
+      const angle = (i/bars)*Math.PI*2 + t;
+      const mix   = ((Math.sin(angle*3 + t*2)+1)/2);
+      const rc    = Math.round(46  + (233-46)*mix);
+      const gc    = Math.round(125 + (30-125)*mix);
+      const bc    = Math.round(50  + (139-50)*mix);
+      const len   = r*(0.18 + 0.18*Math.abs(Math.sin(angle*4+t*3)));
+      const x1 = cx+Math.cos(angle)*r, y1 = cy+Math.sin(angle)*r;
+      const x2 = cx+Math.cos(angle)*(r+len), y2 = cy+Math.sin(angle)*(r+len);
+      orbCtx.beginPath(); orbCtx.moveTo(x1,y1); orbCtx.lineTo(x2,y2);
+      orbCtx.strokeStyle = `rgba(${rc},${gc},${bc},0.88)`;
+      orbCtx.lineWidth = 2.5; orbCtx.lineCap = 'round'; orbCtx.stroke();
     }
-    clearInterval(sphereInterval);
-    dots.forEach(d => { d.style.transform = ""; d.style.animation = ""; });
-    // Pequeno delay para garantir que o browser reflow processe o reset
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => { scene.classList.add("thinking"); });
-    });
+  }
+  frame();
 }
 
-function hideSpheres() {
-    if (sceneWrapper) {
-        sceneWrapper.classList.add("hidden");
-    }
-}
-function showSpheres(atTop = false) {
-    if (!sceneWrapper) return;
-    sceneWrapper.classList.remove("hidden");
-    if (atTop) {
-        sceneWrapper.classList.add("top-mode");
-    } else {
-        sceneWrapper.classList.remove("top-mode");
-    }
-}
+drawIdle();
 
-// Wait for DOM to be ready before starting animations
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', startIdleAnimation);
-} else {
-    startIdleAnimation();
-}
-
-/* ================================================================
-   WAVEFORM REAL — CANVAS NO CÍRCULO DE ESCUTA
-================================================================ */
-const listenCircle = document.getElementById("listenCircle");
-const waveCanvas   = document.getElementById("waveCanvas");
-const waveCtx      = waveCanvas.getContext("2d");
-
-let audioCtx    = null;
-let analyser    = null;
-let micSource   = null;
-let waveData    = null;
-let waveRAF     = null;
-let isWaveReady = false;
-
+/* ─── AUDIO SETUP ─────────────────────────────────── */
 async function setupAudio() {
-    if (isWaveReady) return true;
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio:true, video:false });
-        audioCtx   = new (window.AudioContext || window.webkitAudioContext)();
-        analyser   = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        waveData   = new Uint8Array(analyser.frequencyBinCount);
-        micSource  = audioCtx.createMediaStreamSource(stream);
-        micSource.connect(analyser);
-        isWaveReady = true;
-        return true;
-    } catch(e) {
-        console.error("Mic:", e);
-        return false;
+  if (isAudioReady) return true;
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({audio:true,video:false});
+    audioCtx  = new (window.AudioContext||window.webkitAudioContext)();
+    analyser  = audioCtx.createAnalyser();
+    analyser.fftSize = 256;
+    waveData  = new Uint8Array(analyser.frequencyBinCount);
+    micSrc    = audioCtx.createMediaStreamSource(stream);
+    micSrc.connect(analyser);
+    isAudioReady = true;
+    return true;
+  } catch(e) { return false; }
+}
+
+/* ─── SPEECH RECOGNITION ─────────────────────────── */
+const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recog = null, isRecog = false, silTimer = null;
+const SILENCE = 2000;
+
+if (SR) {
+  recog = new SR();
+  recog.continuous = true;
+  recog.interimResults = true;
+  recog.lang = 'pt-BR';
+  recog.onresult = (e) => {
+    if (!voiceActive) return;
+    let final='', interim='';
+    for (let i=e.resultIndex;i<e.results.length;i++) {
+      if (e.results[i].isFinal) final   += e.results[i][0].transcript;
+      else                      interim += e.results[i][0].transcript;
     }
+    const txt = final||interim;
+    ltEl.textContent = txt;
+    ltEl.classList.add('vis');
+    if (APP_STATE==='responding') leaveResponding();
+    clearTimeout(silTimer);
+    if (final) silTimer = setTimeout(()=>{ if(voiceActive&&APP_STATE==='listening') fromVoice(final.trim()); }, SILENCE);
+  };
+  recog.onerror = (e) => {
+    if (e.error==='no-speech') return;
+    if (e.error==='not-allowed') { alert('Permissão de microfone negada.'); deactivateVoice(); }
+  };
+  recog.onend = () => {
+    isRecog = false;
+    if (voiceActive && APP_STATE!=='thinking') try{ recog.start(); isRecog=true; }catch(_){}
+  };
 }
 
-function resizeCanvas() {
-    const size = listenCircle.offsetWidth;
-    waveCanvas.width  = size;
-    waveCanvas.height = size;
+/* ─── STATE ──────────────────────────────────────── */
+let APP_STATE  = 'idle';
+let voiceActive = false;
+let isBusy     = false;
+
+const voiceBtn  = document.getElementById('voiceBtn');
+const orbStatus = document.getElementById('orbStatus');
+const ltEl      = document.getElementById('listenTranscript');
+const responseWrap   = document.getElementById('responseWrap');
+const responseBubble = document.getElementById('responseBubble');
+const responseClose  = document.getElementById('responseClose');
+const sendBtn   = document.getElementById('sendBtn');
+const msgInput  = document.getElementById('msgInput');
+
+function setOrbState(state) {
+  orbEl.classList.remove('active','responding');
+  if (state==='active')     orbEl.classList.add('active');
+  if (state==='responding') orbEl.classList.add('responding');
 }
 
-function drawWave(isResponding = false) {
-    cancelAnimationFrame(waveRAF);
-    const size = waveCanvas.width;
-    const cx   = size / 2;
-    const cy   = size / 2;
-    const r    = size * 0.3;  // raio base
-
-    function frame() {
-        waveRAF = requestAnimationFrame(frame);
-        waveCtx.clearRect(0, 0, size, size);
-
-        if (isResponding) {
-            // — Anel girante verde→rosa —
-            const now  = Date.now() / 1000;
-            const bars = 40;
-            for (let i = 0; i < bars; i++) {
-                const angle = (i / bars) * Math.PI * 2 + now * 1.2;
-                const t     = ((Math.sin(angle * 3 + now * 2) + 1) / 2); // 0..1
-                // Interpola verde → rosa
-                const rc = Math.round(46  + (233-46)  * t);
-                const gc = Math.round(125 + (30-125)  * t);
-                const bc = Math.round(50  + (139-50)  * t);
-                const len = r * 0.22 + r * 0.18 * Math.abs(Math.sin(angle * 4 + now * 3));
-
-                const x1 = cx + Math.cos(angle) * r;
-                const y1 = cy + Math.sin(angle) * r;
-                const x2 = cx + Math.cos(angle) * (r + len);
-                const y2 = cy + Math.sin(angle) * (r + len);
-
-                waveCtx.beginPath();
-                waveCtx.moveTo(x1, y1);
-                waveCtx.lineTo(x2, y2);
-                waveCtx.strokeStyle = `rgba(${rc},${gc},${bc},0.85)`;
-                waveCtx.lineWidth   = 2.5;
-                waveCtx.lineCap     = "round";
-                waveCtx.stroke();
-            }
-        } else {
-            // — Waveform real do microfone —
-            if (analyser) analyser.getByteFrequencyData(waveData);
-
-            const bars    = 36;
-            const step    = Math.floor(waveData ? waveData.length / bars : 1);
-
-            for (let i = 0; i < bars; i++) {
-                const angle   = (i / bars) * Math.PI * 2 - Math.PI / 2;
-                const raw     = waveData ? waveData[i * step] : 0;
-                const norm    = raw / 255;
-                const len     = r * 0.12 + r * 0.55 * norm;
-
-                const x1 = cx + Math.cos(angle) * (r - 4);
-                const y1 = cy + Math.sin(angle) * (r - 4);
-                const x2 = cx + Math.cos(angle) * (r - 4 + len);
-                const y2 = cy + Math.sin(angle) * (r - 4 + len);
-
-                const alpha = 0.4 + 0.6 * norm;
-                waveCtx.beginPath();
-                waveCtx.moveTo(x1, y1);
-                waveCtx.lineTo(x2, y2);
-                waveCtx.strokeStyle = `rgba(46,125,50,${alpha})`;
-                waveCtx.lineWidth   = 2.5;
-                waveCtx.lineCap     = "round";
-                waveCtx.stroke();
-            }
-        }
-    }
-
-    frame();
+/* ─── VOICE ACTIVATION ───────────────────────────── */
+async function activateVoice() {
+  voiceActive = true;
+  voiceBtn.classList.add('active');
+  const ok = await setupAudio();
+  if (!ok) { deactivateVoice(); return; }
+  stopPH();
+  setOrbState('active');
+  orbStatus.textContent = 'Ouvindo…';
+  ltEl.textContent = '';
+  ltEl.classList.add('vis');
+  drawMic();
+  APP_STATE = 'listening';
+  if (recog && !isRecog) try{ recog.start(); isRecog=true; }catch(_){}
 }
 
-function stopWave() {
-    cancelAnimationFrame(waveRAF);
-    waveCtx.clearRect(0, 0, waveCanvas.width, waveCanvas.height);
+function deactivateVoice() {
+  voiceActive = false;
+  isRecog = false;
+  voiceBtn.classList.remove('active');
+  clearTimeout(silTimer);
+  if (recog) try{ recog.stop(); }catch(_){}
+  setOrbState('');
+  orbStatus.textContent = 'Pronto para ajudar';
+  ltEl.classList.remove('vis');
+  drawIdle();
+  closeResponse();
+  startPH();
+  APP_STATE = 'idle';
 }
 
-/* ================================================================
-   ESTADO GLOBAL
-================================================================ */
-/*
-  Estados:
-    "idle"      — esferas + placeholders
-    "listening" — círculo + waveform real + transcrição
-    "thinking"  — esferas no topo girando (transição)
-    "responding"— círculo com waveform rosa/verde, resposta exibida
-*/
-let APP_STATE = "idle";
-
-function setState(newState) {
-    APP_STATE = newState;
+function leaveResponding() {
+  setOrbState('active');
+  closeResponse();
+  ltEl.textContent = 'Ouvindo…';
+  ltEl.classList.add('vis');
+  orbStatus.textContent = 'Ouvindo…';
+  drawMic();
+  APP_STATE = 'listening';
 }
 
-/* ================================================================
-   MODO ESCUTA ATIVA
-================================================================ */
-const voiceModeBtn = document.getElementById("voiceModeBtn");
-let voiceModeActive = false;
+voiceBtn.addEventListener('click', () => { voiceActive ? deactivateVoice() : activateVoice(); });
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition   = null;
-let isRecognizing = false;
-let silenceTimer  = null;
-const SILENCE_MS  = 2000;
-
-if (SpeechRecognition) {
-    recognition = new SpeechRecognition();
-    recognition.continuous     = true;
-    recognition.interimResults = true;
-    recognition.lang           = "pt-BR";
-
-    recognition.onresult = (event) => {
-        if (!voiceModeActive) return;
-        let interim = "", final = "";
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            if (event.results[i].isFinal) final   += event.results[i][0].transcript;
-            else                          interim  += event.results[i][0].transcript;
-        }
-
-        const text = final || interim;
-        listenTranscript.textContent = text;
-        listenTranscript.style.opacity = "1";
-
-        // Se estava em modo "responding", o user falou → volta a ouvir
-        if (APP_STATE === "responding") {
-            leaveRespondingMode();
-        }
-
-        clearTimeout(silenceTimer);
-        if (final) {
-            silenceTimer = setTimeout(() => {
-                if (voiceModeActive && APP_STATE === "listening") {
-                    submitFromVoice(final.trim());
-                }
-            }, SILENCE_MS);
-        }
-    };
-
-    recognition.onerror = (e) => {
-        if (e.error === "no-speech") return;
-        console.error("Speech error:", e.error);
-        if (e.error === "not-allowed") {
-            alert("Permissão de microfone negada.");
-            deactivateVoiceMode();
-        }
-    };
-
-    recognition.onend = () => {
-        isRecognizing = false;
-        if (voiceModeActive && APP_STATE !== "thinking") {
-            // Reinicia automaticamente
-            try { recognition.start(); isRecognizing = true; } catch(_) {}
-        }
-    };
+/* ─── RESPONSE ───────────────────────────────────── */
+function showResponse(html) {
+  // preserve close button
+  const closeBtn = `<button class="response-close" id="responseClose" title="Fechar">✕</button>`;
+  responseBubble.innerHTML = closeBtn + html;
+  document.getElementById('responseClose').addEventListener('click', closeResponse);
+  responseWrap.classList.add('visible');
 }
 
-async function activateVoiceMode() {
-    voiceModeActive = true;
-    voiceModeBtn.classList.add("active");
-
-    // Prepara áudio
-    const ok = await setupAudio();
-    if (!ok) { deactivateVoiceMode(); return; }
-
-    // Esconde esferas suavemente
-    hideSpheres();
-    stopPlaceholders();
-    clearResponse();
-
-    // Mostra círculo
-    resizeCanvas();
-    listenCircle.classList.add("visible", "active");
-    listenTranscript.textContent = "Ouvindo...";
-    listenTranscript.style.opacity = "1";
-
-    setState("listening");
-
-    // Inicia waveform
-    drawWave(false);
-
-    // Inicia reconhecimento
-    if (recognition && !isRecognizing) {
-        try { recognition.start(); isRecognizing = true; } catch(_) {}
-    }
+function closeResponse() {
+  responseWrap.classList.remove('visible');
 }
 
-function deactivateVoiceMode() {
-    voiceModeActive = false;
-    isRecognizing   = false;
-    voiceModeBtn.classList.remove("active");
-    clearTimeout(silenceTimer);
+responseClose && responseClose.addEventListener('click', closeResponse);
 
-    if (recognition) try { recognition.stop(); } catch(_) {}
+/* ─── SUBMIT ─────────────────────────────────────── */
+async function submitMsg(text) {
+  if (isBusy || !text) return;
+  const apiKey = window.__yraApiKey;
+  if (!apiKey) { showMdResponse('⚠️ Nenhuma API key encontrada. Configure em Configurações.'); return; }
 
-    // Esconde círculo
-    listenCircle.classList.remove("visible", "active", "responding");
-    listenTranscript.style.opacity = "0";
-    stopWave();
+  isBusy = true;
+  msgInput.value = '';
+  msgInput.disabled = true;
+  sendBtn.disabled  = true;
+  APP_STATE = 'thinking';
+  stopPH();
 
-    // Volta ao idle
-    clearResponse();
-    showSpheres(false);
-    startIdleAnimation();
-    startPlaceholders();
-    setState("idle");
-}
+  setOrbState('');
+  orbStatus.textContent = 'Pensando…';
+  ltEl.classList.remove('vis');
+  drawIdle();
 
-// Initialize voice mode button listener when DOM is ready
-function initVoiceListener() {
-    if (!voiceModeBtn) return;
-    voiceModeBtn.addEventListener("click", () => {
-        if (voiceModeActive) {
-            deactivateVoiceMode();
-        } else {
-            activateVoiceMode();
-        }
+  showResponse('<div class="typing-dots"><span></span><span></span><span></span></div>');
+
+  try {
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+    const res  = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ role:'user', parts:[{text}] }],
+        generationConfig: { temperature:0.85, maxOutputTokens:512 }
+      })
     });
+    const data  = await res.json();
+    const reply = data.error
+      ? `⚠️ ${data.error.message}`
+      : (data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sem resposta.');
+
+    showMdResponse(reply);
+
+  } catch(err) {
+    showMdResponse('⚠️ Não foi possível conectar. Tente novamente.');
+  } finally {
+    isBusy = false;
+    msgInput.disabled = false;
+    sendBtn.disabled  = false;
+  }
 }
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initVoiceListener);
-} else {
-    initVoiceListener();
+function showMdResponse(text) {
+  let html;
+  try { html = typeof marked!=='undefined' ? marked.parse(text) : text.replace(/\n/g,'<br>'); }
+  catch { html = text.replace(/\n/g,'<br>'); }
+
+  APP_STATE = 'responding';
+
+  if (voiceActive) {
+    setOrbState('responding');
+    orbStatus.textContent = 'Resposta pronta';
+    ltEl.textContent = 'Fale para continuar…';
+    ltEl.classList.add('vis');
+    drawResponding();
+    if (recog && !isRecog) try{ recog.start(); isRecog=true; }catch(_){}
+  } else {
+    setOrbState('');
+    orbStatus.textContent = 'Pronto para ajudar';
+    drawIdle();
+    startPH();
+  }
+
+  showResponse(html);
 }
 
-/* ================================================================
-   SUBMISSÃO DE MENSAGEM (texto ou voz)
-================================================================ */
-const sendBtn      = document.getElementById("sendBtn");
-const messageInput = document.getElementById("messageInput");
-const responseArea = document.getElementById("responseArea");
-const responseBubble = document.getElementById("responseBubble");
-
-let isBusy = false;
-
-async function submitMessage(text) {
-    if (isBusy || !text) return;
-
-    const apiKey = window.__yraApiKey;
-    if (!apiKey) {
-        showResponseText("⚠️ Nenhuma API key encontrada. Configure em Settings.");
-        return;
-    }
-
-    isBusy = true;
-    messageInput.value    = "";
-    messageInput.disabled = true;
-    sendBtn.disabled      = true;
-    setState("thinking");
-
-    if (voiceModeActive) {
-        // Esconde círculo de escuta, mostra esferas no topo girando
-        listenCircle.classList.remove("active", "responding");
-        stopWave();
-        listenTranscript.style.opacity = "0";
-
-        showSpheres(true);
-        startThinkingAnimation();
-    } else {
-        // Modo texto: esconde esferas e mostra thinking dots ao lado
-        stopPlaceholders();
-        transcriptEl.classList.remove("visible");
-        hideSpheres();
-    }
-
-    // Typing indicator + thinking dots verticais
-    responseArea.classList.add("visible");
-    document.getElementById("thinkingDotsVertical").classList.add("visible");
-    responseBubble.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
-
-    try {
-        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
-        const res = await fetch(endpoint, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                contents: [{ role:"user", parts:[{ text }] }],
-                generationConfig: { temperature:0.85, maxOutputTokens:512 }
-            })
-        });
-        const data = await res.json();
-        const reply = data.error
-            ? `⚠️ ${data.error.message}`
-            : (data.candidates?.[0]?.content?.parts?.[0]?.text || "Sem resposta.");
-
-        showResponseText(reply);
-
-    } catch(err) {
-        console.error(err);
-        showResponseText("⚠️ Não foi possível conectar. Tente novamente.");
-    } finally {
-        isBusy = false;
-        messageInput.disabled = false;
-        sendBtn.disabled      = false;
-    }
+function fromVoice(text) {
+  if (!text) return;
+  ltEl.classList.remove('vis');
+  setTimeout(() => { ltEl.textContent=''; }, 300);
+  submitMsg(text);
 }
 
-function showResponseText(text) {
-    // Converter markdown para HTML
-    let html;
-    try {
-        if (typeof marked !== 'undefined') {
-            html = marked.parse(text);
-        } else {
-            html = text.replace(/\n/g, '<br>');
-        }
-    } catch(e) {
-        html = text.replace(/\n/g, '<br>');
-    }
-    
-    responseBubble.innerHTML = html;
-    responseArea.classList.add("visible", "thinking");
-    setState("responding");
-
-    const thinkingDots = document.getElementById("thinkingDotsVertical");
-
-    if (voiceModeActive) {
-        // Esferas somem, círculo volta com modo resposta
-        thinkingDots.classList.remove("visible");
-        responseArea.classList.remove("thinking");
-        sceneWrapper.classList.add("hidden");
-
-        setTimeout(() => {
-            listenCircle.classList.add("visible", "responding");
-            listenCircle.classList.remove("active");
-            listenTranscript.textContent = "Resposta pronta — fale para continuar...";
-            listenTranscript.style.opacity = "1";
-            resizeCanvas();
-            drawWave(true);
-
-            // Mantém reconhecimento ativo para detectar próxima fala
-            if (recognition && !isRecognizing) {
-                try { recognition.start(); isRecognizing = true; } catch(_) {}
-            }
-        }, 300);
-    } else {
-        // Modo texto — bolinhas ficam visíveis pulsando
-        // A resposta fica visível até:
-        // 1. Enviar outra mensagem
-        // 2. Clicar nas bolinhas
-        // 3. Ativar modo voz
-        
-        // Cancelar qualquer timer anterior
-        clearTimeout(window.__yraIdleTimer);
-        
-        // Bolinhas desaparecem após 5 segundos, deixando só a mensagem visível
-        // A mensagem só some quando: enviar nova msg, clicar nas bolinhas, ou ativar modo voz
-        window.__yraIdleTimer = setTimeout(() => {
-            thinkingDots.classList.remove("visible");
-            responseArea.classList.remove("thinking");
-        }, 5000);
-    }
-}
-
-// Fazer bolinhas serem clicáveis para fechar resposta
-function setupThinkingDotsClick() {
-    const thinkingDots = document.getElementById("thinkingDotsVertical");
-    if (!thinkingDots) return;
-    
-    thinkingDots.style.cursor = "pointer";
-    thinkingDots.onclick = (e) => {
-        e.stopPropagation();
-        resetToIdle();
-    };
-}
-
-function leaveRespondingMode() {
-    // User falou novamente no modo escuta
-    listenCircle.classList.remove("responding");
-    listenCircle.classList.add("active");
-    stopWave();
-    clearResponse();
-
-    // Volta waveform de escuta
-    resizeCanvas();
-    drawWave(false);
-
-    listenTranscript.textContent = "Ouvindo...";
-    setState("listening");
-
-    // Mostra esferas novamente (some depois de capturar mensagem)
-}
-
-function clearResponse() {
-    if (responseArea) {
-        responseArea.classList.remove("visible", "thinking");
-    }
-    const thinkingDots = document.getElementById("thinkingDotsVertical");
-    if (thinkingDots) {
-        thinkingDots.classList.remove("visible");
-    }
-    clearTimeout(window.__yraIdleTimer);
-}
-
-function resetToIdle() {
-    clearResponse();
-    setTimeout(() => {
-        showSpheres(false);
-        startIdleAnimation();
-        startPlaceholders();
-        setState("idle");
-    }, 400);
-}
-
-function submitFromVoice(text) {
-    if (!text) return;
-    listenTranscript.style.opacity = "0";
-    setTimeout(() => { listenTranscript.textContent = ""; }, 300);
-    submitMessage(text);
-}
-
-// Envio pelo input de texto
-async function sendTextMessage() {
-    const text = messageInput.value.trim();
-    if (!text) return;
-    if (voiceModeActive) deactivateVoiceMode();
-    await submitMessage(text);
-}
-
-// Initialize message submission listeners when DOM is ready
-function initMessageListeners() {
-    if (!sendBtn || !messageInput || !responseArea) return;
-    
-    sendBtn.addEventListener("click", sendTextMessage);
-    messageInput.addEventListener("keypress", e => { if (e.key === "Enter") sendTextMessage(); });
-
-    // Clique na resposta para fechar manualmente (modo texto)
-    responseArea.addEventListener("click", () => {
-        if (!voiceModeActive) resetToIdle();
-    });
-    
-    // Setup clicking on thinking dots to close response
-    setupThinkingDotsClick();
-}
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initMessageListeners);
-} else {
-    initMessageListeners();
-}
-
-// Redimensiona canvas quando a janela muda
-window.addEventListener("resize", () => {
-    if (listenCircle && listenCircle.classList.contains("visible")) resizeCanvas();
+/* ─── TEXT SEND ──────────────────────────────────── */
+sendBtn.addEventListener('click', () => {
+  const t = msgInput.value.trim();
+  if (!t) return;
+  if (voiceActive) deactivateVoice();
+  submitMsg(t);
+});
+msgInput.addEventListener('keypress', e => {
+  if (e.key==='Enter') { const t=msgInput.value.trim(); if(t){if(voiceActive)deactivateVoice();submitMsg(t);} }
 });
 </script>
 </body>
-</html> 
+</html>
