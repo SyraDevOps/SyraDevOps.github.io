@@ -59,7 +59,6 @@
             overflow: hidden;
         }
 
-        /* ── scrollbar ────────────────────────────────────── */
         ::-webkit-scrollbar {
             width: 5px;
         }
@@ -74,7 +73,6 @@
             background: var(--green-600);
         }
 
-        /* ── layout ───────────────────────────────────────── */
         .app {
             display: flex;
             height: 100vh;
@@ -351,7 +349,7 @@
             align-items: center;
         }
 
-        /* ── welcome state (spheres) ────────────────────── */
+        /* ── welcome state ────────────────────────────────── */
         .welcome-state {
             display: flex;
             flex-direction: column;
@@ -383,7 +381,7 @@
             top: 50%;
             margin-left: -16px;
             margin-top: -16px;
-            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1), background 0.6s ease;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 4px 16px rgba(46, 125, 50, 0.08);
         }
         .dot:nth-child(1) {
@@ -1285,7 +1283,7 @@
     <script type="module">
         // ─── FIREBASE ──────────────────────────────────────
         import { initializeApp } from 'firebase/app';
-        import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+        import { getAuth, onAuthStateChanged } from 'firebase/auth';
         import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 
         const firebaseConfig = {
