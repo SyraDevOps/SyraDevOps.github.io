@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YRA · Planos e Preços</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background: #f6faf6;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .prices-wrapper {
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    /* cabeçalho com botão voltar */
+    .header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      border: 1px solid #dce8dc;
+      border-radius: 40px;
+      padding: 10px 22px;
+      font-weight: 500;
+      font-size: 15px;
+      color: #1e3a2a;
+      text-decoration: none;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .back-btn:hover {
+      background: #eaf3ea;
+      border-color: #2e7d32;
+      box-shadow: 0 4px 12px rgba(46,125,50,0.08);
+    }
+    .back-btn svg {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: #1b3b1b;
+      letter-spacing: -0.3px;
+    }
+    .page-title small {
+      font-weight: 400;
+      font-size: 16px;
+      color: #4d6b4d;
+      margin-left: 8px;
+    }
+
+    /* cards */
+    .plans-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 30px;
+      margin: 30px 0 50px;
+    }
+
+    .plan-card {
+      background: white;
+      border-radius: 32px;
+      padding: 28px 20px 30px;
+      box-shadow: 0 8px 28px rgba(0,20,0,0.03);
+      border: 1px solid #e3efe3;
+      transition: 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .plan-card:hover {
+      border-color: #b6d7b6;
+      box-shadow: 0 12px 36px rgba(46,125,50,0.06);
+    }
+    .plan-card.ultimate {
+      background: linear-gradient(145deg, #fafffa, #f4fcf4);
+      border-color: #8dbd8d;
+    }
+
+    .plan-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1a3a1a;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .plan-badge {
+      background: #e6f3e6;
+      font-size: 11px;
+      font-weight: 600;
+      color: #1f5822;
+      padding: 3px 12px;
+      border-radius: 50px;
+      letter-spacing: 0.3px;
+    }
+    .plan-price {
+      font-size: 36px;
+      font-weight: 700;
+      color: #0f2b0f;
+      margin: 12px 0 4px;
+      line-height: 1.1;
+    }
+    .plan-price small {
+      font-size: 18px;
+      font-weight: 500;
+      color: #4b6b4b;
+    }
+    .plan-desc {
+      color: #2c4a2c;
+      font-size: 15px;
+      line-height: 1.5;
+      margin: 8px 0 16px;
+      flex: 1;
+    }
+    .plan-features {
+      list-style: none;
+      margin: 8px 0 24px;
+      flex: 1;
+    }
+    .plan-features li {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      font-size: 14px;
+      color: #1d3a1d;
+      padding: 4px 0;
+      border-bottom: 1px solid #f0f7f0;
+    }
+    .plan-features li::before {
+      content: "✓";
+      color: #2e7d32;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .btn-plan {
+      background: #edf7ed;
+      border: none;
+      border-radius: 60px;
+      padding: 14px 12px;
+      font-weight: 600;
+      font-size: 16px;
+      color: #1b4b1b;
+      cursor: pointer;
+      transition: 0.2s;
+      width: 100%;
+      margin-top: 8px;
+      text-align: center;
+    }
+    .btn-plan:hover {
+      background: #d4e8d4;
+      transform: scale(0.98);
+    }
+    .btn-plan.primary {
+      background: #1f5a22;
+      color: white;
+    }
+    .btn-plan.primary:hover {
+      background: #144517;
+    }
+
+    /* seção pré-pago / simulador */
+    .prepaid-section {
+      background: white;
+      border-radius: 36px;
+      padding: 32px 28px;
+      border: 1px solid #dfecdf;
+      margin: 20px 0 40px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      align-items: flex-start;
+      box-shadow: 0 4px 18px rgba(0,20,0,0.02);
+    }
+    .prepaid-info {
+      flex: 2;
+      min-width: 220px;
+    }
+    .prepaid-info h3 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #173017;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .prepaid-info h3 span {
+      background: #e4f1e4;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 2px 14px;
+      border-radius: 40px;
+      color: #1f5522;
+    }
+    .prepaid-info p {
+      color: #2f4d2f;
+      margin: 6px 0 12px;
+      font-size: 15px;
+    }
+    .price-tag {
+      background: #e9f3e9;
+      display: inline-block;
+      padding: 4px 18px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #1c4b1c;
+      font-size: 15px;
+    }
+
+    .simulator {
+      flex: 3;
+      min-width: 260px;
+      background: #f8fcf8;
+      padding: 20px 24px 24px;
+      border-radius: 28px;
+      border: 1px solid #dbe9db;
+    }
+    .simulator label {
+      font-weight: 500;
+      font-size: 15px;
+      color: #1b3d1b;
+      display: block;
+      margin-bottom: 6px;
+    }
+    .sim-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .sim-row input {
+      flex: 2;
+      min-width: 160px;
+      padding: 12px 16px;
+      border-radius: 40px;
+      border: 1px solid #cde0cd;
+      background: white;
+      font-size: 15px;
+      outline: none;
+      transition: 0.15s;
+    }
+    .sim-row input:focus {
+      border-color: #2e7d32;
+      box-shadow: 0 0 0 3px rgba(46,125,50,0.08);
+    }
+    .sim-row button {
+      background: #1f5a22;
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 12px 28px;
+      border-radius: 60px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: 0.2s;
+      white-space: nowrap;
+    }
+    .sim-row button:hover {
+      background: #134016;
+    }
+    .token-result {
+      margin-top: 18px;
+      background: #edf6ed;
+      padding: 14px 18px;
+      border-radius: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .token-result .tokens {
+      font-weight: 700;
+      font-size: 22px;
+      color: #0f3a0f;
+    }
+    .token-result .tokens small {
+      font-weight: 400;
+      font-size: 16px;
+      color: #3b5f3b;
+    }
+    .token-result .cost {
+      background: white;
+      padding: 6px 22px;
+      border-radius: 60px;
+      font-weight: 600;
+      color: #144014;
+      border: 1px solid #c7dec7;
+    }
+    .token-hint {
+      font-size: 13px;
+      color: #3e613e;
+      margin-top: 10px;
+    }
+
+    /* comparativo */
+    .compare-wrap {
+      background: white;
+      border-radius: 32px;
+      padding: 24px 20px 30px;
+      border: 1px solid #e2efe2;
+      margin: 30px 0 20px;
+      overflow-x: auto;
+    }
+    .compare-wrap h4 {
+      font-size: 20px;
+      font-weight: 600;
+      color: #163016;
+      margin-bottom: 16px;
+    }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      min-width: 500px;
+    }
+    .compare-table th {
+      text-align: left;
+      padding: 12px 8px 10px 0;
+      font-weight: 600;
+      color: #173017;
+      border-bottom: 2px solid #d3e7d3;
+    }
+    .compare-table td {
+      padding: 12px 8px 12px 0;
+      border-bottom: 1px solid #edf5ed;
+      color: #1b3b1b;
+    }
+    .compare-table td:first-child {
+      font-weight: 500;
+    }
+    .compare-table .check {
+      color: #2e7d32;
+      font-weight: 700;
+    }
+    .compare-table .dash {
+      color: #9bb89b;
+    }
+    .compare-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* responsivo */
+    @media (max-width: 700px) {
+      .header-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .plans-grid {
+        grid-template-columns: 1fr;
+      }
+      .prepaid-section {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="prices-wrapper">
+
+  <!-- cabeçalho + voltar -->
+  <div class="header-row">
+    <a href="settings.html" class="back-btn">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Voltar
+    </a>
+    <div class="page-title">
+      YRA · Planos
+      <small>preços em R$</small>
+    </div>
+  </div>
+
+  <!-- Grid de planos -->
+  <div class="plans-grid">
+
+    <!-- Starter -->
+    <div class="plan-card">
+      <div class="plan-name">
+        Starter
+        <span class="plan-badge">popular</span>
+      </div>
+      <div class="plan-price">R$ 14,90 <small>/mês</small></div>
+      <div class="plan-desc">Ideal para quem deseja conhecer a YRA no dia a dia.</div>
+      <ul class="plan-features">
+        <li>Modelo principal com memória</li>
+        <li>Sistema de notas inteligentes</li>
+        <li>Histórico completo</li>
+        <li>Personalização da assistente</li>
+        <li>Sincronização entre dispositivos</li>
+        <li>Suporte padrão</li>
+        <li>Cota mensal de tokens</li>
+      </ul>
+      <button class="btn-plan">Assinar Starter</button>
+    </div>
+
+    <!-- Pro -->
+    <div class="plan-card">
+      <div class="plan-name">
+        Pro
+        <span class="plan-badge">para trabalho</span>
+      </div>
+      <div class="plan-price">R$ 44,90 <small>/mês</small></div>
+      <div class="plan-desc">Ferramenta de produtividade com API e plugins.</div>
+      <ul class="plan-features">
+        <li>Tudo do Starter</li>
+        <li>Acesso à API da YRA</li>
+        <li>Até 5 plugins habilitados</li>
+        <li>3 plugins simultâneos</li>
+        <li>Automações inteligentes</li>
+        <li>Prioridade moderada</li>
+        <li>Cota ampliada de tokens</li>
+      </ul>
+      <button class="btn-plan primary">Assinar Pro</button>
+    </div>
+
+    <!-- Ultimate -->
+    <div class="plan-card ultimate">
+      <div class="plan-name">
+        Ultimate
+        <span class="plan-badge">máximo</span>
+      </div>
+      <div class="plan-price">R$ 79,90 <small>/mês</small></div>
+      <div class="plan-desc">Experiência completa, sem limites e com recursos Beta.</div>
+      <ul class="plan-features">
+        <li>Tudo do Pro</li>
+        <li><strong>Todos</strong> os plugins disponíveis</li>
+        <li>10 plugins simultâneos</li>
+        <li>Acesso completo à API</li>
+        <li>Prioridade máxima</li>
+        <li>Recursos Beta exclusivos</li>
+        <li>Suporte prioritário</li>
+        <li>Maior memória e contexto</li>
+      </ul>
+      <button class="btn-plan primary">Assinar Ultimate</button>
+    </div>
+  </div>
+
+  <!-- PRÉ-PAGO + SIMULADOR DE TOKENS -->
+  <div class="prepaid-section">
+    <div class="prepaid-info">
+      <h3>
+        YRA Tokens
+        <span>pré‑pago</span>
+      </h3>
+      <p>Sem assinatura. Adquira créditos e use apenas quando precisar.</p>
+      <div class="price-tag">💡 100.000 tokens — R$ 0,20</div>
+      <div style="margin-top:12px; font-size:14px; color:#2f552f;">
+        Consumido conforme o uso dos modelos e recursos.
+      </div>
+    </div>
+
+    <div class="simulator">
+      <label for="msgInput">✏️ Simule o custo de uma mensagem</label>
+      <div class="sim-row">
+        <input type="text" id="msgInput" placeholder="Ex: 'Resuma este artigo sobre IA'" value="Me explique o que é machine learning">
+        <button id="calcTokensBtn">Estimar tokens</button>
+      </div>
+      <div class="token-result" id="tokenResult">
+        <span class="tokens" id="tokenDisplay">0 <small>tokens</small></span>
+        <span class="cost" id="costDisplay">R$ 0,0000</span>
+      </div>
+      <div class="token-hint">
+        ⚡ Estimativa baseada em ~0,4 token por caractere (média).
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabela comparativa -->
+  <div class="compare-wrap">
+    <h4>📊 Comparativo de recursos</h4>
+    <table class="compare-table">
+      <thead>
+        <tr><th>Recurso</th><th>Starter</th><th>Pro</th><th>Ultimate</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Modelo principal + memória</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>Sistema de notas / histórico</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>Personalização</td><td class="check">✓</td><td class="check">✓</td><td class="check">✓</td></tr>
+        <tr><td>Plugins (máx.)</td><td class="dash">—</td><td>5</td><td><strong>Todos</strong></td></tr>
+        <tr><td>Plugins simultâneos</td><td class="dash">—</td><td>3</td><td>10</td></tr>
+        <tr><td>API</td><td class="dash">—</td><td class="check">✓</td><td class="check">✓ completo</td></tr>
+        <tr><td>Prioridade de processamento</td><td>Padrão</td><td>Alta</td><td>Máxima</td></tr>
+        <tr><td>Recursos Beta / acesso antecipado</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td></tr>
+        <tr><td>Suporte prioritário</td><td class="dash">—</td><td class="dash">—</td><td class="check">✓</td></tr>
+      </tbody>
+    </table>
+    <div style="margin-top:16px; font-size:14px; color:#3b5f3b; background:#edf6ed; padding:12px 18px; border-radius:40px;">
+      ⭐ <strong>Ultimate</strong> inclui <strong>YRA Studio</strong> — agentes personalizados, fluxos de automação e combinações de plugins.
+    </div>
+  </div>
+
+</div>
+
+<script>
+  (function() {
+    // Simulador de tokens
+    const msgInput = document.getElementById('msgInput');
+    const calcBtn = document.getElementById('calcTokensBtn');
+    const tokenDisplay = document.getElementById('tokenDisplay');
+    const costDisplay = document.getElementById('costDisplay');
+
+    // Preço por token (R$ 0,20 / 100.000 = 0,000002)
+    const PRICE_PER_TOKEN = 0.000002;
+
+    function estimateTokens(text) {
+      if (!text) return 0;
+      // ~0,4 token por caractere (média empírica)
+      return Math.round(text.length * 0.4);
+    }
+
+    function updateSimulator() {
+      const raw = msgInput.value.trim();
+      const tokens = estimateTokens(raw);
+      const cost = tokens * PRICE_PER_TOKEN;
+      tokenDisplay.innerHTML = `${tokens} <small>tokens</small>`;
+      costDisplay.textContent = `R$ ${cost.toFixed(4)}`;
+    }
+
+    calcBtn.addEventListener('click', updateSimulator);
+    msgInput.addEventListener('keyup', (e) => {
+      if (e.key === 'Enter') updateSimulator();
+    });
+
+    // executa ao carregar com valor padrão
+    setTimeout(updateSimulator, 20);
+
+    // Botões "Assinar" – apenas feedback
+    document.querySelectorAll('.btn-plan').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        const plan = this.closest('.plan-card')?.querySelector('.plan-name')?.innerText?.trim() || 'plano';
+        alert(`🔔 Você selecionou o plano ${plan}.\n(integração com pagamento em breve)`);
+      });
+    });
+
+    // Back button permanece <a href="settings.html">
+  })();
+</script>
+</body>
+</html>
