@@ -345,16 +345,25 @@ body {
 
 /* Avatar pequeno para o modelo */
 .msg-row.model { gap: 10px; align-items: flex-start; }
+/* Losango-avatar do modelo */
 .model-avatar {
   width: 26px; height: 26px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--g2), var(--g3));
+  flex-shrink: 0; margin-top: 3px;
+  position: relative;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; margin-top: 4px;
 }
-.model-avatar svg {
-  width:13px;height:13px;stroke:white;fill:none;
-  stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+.model-avatar .diamond-wrap {
+  position: relative; width: 22px; height: 22px;
+}
+.model-avatar .diamond-wrap svg {
+  width: 22px; height: 22px;
+  overflow: visible;
+}
+/* partículas dentro do losango (paradas) */
+.diamond-particle {
+  r: 1.8px;
+  fill: var(--g2);
+  opacity: 0.75;
 }
 
 /* Markdown inside model messages */
@@ -362,28 +371,28 @@ body {
 .msg-content p:first-child { margin-top: 0; }
 .msg-content p:last-child  { margin-bottom: 0; }
 .msg-content h1,.msg-content h2,.msg-content h3 {
-  font-weight:600; margin:12px 0 4px; color:var(--g1);
+  font-weight:600; margin:12px 0 4px; color:#133A16;
   font-size:14px;
 }
 .msg-content ul,.msg-content ol { padding-left:18px; margin:6px 0; }
 .msg-content li { margin:3px 0; }
 .msg-content code {
-  background:rgba(46,125,50,.08); padding:2px 5px;
+  background:rgba(27,94,32,.13); padding:2px 6px;
   border-radius:4px; font-size:12.5px;
-  font-family:'Courier New',monospace; color:var(--g1);
+  font-family:'Courier New',monospace; color:#133A16;
 }
 .msg-content pre {
-  background:rgba(46,125,50,.06); padding:12px;
+  background:rgba(27,94,32,.10); padding:12px;
   border-radius:8px; overflow-x:auto; margin:8px 0;
-  border-left:2px solid var(--g4);
+  border-left:2.5px solid #2E7D32;
 }
-.msg-content pre code { background:none; padding:0; }
-.msg-content strong { font-weight:600; }
+.msg-content pre code { background:none; padding:0; color:#133A16; }
+.msg-content strong { font-weight:600; color:#1a2a1a; }
 .msg-content blockquote {
-  border-left:2px solid var(--g4); padding-left:10px;
-  margin:6px 0; color:var(--text-muted); font-style:italic;
+  border-left:2.5px solid #2E7D32; padding-left:10px;
+  margin:6px 0; color:#4a5a4a; font-style:italic;
 }
-.msg-content a { color:var(--g2); text-decoration:underline; text-underline-offset:3px; }
+.msg-content a { color:#1B5E20; text-decoration:underline; text-underline-offset:3px; font-weight:500; }
 
 /* Typing dots in chat */
 .typing-dots { display:inline-flex; gap:5px; align-items:center; padding:2px 0; }
@@ -480,6 +489,22 @@ body {
   text-align:center; margin-top:8px;
   font-size:11px; color:var(--text-muted);
   opacity:.7;
+}
+
+/* Cursor piscante durante streaming */
+.msg-content.streaming::after {
+  content: '▋';
+  display: inline;
+  color: var(--g3);
+  animation: cursorBlink .75s step-end infinite;
+  font-size: 13px;
+  line-height: 1;
+  vertical-align: baseline;
+  margin-left: 1px;
+}
+@keyframes cursorBlink {
+  0%,100%{ opacity:1 }
+  50%     { opacity:0 }
 }
 </style>
 </head>
@@ -857,6 +882,24 @@ newChatBtn.addEventListener('click',()=>{
 });
 
 /* ── CHAT RENDERING ─────────────────────────────────── */
+function diamondAvatar(){
+  // Losango com 5 partículas distribuídas
+  return `<div class="model-avatar"><div class="diamond-wrap">
+    <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
+      <!-- losango -->
+      <polygon points="11,1 21,11 11,21 1,11"
+        fill="none" stroke="#2E7D32" stroke-width="1.4"
+        stroke-linejoin="round"/>
+      <!-- partículas paradas -->
+      <circle class="diamond-particle" cx="11" cy="11" r="1.6"/>
+      <circle class="diamond-particle" cx="7"  cy="9"  r="1.2" opacity="0.55"/>
+      <circle class="diamond-particle" cx="15" cy="9"  r="1.2" opacity="0.55"/>
+      <circle class="diamond-particle" cx="8"  cy="14" r="1.0" opacity="0.40"/>
+      <circle class="diamond-particle" cx="14" cy="14" r="1.0" opacity="0.40"/>
+    </svg>
+  </div></div>`;
+}
+
 function addUserMsg(text){
   const row=document.createElement('div');
   row.className='msg-row user';
@@ -865,19 +908,17 @@ function addUserMsg(text){
   scrollChat();
 }
 
-function addModelMsg(html, isTyping=false){
+function addModelRow(){
+  // Cria linha do modelo e retorna o div de conteúdo (vazio por ora)
   const row=document.createElement('div');
   row.className='msg-row model';
-  const avatarSvg=`<div class="model-avatar"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></div>`;
+  row.innerHTML=diamondAvatar();
   const content=document.createElement('div');
-  content.className='msg-content';
-  if(isTyping) content.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
-  else         content.innerHTML=html;
-  row.innerHTML=avatarSvg;
+  content.className='msg-content streaming';
   row.appendChild(content);
   chatThread.appendChild(row);
   scrollChat();
-  return content; // retorna o content para poder atualizar
+  return content;
 }
 
 function scrollChat(){ chatThread.scrollTop=chatThread.scrollHeight; }
@@ -887,26 +928,33 @@ function md(t){
   catch{ return t.replace(/\n/g,'<br>'); }
 }
 
-/* ── SUBMIT ─────────────────────────────────────────── */
+/* Renderiza markdown progressivo mantendo scroll no fundo */
+function renderStream(el, rawText){
+  el.innerHTML = md(rawText);
+  scrollChat();
+}
+
+/* ── SUBMIT com streaming SSE ────────────────────────── */
 async function submitMsg(text){
   if(isBusy||!text.trim())return;
   const apiKey=window.__yraApiKey;
-  if(!apiKey){ addModelMsg('⚠️ Nenhuma API key encontrada. Configure em Configurações.'); return; }
+  if(!apiKey){ const c=addModelRow(); c.innerHTML='⚠️ Nenhuma API key encontrada. Configure em Configurações.'; return; }
 
   isBusy=true; msgInput.value=''; autoResize(); sendBtn.disabled=true;
   APP_STATE='thinking'; stopPH();
 
-  // Esconde orbe suavemente ao primeiro envio
-  if(!hasChat){
-    hasChat=true;
-    hideOrb();
-  }
+  if(!hasChat){ hasChat=true; hideOrb(); }
 
   addUserMsg(text);
-  const typingContent=addModelMsg('',true);
+  const contentEl = addModelRow();
+  // Mostra dots enquanto aguarda o primeiro chunk
+  contentEl.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+
+  let accumulated = '';
+  let firstChunk  = true;
 
   try{
-    const ep=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+    const ep=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:streamGenerateContent?alt=sse&key=${apiKey}`;
     const res=await fetch(ep,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
@@ -915,19 +963,52 @@ async function submitMsg(text){
         generationConfig:{temperature:.85,maxOutputTokens:1024}
       })
     });
-    const data=await res.json();
-    const reply=data.error
-      ?`⚠️ ${data.error.message}`
-      :(data.candidates?.[0]?.content?.parts?.[0]?.text||'Sem resposta.');
-    typingContent.innerHTML=md(reply);
+
+    if(!res.ok){ throw new Error(`HTTP ${res.status}`); }
+
+    const reader  = res.body.getReader();
+    const decoder = new TextDecoder();
+    let   buffer  = '';
+
+    while(true){
+      const {done, value} = await reader.read();
+      if(done) break;
+
+      buffer += decoder.decode(value, {stream:true});
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // guarda linha incompleta
+
+      for(const line of lines){
+        if(!line.startsWith('data:')) continue;
+        const jsonStr = line.slice(5).trim();
+        if(jsonStr==='[DONE]') break;
+        try{
+          const chunk = JSON.parse(jsonStr);
+          const piece = chunk.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if(piece){
+            if(firstChunk){ contentEl.innerHTML=''; firstChunk=false; }
+            accumulated += piece;
+            renderStream(contentEl, accumulated);
+          }
+        }catch(_){}
+      }
+    }
+
+    // Garante render final completo
+    if(accumulated){
+      renderStream(contentEl, accumulated);
+    } else if(firstChunk){
+      contentEl.innerHTML='Sem resposta.';
+    }
+
   } catch(err){
-    typingContent.innerHTML='⚠️ Não foi possível conectar. Tente novamente.';
+    contentEl.innerHTML=`⚠️ Não foi possível conectar. Tente novamente.<br><small style="color:#999">${err.message}</small>`;
   } finally {
+    contentEl.classList.remove('streaming');
     scrollChat();
     isBusy=false; sendBtn.disabled=false;
     APP_STATE= voiceActive?'responding':'idle';
     if(voiceActive){
-      // volta o orbe em modo responding (modo voz ativo)
       showOrb(); stopPH();
       setOrbClass('responding');
       orbStatusEl.textContent='Resposta pronta — fale para continuar';
@@ -941,7 +1022,6 @@ async function submitMsg(text){
 function fromVoice(text){
   if(!text)return;
   ltEl.classList.remove('vis'); ltEl.textContent='';
-  // esconde orbe para mostrar chat
   hideOrb(); hasChat=true;
   submitMsg(text);
 }
