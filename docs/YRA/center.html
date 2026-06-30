@@ -46,7 +46,6 @@
             --radius-sm: 10px;
             --shadow-soft: 0 8px 40px rgba(0, 0, 0, 0.04);
             --shadow-medium: 0 12px 48px rgba(0, 0, 0, 0.06);
-            --shadow-circle: 0 12px 56px rgba(46, 125, 50, 0.10);
             --transition: 0.4s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
@@ -101,7 +100,6 @@
             overflow: hidden;
         }
 
-        /* brand / diamond particles */
         .brand {
             display: flex;
             align-items: center;
@@ -118,7 +116,6 @@
             height: 40px;
             flex-shrink: 0;
         }
-
         .diamond-dot {
             position: absolute;
             width: 8px;
@@ -157,7 +154,6 @@
             color: var(--gray-500);
         }
 
-        /* user info */
         .user-info {
             display: flex;
             align-items: center;
@@ -203,7 +199,6 @@
             min-width: 0;
         }
 
-        /* menu */
         .menu-list {
             list-style: none;
             display: flex;
@@ -211,7 +206,6 @@
             gap: 2px;
             flex: 1;
         }
-
         .menu-item a {
             display: flex;
             align-items: center;
@@ -261,12 +255,10 @@
             background: var(--green-600);
             border-radius: 0 3px 3px 0;
         }
-
         .menu-label {
             transition: opacity var(--transition);
         }
 
-        /* sidebar collapse (mobile) */
         @media (max-width: 820px) {
             .sidebar {
                 width: var(--sidebar-collapsed);
@@ -331,7 +323,6 @@
             position: relative;
         }
 
-        /* ── CHAT AREA ────────────────────────────────────── */
         .chat-area {
             flex: 1;
             display: flex;
@@ -355,7 +346,6 @@
             gap: 6px;
             min-height: 0;
         }
-
         .messages-container.empty {
             justify-content: center;
             align-items: center;
@@ -378,7 +368,6 @@
             position: absolute;
         }
 
-        /* esferas */
         .scene {
             position: relative;
             width: 160px;
@@ -541,13 +530,11 @@
             overflow-wrap: break-word;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
         }
-
         .message.user .message-bubble {
             background: var(--green-700);
             color: #fff;
             border-bottom-right-radius: 4px;
         }
-
         .message.assistant .message-bubble {
             background: var(--white);
             color: var(--gray-900);
@@ -555,7 +542,6 @@
             border-bottom-left-radius: 4px;
             box-shadow: var(--shadow-soft);
         }
-
         .message-time {
             font-size: 10.5px;
             color: var(--gray-400);
@@ -567,7 +553,7 @@
             color: rgba(255, 255, 255, 0.5);
         }
 
-        /* markdown dentro da resposta */
+        /* markdown */
         .message-bubble h1 {
             font-size: 18px;
             font-weight: 600;
@@ -687,7 +673,6 @@
             background: var(--green-50);
             animation: pulseDot 1.4s ease-in-out infinite;
         }
-
         @keyframes pulseRing {
             0%,
             100% {
@@ -736,7 +721,6 @@
         .thinking-indicator .thinking-text .dot-anim span:nth-child(3) {
             animation-delay: 0.4s;
         }
-
         @keyframes dotPulse {
             0%,
             80%,
@@ -837,7 +821,6 @@
             transform: translateX(2px);
         }
 
-        /* botão de voz */
         .voice-toggle-btn {
             width: 48px;
             height: 48px;
@@ -878,7 +861,6 @@
             transform: scale(1.05);
         }
 
-        /* stop button (modo voz) */
         .stop-btn-wrap {
             display: none;
             align-items: center;
@@ -926,7 +908,6 @@
             fill: none;
         }
 
-        /* input escondido no modo voz */
         .input-footer.hidden {
             opacity: 0;
             pointer-events: none;
@@ -937,7 +918,6 @@
             overflow: hidden;
         }
 
-        /* ── voice status (pequeno) ───────────────────────── */
         .voice-status-bar {
             font-size: 13px;
             color: var(--gray-400);
@@ -1171,7 +1151,6 @@
         <!-- ─── SIDEBAR ─── -->
         <aside class="sidebar" id="sidebar">
 
-            <!-- brand com losango -->
             <div class="brand">
                 <div class="diamond-scene" id="diamondScene">
                     <div class="diamond-dot"></div>
@@ -1182,7 +1161,6 @@
                 <span class="brand-name">Yra<span>Assistant</span></span>
             </div>
 
-            <!-- user info (preenchido via Firebase) -->
             <div class="user-info" id="userInfo">
                 <div class="user-avatar" id="userAvatar">Y</div>
                 <div class="user-meta">
@@ -1191,7 +1169,6 @@
                 </div>
             </div>
 
-            <!-- menu -->
             <ul class="menu-list">
                 <li class="menu-item active">
                     <a href="#">
@@ -1234,7 +1211,7 @@
                 <!-- ─── MESSAGES ─── -->
                 <div class="messages-container empty" id="messagesContainer">
 
-                    <!-- welcome state (esferas + placeholder) -->
+                    <!-- welcome state -->
                     <div class="welcome-state" id="welcomeState">
                         <div class="scene" id="scene">
                             <div class="dot"></div>
@@ -1243,12 +1220,11 @@
                             <div class="dot"></div>
                         </div>
                         <div class="welcome-text" id="welcomeText">
-                            Olá! <span class="highlight">Yra</span> está pronto para ajudar.<br />
+                            Olá! <span class="highlight">Yra</span> está pronto.<br />
                             Pergunte qualquer coisa.
                         </div>
                     </div>
 
-                    <!-- mensagens serão inseridas aqui via JS -->
                 </div>
 
                 <!-- ─── THINKING INDICATOR ─── -->
@@ -1260,8 +1236,8 @@
                     </span>
                 </div>
 
-                <!-- ─── VOICE STATUS BAR ─── -->
-                <div class="voice-status-bar" id="voiceStatusBar">Toque no microfone para ativar voz</div>
+                <!-- ─── VOICE STATUS ─── -->
+                <div class="voice-status-bar" id="voiceStatusBar">Conectando…</div>
 
                 <!-- ─── INPUT FOOTER ─── -->
                 <footer class="input-footer" id="inputFooter">
@@ -1278,7 +1254,7 @@
                     </button>
                 </footer>
 
-                <!-- ─── STOP BUTTON (modo voz) ─── -->
+                <!-- ─── STOP BUTTON ─── -->
                 <div class="stop-btn-wrap" id="stopBtnWrap">
                     <button class="stop-btn" id="stopBtn">
                         <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
@@ -1295,7 +1271,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js">
     </script>
 
-    <!-- ─── FIREBASE ─── -->
+    <!-- ─── FIREBASE (import map) ─────────────────────────── -->
     <script type="importmap">
         {
             "imports": {
@@ -1307,10 +1283,10 @@
     </script>
 
     <script type="module">
-        // ─── FIREBASE IMPORTS ──────────────────────────────
+        // ─── FIREBASE ──────────────────────────────────────
         import { initializeApp } from 'firebase/app';
-        import { getAuth, onAuthStateChanged } from 'firebase/auth';
-        import { getFirestore, doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
+        import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+        import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
 
         const firebaseConfig = {
             apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
@@ -1325,11 +1301,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ─── EXPOR PARA O ESCOPO GLOBAL ────────────────────
-        window.__yraFirestore = db;
-        window.__yraAuth = auth;
-
-        // ─── REFS ────────────────────────────────────────────
+        // ─── DOM REFS ──────────────────────────────────────
         const messagesContainer = document.getElementById('messagesContainer');
         const welcomeState = document.getElementById('welcomeState');
         const scene = document.getElementById('scene');
@@ -1357,7 +1329,7 @@
         let apiKey = null;
         let currentUser = null;
 
-        // ─── DOM helpers ────────────────────────────────────
+        // ─── HELPERS ────────────────────────────────────────
         function getTime() {
             return new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
         }
@@ -1366,9 +1338,8 @@
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // ─── RENDER MESSAGES ────────────────────────────────
+        // ─── RENDER ──────────────────────────────────────────
         function renderMessages() {
-            // Remove todas as mensagens (mas mantém o welcome state)
             const msgs = messagesContainer.querySelectorAll('.message');
             msgs.forEach(el => el.remove());
 
@@ -1420,10 +1391,8 @@
             renderMessages();
         }
 
-        // ─── THINKING INDICATOR ─────────────────────────────
         function showThinking() {
             thinkingIndicator.classList.add('visible');
-            // esconde o welcome se estiver visível
             if (messages.length === 0) {
                 welcomeState.classList.add('hidden');
                 messagesContainer.classList.remove('empty');
@@ -1435,12 +1404,11 @@
             thinkingIndicator.classList.remove('visible');
         }
 
-        // ─── ENVIAR MENSAGEM ────────────────────────────────
+        // ─── ENVIAR ──────────────────────────────────────────
         async function sendMessage(text) {
             if (isProcessing || !text || !text.trim()) return;
             text = text.trim();
 
-            // Se modo voz ativo, desativa
             if (isVoiceActive) deactivateVoice();
 
             isProcessing = true;
@@ -1448,16 +1416,12 @@
             messageInput.disabled = true;
             sendBtn.disabled = true;
 
-            // Adiciona mensagem do usuário
             addMessage('user', text);
-
-            // Mostra indicador de pensamento
             showThinking();
             voiceStatusBar.textContent = '⏳ Yra está processando…';
             voiceStatusBar.className = 'voice-status-bar active';
 
-            // Obtém a key
-            const key = apiKey || window.__yraApiKey;
+            const key = apiKey;
             if (!key) {
                 hideThinking();
                 addMessage('assistant', '⚠️ Nenhuma API key encontrada. Configure em Configurações.');
@@ -1505,7 +1469,7 @@
             messageInput.focus();
         }
 
-        // ─── VOICE MODE ──────────────────────────────────────
+        // ─── VOICE ──────────────────────────────────────────
         if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
             const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SR();
@@ -1532,7 +1496,6 @@
                 if (final && text.trim()) {
                     silenceTimer = setTimeout(() => {
                         if (isVoiceActive && !isProcessing) {
-                            // desativa voz antes de enviar para evitar loop
                             deactivateVoice();
                             sendMessage(text.trim());
                         }
@@ -1561,7 +1524,6 @@
         async function activateVoice() {
             if (isVoiceActive) return;
 
-            // Verifica permissão do microfone
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
                 stream.getTracks().forEach(t => t.stop());
@@ -1601,8 +1563,6 @@
         }
 
         // ─── EVENT LISTENERS ────────────────────────────────
-
-        // Envio por texto
         sendBtn.addEventListener('click', () => sendMessage(messageInput.value));
         messageInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
@@ -1611,23 +1571,17 @@
             }
         });
 
-        // Toggle voz
         voiceToggleBtn.addEventListener('click', () => {
-            if (isVoiceActive) {
-                deactivateVoice();
-            } else {
-                activateVoice();
-            }
+            if (isVoiceActive) deactivateVoice();
+            else activateVoice();
         });
 
-        // Stop
         stopBtn.addEventListener('click', deactivateVoice);
 
         // ─── FIREBASE AUTH ──────────────────────────────────
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
-                // Atualiza informações do usuário
                 const name = user.displayName || user.email?.split('@')[0] || 'Usuário';
                 const email = user.email || '—';
                 const initial = name.charAt(0).toUpperCase();
@@ -1636,7 +1590,7 @@
                 userName.textContent = name;
                 userEmail.textContent = email;
 
-                // Busca a API key
+                // Busca a chave API
                 try {
                     const q = query(
                         collection(db, 'Keys'),
@@ -1647,7 +1601,6 @@
                     if (!ks.empty) {
                         const keyData = ks.docs[0].data();
                         apiKey = keyData.key;
-                        window.__yraApiKey = apiKey;
                         voiceStatusBar.textContent = '✅ Conectado · Yra pronto';
                         voiceStatusBar.className = 'voice-status-bar active';
                         setTimeout(() => {
@@ -1751,11 +1704,6 @@
                 }, 1000);
             }
 
-            // Quando o thinking é ativado, paramos a idle
-            // O thinking é controlado pelo scene.thinking class
-            // Mas precisamos parar a idle quando thinking começa
-
-            // Observador para quando thinking é adicionado/removido
             const observer = new MutationObserver(() => {
                 if (sceneEl.classList.contains('thinking')) {
                     clearInterval(interval);
@@ -1766,14 +1714,14 @@
             observer.observe(sceneEl, { attributes: true, attributeFilter: ['class'] });
 
             startIdle();
-
-            // Expoe para controle externo
-            window.__sphereControl = { startIdle };
         })();
 
         // ─── INICIALIZA ──────────────────────────────────────
         console.log('Yra Assistant · pronto');
         messageInput.focus();
+
+        // ─── EXPOSIÇÃO PARA DEBUG ──────────────────────────
+        window.__yra = { auth, db, sendMessage, activateVoice, deactivateVoice };
     </script>
 
 </body>
