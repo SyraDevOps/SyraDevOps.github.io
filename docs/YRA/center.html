@@ -164,16 +164,14 @@ body {
 
 /* TOPBAR */
 .topbar {
-  padding: 16px 32px;
+  padding: 12px 20px 12px 32px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   flex-shrink: 0;
   border-bottom: 1px solid var(--border);
   background: var(--white);
 }
-.topbar-title { font-size: 13px; color: var(--text-muted); font-weight: 450; }
-.topbar-actions { display:flex; gap:6px; }
 .tb-btn {
   width:30px; height:30px; border-radius:7px;
   border:1px solid var(--border); background:transparent;
@@ -544,15 +542,9 @@ body {
 <div class="main">
 
   <div class="topbar">
-    <span class="topbar-title">Conversa</span>
-    <div class="topbar-actions">
-      <button class="tb-btn" title="Histórico">
-        <svg viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.9"/></svg>
-      </button>
-      <button class="tb-btn" id="newChatBtn" title="Nova conversa">
-        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      </button>
-    </div>
+    <button class="tb-btn" id="newChatBtn" title="Nova conversa">
+      <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
   </div>
 
   <div class="stage">
