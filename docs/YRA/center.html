@@ -280,11 +280,18 @@ body {
 .orb-caption { text-align: center; display:flex; flex-direction:column; align-items:center; gap:6px; }
 .orb-status   { font-size:14px; font-weight:500; color:var(--g2); min-height:20px; }
 #listenTranscript {
-  font-size:13px; color:var(--g2); font-weight:500;
-  text-align:center; max-width:280px;
+  font-size:13.5px; color:var(--g2); font-weight:500;
+  text-align:center; max-width:340px;
   opacity:0; transition:opacity .4s; min-height:18px;
+  line-height:1.6;
 }
 #listenTranscript.vis { opacity:1; }
+/* Quando exibe a resposta do modelo no orbe */
+#listenTranscript.model-reply {
+  color: var(--text);
+  font-weight:400;
+  font-size:14px;
+}
 #placeholderText {
   font-size:12px; color:var(--text-muted); font-style:italic;
   max-width:260px; text-align:center; min-height:16px;
@@ -534,7 +541,6 @@ body {
     <a class="nav-item" href="plugins.html">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
       Plugins
-      <span class="nav-badge">3</span>
     </a>
     <span class="nav-sep">Organização</span>
     <a class="nav-item" href="notes.html">
@@ -613,7 +619,7 @@ body {
         </button>
       </div>
     </div>
-    <div class="input-hint">Yra pode cometer erros. Verifique informações importantes. Feito pela @SyraDevOps</div>
+    <div class="input-hint">Yra pode cometer erros. Verifique informações importantes.</div>
   </footer>
 </div>
 
@@ -811,7 +817,7 @@ function hideOrb(){
 /* ── SPEECH RECOGNITION ─────────────────────────────── */
 const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
 let recog=null, isRecog=false, silTimer=null;
-const SILENCE=2000;
+const SILENCE=1800;
 
 if(SR){
   recog=new SR(); recog.continuous=true; recog.interimResults=true; recog.lang='pt-BR';
@@ -823,7 +829,19 @@ if(SR){
       else                     interim+=e.results[i][0].transcript;
     }
     const txt=final||interim;
-    ltEl.textContent=txt; ltEl.classList.add('vis');
+
+    // Se estava mostrando resposta do modelo → limpa e volta a ouvir
+    if(APP_STATE==='responding'){
+      clearModelReply();
+      setOrbClass('active');
+      orbStatusEl.textContent='Ouvindo…';
+      drawMic();
+      APP_STATE='listening';
+    }
+
+    ltEl.textContent=txt;
+    ltEl.classList.remove('model-reply');
+    ltEl.classList.add('vis');
     clearTimeout(silTimer);
     if(final) silTimer=setTimeout(()=>{ if(voiceActive&&APP_STATE==='listening') fromVoice(final.trim()); },SILENCE);
   };
@@ -833,6 +851,7 @@ if(SR){
   };
   recog.onend=()=>{
     isRecog=false;
+    // Reinicia apenas se ativo e não está pensando
     if(voiceActive&&APP_STATE!=='thinking') try{recog.start();isRecog=true;}catch(_){}
   };
 }
@@ -843,14 +862,18 @@ function setOrbClass(cls){
   if(cls) voiceOrb.classList.add(cls);
 }
 
+function clearModelReply(){
+  ltEl.classList.remove('model-reply');
+  ltEl.textContent='';
+}
+
 async function activateVoice(){
   voiceActive=true; voiceBtn.classList.add('active');
   const ok=await setupAudio(); if(!ok){deactivateVoice();return;}
-  // mostra orbe se estava com chat
   showOrb(); stopPH();
   setOrbClass('active');
   orbStatusEl.textContent='Ouvindo…';
-  ltEl.textContent=''; ltEl.classList.add('vis');
+  ltEl.textContent=''; ltEl.classList.remove('model-reply'); ltEl.classList.add('vis');
   drawMic(); APP_STATE='listening';
   if(recog&&!isRecog) try{recog.start();isRecog=true;}catch(_){}
 }
@@ -862,9 +885,8 @@ function deactivateVoice(){
   if(recog) try{recog.stop();}catch(_){}
   setOrbClass('');
   orbStatusEl.textContent='Olá! Como posso ajudar?';
-  ltEl.classList.remove('vis');
+  ltEl.classList.remove('vis','model-reply');
   drawIdle();
-  // Se há chat, volta para o chat; senão fica no orbe idle
   if(hasChat){ hideOrb(); } else { startPH(); }
   APP_STATE='idle';
 }
@@ -935,7 +957,7 @@ function renderStream(el, rawText){
 }
 
 /* ── SUBMIT com streaming SSE ────────────────────────── */
-async function submitMsg(text){
+async function submitMsg(text, isVoiceMode=false){
   if(isBusy||!text.trim())return;
   const apiKey=window.__yraApiKey;
   if(!apiKey){ const c=addModelRow(); c.innerHTML='⚠️ Nenhuma API key encontrada. Configure em Configurações.'; return; }
@@ -943,15 +965,47 @@ async function submitMsg(text){
   isBusy=true; msgInput.value=''; autoResize(); sendBtn.disabled=true;
   APP_STATE='thinking'; stopPH();
 
-  if(!hasChat){ hasChat=true; hideOrb(); }
+  // Modo voz: fica no orbe, mostra "pensando…"
+  // Modo texto: esconde orbe, vai para o chat
+  if(isVoiceMode){
+    setOrbClass('');
+    orbStatusEl.textContent='Pensando…';
+    ltEl.classList.remove('model-reply');
+    ltEl.textContent='';
+    // Para o mic durante o processamento
+    if(recog&&isRecog) try{recog.stop();isRecog=false;}catch(_){}
+    drawIdle();
+  } else {
+    if(!hasChat){ hasChat=true; hideOrb(); }
+    addUserMsg(text);
+  }
 
-  addUserMsg(text);
-  const contentEl = addModelRow();
-  // Mostra dots enquanto aguarda o primeiro chunk
-  contentEl.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+  // No modo voz, adiciona mensagem do user no chat (invisível) para histórico
+  // mas não muda para o chat thread
+  if(isVoiceMode){
+    const row=document.createElement('div');
+    row.className='msg-row user';
+    row.innerHTML=`<div class="msg-content">${escHtml(text)}</div>`;
+    chatThread.appendChild(row);
+  }
+
+  // Cria o elemento de resposta do modelo apenas no modo texto
+  let contentEl = null;
+  if(!isVoiceMode){
+    contentEl = addModelRow();
+    contentEl.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
+  }
 
   let accumulated = '';
   let firstChunk  = true;
+
+  // Tokens máximos: voz = curto; texto = longo
+  const maxTokens = isVoiceMode ? 120 : 1024;
+
+  // Instrução extra para modo voz: resposta curta
+  const systemHint = isVoiceMode
+    ? text + '\n\n[Responda de forma muito breve, 1-2 frases, como numa conversa falada.]'
+    : text;
 
   try{
     const ep=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:streamGenerateContent?alt=sse&key=${apiKey}`;
@@ -959,8 +1013,8 @@ async function submitMsg(text){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        contents:[{role:'user',parts:[{text}]}],
-        generationConfig:{temperature:.85,maxOutputTokens:1024}
+        contents:[{role:'user',parts:[{text:systemHint}]}],
+        generationConfig:{temperature:.85,maxOutputTokens:maxTokens}
       })
     });
 
@@ -976,7 +1030,7 @@ async function submitMsg(text){
 
       buffer += decoder.decode(value, {stream:true});
       const lines = buffer.split('\n');
-      buffer = lines.pop(); // guarda linha incompleta
+      buffer = lines.pop();
 
       for(const line of lines){
         if(!line.startsWith('data:')) continue;
@@ -986,44 +1040,59 @@ async function submitMsg(text){
           const chunk = JSON.parse(jsonStr);
           const piece = chunk.candidates?.[0]?.content?.parts?.[0]?.text || '';
           if(piece){
-            if(firstChunk){ contentEl.innerHTML=''; firstChunk=false; }
             accumulated += piece;
-            renderStream(contentEl, accumulated);
+            if(isVoiceMode){
+              // Exibe a resposta acumulada no lugar da transcrição
+              ltEl.textContent = accumulated;
+              ltEl.classList.add('vis','model-reply');
+            } else {
+              if(firstChunk){ contentEl.innerHTML=''; firstChunk=false; }
+              renderStream(contentEl, accumulated);
+            }
           }
         }catch(_){}
       }
     }
 
-    // Garante render final completo
-    if(accumulated){
-      renderStream(contentEl, accumulated);
-    } else if(firstChunk){
-      contentEl.innerHTML='Sem resposta.';
+    if(!isVoiceMode){
+      if(accumulated) renderStream(contentEl, accumulated);
+      else if(firstChunk) contentEl.innerHTML='Sem resposta.';
     }
 
   } catch(err){
-    contentEl.innerHTML=`⚠️ Não foi possível conectar. Tente novamente.<br><small style="color:#999">${err.message}</small>`;
+    if(isVoiceMode){
+      ltEl.textContent='Erro ao conectar.';
+      ltEl.classList.add('vis','model-reply');
+    } else {
+      if(contentEl) contentEl.innerHTML=`⚠️ Não foi possível conectar.<br><small style="color:#999">${err.message}</small>`;
+    }
   } finally {
-    contentEl.classList.remove('streaming');
-    scrollChat();
+    if(contentEl) contentEl.classList.remove('streaming');
+    if(!isVoiceMode) scrollChat();
     isBusy=false; sendBtn.disabled=false;
-    APP_STATE= voiceActive?'responding':'idle';
-    if(voiceActive){
-      showOrb(); stopPH();
+
+    if(isVoiceMode){
+      // Resposta exibida no orbe — aguarda o user falar para limpar
+      APP_STATE='responding';
       setOrbClass('responding');
-      orbStatusEl.textContent='Resposta pronta — fale para continuar';
-      ltEl.classList.add('vis'); ltEl.textContent='Fale para continuar…';
+      orbStatusEl.textContent='Fale para continuar…';
       drawResponding();
+      // Reativa o microfone para capturar próxima fala
       if(recog&&!isRecog) try{recog.start();isRecog=true;}catch(_){}
+    } else {
+      APP_STATE='idle';
     }
   }
 }
 
 function fromVoice(text){
   if(!text)return;
-  ltEl.classList.remove('vis'); ltEl.textContent='';
-  hideOrb(); hasChat=true;
-  submitMsg(text);
+  // Limpa transcrição
+  ltEl.classList.remove('model-reply');
+  ltEl.textContent='';
+  // Garante que hasChat está true para histórico
+  if(!hasChat){ hasChat=true; }
+  submitMsg(text, true);
 }
 
 /* ── INPUT ──────────────────────────────────────────── */
