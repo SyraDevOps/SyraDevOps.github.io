@@ -145,6 +145,33 @@ body {
     color: var(--text-light);
 }
 
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-name {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.btn-logout {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-light);
+    transition: 0.2s;
+}
+.btn-logout:hover {
+    background: #f5f5f5;
+    color: var(--text-dark);
+}
+
 /* Estrutura de Seções do Painel */
 .memory-grid {
     display: grid;
@@ -321,6 +348,9 @@ body {
         margin-left: 70px;
         padding: 20px;
     }
+    .user-area .user-name {
+        display: none;
+    }
 }
 </style>
 </head>
@@ -379,6 +409,10 @@ body {
             <h2>Memória Cognitiva</h2>
             <p>Gerencie as regras operacionais e as memórias de longo prazo da sua IA.</p>
         </div>
+        <div class="user-area">
+            <span class="user-name" id="userNameDisplay">Carregando...</span>
+            <button class="btn-logout" id="logoutBtn">Sair</button>
+        </div>
     </div>
 
     <div class="memory-grid">
@@ -412,78 +446,300 @@ body {
     </div>
 </div>
 
-<script>
-// ============ DATABASE DE FATOS (LOCAL STORAGE) ============
-let localRules = localStorage.getItem('yra-system-rules') || "Você é a YRA, uma assistente pessoal inteligente voltada a otimização de rotina, automações de negócios e gestão de dados.";
-let facts = JSON.parse(localStorage.getItem('yra-facts')) || [
-    { id: 1, text: "O usuário prefere respostas diretas, estruturadas e sem formalidade excessiva." },
-    { id: 2, text: "A empresa do usuário atua no ramo de desenvolvimento de software e soluções Cloud." }
-];
+<script type="importmap">
+{
+    "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+    }
+}
+</script>
 
+<script type="module">
+// ============================
+// IMPORTS DO FIREBASE
+// ============================
+import { initializeApp } from "firebase/app";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+} from "firebase/auth";
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    serverTimestamp,
+    onSnapshot
+} from "firebase/firestore";
+
+// ============================
+// CONFIGURAÇÃO DO FIREBASE
+// ============================
+const firebaseConfig = {
+    apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+    authDomain: "yra-syra.firebaseapp.com",
+    projectId: "yra-syra",
+    storageBucket: "yra-syra.firebasestorage.app",
+    messagingSenderId: "555145505684",
+    appId: "1:555145505684:web:aa1ef14072653e41057d81"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ============================
+// ELEMENTOS DOM
+// ============================
 const systemRulesInput = document.getElementById("systemRulesInput");
-const newFactInput = document.getElementById("newFactInput");
-const factsListContainer = document.getElementById("factsListContainer");
+const saveRulesBtn = document.getElementById("saveRulesBtn");
 const feedbackMsg = document.getElementById("feedbackMsg");
+const newFactInput = document.getElementById("newFactInput");
+const addFactBtn = document.getElementById("addFactBtn");
+const factsListContainer = document.getElementById("factsListContainer");
+const logoutBtn = document.getElementById("logoutBtn");
+const userNameDisplay = document.getElementById("userNameDisplay");
 
-// Inicializar regras na textarea
-systemRulesInput.value = localRules;
+// ============================
+// ESTADO GLOBAL
+// ============================
+let currentUserId = null;
+let currentFacts = [];      // array de strings
+
+// ============================
+// FUNÇÕES DE LEITURA/ESCRITA NO FIRESTORE
+// ============================
+
+// Referência ao documento System do usuário
+function getSystemDocRef() {
+    if (!currentUserId) throw new Error("Usuário não autenticado");
+    return doc(db, "System", currentUserId);
+}
+
+// Carregar dados do System (onSnapshot para tempo real)
+function subscribeToSystem() {
+    if (!currentUserId) return;
+
+    const sysRef = getSystemDocRef();
+    const unsubscribe = onSnapshot(sysRef, (snapshot) => {
+        if (snapshot.exists()) {
+            const data = snapshot.data();
+            // Atualiza regras
+            systemRulesInput.value = data.admin_rules || "";
+            // Atualiza fatos (array)
+            currentFacts = data.facts || [];
+            renderFacts();
+        } else {
+            // Documento não existe: criar com valores padrão
+            const defaultData = {
+                admin_rules: "Você é a YRA, uma assistente pessoal inteligente voltada a otimização de rotina, automações de negócios e gestão de dados.",
+                facts: [
+                    "O usuário prefere respostas diretas, estruturadas e sem formalidade excessiva.",
+                    "A empresa do usuário atua no ramo de desenvolvimento de software e soluções Cloud."
+                ],
+                updated_at: serverTimestamp()
+            };
+            setDoc(sysRef, defaultData)
+                .then(() => {
+                    console.log("Documento System criado com dados padrão.");
+                })
+                .catch((error) => {
+                    console.error("Erro ao criar System:", error);
+                });
+        }
+    }, (error) => {
+        console.error("Erro ao escutar System:", error);
+        alert("Erro ao carregar dados de memória. Verifique sua conexão.");
+    });
+
+    return unsubscribe;
+}
+
+// Salvar regras (admin_rules)
+async function saveRules() {
+    if (!currentUserId) return;
+    const rules = systemRulesInput.value;
+    const sysRef = getSystemDocRef();
+
+    try {
+        await updateDoc(sysRef, {
+            admin_rules: rules,
+            updated_at: serverTimestamp()
+        });
+        feedbackMsg.innerText = "Diretrizes salvas com sucesso!";
+        setTimeout(() => { feedbackMsg.innerText = ""; }, 3000);
+    } catch (error) {
+        console.error("Erro ao salvar regras:", error);
+        feedbackMsg.innerText = "Erro ao salvar. Tente novamente.";
+        feedbackMsg.style.color = "#c0392b";
+        setTimeout(() => {
+            feedbackMsg.innerText = "";
+            feedbackMsg.style.color = "var(--primary-color)";
+        }, 3000);
+    }
+}
+
+// Adicionar fato
+async function addFact() {
+    if (!currentUserId) return;
+    const text = newFactInput.value.trim();
+    if (!text) return;
+
+    const sysRef = getSystemDocRef();
+    // Pega o array atual, adiciona o novo e atualiza
+    try {
+        const docSnap = await getDoc(sysRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const facts = data.facts || [];
+            facts.push(text);
+            await updateDoc(sysRef, {
+                facts: facts,
+                updated_at: serverTimestamp()
+            });
+            newFactInput.value = "";
+            // O snapshot atualizará a lista automaticamente
+        } else {
+            // Se não existir, criar com o fato
+            await setDoc(sysRef, {
+                admin_rules: systemRulesInput.value || "",
+                facts: [text],
+                updated_at: serverTimestamp()
+            });
+            newFactInput.value = "";
+        }
+    } catch (error) {
+        console.error("Erro ao adicionar fato:", error);
+        alert("Não foi possível adicionar o fato.");
+    }
+}
+
+// Remover fato (por índice)
+async function deleteFact(index) {
+    if (!currentUserId) return;
+    if (index < 0 || index >= currentFacts.length) return;
+
+    const sysRef = getSystemDocRef();
+    try {
+        const docSnap = await getDoc(sysRef);
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            const facts = data.facts || [];
+            if (index < facts.length) {
+                facts.splice(index, 1);
+                await updateDoc(sysRef, {
+                    facts: facts,
+                    updated_at: serverTimestamp()
+                });
+            }
+        }
+    } catch (error) {
+        console.error("Erro ao remover fato:", error);
+        alert("Não foi possível remover o fato.");
+    }
+}
+
+// ============================
+// RENDERIZAÇÃO DA LISTA DE FATOS
+// ============================
 
 function renderFacts() {
     factsListContainer.innerHTML = "";
-    facts.forEach(fact => {
+    if (currentFacts.length === 0) {
+        factsListContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-light);">Nenhum fato memorizado ainda.</div>`;
+        return;
+    }
+
+    currentFacts.forEach((factText, index) => {
         const item = document.createElement("div");
         item.className = "fact-item";
         item.innerHTML = `
-            <span class="fact-text">${fact.text}</span>
-            <button class="btn-delete-fact" onclick="deleteFact(${fact.id})" title="Remover fato">
+            <span class="fact-text">${factText}</span>
+            <button class="btn-delete-fact" data-index="${index}" title="Remover fato">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
             </button>
         `;
+        // Adiciona evento de clique para deletar
+        const deleteBtn = item.querySelector(".btn-delete-fact");
+        deleteBtn.addEventListener("click", () => {
+            deleteFact(index);
+        });
         factsListContainer.appendChild(item);
     });
 }
 
-// Salvar as regras do sistema
-document.getElementById("saveRulesBtn").onclick = () => {
-    localStorage.setItem('yra-system-rules', systemRulesInput.value);
-    feedbackMsg.innerText = "Diretrizes salvas com sucesso!";
-    setTimeout(() => { feedbackMsg.innerText = ""; }, 3000);
-};
+// ============================
+// EVENT LISTENERS
+// ============================
 
-// Adicionar Fato
-document.getElementById("addFactBtn").onclick = () => {
-    const text = newFactInput.value.trim();
-    if (!text) return;
+saveRulesBtn.addEventListener("click", saveRules);
 
-    facts.unshift({
-        id: Date.now(),
-        text: text
-    });
-    localStorage.setItem('yra-facts', JSON.stringify(facts));
-    newFactInput.value = "";
-    renderFacts();
-};
+addFactBtn.addEventListener("click", addFact);
 
-// Permitir adicionar apertando Enter
-newFactInput.onkeydown = (e) => {
+newFactInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
-        document.getElementById("addFactBtn").click();
+        e.preventDefault();
+        addFact();
     }
-};
+});
 
-// Deletar Fato
-window.deleteFact = (id) => {
-    facts = facts.filter(f => f.id !== id);
-    localStorage.setItem('yra-facts', JSON.stringify(facts));
-    renderFacts();
-};
+logoutBtn.addEventListener("click", async () => {
+    try {
+        await signOut(auth);
+        // Redirecionamento será feito pelo onAuthStateChanged
+    } catch (error) {
+        console.error("Erro ao sair:", error);
+    }
+});
 
-// Carregar fatos no início
-renderFacts();
-</script>
+// ============================
+// AUTENTICAÇÃO
+// ============================
 
-<script>
-// ============ ANIMAÇÃO DO LOGO LATERAL (BOLINHAS) ============
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        // Redireciona para login
+        window.location.href = "index.html";
+        return;
+    }
+
+    // Usuário autenticado
+    currentUserId = user.uid;
+    userNameDisplay.textContent = user.displayName || user.email || "Usuário";
+
+    // Verificar/criar documento do usuário em Users (opcional, mas alinhado com miu.py)
+    try {
+        const userDocRef = doc(db, "Users", currentUserId);
+        const userSnap = await getDoc(userDocRef);
+        if (!userSnap.exists()) {
+            await setDoc(userDocRef, {
+                username: user.displayName || "",
+                email: user.email || "",
+                phone: "",
+                birth_date: "",
+                security_code: "",
+                monthly_cost: 0.0,
+                status: "active",
+                role: "user",
+                created_at: serverTimestamp(),
+                updated_at: serverTimestamp()
+            });
+        }
+    } catch (error) {
+        console.warn("Erro ao verificar/criar documento do usuário:", error);
+    }
+
+    // Iniciar escuta do System
+    subscribeToSystem();
+});
+
+// ============================
+// ANIMAÇÃO DAS BOLINHAS (SIDEBAR)
+// ============================
 const sidebarDots = document.querySelectorAll(".dot-sidebar");
 const positions = [
     {x: 0, y: -10}, 
