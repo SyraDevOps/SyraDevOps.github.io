@@ -55,7 +55,6 @@ body {
     padding-left: 10px;
 }
 
-/* Mini Bolinhas Animadas */
 .scene-sidebar {
     position: relative;
     width: 40px;
@@ -86,7 +85,6 @@ body {
     letter-spacing: 0.5px;
 }
 
-/* Itens do Menu */
 .menu-list {
     list-style: none;
     display: flex;
@@ -129,7 +127,6 @@ body {
     flex-direction: column;
 }
 
-/* Header Superior */
 .top-header {
     display: flex;
     justify-content: space-between;
@@ -138,7 +135,6 @@ body {
     gap: 20px;
 }
 
-/* Barra de Pesquisa */
 .search-container {
     position: relative;
     width: 100%;
@@ -170,7 +166,33 @@ body {
     pointer-events: none;
 }
 
-/* Botão Chat no Topo */
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-name {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.btn-logout {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-light);
+    transition: 0.2s;
+}
+.btn-logout:hover {
+    background: #f5f5f5;
+    color: var(--text-dark);
+}
+
 .btn-chat {
     background: var(--primary-color);
     color: var(--white);
@@ -516,6 +538,13 @@ body {
     background: #1B5E20;
 }
 
+.btn-action.desativar {
+    background: #c0392b;
+}
+.btn-action.desativar:hover {
+    background: #a93226;
+}
+
 /* Responsividade Geral */
 @media (max-width: 900px) {
     .sidebar {
@@ -537,6 +566,9 @@ body {
         max-width: 100%;
     }
     .featured-graphic {
+        display: none;
+    }
+    .user-area .user-name {
         display: none;
     }
 }
@@ -587,28 +619,32 @@ body {
             <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
             <input type="text" id="searchInput" class="search-input" placeholder="Buscar extensões ou integrações...">
         </div>
-        <a href="center.html" class="btn-chat">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-            Ir para o Chat
-        </a>
+        <div class="user-area">
+            <span class="user-name" id="userNameDisplay">Carregando...</span>
+            <button class="btn-logout" id="logoutBtn">Sair</button>
+            <a href="center.html" class="btn-chat">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                Ir para o Chat
+            </a>
+        </div>
     </div>
 
-    <!-- Banner Principal (Card Especial) -->
-    <div class="featured-card">
+    <!-- Banner de Destaque (Dinâmico) -->
+    <div class="featured-card" id="featuredCard">
         <div class="featured-info">
-            <span class="featured-tag">Destaque</span>
-            <h1 class="featured-title">Automação de WhatsApp</h1>
-            <p class="featured-desc">Conecte o cérebro da Yra diretamente ao seu número comercial. Envie relatórios, responda clientes e gerencie fluxos de trabalho automaticamente.</p>
-            <button class="btn-featured" onclick="openFeaturedDetails()">Ver Detalhes</button>
+            <span class="featured-tag" id="featuredTag">Destaque</span>
+            <h1 class="featured-title" id="featuredTitle">Carregando...</h1>
+            <p class="featured-desc" id="featuredDesc">Conecte os melhores plugins ao seu assistente.</p>
+            <button class="btn-featured" id="featuredBtn">Ver Detalhes</button>
         </div>
-        <div class="featured-graphic">💬</div>
+        <div class="featured-graphic" id="featuredGraphic">🚀</div>
     </div>
 
     <!-- Catálogo de Plugins -->
     <div class="catalog-section">
         <h2>Coleções de Integrações</h2>
         <div class="plugins-grid" id="pluginsGrid">
-            <!-- Os cards serão criados de forma dinâmica via script para permitir filtragem -->
+            <!-- Os cards serão criados de forma dinâmica via script -->
         </div>
     </div>
 
@@ -637,114 +673,195 @@ body {
     </div>
 </div>
 
-<script>
-// ============ LISTA DE PLUGINS (SIMULADOR DE DATABASE) ============
-const pluginsData = [
-    {
-        id: "whatsapp",
-        name: "WhatsApp Automator",
-        category: "Comunicação",
-        icon: "💬",
-        shortDesc: "Responda clientes de forma automatizada com a lógica avançada do Yra.",
-        fullDesc: "O WhatsApp Automator permite a você conectar a inteligência da YRA à sua conta comercial ou pessoal do WhatsApp. Responda perguntas frequentes, execute fluxos inteligentes de conversação e envie atualizações agendadas para seus clientes com total elegância.",
-        rating: "4.9",
-        active: true
-    },
-    {
-        id: "gcal",
-        name: "Google Calendar Sync",
-        category: "Produtividade",
-        icon: "📅",
-        shortDesc: "Agende reuniões e compromissos diretamente pela conversa com a IA.",
-        fullDesc: "Sincronize a YRA com sua agenda do Google. Com este plugin, o assistente pode consultar seus horários livres, agendar compromissos, enviar lembretes personalizados e reagendar compromissos diretamente a partir das suas solicitações verbais ou textuais.",
-        rating: "4.8",
-        active: false
-    },
-    {
-        id: "finance",
-        name: "Finance Tracker",
-        category: "Finanças",
-        icon: "📈",
-        shortDesc: "Controle de despesas e relatórios analíticos de faturamento.",
-        fullDesc: "Mantenha o controle da sua vida financeira. O Finance Tracker ajuda a monitorar despesas operacionais ou pessoais, faturamentos, custos mensais fixos e gera lindos relatórios visuais sob demanda, tudo interpretado pela inteligência analítica do sistema.",
-        rating: "4.7",
-        active: false
-    },
-    {
-        id: "websearch",
-        name: "Web Browser Engine",
-        category: "Utilitário",
-        icon: "🌐",
-        shortDesc: "Permita que a Yra pesquise na web em tempo real por novas atualizações.",
-        fullDesc: "Adicione recursos de pesquisa em tempo real à sua Inteligência Artificial. Com a pesquisa na web integrada, seu assistente é capaz de extrair as notícias mais recentes do mercado, cotações de ações e soluções atualizadas diretamente do buscador.",
-        rating: "4.9",
-        active: true
-    },
-    {
-        id: "notion",
-        name: "Notion Sync Pro",
-        category: "Organização",
-        icon: "📝",
-        shortDesc: "Organize notas e tarefas em seus quadros e tabelas do Notion.",
-        fullDesc: "Conecte seus bancos de dados e documentos do Notion diretamente ao ecossistema YRA. Crie novas páginas, adicione tarefas ao seu quadro Kanban pessoal e recupere informações de anotações passadas em poucos segundos.",
-        rating: "4.6",
-        active: false
-    },
-    {
-        id: "email",
-        name: "Email Automator",
-        category: "Comunicação",
-        icon: "✉️",
-        shortDesc: "Esboce respostas de e-mails importantes de forma semântica.",
-        fullDesc: "O Email Automator conecta-se com suas caixas de entrada Outlook ou Gmail. A IA ajuda a resumir newsletters, filtrar prioridades e redigir rascunhos de e-mails profissionais com perfeição estrutural, economizando horas do seu dia.",
-        rating: "4.5",
-        active: false
+<script type="importmap">
+{
+    "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
     }
-];
+}
+</script>
 
-// ============ INICIALIZAR E POPULAR CATALOGO ============
+<script type="module">
+// ============================
+// IMPORTS DO FIREBASE
+// ============================
+import { initializeApp } from "firebase/app";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+} from "firebase/auth";
+import {
+    getFirestore,
+    collection,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    arrayUnion,
+    arrayRemove,
+    onSnapshot,
+    serverTimestamp
+} from "firebase/firestore";
+
+// ============================
+// CONFIGURAÇÃO DO FIREBASE
+// ============================
+const firebaseConfig = {
+    apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+    authDomain: "yra-syra.firebaseapp.com",
+    projectId: "yra-syra",
+    storageBucket: "yra-syra.firebasestorage.app",
+    messagingSenderId: "555145505684",
+    appId: "1:555145505684:web:aa1ef14072653e41057d81"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ============================
+// ELEMENTOS DOM
+// ============================
 const pluginsGrid = document.getElementById("pluginsGrid");
 const searchInput = document.getElementById("searchInput");
+const modal = document.getElementById("pluginModal");
+const modalIcon = document.getElementById("modalIcon");
+const modalTitle = document.getElementById("modalTitle");
+const modalCategory = document.getElementById("modalCategory");
+const modalDescription = document.getElementById("modalDescription");
+const modalPrimaryAction = document.getElementById("modalPrimaryAction");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const closeModalActionBtn = document.getElementById("closeModalActionBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const userNameDisplay = document.getElementById("userNameDisplay");
+
+// Banner
+const featuredTag = document.getElementById("featuredTag");
+const featuredTitle = document.getElementById("featuredTitle");
+const featuredDesc = document.getElementById("featuredDesc");
+const featuredGraphic = document.getElementById("featuredGraphic");
+const featuredBtn = document.getElementById("featuredBtn");
+
+// ============================
+// ESTADO GLOBAL
+// ============================
+let currentUserId = null;
+let allPlugins = [];          // array de objetos {id, ...data}
+let currentSelectedPluginId = null;
+
+// ============================
+// FUNÇÕES DE FIRESTORE
+// ============================
+
+// Referência à coleção Plugins
+function getPluginsCollection() {
+    return collection(db, "Plugins");
+}
+
+// Verificar se o usuário tem o plugin ativo
+function isPluginActive(plugin) {
+    if (!currentUserId) return false;
+    const users = plugin.associated_users || [];
+    return users.includes(currentUserId);
+}
+
+// Ativar/Desativar plugin (adicionar/remover UID do array)
+async function togglePlugin(pluginId, active) {
+    if (!currentUserId) return;
+    const pluginRef = doc(db, "Plugins", pluginId);
+    try {
+        if (active) {
+            // Adicionar UID ao array
+            await updateDoc(pluginRef, {
+                associated_users: arrayUnion(currentUserId),
+                updated_at: serverTimestamp()
+            });
+        } else {
+            // Remover UID do array
+            await updateDoc(pluginRef, {
+                associated_users: arrayRemove(currentUserId),
+                updated_at: serverTimestamp()
+            });
+        }
+    } catch (error) {
+        console.error("Erro ao atualizar plugin:", error);
+        alert("Não foi possível alterar o status do plugin.");
+    }
+}
+
+// ============================
+// ESCUTAR PLUGINS EM TEMPO REAL
+// ============================
+
+function subscribeToPlugins() {
+    const pluginsRef = getPluginsCollection();
+    const unsubscribe = onSnapshot(pluginsRef, (snapshot) => {
+        allPlugins = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            allPlugins.push({
+                id: doc.id,
+                ...data,
+                // Garantir que associated_users seja um array
+                associated_users: data.associated_users || []
+            });
+        });
+        // Atualizar a interface
+        renderPlugins(searchInput.value);
+        updateFeaturedCard();
+    }, (error) => {
+        console.error("Erro ao carregar plugins:", error);
+        alert("Erro ao carregar plugins. Verifique sua conexão.");
+    });
+    return unsubscribe;
+}
+
+// ============================
+// RENDERIZAÇÃO DOS PLUGINS
+// ============================
 
 function renderPlugins(filterText = "") {
     pluginsGrid.innerHTML = "";
-    
-    const filtered = pluginsData.filter(plugin => 
-        plugin.name.toLowerCase().includes(filterText.toLowerCase()) || 
-        plugin.shortDesc.toLowerCase().includes(filterText.toLowerCase()) ||
-        plugin.category.toLowerCase().includes(filterText.toLowerCase())
+
+    const filtered = allPlugins.filter(p =>
+        p.name.toLowerCase().includes(filterText.toLowerCase()) ||
+        (p.description && p.description.toLowerCase().includes(filterText.toLowerCase()))
     );
 
     if (filtered.length === 0) {
-        pluginsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-light); padding: 30px;">Nenhum plugin localizado para sua pesquisa.</p>`;
+        pluginsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--text-light); padding: 30px;">Nenhum plugin encontrado para sua pesquisa.</p>`;
         return;
     }
 
     filtered.forEach(plugin => {
+        const active = isPluginActive(plugin);
         const card = document.createElement("div");
         card.className = "plugin-card";
-        card.onclick = () => openModal(plugin);
+        card.onclick = () => openModal(plugin.id);
 
         card.innerHTML = `
             <div>
                 <div class="plugin-header">
-                    <div class="plugin-icon-box">${plugin.icon}</div>
+                    <div class="plugin-icon-box">${plugin.icon || '🧩'}</div>
                     <div class="plugin-meta">
-                        <div class="plugin-category">${plugin.category}</div>
+                        <div class="plugin-category">${plugin.category || 'Geral'}</div>
                         <h3 class="plugin-name" title="${plugin.name}">${plugin.name}</h3>
                     </div>
                 </div>
                 <div class="plugin-body">
-                    ${plugin.shortDesc}
+                    ${plugin.description || 'Sem descrição.'}
                 </div>
             </div>
             <div class="plugin-footer">
                 <div class="plugin-rating">
                     <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-                    <span>${plugin.rating}</span>
+                    <span>${plugin.rating || '4.5'}</span>
                 </div>
-                <span class="plugin-status-badge ${plugin.active ? 'active' : 'inactive'}">
-                    ${plugin.active ? 'Ativo' : 'Inativo'}
+                <span class="plugin-status-badge ${active ? 'active' : 'inactive'}">
+                    ${active ? 'Ativo' : 'Inativo'}
                 </span>
             </div>
         `;
@@ -752,75 +869,145 @@ function renderPlugins(filterText = "") {
     });
 }
 
-// Filtro em tempo real na busca
-searchInput.oninput = (e) => {
-    renderPlugins(e.target.value);
-};
+// ============================
+// BANNER DE DESTAQUE (primeiro plugin ativo ou primeiro da lista)
+// ============================
 
-// ============ CONTROLE DO MODAL DE DETALHES ============
-const modal = document.getElementById("pluginModal");
-const modalIcon = document.getElementById("modalIcon");
-const modalTitle = document.getElementById("modalTitle");
-const modalCategory = document.getElementById("modalCategory");
-const modalDescription = document.getElementById("modalDescription");
-const modalPrimaryAction = document.getElementById("modalPrimaryAction");
+function updateFeaturedCard() {
+    if (allPlugins.length === 0) {
+        featuredTitle.innerText = "Nenhum plugin disponível";
+        featuredDesc.innerText = "Volte em breve para novas integrações.";
+        featuredGraphic.innerText = "🧩";
+        featuredBtn.style.display = "none";
+        return;
+    }
 
-let currentSelectedPlugin = null;
+    // Escolhe o primeiro plugin ativo do usuário, senão o primeiro da lista
+    let featured = allPlugins.find(p => isPluginActive(p));
+    if (!featured) featured = allPlugins[0];
 
-function openModal(plugin) {
-    currentSelectedPlugin = plugin;
-    modalIcon.innerText = plugin.icon;
-    modalTitle.innerText = plugin.name;
-    modalCategory.innerText = plugin.category;
-    modalDescription.innerText = plugin.fullDesc;
-    
-    updateModalButtonState(plugin.active);
-    
+    featuredTitle.innerText = featured.name || "Plugin";
+    featuredDesc.innerText = featured.description || "Conecte este plugin ao seu assistente.";
+    featuredGraphic.innerText = featured.icon || "🚀";
+    featuredBtn.style.display = "inline-block";
+    featuredBtn.onclick = () => openModal(featured.id);
+}
+
+// ============================
+// MODAL DE DETALHES
+// ============================
+
+function openModal(pluginId) {
+    const plugin = allPlugins.find(p => p.id === pluginId);
+    if (!plugin) return;
+
+    currentSelectedPluginId = pluginId;
+    modalIcon.innerText = plugin.icon || '🧩';
+    modalTitle.innerText = plugin.name || 'Sem nome';
+    modalCategory.innerText = plugin.category || 'Geral';
+    modalDescription.innerText = plugin.description || 'Sem descrição detalhada.';
+    const active = isPluginActive(plugin);
+    updateModalButton(active);
     modal.classList.add("open");
 }
 
-function updateModalButtonState(isActive) {
+function updateModalButton(isActive) {
     if (isActive) {
         modalPrimaryAction.innerText = "Desativar";
-        modalPrimaryAction.style.background = "#c0392b";
+        modalPrimaryAction.className = "btn-action desativar";
     } else {
         modalPrimaryAction.innerText = "Ativar";
-        modalPrimaryAction.style.background = "var(--primary-color)";
+        modalPrimaryAction.className = "btn-action";
     }
 }
 
-// Alternar status ativo/inativo
-modalPrimaryAction.onclick = () => {
-    if (currentSelectedPlugin) {
-        currentSelectedPlugin.active = !currentSelectedPlugin.active;
-        updateModalButtonState(currentSelectedPlugin.active);
-        renderPlugins(searchInput.value);
-        closeModal();
-    }
+// Ação do botão principal do modal
+modalPrimaryAction.onclick = async () => {
+    if (!currentSelectedPluginId) return;
+    const plugin = allPlugins.find(p => p.id === currentSelectedPluginId);
+    if (!plugin) return;
+
+    const active = isPluginActive(plugin);
+    await togglePlugin(currentSelectedPluginId, !active);
+    // O snapshot atualizará a lista automaticamente
+    closeModal();
 };
 
 function closeModal() {
     modal.classList.remove("open");
+    currentSelectedPluginId = null;
 }
 
-document.getElementById("closeModalBtn").onclick = closeModal;
-document.getElementById("closeModalActionBtn").onclick = closeModal;
+// Fechar modal com botões
+closeModalBtn.onclick = closeModal;
+closeModalActionBtn.onclick = closeModal;
 window.onclick = (e) => {
     if (e.target === modal) closeModal();
 };
 
-// Abre detalhes do banner de destaque
-function openFeaturedDetails() {
-    const featured = pluginsData.find(p => p.id === "whatsapp");
-    if (featured) openModal(featured);
-}
+// ============================
+// BUSCA EM TEMPO REAL
+// ============================
 
-// Renderizar Inicialmente
-renderPlugins();
-</script>
+searchInput.addEventListener("input", (e) => {
+    renderPlugins(e.target.value);
+});
 
-<script>
-// ============ ANIMAÇÃO DO LOGO LATERAL (BOLINHAS) ============
+// ============================
+// LOGOUT
+// ============================
+
+logoutBtn.addEventListener("click", async () => {
+    try {
+        await signOut(auth);
+        // Redirecionamento feito pelo onAuthStateChanged
+    } catch (error) {
+        console.error("Erro ao sair:", error);
+    }
+});
+
+// ============================
+// AUTENTICAÇÃO
+// ============================
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        window.location.href = "index.html";
+        return;
+    }
+
+    currentUserId = user.uid;
+    userNameDisplay.textContent = user.displayName || user.email || "Usuário";
+
+    // Verificar/criar documento do usuário em Users (alinhado com miu.py)
+    try {
+        const userDocRef = doc(db, "Users", currentUserId);
+        const userSnap = await getDoc(userDocRef);
+        if (!userSnap.exists()) {
+            await setDoc(userDocRef, {
+                username: user.displayName || "",
+                email: user.email || "",
+                phone: "",
+                birth_date: "",
+                security_code: "",
+                monthly_cost: 0.0,
+                status: "active",
+                role: "user",
+                created_at: serverTimestamp(),
+                updated_at: serverTimestamp()
+            });
+        }
+    } catch (error) {
+        console.warn("Erro ao verificar/criar documento do usuário:", error);
+    }
+
+    // Iniciar escuta dos plugins
+    subscribeToPlugins();
+});
+
+// ============================
+// ANIMAÇÃO DAS BOLINHAS (SIDEBAR)
+// ============================
 const sidebarDots = document.querySelectorAll(".dot-sidebar");
 const positions = [
     {x: 0, y: -10}, 
@@ -848,6 +1035,7 @@ function startSidebarAnimation() {
 }
 
 startSidebarAnimation();
+
 </script>
 </body>
 </html>
