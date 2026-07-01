@@ -486,14 +486,19 @@ body {
 
 /* ══ OVERLAY MOBILE ═══════════════════════════════════ */
 .sidebar-overlay {
-  display:none;
   position:fixed; inset:0;
-  background:rgba(0,0,0,.38);
+  background:rgba(0,0,0,.42);
   z-index:90;
-  opacity:0; transition:opacity .3s ease;
-  -webkit-tap-highlight-color:transparent;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s ease;
+  /* sempre no DOM, mas invisível e sem eventos no desktop */
 }
-.sidebar-overlay.vis { opacity:1; }
+.sidebar-overlay.vis {
+  opacity:1;
+  pointer-events:auto;
+  cursor:pointer;
+}
 
 /* ══════════════════════════════════════════════════════
    RESPONSIVO
@@ -514,7 +519,6 @@ body {
     transform:translateX(0);
     box-shadow:6px 0 32px rgba(0,0,0,.15);
   }
-  .sidebar-overlay { display:block; }
   .menu-toggle { display:flex; }
 
   .topbar { padding:10px 16px; }
@@ -1224,26 +1228,47 @@ const menuToggle     = document.getElementById('menuToggle');
 function openDrawer(){
   sidebar.classList.add('open');
   sidebarOverlay.classList.add('vis');
+  // impede scroll do body enquanto drawer aberto
+  document.body.style.overflow='hidden';
 }
 function closeDrawer(){
   sidebar.classList.remove('open');
   sidebarOverlay.classList.remove('vis');
+  document.body.style.overflow='';
 }
 
-menuToggle.addEventListener('click', ()=>sidebar.classList.contains('open')?closeDrawer():openDrawer());
+menuToggle.addEventListener('click', e=>{
+  e.stopPropagation();
+  sidebar.classList.contains('open') ? closeDrawer() : openDrawer();
+});
+
+// Overlay: toque fecha o drawer
+sidebarOverlay.addEventListener('touchstart', e=>{
+  e.preventDefault(); // impede ghost click
+  closeDrawer();
+}, {passive:false});
 sidebarOverlay.addEventListener('click', closeDrawer);
 
 // Fechar ao clicar em item de nav no mobile
 document.querySelectorAll('.nav-item').forEach(el=>{
-  el.addEventListener('click', ()=>{ if(window.innerWidth<=768)closeDrawer(); });
+  el.addEventListener('click', ()=>{ if(window.innerWidth<=900) closeDrawer(); });
 });
 
-// Swipe para esquerda fecha
-let touchStartX=0;
-sidebar.addEventListener('touchstart', e=>{ touchStartX=e.touches[0].clientX; },{passive:true});
-sidebar.addEventListener('touchmove',  e=>{
-  if(touchStartX - e.touches[0].clientX > 40) closeDrawer();
+// Swipe esquerda na sidebar fecha
+let touchStartX=0, touchStartY=0;
+sidebar.addEventListener('touchstart', e=>{
+  touchStartX=e.touches[0].clientX;
+  touchStartY=e.touches[0].clientY;
 },{passive:true});
+sidebar.addEventListener('touchmove', e=>{
+  const dx=touchStartX-e.touches[0].clientX;
+  const dy=Math.abs(touchStartY-e.touches[0].clientY);
+  // só fecha se movimento horizontal dominante
+  if(dx>50 && dx>dy*1.5) closeDrawer();
+},{passive:true});
+
+// Fechar drawer com tecla Escape
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDrawer(); });
 </script>
 </body>
 </html>
