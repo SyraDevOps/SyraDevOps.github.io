@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Yra Assistant</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
@@ -19,46 +22,48 @@
   --bg: #F6F8F6;
   --white: #ffffff;
   --border: rgba(46,125,50,0.09);
-  --shadow-sm: 0 1px 8px rgba(0,0,0,0.05);
 }
 
 *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+html { height: 100%; }
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   display: flex;
-  height: 100vh;
+  height: 100%;
+  /* dvh para mobile browsers com chrome dinâmico */
+  height: 100dvh;
   overflow: hidden;
 }
 
-/* ══ SIDEBAR ══════════════════════════════════════════ */
+/* ══ SIDEBAR ═══════════════════════════════════════════ */
 .sidebar {
   width: var(--sidebar-w);
   background: var(--white);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
   flex-shrink: 0;
+  /* transição pronta para mobile drawer */
+  transition: transform .3s cubic-bezier(.4,0,.2,1),
+              box-shadow .3s ease;
 }
 
 .sidebar-head {
   padding: 24px 18px 20px;
   border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
 }
 
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 0;
-}
+.brand { display:flex; align-items:center; gap:10px; }
+
 .brand-orb {
   position: relative;
-  width: 32px;
-  height: 32px;
+  width: 32px; height: 32px;
   flex-shrink: 0;
 }
 .brand-orb .bd {
@@ -73,6 +78,7 @@ body {
 .brand-orb .bd:nth-child(2){background:#2E7D32}
 .brand-orb .bd:nth-child(3){background:#4CAF50}
 .brand-orb .bd:nth-child(4){background:#81C784}
+
 .brand-info { display:flex; flex-direction:column; line-height:1.2; }
 .brand-name  { font-size:15px; font-weight:600; color:var(--g1); letter-spacing:.2px; }
 .brand-sub   { font-size:10px; color:var(--text-muted); letter-spacing:.7px; text-transform:uppercase; margin-top:1px; }
@@ -94,59 +100,57 @@ body {
   text-transform: uppercase;
   padding: 10px 8px 5px;
   margin-top: 4px;
+  user-select: none;
 }
-.nav-sep:first-child { margin-top: 0; }
+.nav-sep:first-child { margin-top:0; }
 .nav-item {
-  display: flex; align-items: center; gap: 9px;
-  padding: 8px 10px; border-radius: 8px;
-  text-decoration: none;
-  color: var(--text-muted);
-  font-size: 13px; font-weight: 450;
-  transition: all .15s ease;
-  cursor: pointer;
+  display:flex; align-items:center; gap:9px;
+  padding:9px 10px; border-radius:8px;
+  text-decoration:none;
+  color:var(--text-muted);
+  font-size:13px; font-weight:500;
+  transition:all .15s ease;
+  cursor:pointer;
+  -webkit-tap-highlight-color: transparent;
 }
-.nav-item:hover  { background: rgba(46,125,50,0.06); color: var(--g2); }
-.nav-item.active { background: rgba(46,125,50,0.09); color: var(--g1); font-weight: 540; }
+.nav-item:hover  { background:rgba(46,125,50,.06); color:var(--g2); }
+.nav-item.active { background:rgba(46,125,50,.09); color:var(--g1); font-weight:600; }
 .nav-item svg {
   width:15px; height:15px; flex-shrink:0;
   stroke:currentColor; fill:none; stroke-width:1.8;
   stroke-linecap:round; stroke-linejoin:round;
 }
 .nav-badge {
-  margin-left: auto;
-  font-size: 9.5px; font-weight: 600;
-  background: rgba(46,125,50,0.11);
-  color: var(--g2);
-  padding: 1px 6px; border-radius: 8px;
+  margin-left:auto;
+  font-size:9.5px; font-weight:600;
+  background:rgba(46,125,50,.11);
+  color:var(--g2);
+  padding:1px 6px; border-radius:8px;
 }
 
-/* USER CARD na sidebar */
+/* USER CARD */
 .sidebar-user {
-  padding: 14px 16px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  padding:14px 16px;
+  border-top:1px solid var(--border);
+  display:flex; align-items:center; gap:10px;
+  flex-shrink:0;
 }
 .user-avatar {
-  width: 32px; height: 32px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, var(--g2), var(--g3));
-  display: flex; align-items: center; justify-content: center;
-  color: white;
-  font-size: 13px; font-weight: 600;
-  flex-shrink: 0;
-  letter-spacing: .3px;
+  width:32px; height:32px; border-radius:50%;
+  background:linear-gradient(135deg,var(--g2),var(--g3));
+  display:flex; align-items:center; justify-content:center;
+  color:white; font-size:13px; font-weight:600;
+  flex-shrink:0; letter-spacing:.3px;
+  user-select:none;
 }
 .user-info { flex:1; min-width:0; }
-.user-name  { font-size: 12.5px; font-weight: 550; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.user-email { font-size: 10.5px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px; }
+.user-name  { font-size:12.5px; font-weight:600; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.user-email { font-size:10.5px; color:var(--text-muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-top:1px; }
 .user-status-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: #4CAF50;
-  flex-shrink: 0;
-  box-shadow: 0 0 0 2px rgba(76,175,80,.2);
-  animation: statusPulse 3s ease-in-out infinite;
+  width:7px; height:7px; border-radius:50%;
+  background:#4CAF50; flex-shrink:0;
+  box-shadow:0 0 0 2px rgba(76,175,80,.2);
+  animation:statusPulse 3s ease-in-out infinite;
 }
 @keyframes statusPulse {
   0%,100%{box-shadow:0 0 0 2px rgba(76,175,80,.2)}
@@ -155,102 +159,101 @@ body {
 
 /* ══ MAIN ══════════════════════════════════════════════ */
 .main {
-  flex:1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
+  flex:1; min-width:0;
+  display:flex; flex-direction:column;
+  overflow:hidden; position:relative;
 }
 
 /* TOPBAR */
 .topbar {
-  padding: 12px 20px 12px 32px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  flex-shrink: 0;
-  border-bottom: 1px solid var(--border);
-  background: var(--white);
+  padding:12px 20px;
+  display:flex; align-items:center;
+  justify-content:flex-end;
+  flex-shrink:0;
+  border-bottom:1px solid var(--border);
+  background:var(--white);
+  gap:8px;
 }
 .tb-btn {
   width:30px; height:30px; border-radius:7px;
   border:1px solid var(--border); background:transparent;
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; color:var(--text-muted); transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  flex-shrink:0;
 }
 .tb-btn:hover { border-color:var(--g4); color:var(--g2); }
 .tb-btn svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
 
-/* ══ STAGE (centro) ════════════════════════════════════ */
-/* O stage acomoda o orbe e o chat, e faz a transição */
+/* Hambúrguer — escondido no desktop */
+.menu-toggle {
+  display:none;
+  width:32px; height:32px; border-radius:8px;
+  border:1px solid var(--border); background:transparent;
+  align-items:center; justify-content:center;
+  cursor:pointer; color:var(--text-muted); transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  flex-shrink:0; margin-right:auto;
+}
+.menu-toggle svg { width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
+
+/* ══ STAGE ═════════════════════════════════════════════ */
 .stage {
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  position:relative;
+  flex:1; display:flex; flex-direction:column;
+  overflow:hidden; position:relative;
 }
 
-/* ── ORBE CONTAINER: entra e sai da tela ── */
+/* ── ORBE CONTAINER ── */
 .orb-stage {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  gap: 24px;
-  padding: 32px;
-  /* transição de saída suave para cima */
-  transition: transform .65s cubic-bezier(.4,0,.2,1),
-              opacity   .55s cubic-bezier(.4,0,.2,1);
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
-  position: absolute;
-  inset: 0;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:24px; padding:32px;
+  position:absolute; inset:0;
+  transition:transform .6s cubic-bezier(.4,0,.2,1),
+             opacity .5s cubic-bezier(.4,0,.2,1);
 }
 .orb-stage.hidden {
-  transform: translateY(-60px);
-  opacity: 0;
-  pointer-events: none;
+  transform:translateY(-50px);
+  opacity:0;
+  pointer-events:none;
 }
 
 /* Orbe */
 .voice-orb {
-  position: relative;
-  width: 188px; height: 188px;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  cursor: default;
+  position:relative;
+  width:188px; height:188px;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
 }
 .orb-halo {
-  position: absolute;
-  inset: -16px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(76,175,80,.09) 0%, transparent 70%);
-  animation: haloBreath 4s ease-in-out infinite;
+  position:absolute; inset:-16px; border-radius:50%;
+  background:radial-gradient(circle,rgba(76,175,80,.09) 0%,transparent 70%);
+  animation:haloBreath 4s ease-in-out infinite;
 }
 @keyframes haloBreath {
   0%,100%{transform:scale(1);opacity:.6}
   50%    {transform:scale(1.1);opacity:1}
 }
 .orb-ring {
-  position: absolute; inset: 0; border-radius: 50%;
-  background: conic-gradient(from 0deg,
-    #1B5E20 0%, #4CAF50 25%, #A5D6A7 48%,
-    #C8E6C9 55%, #A5D6A7 62%, #4CAF50 75%,
+  position:absolute; inset:0; border-radius:50%;
+  background:conic-gradient(from 0deg,
+    #1B5E20 0%,#4CAF50 25%,#A5D6A7 48%,
+    #C8E6C9 55%,#A5D6A7 62%,#4CAF50 75%,
     #1B5E20 100%);
-  animation: orbSpin 7s linear infinite;
-  opacity: .85;
+  animation:orbSpin 7s linear infinite;
+  opacity:.85;
 }
+/* Mascara interna — usa a mesma cor de fundo */
 .orb-ring::after {
   content:''; position:absolute; inset:3px;
-  border-radius:50%; background:var(--bg);
+  border-radius:50%; background:var(--white);
 }
-@keyframes orbSpin { to { transform: rotate(360deg); } }
+@keyframes orbSpin { to{transform:rotate(360deg)} }
+
 .orb-bg {
   position:absolute; inset:3px; border-radius:50%;
   background:var(--white);
-  box-shadow: 0 6px 28px rgba(46,125,50,.08), inset 0 1px 0 rgba(255,255,255,.9);
+  box-shadow:0 6px 28px rgba(46,125,50,.08),inset 0 1px 0 rgba(255,255,255,.9);
   z-index:1;
 }
 #orbCanvas {
@@ -261,203 +264,194 @@ body {
 .orb-icon {
   position:relative; z-index:3;
   opacity:.28; transition:opacity .4s;
+  pointer-events:none;
 }
-.orb-icon svg {
-  width:30px;height:30px;
-  stroke:var(--g2);fill:none;stroke-width:1.5;
-  stroke-linecap:round;stroke-linejoin:round;
-}
+.orb-icon svg { width:30px;height:30px;stroke:var(--g2);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round; }
 .voice-orb.active .orb-icon { opacity:0; }
-.voice-orb.active .orb-ring { animation: orbSpin 2.5s linear infinite; opacity:1; }
+.voice-orb.active  .orb-ring { animation:orbSpin 2.5s linear infinite; opacity:1; }
 .voice-orb.responding .orb-ring {
-  background: conic-gradient(from 0deg,
-    #1B5E20 0%, #4CAF50 20%, #A5D6A7 35%,
-    #F48FB1 55%, #E91E8C 68%, #4CAF50 85%, #1B5E20 100%);
-  animation: orbSpin 2s linear infinite;
+  background:conic-gradient(from 0deg,
+    #1B5E20 0%,#4CAF50 20%,#A5D6A7 35%,
+    #F48FB1 55%,#E91E8C 68%,#4CAF50 85%,#1B5E20 100%);
+  animation:orbSpin 2s linear infinite;
 }
 
-/* Label e placeholder */
-.orb-caption { text-align: center; display:flex; flex-direction:column; align-items:center; gap:6px; }
-.orb-status   { font-size:14px; font-weight:500; color:var(--g2); min-height:20px; }
+/* Label orbe */
+.orb-caption {
+  text-align:center; display:flex; flex-direction:column;
+  align-items:center; gap:6px;
+}
+.orb-status { font-size:14px; font-weight:500; color:var(--g2); min-height:20px; }
+
+#voiceLabel {
+  display:flex; flex-direction:column; align-items:center;
+  gap:6px; max-width:320px; min-height:44px; text-align:center;
+}
+#voiceUserText {
+  font-size:12px; color:var(--text-muted); font-weight:400;
+  line-height:1.5; opacity:0; transition:opacity .35s;
+  max-width:280px;
+}
+#voiceUserText.vis { opacity:1; }
+#voiceDivider {
+  width:24px; height:1px; background:var(--border);
+  opacity:0; transition:opacity .3s;
+}
+#voiceDivider.vis { opacity:1; }
 #listenTranscript {
   font-size:13.5px; color:var(--g2); font-weight:500;
-  text-align:center; max-width:340px;
-  opacity:0; transition:opacity .4s; min-height:18px;
-  line-height:1.6;
+  max-width:320px; opacity:0; transition:opacity .4s;
+  min-height:18px; line-height:1.6;
 }
 #listenTranscript.vis { opacity:1; }
-/* Quando exibe a resposta do modelo no orbe */
 #listenTranscript.model-reply {
-  color: var(--text);
-  font-weight:400;
-  font-size:14px;
+  color:var(--text); font-weight:400; font-size:14px; line-height:1.65;
 }
 #placeholderText {
   font-size:12px; color:var(--text-muted); font-style:italic;
-  max-width:260px; text-align:center; min-height:16px;
-  transition:opacity .5s;
+  max-width:260px; min-height:16px; transition:opacity .5s;
 }
 #placeholderText.fade { opacity:0; }
 
 /* ══ CHAT THREAD ═══════════════════════════════════════ */
 .chat-thread {
   flex:1; overflow-y:auto;
-  padding: 28px 0 8px;
-  display: flex; flex-direction: column; gap: 0;
-  /* começa invisível/deslocado */
-  opacity: 0;
-  transition: opacity .45s ease;
-  /* ocupa todo o espaço do stage mas fica atrás do orb-stage quando orbe visível */
+  padding:24px 0 12px;
+  display:flex; flex-direction:column;
+  opacity:0; transition:opacity .4s ease;
 }
-.chat-thread.visible { opacity: 1; }
+.chat-thread.visible { opacity:1; }
 .chat-thread::-webkit-scrollbar { width:4px; }
 .chat-thread::-webkit-scrollbar-thumb { background:var(--g5); border-radius:4px; }
 
-/* Linha de mensagem */
 .msg-row {
-  display: flex;
-  padding: 4px 32px;
-  animation: msgIn .3s ease;
+  display:flex;
+  padding:4px 32px;
+  animation:msgIn .28s ease;
 }
 @keyframes msgIn {
-  from { opacity:0; transform: translateY(8px); }
-  to   { opacity:1; transform: translateY(0); }
+  from{opacity:0;transform:translateY(6px)}
+  to  {opacity:1;transform:translateY(0)  }
 }
-.msg-row.user  { justify-content: flex-end; }
-.msg-row.model { justify-content: flex-start; }
+.msg-row.user  { justify-content:flex-end; }
+.msg-row.model { justify-content:flex-start; gap:10px; align-items:flex-start; }
 
-/* Textos */
 .msg-content {
-  max-width: 68%;
-  font-size: 14px;
-  line-height: 1.72;
-  color: var(--text);
+  max-width:68%; font-size:14px;
+  line-height:1.72; color:var(--text);
 }
-
-/* Mensagem do usuário: pill suave à direita */
 .msg-row.user .msg-content {
-  background: linear-gradient(135deg, var(--g2) 0%, #388E3C 100%);
-  color: #fff;
-  border-radius: 18px 18px 4px 18px;
-  padding: 10px 16px;
-  font-size: 13.5px;
-  line-height: 1.6;
+  background:linear-gradient(135deg,var(--g2) 0%,#388E3C 100%);
+  color:#fff; border-radius:18px 18px 4px 18px;
+  padding:10px 16px; font-size:13.5px; line-height:1.6;
 }
-
-/* Mensagem do modelo: texto livre à esquerda, sem box */
 .msg-row.model .msg-content {
-  padding: 6px 4px;
-  color: var(--text);
+  padding:4px 2px; color:var(--text);
 }
 
-/* Avatar pequeno para o modelo */
-.msg-row.model { gap: 10px; align-items: flex-start; }
-/* Losango-avatar do modelo */
+/* Losango avatar */
 .model-avatar {
-  width: 26px; height: 26px;
-  flex-shrink: 0; margin-top: 3px;
-  position: relative;
-  display: flex; align-items: center; justify-content: center;
+  width:24px; height:24px;
+  flex-shrink:0; margin-top:4px;
+  display:flex; align-items:center; justify-content:center;
 }
-.model-avatar .diamond-wrap {
-  position: relative; width: 22px; height: 22px;
-}
-.model-avatar .diamond-wrap svg {
-  width: 22px; height: 22px;
-  overflow: visible;
-}
-/* partículas dentro do losango (paradas) */
-.diamond-particle {
-  r: 1.8px;
-  fill: var(--g2);
-  opacity: 0.75;
-}
+.model-avatar svg { width:22px; height:22px; overflow:visible; }
+.diamond-particle { fill:var(--g2); }
 
-/* Markdown inside model messages */
-.msg-content p         { margin: 6px 0; }
-.msg-content p:first-child { margin-top: 0; }
-.msg-content p:last-child  { margin-bottom: 0; }
+/* Markdown */
+.msg-content p { margin:6px 0; }
+.msg-content p:first-child { margin-top:0; }
+.msg-content p:last-child  { margin-bottom:0; }
 .msg-content h1,.msg-content h2,.msg-content h3 {
-  font-weight:600; margin:12px 0 4px; color:#133A16;
-  font-size:14px;
+  font-weight:600; margin:12px 0 4px; color:#133A16; font-size:14px;
 }
 .msg-content ul,.msg-content ol { padding-left:18px; margin:6px 0; }
 .msg-content li { margin:3px 0; }
 .msg-content code {
-  background:rgba(27,94,32,.13); padding:2px 6px;
+  background:rgba(27,94,32,.12); padding:2px 5px;
   border-radius:4px; font-size:12.5px;
   font-family:'Courier New',monospace; color:#133A16;
 }
 .msg-content pre {
-  background:rgba(27,94,32,.10); padding:12px;
+  background:rgba(27,94,32,.08); padding:12px;
   border-radius:8px; overflow-x:auto; margin:8px 0;
-  border-left:2.5px solid #2E7D32;
+  border-left:2.5px solid var(--g2);
 }
 .msg-content pre code { background:none; padding:0; color:#133A16; }
-.msg-content strong { font-weight:600; color:#1a2a1a; }
+.msg-content strong { font-weight:700; color:#1a2a1a; }
+.msg-content em { font-style:italic; }
 .msg-content blockquote {
-  border-left:2.5px solid #2E7D32; padding-left:10px;
+  border-left:2.5px solid var(--g4); padding-left:10px;
   margin:6px 0; color:#4a5a4a; font-style:italic;
 }
-.msg-content a { color:#1B5E20; text-decoration:underline; text-underline-offset:3px; font-weight:500; }
+.msg-content a { color:var(--g1); text-decoration:underline; text-underline-offset:3px; font-weight:500; }
 
-/* Typing dots in chat */
-.typing-dots { display:inline-flex; gap:5px; align-items:center; padding:2px 0; }
+/* Cursor streaming — só no último parágrafo */
+.msg-content.streaming p:last-child::after,
+.msg-content.streaming > *:last-child::after,
+.msg-content.streaming::after {
+  content:'▋';
+  color:var(--g3);
+  animation:cursorBlink .75s step-end infinite;
+  font-size:12px; margin-left:1px;
+}
+@keyframes cursorBlink{0%,100%{opacity:1}50%{opacity:0}}
+
+/* Typing dots */
+.typing-dots { display:inline-flex; gap:5px; align-items:center; padding:4px 0; }
 .typing-dots span {
   width:6px; height:6px; border-radius:50%; background:var(--g4);
   animation:blink 1.2s ease-in-out infinite;
 }
 .typing-dots span:nth-child(2){animation-delay:.2s}
 .typing-dots span:nth-child(3){animation-delay:.4s}
-@keyframes blink {
-  0%,80%,100%{opacity:.25;transform:scale(.8)}
-  40%        {opacity:1;  transform:scale(1)  }
-}
+@keyframes blink{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 
 /* ══ INPUT FOOTER ══════════════════════════════════════ */
 .footer {
-  padding: 12px 32px 22px;
-  flex-shrink: 0;
-  background: var(--white);
-  border-top: 1px solid var(--border);
+  padding:10px 32px 20px;
+  flex-shrink:0;
+  background:var(--white);
+  border-top:1px solid var(--border);
+  /* safe area iOS */
+  padding-bottom:max(20px, calc(14px + env(safe-area-inset-bottom)));
 }
 .input-wrap {
-  max-width: 680px;
-  margin: 0 auto;
-  display: flex;
-  align-items: flex-end;
-  gap: 8px;
-  background: var(--bg);
-  border: 1px solid rgba(46,125,50,.15);
-  border-radius: 14px;
-  padding: 10px 10px 10px 16px;
-  transition: border-color .2s, box-shadow .2s;
+  max-width:680px; margin:0 auto;
+  display:flex; align-items:flex-end; gap:8px;
+  background:var(--bg);
+  border:1px solid rgba(46,125,50,.15);
+  border-radius:14px;
+  padding:10px 10px 10px 16px;
+  transition:border-color .2s, box-shadow .2s;
 }
 .input-wrap:focus-within {
-  border-color: rgba(46,125,50,.35);
-  box-shadow: 0 0 0 3px rgba(46,125,50,.06);
+  border-color:rgba(46,125,50,.35);
+  box-shadow:0 0 0 3px rgba(46,125,50,.06);
 }
 .msg-input {
   flex:1; border:none; outline:none;
   background:transparent;
-  font-size: 14px; color: var(--text);
-  font-family: inherit;
-  resize: none;
-  min-height: 22px;
-  max-height: 140px;
-  line-height: 1.55;
-  padding: 0;
+  font-size:16px; /* ≥16px evita zoom iOS */
+  color:var(--text); font-family:inherit;
+  resize:none; min-height:22px; max-height:140px;
+  line-height:1.55; padding:0;
 }
 .msg-input::placeholder { color:var(--text-muted); }
 .input-actions { display:flex; align-items:center; gap:5px; flex-shrink:0; }
+
 .iact-btn {
-  width:34px; height:34px; border-radius:8px;
+  width:36px; height:36px; border-radius:8px;
   border:none; background:transparent;
   display:flex; align-items:center; justify-content:center;
   cursor:pointer; color:var(--text-muted); transition:all .15s;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:manipulation;
 }
-.iact-btn:hover { background:rgba(46,125,50,.08); color:var(--g2); }
+.iact-btn:hover  { background:rgba(46,125,50,.08); color:var(--g2); }
+.iact-btn:active { background:rgba(46,125,50,.14); }
 .iact-btn svg { width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round; }
+
 .voice-toggle { border:1px solid rgba(46,125,50,.15); }
 .voice-toggle.active {
   background:var(--g2); color:white; border-color:var(--g2);
@@ -478,47 +472,95 @@ body {
 @keyframes bw{0%,100%{transform:scaleY(.4)}50%{transform:scaleY(1)}}
 
 .send-btn {
-  width:34px; height:34px; border-radius:8px;
   border:none;
   background:linear-gradient(135deg,var(--g2),var(--g3));
-  color:white;
-  display:flex;align-items:center;justify-content:center;
-  cursor:pointer; transition:all .15s;
-  box-shadow:0 2px 8px rgba(46,125,50,.22);
-  flex-shrink:0;
+  color:white; box-shadow:0 2px 8px rgba(46,125,50,.22);
+  touch-action:manipulation;
 }
 .send-btn:hover  { background:linear-gradient(135deg,var(--g1),var(--g2)); box-shadow:0 3px 14px rgba(46,125,50,.32); }
-.send-btn:disabled { opacity:.4; cursor:not-allowed; }
+.send-btn:active { transform:scale(.96); }
+.send-btn:disabled { opacity:.4; cursor:not-allowed; transform:none; }
 .send-btn svg { width:14px;height:14px;stroke:white;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round; }
 
-/* hint abaixo do input */
-.input-hint {
-  text-align:center; margin-top:8px;
-  font-size:11px; color:var(--text-muted);
-  opacity:.7;
+.input-hint { text-align:center; margin-top:8px; font-size:11px; color:var(--text-muted); opacity:.7; }
+
+/* ══ OVERLAY MOBILE ═══════════════════════════════════ */
+.sidebar-overlay {
+  display:none;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.38);
+  z-index:90;
+  opacity:0; transition:opacity .3s ease;
+  -webkit-tap-highlight-color:transparent;
+}
+.sidebar-overlay.vis { opacity:1; }
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVO
+══════════════════════════════════════════════════════ */
+
+/* TABLET ≤ 768px */
+@media (max-width: 768px) {
+
+  .sidebar {
+    position:fixed;
+    left:0; top:0; bottom:0;
+    height:100%;
+    z-index:100;
+    transform:translateX(-100%);
+    box-shadow:none;
+  }
+  .sidebar.open {
+    transform:translateX(0);
+    box-shadow:6px 0 32px rgba(0,0,0,.15);
+  }
+  .sidebar-overlay { display:block; }
+  .menu-toggle { display:flex; }
+
+  .topbar { padding:10px 16px; }
+
+  .orb-stage { padding:20px 16px; gap:16px; }
+  .voice-orb { width:150px; height:150px; }
+
+  .msg-row { padding:4px 16px; }
+  .msg-content { max-width:84%; }
+
+  .footer { padding:10px 16px; padding-bottom:max(16px, calc(10px + env(safe-area-inset-bottom))); }
+  .input-hint { display:none; }
 }
 
-/* Cursor piscante durante streaming */
-.msg-content.streaming::after {
-  content: '▋';
-  display: inline;
-  color: var(--g3);
-  animation: cursorBlink .75s step-end infinite;
-  font-size: 13px;
-  line-height: 1;
-  vertical-align: baseline;
-  margin-left: 1px;
+/* PHONE ≤ 480px */
+@media (max-width: 480px) {
+  .voice-orb { width:130px; height:130px; }
+  .orb-status { font-size:13px; }
+  #listenTranscript { font-size:13px; }
+  #voiceUserText { font-size:11.5px; }
+  #placeholderText { font-size:11px; }
+
+  .msg-row { padding:3px 12px; }
+  .msg-content { max-width:90%; font-size:13.5px; }
+  .msg-row.user .msg-content { font-size:13px; padding:9px 13px; }
+
+  .input-wrap { padding:8px 8px 8px 14px; }
+  .iact-btn { width:34px; height:34px; }
 }
-@keyframes cursorBlink {
-  0%,100%{ opacity:1 }
-  50%     { opacity:0 }
+
+/* LANDSCAPE PHONE */
+@media (max-height:480px) and (max-width:900px) {
+  .voice-orb { width:100px; height:100px; }
+  .orb-stage { gap:10px; padding:10px 16px; }
+  .orb-status { font-size:12px; }
+  #placeholderText { display:none; }
+  .footer { padding:6px 16px; padding-bottom:max(8px, env(safe-area-inset-bottom)); }
 }
 </style>
 </head>
 <body>
 
-<!-- ══ SIDEBAR ══════════════════════════════════════ -->
-<aside class="sidebar">
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
   <div class="sidebar-head">
     <div class="brand">
       <div class="brand-orb" id="brandOrb">
@@ -534,31 +576,31 @@ body {
 
   <nav class="nav">
     <span class="nav-sep">Principal</span>
-    <a class="nav-item active" href="center.html">
+    <a class="nav-item active" href="#">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       Chat
     </a>
-    <a class="nav-item" href="plugins.html">
+    <a class="nav-item" href="#">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
       Plugins
+      <span class="nav-badge">3</span>
     </a>
     <span class="nav-sep">Organização</span>
-    <a class="nav-item" href="notes.html">
+    <a class="nav-item" href="#">
       <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
       Notas
     </a>
-    <a class="nav-item" href="memory.html">
+    <a class="nav-item" href="#">
       <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
       Memória
     </a>
     <span class="nav-sep">Sistema</span>
-    <a class="nav-item" href="settings.html">
+    <a class="nav-item" href="#">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
       Configurações
     </a>
   </nav>
 
-  <!-- USER INFO -->
   <div class="sidebar-user">
     <div class="user-avatar" id="userAvatarEl">?</div>
     <div class="user-info">
@@ -569,10 +611,13 @@ body {
   </div>
 </aside>
 
-<!-- ══ MAIN ═════════════════════════════════════════ -->
+<!-- MAIN -->
 <div class="main">
 
   <div class="topbar">
+    <button class="menu-toggle" id="menuToggle" aria-label="Menu">
+      <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
     <button class="tb-btn" id="newChatBtn" title="Nova conversa">
       <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
     </button>
@@ -580,7 +625,7 @@ body {
 
   <div class="stage">
 
-    <!-- ORBE (some ao conversar, volta só com voz) -->
+    <!-- ORBE -->
     <div class="orb-stage" id="orbStage">
       <div class="voice-orb" id="voiceOrb">
         <div class="orb-halo"></div>
@@ -593,28 +638,31 @@ body {
       </div>
       <div class="orb-caption">
         <div class="orb-status" id="orbStatus">Olá! Como posso ajudar?</div>
-        <div id="listenTranscript"></div>
+        <div id="voiceLabel">
+          <div id="voiceUserText"></div>
+          <div id="voiceDivider"></div>
+          <div id="listenTranscript"></div>
+        </div>
         <div id="placeholderText"></div>
       </div>
     </div>
 
-    <!-- CHAT THREAD -->
+    <!-- CHAT -->
     <div class="chat-thread" id="chatThread"></div>
 
   </div>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="input-wrap">
       <textarea class="msg-input" id="msgInput"
         placeholder="Mensagem para o Yra…"
-        rows="1"
-        autocomplete="off"></textarea>
+        rows="1" autocomplete="off"
+        autocorrect="off" spellcheck="true"></textarea>
       <div class="input-actions">
-        <button class="iact-btn voice-toggle" id="voiceBtn" title="Modo voz">
+        <button class="iact-btn voice-toggle" id="voiceBtn" aria-label="Modo voz">
           <div class="wv"><span></span><span></span><span></span><span></span><span></span></div>
         </button>
-        <button class="iact-btn send-btn" id="sendBtn" title="Enviar">
+        <button class="iact-btn send-btn" id="sendBtn" aria-label="Enviar">
           <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="white" stroke="none"/></svg>
         </button>
       </div>
@@ -630,7 +678,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
 import { getFirestore, collection, query, where, getDocs }
        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const firebaseConfig = {
+const cfg = {
   apiKey:"AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
   authDomain:"yra-syra.firebaseapp.com",
   projectId:"yra-syra",
@@ -638,48 +686,44 @@ const firebaseConfig = {
   messagingSenderId:"555145505684",
   appId:"1:555145505684:web:aa1ef14072653e41057d81"
 };
-
-const app  = initializeApp(firebaseConfig);
+const app  = initializeApp(cfg);
 const auth = getAuth(app);
 const db   = getFirestore(app);
-window.__yraFirestore = db;
 window.__yraAuth = auth;
 
-onAuthStateChanged(auth, async (user) => {
-  if (user) {
-    // Preenche dados do usuário na sidebar
-    const nameEl  = document.getElementById('userNameEl');
-    const emailEl = document.getElementById('userEmailEl');
-    const avatarEl= document.getElementById('userAvatarEl');
-    const displayName = user.displayName || user.email?.split('@')[0] || 'Usuário';
-    const email       = user.email || '';
-    const initials    = displayName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    if(nameEl)   nameEl.textContent  = displayName;
-    if(emailEl)  emailEl.textContent = email;
-    if(avatarEl) avatarEl.textContent= initials || '?';
+onAuthStateChanged(auth, async user => {
+  if (!user) { window.location.href='index.html'; return; }
 
-    try {
-      const q  = query(collection(db,'Keys'), where('user_id','==',user.uid), where('enabled','==',true));
-      const ks = await getDocs(q);
-      if (!ks.empty) window.__yraApiKey = ks.docs[0].data().key;
-    } catch(e){ console.error('Erro key:',e); }
-  } else {
-    window.location.href = 'index.html';
-  }
+  const name   = user.displayName || user.email?.split('@')[0] || 'Usuário';
+  const email  = user.email || '';
+  const inits  = name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() || '?';
+  const nameEl  = document.getElementById('userNameEl');
+  const emailEl = document.getElementById('userEmailEl');
+  const avEl    = document.getElementById('userAvatarEl');
+  if(nameEl)  nameEl.textContent  = name;
+  if(emailEl) emailEl.textContent = email;
+  if(avEl)    avEl.textContent    = inits;
+
+  try {
+    const q  = query(collection(db,'Keys'), where('user_id','==',user.uid), where('enabled','==',true));
+    const ks = await getDocs(q);
+    if (!ks.empty) window.__yraApiKey = ks.docs[0].data().key;
+  } catch(e){ console.error('key err:',e); }
 });
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
 <script>
-/* ── BRAND ORB ──────────────────────────────────────── */
+'use strict';
+
+/* ── BRAND ORB ─────────────────────────────────────────── */
 const brandDots = document.querySelectorAll('.brand-orb .bd');
 const bPos = [{x:0,y:-10},{x:10,y:0},{x:0,y:10},{x:-10,y:0}];
-function shuffleArr(a){ let r=[...a]; for(let i=r.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r; }
-setInterval(()=>{ const p=shuffleArr(bPos); brandDots.forEach((d,i)=>d.style.transform=`translate(${p[i].x}px,${p[i].y}px)`); }, 1200);
+function shuffle(a){ let r=[...a]; for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r; }
+setInterval(()=>{ const p=shuffle(bPos); brandDots.forEach((d,i)=>d.style.transform=`translate(${p[i].x}px,${p[i].y}px)`); }, 1200);
 
-/* ── PLACEHOLDERS ───────────────────────────────────── */
-const PH = [
+/* ── PLACEHOLDERS ──────────────────────────────────────── */
+const PH=[
   "Estudando o mercado cripto…","Memorizando as leis de Newton…",
   "Calculando a entropia do universo…","Lendo Kant por prazer. Sério.",
   "Analisando padrões nas estrelas…","Bebendo café virtual ☕",
@@ -688,47 +732,60 @@ const PH = [
   "Pesquisando por vida inteligente. Ainda buscando.",
   "Atualizando o mapa mental do cosmos…",
 ];
-const phEl = document.getElementById('placeholderText');
-let phIdx=0, phTimer=null, phOn=true;
+const phEl=document.getElementById('placeholderText');
+let phIdx=0,phTimer=null,phOn=false;
+
 function nextPH(){
   if(!phOn)return;
   phEl.classList.add('fade');
   setTimeout(()=>{ phIdx=(phIdx+1)%PH.length; phEl.textContent=PH[phIdx]; phEl.classList.remove('fade'); },500);
   phTimer=setTimeout(nextPH,4000);
 }
-function startPH(){ phOn=true; phEl.textContent=PH[phIdx]; clearTimeout(phTimer); phTimer=setTimeout(nextPH,4000); }
-function stopPH(){ phOn=false; clearTimeout(phTimer); phEl.textContent=''; }
+function startPH(){
+  if(phOn)return;
+  phOn=true; phEl.textContent=PH[phIdx]; clearTimeout(phTimer);
+  phTimer=setTimeout(nextPH,4000);
+}
+function stopPH(){
+  phOn=false; clearTimeout(phTimer); phEl.classList.remove('fade');
+  phEl.textContent='';
+}
 startPH();
 
-/* ── ORBE CANVAS ────────────────────────────────────── */
+/* ── ORB CANVAS ────────────────────────────────────────── */
 const orbStageEl = document.getElementById('orbStage');
 const voiceOrb   = document.getElementById('voiceOrb');
 const orbCanvas  = document.getElementById('orbCanvas');
 const orbCtx     = orbCanvas.getContext('2d');
 
-function resizeOrb(){
-  const sz = voiceOrb.offsetWidth - 6;
-  orbCanvas.width = sz; orbCanvas.height = sz;
-}
-resizeOrb();
-window.addEventListener('resize', resizeOrb);
-
 let rafId=null;
-let audioCtx=null, analyser=null, micSrc=null, waveData=null, isAudioOk=false;
+let audioCtx=null,analyser=null,micSrc=null,waveData=null,isAudioOk=false;
+
+function resizeOrb(){
+  const sz=Math.max(voiceOrb.offsetWidth-6, 1);
+  orbCanvas.width=sz; orbCanvas.height=sz;
+}
+// Resize com debounce para evitar flicker
+let resizeTimer=null;
+window.addEventListener('resize',()=>{
+  clearTimeout(resizeTimer);
+  resizeTimer=setTimeout(resizeOrb,80);
+});
+resizeOrb();
 
 function drawIdle(){
   cancelAnimationFrame(rafId);
-  const sz=orbCanvas.width, cx=sz/2, cy=sz/2, r=sz*.32, bars=40;
   let t=0;
   function frame(){
     rafId=requestAnimationFrame(frame); t+=.024;
+    const sz=orbCanvas.width,cx=sz/2,cy=sz/2,r=sz*.32,bars=40;
     orbCtx.clearRect(0,0,sz,sz);
     for(let i=0;i<bars;i++){
       const ang=(i/bars)*Math.PI*2-Math.PI/2;
       const wave=.07+.11*Math.abs(Math.sin(ang*2.5+t));
       const len=r*wave, alpha=.16+.22*Math.abs(Math.sin(ang*2+t));
-      const x1=cx+Math.cos(ang)*(r-2), y1=cy+Math.sin(ang)*(r-2);
-      const x2=cx+Math.cos(ang)*(r-2+len), y2=cy+Math.sin(ang)*(r-2+len);
+      const x1=cx+Math.cos(ang)*(r-2),y1=cy+Math.sin(ang)*(r-2);
+      const x2=cx+Math.cos(ang)*(r-2+len),y2=cy+Math.sin(ang)*(r-2+len);
       orbCtx.beginPath(); orbCtx.moveTo(x1,y1); orbCtx.lineTo(x2,y2);
       orbCtx.strokeStyle=`rgba(46,125,50,${alpha})`; orbCtx.lineWidth=2.5; orbCtx.lineCap='round'; orbCtx.stroke();
     }
@@ -737,18 +794,18 @@ function drawIdle(){
 }
 function drawMic(){
   cancelAnimationFrame(rafId);
-  const sz=orbCanvas.width, cx=sz/2, cy=sz/2, r=sz*.32, bars=40;
-  const step=Math.floor((waveData?.length||128)/bars);
+  const step=Math.floor((waveData?.length||128)/40);
   function frame(){
     rafId=requestAnimationFrame(frame);
-    if(analyser) analyser.getByteFrequencyData(waveData);
+    if(analyser&&waveData) analyser.getByteFrequencyData(waveData);
+    const sz=orbCanvas.width,cx=sz/2,cy=sz/2,r=sz*.32,bars=40;
     orbCtx.clearRect(0,0,sz,sz);
     for(let i=0;i<bars;i++){
       const ang=(i/bars)*Math.PI*2-Math.PI/2;
       const norm=(waveData?.[i*step]||0)/255;
       const len=r*(.07+.55*norm), alpha=.3+.7*norm;
-      const x1=cx+Math.cos(ang)*(r-2), y1=cy+Math.sin(ang)*(r-2);
-      const x2=cx+Math.cos(ang)*(r-2+len), y2=cy+Math.sin(ang)*(r-2+len);
+      const x1=cx+Math.cos(ang)*(r-2),y1=cy+Math.sin(ang)*(r-2);
+      const x2=cx+Math.cos(ang)*(r-2+len),y2=cy+Math.sin(ang)*(r-2+len);
       orbCtx.beginPath(); orbCtx.moveTo(x1,y1); orbCtx.lineTo(x2,y2);
       orbCtx.strokeStyle=`rgba(46,125,50,${alpha})`; orbCtx.lineWidth=2.5; orbCtx.lineCap='round'; orbCtx.stroke();
     }
@@ -757,18 +814,18 @@ function drawMic(){
 }
 function drawResponding(){
   cancelAnimationFrame(rafId);
-  const sz=orbCanvas.width, cx=sz/2, cy=sz/2, r=sz*.32, bars=44;
   let t=0;
   function frame(){
     rafId=requestAnimationFrame(frame); t+=.03;
+    const sz=orbCanvas.width,cx=sz/2,cy=sz/2,r=sz*.32,bars=44;
     orbCtx.clearRect(0,0,sz,sz);
     for(let i=0;i<bars;i++){
       const ang=(i/bars)*Math.PI*2+t;
       const mix=((Math.sin(ang*3+t*2)+1)/2);
-      const rc=Math.round(46+(233-46)*mix), gc=Math.round(125+(30-125)*mix), bc=Math.round(50+(139-50)*mix);
+      const rc=Math.round(46+(233-46)*mix),gc=Math.round(125+(30-125)*mix),bc=Math.round(50+(139-50)*mix);
       const len=r*(.16+.18*Math.abs(Math.sin(ang*4+t*3)));
-      const x1=cx+Math.cos(ang)*r, y1=cy+Math.sin(ang)*r;
-      const x2=cx+Math.cos(ang)*(r+len), y2=cy+Math.sin(ang)*(r+len);
+      const x1=cx+Math.cos(ang)*r,y1=cy+Math.sin(ang)*r;
+      const x2=cx+Math.cos(ang)*(r+len),y2=cy+Math.sin(ang)*(r+len);
       orbCtx.beginPath(); orbCtx.moveTo(x1,y1); orbCtx.lineTo(x2,y2);
       orbCtx.strokeStyle=`rgba(${rc},${gc},${bc},.88)`; orbCtx.lineWidth=2.5; orbCtx.lineCap='round'; orbCtx.stroke();
     }
@@ -778,7 +835,7 @@ function drawResponding(){
 drawIdle();
 
 async function setupAudio(){
-  if(isAudioOk) return true;
+  if(isAudioOk)return true;
   try{
     const stream=await navigator.mediaDevices.getUserMedia({audio:true,video:false});
     audioCtx=new(window.AudioContext||window.webkitAudioContext)();
@@ -786,140 +843,178 @@ async function setupAudio(){
     waveData=new Uint8Array(analyser.frequencyBinCount);
     micSrc=audioCtx.createMediaStreamSource(stream); micSrc.connect(analyser);
     isAudioOk=true; return true;
-  }catch(e){ return false; }
+  }catch(e){ console.warn('Audio setup failed:',e); return false; }
 }
 
-/* ── STATE ──────────────────────────────────────────── */
-let APP_STATE   = 'idle';   // idle | listening | thinking | responding
-let voiceActive = false;
-let isBusy      = false;
-let hasChat     = false;    // se já há mensagens
-
+/* ── DOM REFS ──────────────────────────────────────────── */
 const chatThread  = document.getElementById('chatThread');
 const orbStatusEl = document.getElementById('orbStatus');
 const ltEl        = document.getElementById('listenTranscript');
+const vuEl        = document.getElementById('voiceUserText');
+const vdEl        = document.getElementById('voiceDivider');
 const sendBtn     = document.getElementById('sendBtn');
 const msgInput    = document.getElementById('msgInput');
 const voiceBtn    = document.getElementById('voiceBtn');
 const newChatBtn  = document.getElementById('newChatBtn');
 
-/* Orbe: mostrar / esconder */
-function showOrb(){
+/* ── STATE ─────────────────────────────────────────────── */
+// 'idle' | 'listening' | 'thinking' | 'responding'
+let APP_STATE   = 'idle';
+let voiceActive = false;
+let isBusy      = false;
+let hasChat     = false;
+
+/* ── ORB HELPERS ───────────────────────────────────────── */
+function showOrb(resetChat=false){
   orbStageEl.classList.remove('hidden');
   chatThread.classList.remove('visible');
-  hasChat = false;
+  if(resetChat) hasChat=false;
 }
 function hideOrb(){
   orbStageEl.classList.add('hidden');
   chatThread.classList.add('visible');
+  // re-render canvas size after transition
+  setTimeout(resizeOrb,100);
+}
+function setOrbClass(cls){
+  voiceOrb.classList.remove('active','responding');
+  if(cls) voiceOrb.classList.add(cls);
+}
+function clearVoiceLabel(){
+  ltEl.textContent=''; ltEl.classList.remove('vis','model-reply');
+  vuEl.textContent=''; vuEl.classList.remove('vis');
+  vdEl.classList.remove('vis');
 }
 
-/* ── SPEECH RECOGNITION ─────────────────────────────── */
-const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
+/* ── SPEECH RECOGNITION ────────────────────────────────── */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
 let recog=null, isRecog=false, silTimer=null;
-const SILENCE=1800;
+const SILENCE_MS=1800;
 
 if(SR){
-  recog=new SR(); recog.continuous=true; recog.interimResults=true; recog.lang='pt-BR';
-  recog.onresult=(e)=>{
-    if(!voiceActive)return;
+  recog=new SR();
+  recog.continuous=true;
+  recog.interimResults=true;
+  recog.lang='pt-BR';
+
+  recog.onresult=e=>{
+    if(!voiceActive||APP_STATE==='thinking')return;
     let final='',interim='';
     for(let i=e.resultIndex;i<e.results.length;i++){
       if(e.results[i].isFinal) final  +=e.results[i][0].transcript;
       else                     interim+=e.results[i][0].transcript;
     }
-    const txt=final||interim;
+    const txt=(final||interim).trim();
+    if(!txt)return;
 
-    // Se estava mostrando resposta do modelo → limpa e volta a ouvir
+    // Usuário começa a falar durante resposta → limpa e volta a ouvir
     if(APP_STATE==='responding'){
-      clearModelReply();
+      clearVoiceLabel();
       setOrbClass('active');
       orbStatusEl.textContent='Ouvindo…';
       drawMic();
       APP_STATE='listening';
     }
 
+    // Mostra transcrição
     ltEl.textContent=txt;
     ltEl.classList.remove('model-reply');
     ltEl.classList.add('vis');
+    vuEl.classList.remove('vis');
+    vdEl.classList.remove('vis');
+
     clearTimeout(silTimer);
-    if(final) silTimer=setTimeout(()=>{ if(voiceActive&&APP_STATE==='listening') fromVoice(final.trim()); },SILENCE);
+    if(final){
+      silTimer=setTimeout(()=>{
+        if(voiceActive&&APP_STATE==='listening') fromVoice(final.trim());
+      }, SILENCE_MS);
+    }
   };
-  recog.onerror=(e)=>{
+
+  recog.onerror=e=>{
     if(e.error==='no-speech')return;
-    if(e.error==='not-allowed'){alert('Permissão de microfone negada.');deactivateVoice();}
+    console.warn('SR error:',e.error);
+    if(e.error==='not-allowed'){ alert('Permissão de microfone negada.'); deactivateVoice(); }
   };
+
   recog.onend=()=>{
     isRecog=false;
-    // Reinicia apenas se ativo e não está pensando
-    if(voiceActive&&APP_STATE!=='thinking') try{recog.start();isRecog=true;}catch(_){}
+    // Reinicia automaticamente se ainda em modo voz e não pensando
+    if(voiceActive&&(APP_STATE==='listening'||APP_STATE==='responding')){
+      try{ recog.start(); isRecog=true; }catch(_){}
+    }
   };
 }
 
-/* ── VOICE ──────────────────────────────────────────── */
-function setOrbClass(cls){
-  voiceOrb.classList.remove('active','responding');
-  if(cls) voiceOrb.classList.add(cls);
-}
-
-function clearModelReply(){
-  ltEl.classList.remove('model-reply');
-  ltEl.textContent='';
-}
-
+/* ── VOICE MODE ────────────────────────────────────────── */
 async function activateVoice(){
-  voiceActive=true; voiceBtn.classList.add('active');
-  const ok=await setupAudio(); if(!ok){deactivateVoice();return;}
-  showOrb(); stopPH();
+  if(voiceActive)return;
+  voiceActive=true;
+  voiceBtn.classList.add('active');
+  const ok=await setupAudio();
+  if(!ok){ deactivateVoice(); return; }
+
+  // Mostra orbe sem resetar hasChat (histórico permanece)
+  showOrb(false);
+  stopPH();
   setOrbClass('active');
   orbStatusEl.textContent='Ouvindo…';
-  ltEl.textContent=''; ltEl.classList.remove('model-reply'); ltEl.classList.add('vis');
-  drawMic(); APP_STATE='listening';
-  if(recog&&!isRecog) try{recog.start();isRecog=true;}catch(_){}
+  clearVoiceLabel();
+  drawMic();
+  APP_STATE='listening';
+  if(recog&&!isRecog) try{ recog.start(); isRecog=true; }catch(_){}
 }
 
 function deactivateVoice(){
-  voiceActive=false; isRecog=false;
+  voiceActive=false;
+  isRecog=false;
   voiceBtn.classList.remove('active');
   clearTimeout(silTimer);
-  if(recog) try{recog.stop();}catch(_){}
+  if(recog) try{ recog.stop(); }catch(_){}
   setOrbClass('');
   orbStatusEl.textContent='Olá! Como posso ajudar?';
-  ltEl.classList.remove('vis','model-reply');
+  clearVoiceLabel();
   drawIdle();
-  if(hasChat){ hideOrb(); } else { startPH(); }
+  // Volta para chat se tinha mensagens, senão exibe orbe idle
+  if(hasChat){ hideOrb(); }
+  else       { startPH(); }
   APP_STATE='idle';
 }
 
-voiceBtn.addEventListener('click',()=>{ voiceActive?deactivateVoice():activateVoice(); });
+voiceBtn.addEventListener('click', ()=>{ voiceActive?deactivateVoice():activateVoice(); });
 
-/* ── NEW CHAT ────────────────────────────────────────── */
+/* ── NEW CHAT ──────────────────────────────────────────── */
 newChatBtn.addEventListener('click',()=>{
   if(voiceActive) deactivateVoice();
   chatThread.innerHTML='';
   hasChat=false;
-  showOrb(); startPH();
+  showOrb(true);
+  startPH();
   orbStatusEl.textContent='Olá! Como posso ajudar?';
+  setOrbClass('');
+  drawIdle();
   APP_STATE='idle';
 });
 
-/* ── CHAT RENDERING ─────────────────────────────────── */
+/* ── CHAT RENDERING ────────────────────────────────────── */
 function diamondAvatar(){
-  // Losango com 5 partículas distribuídas
-  return `<div class="model-avatar"><div class="diamond-wrap">
+  return `<div class="model-avatar">
     <svg viewBox="0 0 22 22" xmlns="http://www.w3.org/2000/svg">
-      <!-- losango -->
-      <polygon points="11,1 21,11 11,21 1,11"
-        fill="none" stroke="#2E7D32" stroke-width="1.4"
-        stroke-linejoin="round"/>
-      <!-- partículas paradas -->
+      <polygon points="11,1 21,11 11,21 1,11" fill="none" stroke="#2E7D32" stroke-width="1.4" stroke-linejoin="round"/>
       <circle class="diamond-particle" cx="11" cy="11" r="1.6"/>
-      <circle class="diamond-particle" cx="7"  cy="9"  r="1.2" opacity="0.55"/>
-      <circle class="diamond-particle" cx="15" cy="9"  r="1.2" opacity="0.55"/>
-      <circle class="diamond-particle" cx="8"  cy="14" r="1.0" opacity="0.40"/>
-      <circle class="diamond-particle" cx="14" cy="14" r="1.0" opacity="0.40"/>
+      <circle class="diamond-particle" cx="7"  cy="9"  r="1.2" opacity=".55"/>
+      <circle class="diamond-particle" cx="15" cy="9"  r="1.2" opacity=".55"/>
+      <circle class="diamond-particle" cx="8"  cy="14" r="1.0" opacity=".40"/>
+      <circle class="diamond-particle" cx="14" cy="14" r="1.0" opacity=".40"/>
     </svg>
-  </div></div>`;
+  </div>`;
+}
+
+function escHtml(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function renderMd(t){
+  if(typeof marked==='undefined') return t.replace(/\n/g,'<br>');
+  try{ return marked.parse(t); }catch{ return t.replace(/\n/g,'<br>'); }
 }
 
 function addUserMsg(text){
@@ -931,80 +1026,82 @@ function addUserMsg(text){
 }
 
 function addModelRow(){
-  // Cria linha do modelo e retorna o div de conteúdo (vazio por ora)
   const row=document.createElement('div');
   row.className='msg-row model';
   row.innerHTML=diamondAvatar();
-  const content=document.createElement('div');
-  content.className='msg-content streaming';
-  row.appendChild(content);
+  const c=document.createElement('div');
+  c.className='msg-content streaming';
+  row.appendChild(c);
   chatThread.appendChild(row);
   scrollChat();
-  return content;
+  return c;
+}
+
+function addModelFinal(html){
+  const row=document.createElement('div');
+  row.className='msg-row model';
+  row.innerHTML=diamondAvatar();
+  const c=document.createElement('div');
+  c.className='msg-content';
+  c.innerHTML=html;
+  row.appendChild(c);
+  chatThread.appendChild(row);
 }
 
 function scrollChat(){ chatThread.scrollTop=chatThread.scrollHeight; }
-function escHtml(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function md(t){
-  try{ return typeof marked!=='undefined'?marked.parse(t):t.replace(/\n/g,'<br>'); }
-  catch{ return t.replace(/\n/g,'<br>'); }
-}
 
-/* Renderiza markdown progressivo mantendo scroll no fundo */
-function renderStream(el, rawText){
-  el.innerHTML = md(rawText);
-  scrollChat();
-}
+/* ── SUBMIT ────────────────────────────────────────────── */
+async function submitMsg(text, isVoice=false){
+  text=text.trim();
+  if(isBusy||!text)return;
 
-/* ── SUBMIT com streaming SSE ────────────────────────── */
-async function submitMsg(text, isVoiceMode=false){
-  if(isBusy||!text.trim())return;
   const apiKey=window.__yraApiKey;
-  if(!apiKey){ const c=addModelRow(); c.innerHTML='⚠️ Nenhuma API key encontrada. Configure em Configurações.'; return; }
+  if(!apiKey){
+    if(!isVoice){ addUserMsg(text); }
+    const c=addModelRow(); c.classList.remove('streaming');
+    c.innerHTML='⚠️ API key não encontrada. Configure em Configurações.';
+    if(!isVoice){ if(!hasChat){hasChat=true;hideOrb();} scrollChat(); }
+    return;
+  }
 
-  isBusy=true; msgInput.value=''; autoResize(); sendBtn.disabled=true;
-  APP_STATE='thinking'; stopPH();
+  isBusy=true;
+  if(!isVoice){ msgInput.value=''; autoResize(); }
+  sendBtn.disabled=true;
+  APP_STATE='thinking';
+  stopPH();
 
-  // Modo voz: fica no orbe, mostra "pensando…"
-  // Modo texto: esconde orbe, vai para o chat
-  if(isVoiceMode){
-    setOrbClass('');
-    orbStatusEl.textContent='Pensando…';
+  if(isVoice){
+    /* Modo voz: fica no orbe, mostra msg do user acima e "…" abaixo */
+    vuEl.textContent=text;
+    vuEl.classList.add('vis');
+    vdEl.classList.add('vis');
+    ltEl.textContent='…';
     ltEl.classList.remove('model-reply');
-    ltEl.textContent='';
-    // Para o mic durante o processamento
-    if(recog&&isRecog) try{recog.stop();isRecog=false;}catch(_){}
+    ltEl.classList.add('vis');
+    setOrbClass('');
+    orbStatusEl.textContent='Gerando resposta…';
     drawIdle();
+    /* Para o mic durante processamento */
+    if(recog&&isRecog){ try{recog.stop();}catch(_){} isRecog=false; }
+    /* Salva no histórico (chat está hidden) */
+    if(!hasChat) hasChat=true;
+    addUserMsg(text);
   } else {
+    /* Modo texto: esconde orbe, mostra chat */
     if(!hasChat){ hasChat=true; hideOrb(); }
     addUserMsg(text);
   }
 
-  // No modo voz, adiciona mensagem do user no chat (invisível) para histórico
-  // mas não muda para o chat thread
-  if(isVoiceMode){
-    const row=document.createElement('div');
-    row.className='msg-row user';
-    row.innerHTML=`<div class="msg-content">${escHtml(text)}</div>`;
-    chatThread.appendChild(row);
-  }
-
-  // Cria o elemento de resposta do modelo apenas no modo texto
-  let contentEl = null;
-  if(!isVoiceMode){
-    contentEl = addModelRow();
+  let contentEl=null;
+  if(!isVoice){
+    contentEl=addModelRow();
     contentEl.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
   }
 
-  let accumulated = '';
-  let firstChunk  = true;
-
-  // Tokens máximos: voz = curto; texto = longo
-  const maxTokens = isVoiceMode ? 120 : 1024;
-
-  // Instrução extra para modo voz: resposta curta
-  const systemHint = isVoiceMode
-    ? text + '\n\n[Responda de forma muito breve, 1-2 frases, como numa conversa falada.]'
+  let accumulated='', firstChunk=true;
+  const maxTok = isVoice ? 100 : 1024;
+  const prompt  = isVoice
+    ? text+'\n\n[INSTRUÇÃO: responda em no máximo 2 frases curtas e diretas.]'
     : text;
 
   try{
@@ -1013,105 +1110,140 @@ async function submitMsg(text, isVoiceMode=false){
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body:JSON.stringify({
-        contents:[{role:'user',parts:[{text:systemHint}]}],
-        generationConfig:{temperature:.85,maxOutputTokens:maxTokens}
+        contents:[{role:'user',parts:[{text:prompt}]}],
+        generationConfig:{temperature:.85,maxOutputTokens:maxTok}
       })
     });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
 
-    if(!res.ok){ throw new Error(`HTTP ${res.status}`); }
-
-    const reader  = res.body.getReader();
-    const decoder = new TextDecoder();
-    let   buffer  = '';
+    const reader=res.body.getReader(), decoder=new TextDecoder();
+    let buf='';
 
     while(true){
-      const {done, value} = await reader.read();
-      if(done) break;
-
-      buffer += decoder.decode(value, {stream:true});
-      const lines = buffer.split('\n');
-      buffer = lines.pop();
-
+      const {done,value}=await reader.read();
+      if(done)break;
+      buf+=decoder.decode(value,{stream:true});
+      const lines=buf.split('\n');
+      buf=lines.pop();
       for(const line of lines){
-        if(!line.startsWith('data:')) continue;
-        const jsonStr = line.slice(5).trim();
-        if(jsonStr==='[DONE]') break;
+        if(!line.startsWith('data:'))continue;
+        const js=line.slice(5).trim();
+        if(js==='[DONE]')break;
         try{
-          const chunk = JSON.parse(jsonStr);
-          const piece = chunk.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          if(piece){
-            accumulated += piece;
-            if(isVoiceMode){
-              // Exibe a resposta acumulada no lugar da transcrição
-              ltEl.textContent = accumulated;
-              ltEl.classList.add('vis','model-reply');
-            } else {
-              if(firstChunk){ contentEl.innerHTML=''; firstChunk=false; }
-              renderStream(contentEl, accumulated);
-            }
+          const chunk=JSON.parse(js);
+          const piece=chunk.candidates?.[0]?.content?.parts?.[0]?.text||'';
+          if(!piece)continue;
+          accumulated+=piece;
+          if(isVoice){
+            firstChunk=false;
+            ltEl.textContent=accumulated;
+            ltEl.classList.add('vis','model-reply');
+          } else {
+            if(firstChunk){ contentEl.innerHTML=''; firstChunk=false; }
+            contentEl.innerHTML=renderMd(accumulated);
+            scrollChat();
           }
         }catch(_){}
       }
     }
 
-    if(!isVoiceMode){
-      if(accumulated) renderStream(contentEl, accumulated);
-      else if(firstChunk) contentEl.innerHTML='Sem resposta.';
+    // Render final
+    if(!isVoice){
+      if(accumulated){ contentEl.innerHTML=renderMd(accumulated); scrollChat(); }
+      else if(firstChunk){ contentEl.innerHTML='(sem resposta)'; }
+    } else if(firstChunk){
+      ltEl.textContent='(sem resposta)';
+      ltEl.classList.add('vis','model-reply');
     }
 
   } catch(err){
-    if(isVoiceMode){
-      ltEl.textContent='Erro ao conectar.';
+    const errMsg=`⚠️ Erro: ${err.message}`;
+    if(isVoice){
+      ltEl.textContent='Não foi possível conectar.';
       ltEl.classList.add('vis','model-reply');
     } else {
-      if(contentEl) contentEl.innerHTML=`⚠️ Não foi possível conectar.<br><small style="color:#999">${err.message}</small>`;
+      if(contentEl){ contentEl.innerHTML=errMsg; }
     }
+    console.error('submitMsg error:',err);
   } finally {
     if(contentEl) contentEl.classList.remove('streaming');
-    if(!isVoiceMode) scrollChat();
+    if(!isVoice) scrollChat();
     isBusy=false; sendBtn.disabled=false;
 
-    if(isVoiceMode){
-      // Resposta exibida no orbe — aguarda o user falar para limpar
+    if(isVoice){
+      /* Guarda resposta no histórico e espera o user falar */
+      addModelFinal(renderMd(accumulated||'(sem resposta)'));
       APP_STATE='responding';
       setOrbClass('responding');
       orbStatusEl.textContent='Fale para continuar…';
       drawResponding();
-      // Reativa o microfone para capturar próxima fala
-      if(recog&&!isRecog) try{recog.start();isRecog=true;}catch(_){}
+      /* Reativa mic */
+      if(recog&&!isRecog){ try{recog.start();isRecog=true;}catch(_){} }
     } else {
       APP_STATE='idle';
     }
   }
 }
 
+/* Chamado pelo recognition após silêncio */
 function fromVoice(text){
-  if(!text)return;
-  // Limpa transcrição
-  ltEl.classList.remove('model-reply');
-  ltEl.textContent='';
-  // Garante que hasChat está true para histórico
-  if(!hasChat){ hasChat=true; }
+  if(!text||!voiceActive)return;
+  /* ltEl ainda mostrando transcrição — submitMsg vai sobrescrever com "…" */
   submitMsg(text, true);
 }
 
-/* ── INPUT ──────────────────────────────────────────── */
+/* ── INPUT HANDLING ────────────────────────────────────── */
 function autoResize(){
   msgInput.style.height='auto';
   msgInput.style.height=Math.min(msgInput.scrollHeight,140)+'px';
 }
 msgInput.addEventListener('input', autoResize);
-msgInput.addEventListener('keydown',e=>{
+
+msgInput.addEventListener('keydown', e=>{
   if(e.key==='Enter'&&!e.shiftKey){
     e.preventDefault();
     const t=msgInput.value.trim();
-    if(t){ if(voiceActive)deactivateVoice(); submitMsg(t); }
+    if(!t)return;
+    if(voiceActive) deactivateVoice();
+    submitMsg(t,false);
   }
 });
-sendBtn.addEventListener('click',()=>{
+
+sendBtn.addEventListener('click', ()=>{
   const t=msgInput.value.trim();
-  if(t){ if(voiceActive)deactivateVoice(); submitMsg(t); }
+  if(!t)return;
+  if(voiceActive) deactivateVoice();
+  submitMsg(t,false);
 });
+
+/* ── DRAWER MOBILE ─────────────────────────────────────── */
+const sidebar        = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+const menuToggle     = document.getElementById('menuToggle');
+
+function openDrawer(){
+  sidebar.classList.add('open');
+  sidebarOverlay.classList.add('vis');
+}
+function closeDrawer(){
+  sidebar.classList.remove('open');
+  sidebarOverlay.classList.remove('vis');
+}
+
+menuToggle.addEventListener('click', ()=>sidebar.classList.contains('open')?closeDrawer():openDrawer());
+sidebarOverlay.addEventListener('click', closeDrawer);
+
+// Fechar ao clicar em item de nav no mobile
+document.querySelectorAll('.nav-item').forEach(el=>{
+  el.addEventListener('click', ()=>{ if(window.innerWidth<=768)closeDrawer(); });
+});
+
+// Swipe para esquerda fecha
+let touchStartX=0;
+sidebar.addEventListener('touchstart', e=>{ touchStartX=e.touches[0].clientX; },{passive:true});
+sidebar.addEventListener('touchmove',  e=>{
+  if(touchStartX - e.touches[0].clientX > 40) closeDrawer();
+},{passive:true});
 </script>
 </body>
 </html>
