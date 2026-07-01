@@ -145,6 +145,33 @@ body {
     color: var(--text-light);
 }
 
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-name {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.btn-logout {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-light);
+    transition: 0.2s;
+}
+.btn-logout:hover {
+    background: #f5f5f5;
+    color: var(--text-dark);
+}
+
 /* Estrutura das Notas (Split) */
 .notes-container {
     display: flex;
@@ -344,6 +371,9 @@ body {
         margin-left: 70px;
         padding: 20px;
     }
+    .user-area .user-name {
+        display: none;
+    }
 }
 </style>
 </head>
@@ -402,6 +432,10 @@ body {
             <h2>Bloco de Notas</h2>
             <p>Guarde pensamentos, instruções e rascunhos rápidos.</p>
         </div>
+        <div class="user-area">
+            <span class="user-name" id="userNameDisplay">Carregando...</span>
+            <button class="btn-logout" id="logoutBtn">Sair</button>
+        </div>
     </div>
 
     <div class="notes-container">
@@ -421,9 +455,9 @@ body {
 
         <!-- Painel de Edição -->
         <div class="note-editor-pane">
-            <div id="editorContent" class="hidden" style="display: flex; flex-direction: column; flex: 1;">
+            <div id="editorContent" style="display: none; flex-direction: column; flex: 1;">
                 <div class="editor-header">
-                    <div class="editor-status" id="saveStatus">Todas as alterações salvas</div>
+                    <div class="editor-status" id="saveStatus">Pronto</div>
                     <div class="editor-actions">
                         <button class="btn-editor btn-editor-delete" id="deleteNoteBtn" title="Excluir Nota">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
@@ -442,16 +476,59 @@ body {
     </div>
 </div>
 
-<script>
-// ============ DATABASE LOCAL (LOCAL STORAGE) ============
-let notes = JSON.parse(localStorage.getItem('yra-notes')) || [
-    { id: 1, title: 'Ideias de Projetos', text: 'Desenvolver automação para atendimento...\n- Integrar com banco de dados\n- Melhorar design da UI' },
-    { id: 2, title: 'Instruções do Sistema', text: 'Evitar o uso de termos genéricos no chat com clientes.' }
-];
+<script type="importmap">
+{
+    "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+    }
+}
+</script>
 
-let activeNoteId = null;
-let saveTimeout = null;
+<script type="module">
+// ============================
+// IMPORTS DO FIREBASE
+// ============================
+import { initializeApp } from "firebase/app";
+import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+} from "firebase/auth";
+import {
+    getFirestore,
+    collection,
+    doc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    query,
+    orderBy,
+    onSnapshot,
+    serverTimestamp,
+    getDoc
+} from "firebase/firestore";
 
+// ============================
+// CONFIGURAÇÃO DO FIREBASE
+// ============================
+const firebaseConfig = {
+    apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+    authDomain: "yra-syra.firebaseapp.com",
+    projectId: "yra-syra",
+    storageBucket: "yra-syra.firebasestorage.app",
+    messagingSenderId: "555145505684",
+    appId: "1:555145505684:web:aa1ef14072653e41057d81"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// ============================
+// ELEMENTOS DOM
+// ============================
 const notesListContainer = document.getElementById("notesListContainer");
 const emptyEditorState = document.getElementById("emptyEditorState");
 const editorContent = document.getElementById("editorContent");
@@ -459,14 +536,138 @@ const noteTitleInput = document.getElementById("noteTitleInput");
 const noteTextInput = document.getElementById("noteTextInput");
 const saveStatus = document.getElementById("saveStatus");
 const noteSearchInput = document.getElementById("noteSearchInput");
+const newNoteBtn = document.getElementById("newNoteBtn");
+const deleteNoteBtn = document.getElementById("deleteNoteBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const userNameDisplay = document.getElementById("userNameDisplay");
+
+// ============================
+// ESTADO GLOBAL
+// ============================
+let currentUserId = null;          // UID do usuário
+let currentNoteId = null;         // ID da nota selecionada
+let allNotes = [];               // array com os dados das notas (do snapshot)
+let saveTimeout = null;
+
+// ============================
+// FUNÇÕES CRUD (com Firestore)
+// ============================
+
+// Referência à subcoleção Notes do usuário
+function getUserNotesRef() {
+    if (!currentUserId) throw new Error("Usuário não autenticado");
+    return collection(db, "Users", currentUserId, "Notes");
+}
+
+// Carregar notas em tempo real (onSnapshot)
+function subscribeToNotes() {
+    if (!currentUserId) return;
+
+    const notesRef = getUserNotesRef();
+    const q = query(notesRef, orderBy("createdAt", "desc"));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        allNotes = [];
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            allNotes.push({
+                id: doc.id,
+                title: data.title || "Sem título",
+                text: data.text || "",
+                createdAt: data.createdAt?.toDate?.() || new Date(),
+                updatedAt: data.updatedAt?.toDate?.() || new Date()
+            });
+        });
+
+        // Atualizar lista
+        renderNotesList(noteSearchInput.value);
+
+        // Se a nota atual foi removida, limpar editor
+        if (currentNoteId && !allNotes.some(n => n.id === currentNoteId)) {
+            clearEditor();
+        }
+    }, (error) => {
+        console.error("Erro ao carregar notas:", error);
+        alert("Erro ao carregar notas. Verifique sua conexão.");
+    });
+
+    // Retorna função para cancelar inscrição (opcional)
+    return unsubscribe;
+}
+
+// Adicionar nova nota
+async function addNote() {
+    if (!currentUserId) return;
+
+    const notesRef = getUserNotesRef();
+    try {
+        const docRef = await addDoc(notesRef, {
+            title: "Nova Nota",
+            text: "",
+            createdAt: serverTimestamp(),
+            updatedAt: serverTimestamp()
+        });
+        // A seleção será feita automaticamente pelo snapshot
+    } catch (error) {
+        console.error("Erro ao criar nota:", error);
+        alert("Não foi possível criar a nota.");
+    }
+}
+
+// Atualizar nota existente
+async function updateNote(noteId, title, text) {
+    if (!currentUserId || !noteId) return;
+
+    const noteRef = doc(db, "Users", currentUserId, "Notes", noteId);
+    try {
+        await updateDoc(noteRef, {
+            title: title,
+            text: text,
+            updatedAt: serverTimestamp()
+        });
+        // O snapshot atualizará a lista
+    } catch (error) {
+        console.error("Erro ao atualizar nota:", error);
+        alert("Não foi possível salvar a nota.");
+    }
+}
+
+// Deletar nota
+async function deleteNote(noteId) {
+    if (!currentUserId || !noteId) return;
+    if (!confirm("Tem certeza que deseja excluir esta nota?")) return;
+
+    const noteRef = doc(db, "Users", currentUserId, "Notes", noteId);
+    try {
+        await deleteDoc(noteRef);
+        // O snapshot atualizará a lista
+        clearEditor();
+    } catch (error) {
+        console.error("Erro ao excluir nota:", error);
+        alert("Não foi possível excluir a nota.");
+    }
+}
+
+// ============================
+// RENDERIZAÇÃO DA LISTA
+// ============================
 
 function renderNotesList(filter = "") {
     notesListContainer.innerHTML = "";
-    const filteredNotes = notes.filter(n => n.title.toLowerCase().includes(filter.toLowerCase()) || n.text.toLowerCase().includes(filter.toLowerCase()));
 
-    filteredNotes.forEach(note => {
+    const filtered = allNotes.filter(n =>
+        n.title.toLowerCase().includes(filter.toLowerCase()) ||
+        n.text.toLowerCase().includes(filter.toLowerCase())
+    );
+
+    if (filtered.length === 0) {
+        notesListContainer.innerHTML = `<div style="padding: 20px; text-align: center; color: var(--text-light);">Nenhuma nota encontrada.</div>`;
+        return;
+    }
+
+    filtered.forEach(note => {
         const item = document.createElement("div");
-        item.className = `note-item ${note.id === activeNoteId ? 'active' : ''}`;
+        item.className = `note-item ${note.id === currentNoteId ? 'active' : ''}`;
         item.onclick = () => selectNote(note.id);
 
         const snippet = note.text ? note.text.substring(0, 35) + "..." : "Sem descrição...";
@@ -479,76 +680,136 @@ function renderNotesList(filter = "") {
     });
 }
 
+// ============================
+// SELEÇÃO E EDIÇÃO
+// ============================
+
 function selectNote(id) {
-    activeNoteId = id;
-    const note = notes.find(n => n.id === id);
+    const note = allNotes.find(n => n.id === id);
     if (!note) return;
 
-    emptyEditorState.classList.add("hidden");
-    editorContent.style.display = "flex";
-
+    currentNoteId = id;
+    // Atualiza o editor
     noteTitleInput.value = note.title;
     noteTextInput.value = note.text;
-    saveStatus.innerText = "Salvo localmente";
+    saveStatus.innerText = "Pronto";
+
+    emptyEditorState.style.display = "none";
+    editorContent.style.display = "flex";
 
     renderNotesList(noteSearchInput.value);
 }
 
-// Criar nova nota
-document.getElementById("newNoteBtn").onclick = () => {
-    const newNote = {
-        id: Date.now(),
-        title: "Nova Nota",
-        text: ""
-    };
-    notes.unshift(newNote);
-    saveNotes();
-    selectNote(newNote.id);
-};
-
-// Excluir Nota
-document.getElementById("deleteNoteBtn").onclick = () => {
-    if (!activeNoteId) return;
-    notes = notes.filter(n => n.id !== activeNoteId);
-    saveNotes();
-    activeNoteId = null;
+function clearEditor() {
+    currentNoteId = null;
     editorContent.style.display = "none";
-    emptyEditorState.classList.remove("hidden");
-    renderNotesList(noteSearchInput.value);
-};
+    emptyEditorState.style.display = "flex";
+    noteTitleInput.value = "";
+    noteTextInput.value = "";
+    saveStatus.innerText = "Pronto";
+}
 
-// Salvamento Automático por debounce
+// ============================
+// SALVAMENTO AUTOMÁTICO (DEBOUNCE)
+// ============================
+
 function autoSave() {
-    if (!activeNoteId) return;
-    saveStatus.innerText = "Escrevendo...";
-    
+    if (!currentNoteId) return;
+
+    const title = noteTitleInput.value;
+    const text = noteTextInput.value;
+
+    // Encontra a nota no array local para evitar atualizações desnecessárias
+    const current = allNotes.find(n => n.id === currentNoteId);
+    if (current && current.title === title && current.text === text) {
+        saveStatus.innerText = "Pronto";
+        return;
+    }
+
+    saveStatus.innerText = "Salvando...";
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
-        const note = notes.find(n => n.id === activeNoteId);
-        if (note) {
-            note.title = noteTitleInput.value;
-            note.text = noteTextInput.value;
-            saveNotes();
-            saveStatus.innerText = "Alterações salvas";
-            renderNotesList(noteSearchInput.value);
-        }
+        updateNote(currentNoteId, title, text).then(() => {
+            saveStatus.innerText = "Salvo";
+        }).catch(() => {
+            saveStatus.innerText = "Erro ao salvar";
+        });
     }, 1000);
 }
 
-noteTitleInput.oninput = autoSave;
-noteTextInput.oninput = autoSave;
-noteSearchInput.oninput = (e) => renderNotesList(e.target.value);
+// ============================
+// EVENT LISTENERS
+// ============================
 
-function saveNotes() {
-    localStorage.setItem('yra-notes', JSON.stringify(notes));
-}
+newNoteBtn.addEventListener("click", addNote);
 
-// Carregamento inicial
-renderNotesList();
-</script>
+deleteNoteBtn.addEventListener("click", () => {
+    if (currentNoteId) deleteNote(currentNoteId);
+});
 
-<script>
-// ============ ANIMAÇÃO DO LOGO LATERAL (BOLINHAS) ============
+noteTitleInput.addEventListener("input", autoSave);
+noteTextInput.addEventListener("input", autoSave);
+
+noteSearchInput.addEventListener("input", (e) => {
+    renderNotesList(e.target.value);
+});
+
+logoutBtn.addEventListener("click", async () => {
+    try {
+        await signOut(auth);
+        // Redirecionamento será feito pelo onAuthStateChanged
+    } catch (error) {
+        console.error("Erro ao sair:", error);
+    }
+});
+
+// ============================
+// AUTENTICAÇÃO
+// ============================
+
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        // Redireciona para login
+        window.location.href = "index.html";
+        return;
+    }
+
+    // Usuário autenticado
+    currentUserId = user.uid;
+
+    // Exibir nome (se disponível)
+    userNameDisplay.textContent = user.displayName || user.email || "Usuário";
+
+    // Iniciar escuta das notas
+    subscribeToNotes();
+
+    // Opcional: buscar documento do usuário para garantir que existe
+    try {
+        const userDoc = await getDoc(doc(db, "Users", currentUserId));
+        if (!userDoc.exists()) {
+            // Se o documento do usuário não existir, podemos criar com dados básicos
+            // (isso segue a estrutura do miu.py)
+            await setDoc(doc(db, "Users", currentUserId), {
+                username: user.displayName || "",
+                email: user.email || "",
+                phone: "",
+                birth_date: "",
+                security_code: "",
+                monthly_cost: 0.0,
+                status: "active",
+                role: "user",
+                created_at: serverTimestamp(),
+                updated_at: serverTimestamp()
+            });
+        }
+    } catch (error) {
+        console.warn("Erro ao verificar documento do usuário:", error);
+    }
+});
+
+// ============================
+// ANIMAÇÃO DAS BOLINHAS (SIDEBAR)
+// ============================
 const sidebarDots = document.querySelectorAll(".dot-sidebar");
 const positions = [
     {x: 0, y: -10}, 
@@ -576,6 +837,7 @@ function startSidebarAnimation() {
 }
 
 startSidebarAnimation();
+
 </script>
 </body>
 </html>
