@@ -1,3 +1,5 @@
+--- START OF FILE Paste July 02, 2026 - 3:41PM ---
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -222,7 +224,7 @@ body {
 
 /* Painel de Reasoning */
 .reasoning-pane {
-  width: 300px;
+  width: 320px;
   background: var(--white);
   border-right: 1px solid var(--border);
   display: flex;
@@ -266,10 +268,12 @@ body {
   gap: 14px;
 }
 .rp-log-entry {
-  font-size: 12.5px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.55;
   color: var(--text-muted);
   animation: msgIn .2s ease;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 8px;
 }
 .rp-log-entry.active {
   color: var(--g1);
@@ -435,14 +439,15 @@ body {
 .plugin-tag-badge {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   font-size: 11px;
   font-weight: 600;
   background: rgba(46,125,50,0.07);
   color: var(--g1);
-  padding: 3px 8px;
+  padding: 4px 9px;
   border-radius: 6px;
   margin-top: 8px;
+  border: 1px solid rgba(46,125,50,0.1);
 }
 
 /* Losango avatar */
@@ -503,7 +508,7 @@ body {
 .typing-dots span:nth-child(3){animation-delay:.4s}
 @keyframes blink{0%,80%,100%{opacity:.25;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 
-/* ══ INPUT FOOTER ══════════════════════════════════════ */
+/* ══ INPUT FOOTER & ATTACHMENTS ════════════════════════ */
 .footer {
   padding:10px 32px 20px;
   flex-shrink:0;
@@ -511,18 +516,71 @@ body {
   border-top:1px solid var(--border);
   padding-bottom:max(20px, calc(14px + env(safe-area-inset-bottom)));
 }
-.input-wrap {
+.input-area-container {
   max-width:680px; margin:0 auto;
-  display:flex; align-items:flex-end; gap:8px;
+  display: flex;
+  flex-direction: column;
   background:var(--bg);
   border:1px solid rgba(46,125,50,.15);
   border-radius:14px;
-  padding:10px 10px 10px 16px;
   transition:border-color .2s, box-shadow .2s;
 }
-.input-wrap:focus-within {
+.input-area-container:focus-within {
   border-color:rgba(46,125,50,.35);
   box-shadow:0 0 0 3px rgba(46,125,50,.06);
+}
+
+/* Área de pré-visualização de anexo */
+.attachment-preview-bar {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px dashed rgba(46, 125, 50, 0.12);
+  background: rgba(46, 125, 50, 0.02);
+  border-top-left-radius: 13px;
+  border-top-right-radius: 13px;
+}
+.attachment-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(46, 125, 50, 0.08);
+  border: 1px solid rgba(46, 125, 50, 0.15);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11.5px;
+  color: var(--g1);
+  font-weight: 500;
+  max-width: 280px;
+}
+.attachment-chip span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.attachment-chip-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin-left: 2px;
+}
+.attachment-chip-close:hover {
+  color: #b71c1c;
+}
+.attachment-chip-close svg {
+  width: 12px; height: 12px; stroke: currentColor; fill: none; stroke-width: 2.5;
+}
+
+.input-wrap {
+  display:flex;
+  align-items:flex-end;
+  gap:8px;
+  padding:10px 10px 10px 16px;
 }
 .msg-input {
   flex:1; border:none; outline:none;
@@ -645,6 +703,7 @@ body {
   .msg-content { max-width:90%; font-size:13.5px; }
   .msg-row.user .msg-content { font-size:13px; padding:9px 13px; }
 
+  .input-area-container { border-radius:12px; }
   .input-wrap { padding:8px 8px 8px 14px; }
   .iact-btn { width:34px; height:34px; }
   
@@ -740,7 +799,7 @@ body {
         <div class="rp-header">
           <span class="rp-title">
             <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            Análise e Integrações
+            Análise e Integrações (Orquestrador)
           </span>
         </div>
         <div class="rp-content" id="reasoningContent">
@@ -780,18 +839,45 @@ body {
   </div>
 
   <footer class="footer">
-    <div class="input-wrap">
-      <textarea class="msg-input" id="msgInput"
-        placeholder="Mensagem para o Yra…"
-        rows="1" autocomplete="off"
-        autocorrect="off" spellcheck="true"></textarea>
-      <div class="input-actions">
-        <button class="iact-btn voice-toggle" id="voiceBtn" aria-label="Modo voz">
-          <div class="wv"><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="input-area-container">
+      
+      <!-- Preview de Anexos -->
+      <div class="attachment-preview-bar" id="attachmentPreviewBar">
+        <div class="attachment-chip">
+          <svg style="width:13px; height:13px; stroke:currentColor; fill:none; stroke-width:2; flex-shrink:0;" viewBox="0 0 24 24">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+          </svg>
+          <span id="attachmentFileName">documento.txt</span>
+          <button class="attachment-chip-close" id="attachmentRemoveBtn" aria-label="Remover anexo">
+            <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="input-wrap">
+        <!-- Input invisível de Arquivo -->
+        <input type="file" id="fileAttachInput" accept=".txt,.csv,.md,.json,.js,.py,.html,.css" style="display:none;" />
+        
+        <!-- Botão Clip Elegant -->
+        <button class="iact-btn" id="clipBtn" title="Anexar arquivo de texto (.txt, .md, .csv, .json...)" aria-label="Anexar arquivo">
+          <svg viewBox="0 0 24 24" style="width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round;">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+          </svg>
         </button>
-        <button class="iact-btn send-btn" id="sendBtn" aria-label="Enviar">
-          <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="white" stroke="none"/></svg>
-        </button>
+
+        <textarea class="msg-input" id="msgInput"
+          placeholder="Mensagem para o Yra…"
+          rows="1" autocomplete="off"
+          autocorrect="off" spellcheck="true"></textarea>
+          
+        <div class="input-actions">
+          <button class="iact-btn voice-toggle" id="voiceBtn" aria-label="Modo voz">
+            <div class="wv"><span></span><span></span><span></span><span></span><span></span></div>
+          </button>
+          <button class="iact-btn send-btn" id="sendBtn" aria-label="Enviar">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="white" stroke="none"/></svg>
+          </button>
+        </div>
       </div>
     </div>
     <div class="input-hint">Yra pode cometer erros. Feito por @Syradevops.</div>
@@ -870,13 +956,27 @@ onAuthStateChanged(auth, async user => {
     snap.forEach(doc => {
       const data = doc.data();
       if (data.enabled !== false) {
-        window.__yraActivePlugins.push(data);
+        // Enriquecimento do registro do plugin conforme nova arquitetura
+        const enrichedPlugin = {
+          id: data.id || doc.id,
+          name: data.name,
+          icon: data.icon || '🧩',
+          description: data.description || 'Consulta dados remotos',
+          request_endpoint: data.request_endpoint,
+          router_rule: data.router_rule || '',
+          keywords: (data.keywords || data.router_rule || '').toLowerCase().match(/[a-z0-9à-ú]+/g) || [],
+          priority: data.priority || 50,
+          timeout: data.timeout || 6000,
+          cache: true
+        };
+        
+        window.__yraActivePlugins.push(enrichedPlugin);
         
         // Renderiza o plugin ativo no menu lateral
         if (listEl) {
           const item = document.createElement('div');
           item.style.cssText = 'font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; padding: 4px 8px;';
-          item.innerHTML = `<span>${data.icon || '🧩'}</span><span style="font-weight: 500;">${data.name}</span>`;
+          item.innerHTML = `<span>${enrichedPlugin.icon}</span><span style="font-weight: 500;">${enrichedPlugin.name}</span>`;
           listEl.appendChild(item);
         }
       }
@@ -903,12 +1003,12 @@ setInterval(()=>{ const p=shuffle(bPos); brandDots.forEach((d,i)=>d.style.transf
 
 /* ── PLACEHOLDERS ──────────────────────────────────────── */
 const PH=[
-  "Estudando o mercado cripto…","Memorizando as leis de Newton…",
-  "Calculando a entropia do universo…","Lendo Kant por prazer. Sério.",
-  "Analisando padrões nas estrelas…","Bebendo café virtual ☕",
-  "Processando 847 abas abertas…","Simulando universos paralelos…",
-  "Otimizando algoritmos de procrastinação…",
-  "Pesquisando por vida inteligente. Ainda buscando.",
+  "Estudando o mercado de cripto…","Memorizando as leis de Newton…",
+  "Calculando a entropia do universo…","Revisando literatura clássica…",
+  "Analisando padrões nas estrelas…","Sintetizando informações em tempo real ☕",
+  "Processando requisições paralelas…","Simulando universos paralelos…",
+  "Otimizando latência de chamadas…",
+  "Analisando dados do mercado financeiro…",
   "Atualizando o mapa mental do cosmos…",
 ];
 const phEl=document.getElementById('placeholderText');
@@ -1035,6 +1135,13 @@ const msgInput    = document.getElementById('msgInput');
 const voiceBtn    = document.getElementById('voiceBtn');
 const newChatBtn  = document.getElementById('newChatBtn');
 
+/* Elements do Clip & Anexo */
+const clipBtn             = document.getElementById('clipBtn');
+const fileAttachInput     = document.getElementById('fileAttachInput');
+const attachmentPreviewBar = document.getElementById('attachmentPreviewBar');
+const attachmentFileName  = document.getElementById('attachmentFileName');
+const attachmentRemoveBtn = document.getElementById('attachmentRemoveBtn');
+
 /* Reasoning DOM elements */
 const reasoningPane    = document.getElementById('reasoningPane');
 const reasoningContent = document.getElementById('reasoningContent');
@@ -1044,6 +1151,47 @@ let APP_STATE   = 'idle';
 let voiceActive = false;
 let isBusy      = false;
 let hasChat     = false;
+
+/* Estado de Arquivos Anexados */
+let currentAttachedFile = null;
+
+/* ── ATTACHMENT PIPELINE ───────────────────────────────── */
+clipBtn.addEventListener('click', () => {
+  fileAttachInput.value = '';
+  fileAttachInput.click();
+});
+
+fileAttachInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Lógica de leitura do arquivo plano
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    currentAttachedFile = {
+      name: file.name,
+      content: evt.target.result,
+      size: file.size
+    };
+    
+    // Atualiza a visualização da UI
+    attachmentFileName.textContent = `${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    attachmentPreviewBar.style.display = 'flex';
+    autoResize();
+  };
+  reader.readAsText(file);
+});
+
+attachmentRemoveBtn.addEventListener('click', () => {
+  removeAttachment();
+});
+
+function removeAttachment() {
+  currentAttachedFile = null;
+  fileAttachInput.value = '';
+  attachmentPreviewBar.style.display = 'none';
+  autoResize();
+}
 
 /* ── ORB HELPERS ───────────────────────────────────────── */
 function showOrb(resetChat=false){
@@ -1165,6 +1313,7 @@ newChatBtn.addEventListener('click',()=>{
   hasChat=false;
   showOrb(true);
   startPH();
+  removeAttachment();
   orbStatusEl.textContent='Olá! Como posso ajudar?';
   setOrbClass('');
   drawIdle();
@@ -1193,10 +1342,17 @@ function renderMd(t){
   try{ return marked.parse(t); }catch{ return t.replace(/\n/g,'<br>'); }
 }
 
-function addUserMsg(text){
+function addUserMsg(text, attachedFileName = null){
   const row=document.createElement('div');
   row.className='msg-row user';
-  row.innerHTML=`<div class="msg-content">${escHtml(text)}</div>`;
+  let inner = `<div class="msg-content">${escHtml(text)}`;
+  if (attachedFileName) {
+    inner += `<div style="font-size:11px; margin-top:6px; opacity:0.95; background:rgba(0,0,0,0.15); border-radius:6px; padding:3px 8px; display:inline-flex; align-items:center; gap:4px;">
+      <span>📂 Documento:</span> <b>${escHtml(attachedFileName)}</b>
+    </div>`;
+  }
+  inner += `</div>`;
+  row.innerHTML = inner;
   chatThread.appendChild(row);
   scrollChat();
 }
@@ -1213,7 +1369,7 @@ function addModelRow(){
   return c;
 }
 
-function addModelFinal(html, pluginUsed = null){
+function addModelFinal(html, listPlugins = []){
   const row=document.createElement('div');
   row.className='msg-row model';
   row.innerHTML=diamondAvatar();
@@ -1221,9 +1377,10 @@ function addModelFinal(html, pluginUsed = null){
   c.className='msg-content';
   
   let contentHtml = html;
-  if(pluginUsed) {
+  if(listPlugins && listPlugins.length > 0) {
+    const listHtml = listPlugins.map(p => `<b>${escHtml(p)}</b>`).join(', ');
     contentHtml += `<div class="plugin-tag-badge">
-      <span>🔌</span> <span>Integrado com <b>${escHtml(pluginUsed)}</b></span>
+      <span>⚡</span> <span>Agente integrado com: ${listHtml}</span>
     </div>`;
   }
   
@@ -1248,12 +1405,146 @@ function closeReasoning(){
 function addReasoningLog(badge, text, isActive=false){
   const item = document.createElement('div');
   item.className = `rp-log-entry ${isActive ? 'active' : ''}`;
-  item.innerHTML = `<span class="badge">${escHtml(badge)}</span><p>${escHtml(text)}</p>`;
+  item.innerHTML = `<span class="badge" style="text-transform: uppercase;">${escHtml(badge)}</span><p>${escHtml(text)}</p>`;
   reasoningContent.appendChild(item);
   reasoningContent.scrollTop = reasoningContent.scrollHeight;
 }
 
-/* ── SUBMIT ────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   ARQUITETURA DE AGENTE INTEGRADA: MOTOR COGNITIVO
+══════════════════════════════════════════════════════ */
+
+/* Cache em memória do cliente para otimizar tokens e requisições */
+const AGENT_CACHE = new Map();
+
+/**
+ * 1. CLASSIFICADOR DE INTENÇÃO E ROUTER INTELIGENTE DE PLUGINS
+ * Calcula pontuação para cada plugin mapeando tokens e regras sem chamar o LLM
+ */
+function runCognitiveRouter(queryText) {
+  const normQuery = queryText.toLowerCase().trim();
+  const words = normQuery.match(/[a-z0-9à-ú]+/g) || [];
+  
+  const matches = [];
+  
+  window.__yraActivePlugins.forEach(p => {
+    let score = 0;
+    
+    // Teste de correspondência de palavras-chave
+    p.keywords.forEach(kw => {
+      if (words.includes(kw)) {
+        score += 25; // Peso forte para palavra isolada correspondente
+      } else if (normQuery.includes(kw)) {
+        score += 12; // Peso médio para substring
+      }
+    });
+
+    // Teste de prioridade nativa
+    if (score > 0) {
+      score += (p.priority / 10);
+    }
+
+    if (score >= 35) {
+      matches.push({ plugin: p, score: Math.min(Math.round(score), 100) });
+    }
+  });
+
+  // Ordena por maior pontuação
+  matches.sort((a, b) => b.score - a.score);
+  return matches;
+}
+
+/**
+ * 2. EXECUTOR DE PLUGINS PARALELOS COM TIMEOUT E CACHE
+ */
+async function executePluginsInParallel(matchedList, queryParam) {
+  addReasoningLog("Pipeline", "Iniciando orquestração em lote paralelo (Promise.all)...", true);
+
+  const promises = matchedList.map(async ({ plugin, score }) => {
+    const cacheKey = `${plugin.id}:${queryParam}`;
+    if (plugin.cache && AGENT_CACHE.has(cacheKey)) {
+      addReasoningLog(plugin.name, `Retornando dados do cache local do agente para "${queryParam}".`);
+      return { plugin, confidence: score, data: AGENT_CACHE.get(cacheKey), error: false };
+    }
+
+    addReasoningLog(plugin.name, `Acionando thread paralela (Confiança: ${score}%)`);
+    
+    // Adiciona timeout wrapper
+    const fetchPromise = fetch(`${plugin.request_endpoint}${encodeURIComponent(queryParam)}`)
+      .then(async res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        
+        // Armazena no cache temporário
+        if (plugin.cache) {
+          AGENT_CACHE.set(cacheKey, data);
+        }
+        return data;
+      });
+
+    const timeoutPromise = new Promise((_, reject) => 
+      setTimeout(() => reject(new Error("Timeout atingido")), plugin.timeout)
+    );
+
+    try {
+      const data = await Promise.race([fetchPromise, timeoutPromise]);
+      return { plugin, confidence: score, data, error: false };
+    } catch (err) {
+      addReasoningLog(plugin.name, `Falha de execução: ${err.message}`);
+      return { plugin, confidence: score, data: null, error: true, errorMsg: err.message };
+    }
+  });
+
+  return await Promise.all(promises);
+}
+
+/**
+ * 3. NORMALIZADOR DE PAYLOAD E MOTOR DE EVIDÊNCIAS
+ * Reduz objetos de dados complexos em resumos otimizados para tokens
+ */
+function normalizeToEvidence(executionResults) {
+  const dossier = [];
+
+  executionResults.forEach(res => {
+    if (res.error || !res.data) return;
+
+    const pluginName = res.plugin.name;
+    const rawData = res.data;
+    let items = [];
+
+    // Estrutura genérica de normalização
+    if (Array.isArray(rawData)) {
+      items = rawData.slice(0, 5); // Limite de 5 itens mais relevantes
+    } else if (rawData.results && Array.isArray(rawData.results)) {
+      items = rawData.results.slice(0, 5);
+    } else if (rawData.data && Array.isArray(rawData.data)) {
+      items = rawData.data.slice(0, 5);
+    } else {
+      items = [rawData]; // Objeto único
+    }
+
+    items.forEach(item => {
+      // Normalização inteligente de campos
+      const title = item.title || item.name || item.heading || item.headline || "";
+      const summary = item.summary || item.snippet || item.description || item.abstract || item.body || JSON.stringify(item).substring(0, 300);
+      const url = item.url || item.link || item.href || "";
+      const published = item.published || item.date || "";
+
+      dossier.push({
+        source: pluginName,
+        confidence: res.confidence,
+        title: title.trim(),
+        summary: summary.trim().substring(0, 450), // Garante compressão rígida
+        url: url.trim(),
+        published: published.trim()
+      });
+    });
+  });
+
+  return dossier;
+}
+
+/* ── SUBMIT PIPELINE ───────────────────────────────────── */
 async function submitMsg(text, isVoice=false){
   text=text.trim();
   if(isBusy||!text)return;
@@ -1268,6 +1559,11 @@ async function submitMsg(text, isVoice=false){
   }
 
   isBusy=true;
+  
+  // Captura do anexo atual para processamento e desassociação do container global
+  const attachedFileToProcess = currentAttachedFile;
+  removeAttachment(); // Reseta o estado do anexo para limpar a UI
+
   if(!isVoice){ msgInput.value=''; autoResize(); }
   sendBtn.disabled=true;
   APP_STATE='thinking';
@@ -1285,10 +1581,10 @@ async function submitMsg(text, isVoice=false){
     drawIdle();
     if(recog&&isRecog){ try{recog.stop();}catch(_){} isRecog=false; }
     if(!hasChat) hasChat=true;
-    addUserMsg(text);
+    addUserMsg(text, attachedFileToProcess?.name);
   } else {
     if(!hasChat){ hasChat=true; hideOrb(); }
-    addUserMsg(text);
+    addUserMsg(text, attachedFileToProcess?.name);
   }
 
   let contentEl=null;
@@ -1297,13 +1593,10 @@ async function submitMsg(text, isVoice=false){
     contentEl.innerHTML='<div class="typing-dots"><span></span><span></span><span></span></div>';
   }
 
-  let accumulated='', firstChunk=true;
+  let accumulated = '';
   const maxTok = isVoice ? 120 : 1024;
-  const prompt  = isVoice
-    ? text+'\n\n[INSTRUÇÃO: responda em no máximo 2 frases curtas e diretas.]'
-    : text;
 
-  // ── CONSTRUTOR DE SYSTEM INSTRUCTION ──
+  // ── MOTOR DE CONTEXTO & SÍNTESE ──
   let systemText = window.__yraSystemRules || "Você é o Yra Assistant, um assistente prestativo e inteligente de IA.";
 
   if (window.__yraSystemFacts && window.__yraSystemFacts.length > 0) {
@@ -1313,19 +1606,68 @@ async function submitMsg(text, isVoice=false){
     });
   }
 
-  if (window.__yraActivePlugins && window.__yraActivePlugins.length > 0) {
-    systemText += "\n\n### PLUGINS ATIVOS:\nVocê possui os seguintes plugins integrados ao ambiente do usuário:";
-    window.__yraActivePlugins.forEach(p => {
-      systemText += `\n- Nome: "${p.name}". Regra de Uso: ${p.router_rule || ''}`;
-    });
-    systemText += `\n\n### PROTOCOLO DE EXECUÇÃO DE PLUGIN:
-Se a pergunta exigir o uso de algum plugin listado acima, responda estritamente seguindo o padrão e encerre:
-▶CALL_PLUGIN: [nome_do_plugin] | [argumento_de_busca_ou_parametro]◀
+  let activePluginsUsed = [];
+  let userQueryPrompt = text;
 
-Exemplo: ▶CALL_PLUGIN: duckduckgo | inteligência artificial no brasil◀`;
+  // Determinar se o pipeline cognitiva deve acionar os Plugins ou o Interpretador de Documentos
+  if (attachedFileToProcess) {
+    // Pipeline especial para arquivos grandes: Bypassa plugins de consulta
+    openReasoning();
+    addReasoningLog("Documento", `Arquivo "${attachedFileToProcess.name}" detectado (${(attachedFileToProcess.size / 1024).toFixed(1)} KB).`, true);
+    addReasoningLog("Filtro", "Bypassando roteamento de plugins para preservar tokens e focar no documento anexado.");
+    
+    userQueryPrompt = `${text}\n\n[ARQUIVO ANEXADO PARA CONTEXTUALIZAÇÃO: "${attachedFileToProcess.name}"]\n\`\`\`\n${attachedFileToProcess.content}\n\`\`\``;
+    
+    // Fechamento curto dos logs do reasoning
+    setTimeout(closeReasoning, 1800);
+  } else {
+    // Pipeline cognitivo padrão (plugins)
+    const matches = runCognitiveRouter(text);
+
+    if (matches.length > 0) {
+      openReasoning();
+      addReasoningLog("Cognição", `Intenção analisada. Identificado(s) ${matches.length} plugin(s) correlacionado(s).`, true);
+      
+      matches.forEach(m => {
+        addReasoningLog("Router", `Seleção: "${m.plugin.name}" com ${m.score}% de confiança.`);
+      });
+
+      try {
+        // Execução concorrente
+        const rawResults = await executePluginsInParallel(matches, text);
+        
+        // Normalização em Dossiê de Evidências
+        const dossier = normalizeToEvidence(rawResults);
+        
+        if (dossier.length > 0) {
+          addReasoningLog("Síntese", `Normalizado em ${dossier.length} evidência(s) de alta confiabilidade.`);
+          
+          let evidenceSection = "\n\n=== DOSSIÊ DE EVIDÊNCIAS COGNITIVAS (DADOS EM TEMPO REAL) ===";
+          dossier.forEach((ev, idx) => {
+            evidenceSection += `\n\n[EVIDÊNCIA #${idx + 1}]`;
+            evidenceSection += `\n- Fonte: ${ev.source} (Confiança: ${ev.confidence}%)`;
+            evidenceSection += `\n- Título: ${ev.title}`;
+            evidenceSection += `\n- Resumo: ${ev.summary}`;
+            if (ev.url) evidenceSection += `\n- URL de referência: ${ev.url}`;
+            if (ev.published) evidenceSection += `\n- Publicado em: ${ev.published}`;
+          });
+
+          userQueryPrompt = `${text}\n\n${evidenceSection}\n\n[Instrução cognitiva de síntese: Com base nas evidências fornecidas acima e na pergunta original do usuário, formule sua resposta consolidando os dados relevantes, cite referências de forma fluida se necessário e remova conteúdos duplicados.]`;
+          
+          activePluginsUsed = [...new Set(dossier.map(d => d.source))];
+        } else {
+          addReasoningLog("Filtro", "Os retornos dos plugins vieram vazios ou instáveis.");
+        }
+      } catch (err) {
+        console.error("Erro no fluxo do agente de plugins:", err);
+        addReasoningLog("Erro", `Falha no barramento paralelo: ${err.message}`);
+      }
+      
+      setTimeout(closeReasoning, 2200);
+    }
   }
 
-  // Função para executar a chamada ao Gemini
+  // Envio final unificado ao LLM Gemini
   async function callGemini(contentsPayload) {
     const ep = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
     const response = await fetch(ep, {
@@ -1334,7 +1676,7 @@ Exemplo: ▶CALL_PLUGIN: duckduckgo | inteligência artificial no brasil◀`;
       body: JSON.stringify({
         contents: contentsPayload,
         systemInstruction: { parts: [{ text: systemText }] },
-        generationConfig: { temperature: 0.5, maxOutputTokens: maxTok }
+        generationConfig: { temperature: 0.45, maxOutputTokens: maxTok }
       })
     });
     if(!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -1342,126 +1684,38 @@ Exemplo: ▶CALL_PLUGIN: duckduckgo | inteligência artificial no brasil◀`;
   }
 
   try {
-    let conversationHistory = [
-      { role: 'user', parts: [{ text: prompt }] }
-    ];
+    const history = [{ role: 'user', parts: [{ text: userQueryPrompt }] }];
+    const resPayload = await callGemini(history);
+    accumulated = resPayload.candidates?.[0]?.content?.parts?.[0]?.text || 'Nenhuma resposta retornada.';
 
-    // 1ª Chamada: Determinar necessidade de plugin
-    const firstResponse = await callGemini(conversationHistory);
-    const firstText = firstResponse.candidates?.[0]?.content?.parts?.[0]?.text || '';
-
-    // Expressão regular para identificar a chamada de plugin
-    const pluginMatch = firstText.match(/▶CALL_PLUGIN:\s*([a-zA-Z0-9_-]+)\s*\|\s*(.+)◀/);
-
-    if (pluginMatch) {
-      const pluginName = pluginMatch[1].trim();
-      let pluginParam = pluginMatch[2].replace('◀', '').trim();
-
-      // Abrir aba de raciocínio
-      openReasoning();
-      addReasoningLog("Plano", `Identificada necessidade de integração com ferramenta externa.`, true);
-      addReasoningLog("Análise", `Selecionando plugin: "${pluginName}" para processar: "${pluginParam}".`);
-
-      const pluginConfig = window.__yraActivePlugins.find(
-      p => p.name.toLowerCase().trim() === pluginName.toLowerCase().trim()
-      );
-
-      if (pluginConfig && pluginConfig.request_endpoint) {
-      addReasoningLog("Requisição", `Conectando ao endpoint remoto do plugin...`);
-  
-      try {
-          const targetUrl = `${pluginConfig.request_endpoint}${encodeURIComponent(pluginParam)}`;
-          const pluginResponse = await fetch(targetUrl);
-          if (!pluginResponse.ok) throw new Error(`Status HTTP ${pluginResponse.status}`);
-          
-          const pluginData = await pluginResponse.json();
-          const pluginResultString = JSON.stringify(pluginData).substring(0, 3000);
-          
-          addReasoningLog("Retorno", `Dados recebidos de "${pluginName}". Integrando contexto...`);
-
-          // 2ª Chamada: Enviar dados de volta para sintetizar resposta
-          conversationHistory.push({ role: 'model', parts: [{ text: firstText }] });
-          conversationHistory.push({ 
-            role: 'user', 
-            parts: [{ text: `[DADOS RETORNADOS PELO PLUGIN ${pluginName}]: ${pluginResultString}\n\nCom base nas informações do plugin e na pergunta original do usuário, formule sua resposta final.` }] 
-          });
-
-          addReasoningLog("Processo", `Gerando resposta estruturada final com a inteligência cognitiva...`);
-          
-          const finalResponse = await callGemini(conversationHistory);
-          accumulated = finalResponse.candidates?.[0]?.content?.parts?.[0]?.text || '';
-          
-          // Sucesso - Fechar a aba de raciocínio
-          closeReasoning();
-
-          if(isVoice) {
-            ltEl.textContent = accumulated;
-            ltEl.classList.add('vis', 'model-reply');
-            addModelFinal(renderMd(accumulated), pluginName);
-          } else {
-            if(contentEl) {
-              contentEl.parentNode.removeChild(contentEl); // remove o container streaming/loader temporário
-            }
-            addModelFinal(renderMd(accumulated), pluginName);
-          }
-
-        } catch (pluginError) {
-          console.error("Erro na chamada de API do plugin:", pluginError);
-          addReasoningLog("Erro", `Falha de rede ou barreira de CORS ao conectar com ${pluginName}.`);
-          closeReasoning();
-          
-          const fallbackText = `Encontrei uma falha ao tentar consultar dados em tempo real utilizando o plugin ${pluginName}.`;
-          if (isVoice) {
-            ltEl.textContent = fallbackText;
-            ltEl.classList.add('vis', 'model-reply');
-          } else {
-            if(contentEl) contentEl.innerHTML = `⚠️ ${fallbackText}`;
-          }
-        }
-      } else {
-        addReasoningLog("Falha", `O plugin "${pluginName}" não pôde ser ativado.`);
-        closeReasoning();
-        
-        const errText = `O plugin requerido (${pluginName}) não está disponível nas configurações.`;
-        if (isVoice) {
-          ltEl.textContent = errText;
-          ltEl.classList.add('vis', 'model-reply');
-        } else {
-          if(contentEl) contentEl.innerHTML = `⚠️ ${errText}`;
-        }
-      }
-
+    if(isVoice) {
+      ltEl.textContent = accumulated;
+      ltEl.classList.add('vis', 'model-reply');
+      addModelFinal(renderMd(accumulated), activePluginsUsed);
     } else {
-      // Resposta convencional (sem plugin)
-      accumulated = firstText;
-      if (isVoice) {
-        ltEl.textContent = accumulated;
-        ltEl.classList.add('vis', 'model-reply');
-        addModelFinal(renderMd(accumulated));
-      } else {
-        if(contentEl) {
-          contentEl.innerHTML = renderMd(accumulated);
-        }
+      if(contentEl) {
+        contentEl.parentNode.removeChild(contentEl); // remove loader temporário
       }
+      addModelFinal(renderMd(accumulated), activePluginsUsed);
     }
 
   } catch(err) {
-    const errMsg=`⚠️ Erro: ${err.message}`;
+    const errMsg=`⚠️ Erro na requisição cognitiva: ${err.message}`;
     closeReasoning();
     if(isVoice){
-      ltEl.textContent='Não foi possível conectar.';
+      ltEl.textContent='Não foi possível conectar com o núcleo cognitivo.';
       ltEl.classList.add('vis','model-reply');
     } else {
       if(contentEl){ contentEl.innerHTML=errMsg; }
     }
-    console.error('submitMsg error:',err);
+    console.error('Submit Cognitive Pipeline error:', err);
   } finally {
     if(contentEl) contentEl.classList.remove('streaming');
     if(!isVoice) scrollChat();
     isBusy=false; sendBtn.disabled=false;
 
     if(isVoice){
-      if(accumulated) addModelFinal(renderMd(accumulated));
+      if(accumulated) addModelFinal(renderMd(accumulated), activePluginsUsed);
       APP_STATE='responding';
       setOrbClass('responding');
       orbStatusEl.textContent='Fale para continuar…';
@@ -1490,17 +1744,17 @@ msgInput.addEventListener('keydown', e=>{
   if(e.key==='Enter'&&!e.shiftKey){
     e.preventDefault();
     const t=msgInput.value.trim();
-    if(!t)return;
+    if(!t && !currentAttachedFile)return;
     if(voiceActive) deactivateVoice();
-    submitMsg(t,false);
+    submitMsg(t || "Analise o arquivo anexado", false);
   }
 });
 
 sendBtn.addEventListener('click', ()=>{
   const t=msgInput.value.trim();
-  if(!t)return;
+  if(!t && !currentAttachedFile)return;
   if(voiceActive) deactivateVoice();
-  submitMsg(t,false);
+  submitMsg(t || "Analise o arquivo anexado", false);
 });
 
 /* ── DRAWER MOBILE ─────────────────────────────────────── */
@@ -1549,3 +1803,4 @@ document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDrawer(); })
 </script>
 </body>
 </html>
+--- END OF FILE Paste July 02, 2026 - 3:41PM ---
