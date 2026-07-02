@@ -1,0 +1,25 @@
+{
+  "name": "Yra Assistant",
+  "short_name": "Yra",
+  "description": "Assistente inteligente Yra",
+  "start_url": "/center.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F9FBF9",
+  "theme_color": "#2E7D32",
+  "orientation": "portrait",
+  "lang": "pt-BR",
+
+  "icons": [
+    {
+      "src": "/icons/yra-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/yra-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
