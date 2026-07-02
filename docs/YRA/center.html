@@ -681,7 +681,7 @@ body {
 <script type="module">
 import { initializeApp }       from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { getFirestore, collection, query, where, getDocs }
+import { getFirestore, collection, query, where, getDocs, doc, getDoc }
        from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const cfg = {
@@ -697,8 +697,10 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 window.__yraAuth = auth;
 
-// Variável para armazenar em memória do window os plugins ativos do usuário corrente
+// Variáveis globais em memória para armazenar as configurações cognitivas do usuário
 window.__yraActivePlugins = [];
+window.__yraSystemRules = "";
+window.__yraSystemFacts = [];
 
 onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href='index.html'; return; }
@@ -713,13 +715,27 @@ onAuthStateChanged(auth, async user => {
   if(emailEl) emailEl.textContent = email;
   if(avEl)    avEl.textContent    = inits;
 
+  // 1. Carrega a API Key
   try {
     const q  = query(collection(db,'Keys'), where('user_id','==',user.uid), where('enabled','==',true));
     const ks = await getDocs(q);
     if (!ks.empty) window.__yraApiKey = ks.docs[0].data().key;
   } catch(e){ console.error('key err:',e); }
 
-  // [NOVO] Busca por plugins ativos no Firestore (onde associated_users contém o UID do usuário)
+  // 2. Carrega as Instruções Globais e Fatos Aprendidos (da coleção System)
+  try {
+    const systemRef = doc(db, "System", user.uid);
+    const systemSnap = await getDoc(systemRef);
+    if (systemSnap.exists()) {
+      const systemData = systemSnap.data();
+      window.__yraSystemRules = systemData.admin_rules || "";
+      window.__yraSystemFacts = systemData.facts || [];
+    }
+  } catch(e) {
+    console.error('Erro ao buscar diretrizes de memória:', e);
+  }
+
+  // 3. Carrega os plugins ativos do Firestore
   try {
     const qPlugins = query(collection(db, 'Plugins'), where('associated_users', 'array-contains', user.uid));
     const snap = await getDocs(qPlugins);
@@ -1146,20 +1162,31 @@ async function submitMsg(text, isVoice=false){
     ? text+'\n\n[INSTRUÇÃO: responda em no máximo 2 frases curtas e diretas.]'
     : text;
 
-  // [NOVO] Constrói a instrução de sistema que diz ao Gemini quais plugins estão ativos
-  let systemText = "Você é o Yra Assistant, um assistente prestativo e inteligente de IA.";
-  if (window.__yraActivePlugins && window.__yraActivePlugins.length > 0) {
-    systemText += "\n\nO usuário ativou os seguintes plugins que você pode utilizar de forma simulada em suas respostas:";
-    window.__yraActivePlugins.forEach(p => {
-      systemText += `\n- ${p.icon || '🧩'} **${p.name}**: ${p.description || ''} (Rota/Regra: ${p.router_rule || ''})`;
+  // ── [NOVO / COMPLETO] CONSTRUTOR DE SYSTEM INSTRUCTION ──
+  // Utiliza as regras operacionais da tela de memória (System -> admin_rules) ou adota uma padrão
+  let systemText = window.__yraSystemRules || "Você é o Yra Assistant, um assistente prestativo e inteligente de IA.";
+
+  // Se houverem Fatos Aprendidos salvos (System -> facts), injetamos como parte das instruções
+  if (window.__yraSystemFacts && window.__yraSystemFacts.length > 0) {
+    systemText += "\n\n### FATOS APRENDIDOS E CONTEXTO DO USUÁRIO:";
+    window.__yraSystemFacts.forEach(fact => {
+      systemText += `\n- ${fact}`;
     });
-    systemText += "\n\nQuando o usuário solicitar tarefas relacionadas a um desses plugins, responda indicando a execução correspondente a essa ferramenta integrada.";
+  }
+
+  // Se houverem plugins ativos, injeta as diretrizes para que o modelo possa interagir com eles
+  if (window.__yraActivePlugins && window.__yraActivePlugins.length > 0) {
+    systemText += "\n\n### PLUGINS ATIVOS:\nVocê possui os seguintes plugins integrados ao ambiente do usuário:";
+    window.__yraActivePlugins.forEach(p => {
+      systemText += `\n- ${p.icon || '🧩'} **${p.name}**: ${p.description || ''} (Rota: ${p.router_rule || ''})`;
+    });
+    systemText += "\n\nSe o usuário solicitar tarefas pertinentes a estes plugins, simule a integração de forma proativa utilizando as regras descritas.";
   }
 
   try{
     const ep=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:streamGenerateContent?alt=sse&key=${apiKey}`;
     
-    // Payload enviado para a API com suporte à propriedade systemInstruction
+    // Configura o payload com a systemInstruction contendo as regras e fatos combinados
     const reqBody = {
       contents:[{role:'user',parts:[{text:prompt}]}],
       generationConfig:{temperature:.85,maxOutputTokens:maxTok}
