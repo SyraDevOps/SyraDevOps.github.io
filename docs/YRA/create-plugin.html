@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yra Assistant - Criar Plugin</title>
+<style>
+:root {
+    --primary-color: #2E7D32;
+    --primary-light: #81C784;
+    --primary-ultra-light: #E8F5E9;
+    --text-dark: #2C3E50;
+    --text-light: #7F8C8D;
+    --bg-light: #F9FBF9;
+    --border-color: #EAEAEA;
+    --white: #ffffff;
+    --sidebar-width: 260px;
+}
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+body {
+    background: var(--bg-light);
+    color: var(--text-dark);
+    min-height: 100vh;
+    display: flex;
+    overflow-x: hidden;
+}
+
+/* ==================== MENU LATERAL (SIDEBAR) ==================== */
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--white);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 30px 20px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 100;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding-left: 10px;
+}
+
+.scene-sidebar {
+    position: relative;
+    width: 40px;
+    height: 40px;
+}
+
+.dot-sidebar {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    left: 50%;
+    top: 50%;
+    margin-left: -4px;
+    margin-top: -4px;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dot-sidebar:nth-child(1) { background: #1B5E20; }
+.dot-sidebar:nth-child(2) { background: #2E7D32; }
+.dot-sidebar:nth-child(3) { background: #4CAF50; }
+.dot-sidebar:nth-child(4) { background: #81C784; }
+
+.brand-name {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1B5E20;
+    letter-spacing: 0.5px;
+}
+
+.menu-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-item a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    color: var(--text-light);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.menu-item a:hover, .menu-item.active a {
+    background: var(--primary-ultra-light);
+    color: var(--primary-color);
+}
+
+.menu-item a svg {
+    stroke: currentColor;
+    fill: none;
+    width: 20px;
+    height: 20px;
+}
+
+/* ==================== ÁREA DE CONTEÚDO PRINCIPAL ==================== */
+.main-content {
+    margin-left: var(--sidebar-width);
+    flex: 1;
+    padding: 40px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.top-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 35px;
+}
+
+.page-title h2 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.page-title p {
+    font-size: 13px;
+    color: var(--text-light);
+}
+
+.user-area {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.user-name {
+    font-weight: 500;
+    font-size: 14px;
+    color: var(--text-dark);
+}
+
+.btn-logout {
+    background: none;
+    border: 1px solid var(--border-color);
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text-light);
+    transition: 0.2s;
+}
+.btn-logout:hover {
+    background: #f5f5f5;
+    color: var(--text-dark);
+}
+
+/* Estrutura do Formulário */
+.form-card {
+    background: var(--white);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 35px;
+    max-width: 700px;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    background: #FAFBFa;
+    transition: all 0.2s ease;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+    border-color: var(--primary-color);
+    background: var(--white);
+    box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.08);
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+.status-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.status-row input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.status-row label {
+    font-size: 13px;
+    color: var(--text-dark);
+    font-weight: 500;
+}
+
+.actions-row {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 15px;
+    border-top: 1px solid var(--border-color);
+    padding-top: 20px;
+}
+
+.btn-secondary {
+    background: #F5F5F5;
+    border: none;
+    color: var(--text-dark);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.2s;
+}
+.btn-secondary:hover {
+    background: #EAEAEA;
+}
+
+.btn-primary {
+    background: var(--primary-color);
+    border: none;
+    color: var(--white);
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background 0.2s;
+}
+.btn-primary:hover {
+    background: #1B5E20;
+}
+.btn-primary:disabled {
+    background: var(--primary-light);
+    cursor: not-allowed;
+}
+
+#feedbackMsg {
+    grid-column: 1 / -1;
+    font-size: 13px;
+    min-height: 20px;
+    text-align: center;
+}
+
+.feedback-success { color: var(--primary-color); }
+.feedback-error { color: #c0392b; }
+
+/* Responsividade */
+@media (max-width: 900px) {
+    .sidebar {
+        width: 70px;
+        padding: 20px 10px;
+    }
+    .brand-name, .menu-item span {
+        display: none;
+    }
+    .brand {
+        justify-content: center;
+    }
+    .main-content {
+        margin-left: 70px;
+        padding: 20px;
+    }
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- Sidebar Menu Lateral -->
+<div class="sidebar">
+    <div class="brand">
+        <div class="scene-sidebar" id="sceneSidebar">
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+            <div class="dot-sidebar"></div>
+        </div>
+        <span class="brand-name">YRA Assistant</span>
+    </div>
+
+    <ul class="menu-list">
+        <li class="menu-item">
+            <a href="center.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <span>Chat</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="plugins.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                <span>Plugins</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="notes.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg>
+                <span>Notas</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="memory.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                <span>Memória</span>
+            </a>
+        </li>
+        <li class="menu-item">
+            <a href="settings.html">
+                <svg viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
+                <span>Configurações</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<!-- Área Principal -->
+<div class="main-content">
+    <div class="top-header">
+        <div class="page-title">
+            <h2>Criar Extensão (Plugin)</h2>
+            <p>Cadastre novos plugins no ecossistema do Yra Assistant.</p>
+        </div>
+        <div class="user-area">
+            <span class="user-name" id="userNameDisplay">Carregando...</span>
+            <button class="btn-logout" id="logoutBtn">Sair</button>
+        </div>
+    </div>
+
+    <!-- Card de Formulário -->
+    <div class="form-card">
+        <div class="form-grid">
+            
+            <div class="form-group">
+                <label for="pluginName">Nome do Plugin</label>
+                <input type="text" id="pluginName" placeholder="Ex: DuckDuckGo Search">
+            </div>
+
+            <div class="form-group">
+                <label for="pluginIcon">Ícone (Emoji)</label>
+                <input type="text" id="pluginIcon" placeholder="Ex: 🔍" maxlength="4">
+            </div>
+
+            <div class="form-group full-width">
+                <label for="pluginDesc">Descrição</label>
+                <textarea id="pluginDesc" placeholder="Descreva brevemente o que esta ferramenta faz..."></textarea>
+            </div>
+
+            <div class="form-group full-width">
+                <label for="pluginEndpoint">Endpoint da Requisição (URL)</label>
+                <input type="url" id="pluginEndpoint" placeholder="https://api.servico.com/busca?q=">
+            </div>
+
+            <div class="form-group full-width">
+                <label for="pluginRoute">Regra de Roteamento (Router Rule/Instrução)</label>
+                <input type="text" id="pluginRoute" placeholder="Ex: Use sempre que o usuário solicitar buscas externas na web.">
+            </div>
+
+            <div class="form-group status-row full-width">
+                <input type="checkbox" id="pluginEnabled" checked>
+                <label for="pluginEnabled">Ativar plugin imediatamente para uso</label>
+            </div>
+
+            <!-- Feedback de ações -->
+            <div id="feedbackMsg"></div>
+
+            <div class="actions-row">
+                <button class="btn-secondary" id="clearFormBtn">Limpar</button>
+                <button class="btn-primary" id="savePluginBtn">Cadastrar Plugin</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script type="importmap">
+{
+    "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+        "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+        "firebase/firestore": "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js"
+    }
+}
+</script>
+
+<script type="module">
+import { initializeApp } from "firebase/app";
+import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
+import { getFirestore, collection, addDoc, serverTimestamp } from "firebase/firestore";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCvZrOVysl6iPOkqGNhUbWtmgRPkfxI1EA",
+    authDomain: "yra-syra.firebaseapp.com",
+    projectId: "yra-syra",
+    storageBucket: "yra-syra.firebasestorage.app",
+    messagingSenderId: "555145505684",
+    appId: "1:555145505684:web:aa1ef14072653e41057d81"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// DOM Elements
+const pluginNameInput = document.getElementById("pluginName");
+const pluginIconInput = document.getElementById("pluginIcon");
+const pluginDescInput = document.getElementById("pluginDesc");
+const pluginEndpointInput = document.getElementById("pluginEndpoint");
+const pluginRouteInput = document.getElementById("pluginRoute");
+const pluginEnabledCheck = document.getElementById("pluginEnabled");
+const savePluginBtn = document.getElementById("savePluginBtn");
+const clearFormBtn = document.getElementById("clearFormBtn");
+const feedbackMsg = document.getElementById("feedbackMsg");
+const logoutBtn = document.getElementById("logoutBtn");
+const userNameDisplay = document.getElementById("userNameDisplay");
+
+let currentUserId = null;
+
+// Verifica se o usuário está logado
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        window.location.href = "index.html";
+        return;
+    }
+    currentUserId = user.uid;
+    userNameDisplay.textContent = user.displayName || user.email || "Usuário";
+});
+
+// Ação de Salvar Plugin
+savePluginBtn.onclick = async () => {
+    feedbackMsg.className = "";
+    feedbackMsg.textContent = "";
+
+    const name = pluginNameInput.value.trim();
+    const icon = pluginIconInput.value.trim() || "🧩";
+    const description = pluginDescInput.value.trim();
+    const endpoint = pluginEndpointInput.value.trim();
+    const router_rule = pluginRouteInput.value.trim();
+    const enabled = pluginEnabledCheck.checked;
+
+    // Validações
+    if (!name || !description || !endpoint || !router_rule) {
+        showFeedback("Por favor, preencha todos os campos obrigatórios.", "error");
+        return;
+    }
+
+    try {
+        URL.canParse(endpoint);
+    } catch (_) {
+        showFeedback("Por favor, informe uma URL válida para o endpoint da requisição.", "error");
+        return;
+    }
+
+    if (!currentUserId) return;
+
+    try {
+        savePluginBtn.disabled = true;
+        savePluginBtn.textContent = "Gravando dados...";
+
+        // Criação de documento na coleção 'Plugins' com a estrutura do miu.py
+        await addDoc(collection(db, "Plugins"), {
+            name: name,
+            icon: icon,
+            description: description,
+            request_endpoint: endpoint,
+            router_rule: router_rule,
+            associated_users: [currentUserId], // Vincula o criador do plugin imediatamente
+            enabled: enabled,
+            created_at: serverTimestamp(),
+            updated_at: serverTimestamp()
+        });
+
+        showFeedback("Plugin cadastrado com sucesso e adicionado à sua conta!", "success");
+        clearForm();
+    } catch (e) {
+        console.error("Erro ao salvar plugin no Firestore: ", e);
+        showFeedback("Erro ao registrar o plugin no banco de dados. Tente novamente.", "error");
+    } finally {
+        savePluginBtn.disabled = false;
+        savePluginBtn.textContent = "Cadastrar Plugin";
+    }
+};
+
+// Limpar Formulário
+clearFormBtn.onclick = clearForm;
+
+function clearForm() {
+    pluginNameInput.value = "";
+    pluginIconInput.value = "";
+    pluginDescInput.value = "";
+    pluginEndpointInput.value = "";
+    pluginRouteInput.value = "";
+    pluginEnabledCheck.checked = true;
+}
+
+function showFeedback(msg, type) {
+    feedbackMsg.className = type === "success" ? "feedback-success" : "feedback-error";
+    feedbackMsg.textContent = msg;
+}
+
+logoutBtn.onclick = async () => {
+    try {
+        await signOut(auth);
+    } catch (e) {
+        console.error("Erro ao efetuar logout: ", e);
+    }
+};
+
+// ============ ANIMAÇÃO DE MINI BOLINHAS (Sidebar) ============
+const sidebarDots = document.querySelectorAll(".dot-sidebar");
+const positions = [
+    {x: 0, y: -10}, 
+    {x: 10, y: 0}, 
+    {x: 0, y: 10}, 
+    {x: -10, y: 0}
+];
+
+function shuffleArray(arr) {
+    let a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function startSidebarAnimation() {
+    setInterval(() => {
+        const p = shuffleArray(positions);
+        sidebarDots.forEach((dot, i) => {
+            dot.style.transform = `translate(${p[i].x}px, ${p[i].y}px)`;
+        });
+    }, 1000);
+}
+
+startSidebarAnimation();
+</script>
+</body>
+</html>
