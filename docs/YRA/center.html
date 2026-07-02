@@ -602,6 +602,9 @@ body {
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9"/></svg>
       Configurações
     </a>
+    <!-- Seção Dinâmica de Plugins Ativos -->
+    <span class="nav-sep" id="activePluginsSep" style="display:none;">Plugins Ativos</span>
+    <div id="activePluginsList" style="padding: 2px 10px; display: flex; flex-direction: column; gap: 4px;"></div>
   </nav>
 
   <div class="sidebar-user">
@@ -694,6 +697,9 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 window.__yraAuth = auth;
 
+// Variável para armazenar em memória do window os plugins ativos do usuário corrente
+window.__yraActivePlugins = [];
+
 onAuthStateChanged(auth, async user => {
   if (!user) { window.location.href='index.html'; return; }
 
@@ -712,6 +718,39 @@ onAuthStateChanged(auth, async user => {
     const ks = await getDocs(q);
     if (!ks.empty) window.__yraApiKey = ks.docs[0].data().key;
   } catch(e){ console.error('key err:',e); }
+
+  // [NOVO] Busca por plugins ativos no Firestore (onde associated_users contém o UID do usuário)
+  try {
+    const qPlugins = query(collection(db, 'Plugins'), where('associated_users', 'array-contains', user.uid));
+    const snap = await getDocs(qPlugins);
+    
+    window.__yraActivePlugins = [];
+    const listEl = document.getElementById('activePluginsList');
+    const sepEl = document.getElementById('activePluginsSep');
+    
+    if (listEl) listEl.innerHTML = '';
+
+    snap.forEach(doc => {
+      const data = doc.data();
+      if (data.enabled !== false) {
+        window.__yraActivePlugins.push(data);
+        
+        // Renderiza o plugin ativo no menu lateral
+        if (listEl) {
+          const item = document.createElement('div');
+          item.style.cssText = 'font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; padding: 4px 8px;';
+          item.innerHTML = `<span>${data.icon || '🧩'}</span><span style="font-weight: 500;">${data.name}</span>`;
+          listEl.appendChild(item);
+        }
+      }
+    });
+
+    if (window.__yraActivePlugins.length > 0 && sepEl) {
+      sepEl.style.display = 'block';
+    }
+  } catch(e) {
+    console.error('Erro ao carregar plugins ativos:', e);
+  }
 });
 </script>
 
@@ -1107,15 +1146,35 @@ async function submitMsg(text, isVoice=false){
     ? text+'\n\n[INSTRUÇÃO: responda em no máximo 2 frases curtas e diretas.]'
     : text;
 
+  // [NOVO] Constrói a instrução de sistema que diz ao Gemini quais plugins estão ativos
+  let systemText = "Você é o Yra Assistant, um assistente prestativo e inteligente de IA.";
+  if (window.__yraActivePlugins && window.__yraActivePlugins.length > 0) {
+    systemText += "\n\nO usuário ativou os seguintes plugins que você pode utilizar de forma simulada em suas respostas:";
+    window.__yraActivePlugins.forEach(p => {
+      systemText += `\n- ${p.icon || '🧩'} **${p.name}**: ${p.description || ''} (Rota/Regra: ${p.router_rule || ''})`;
+    });
+    systemText += "\n\nQuando o usuário solicitar tarefas relacionadas a um desses plugins, responda indicando a execução correspondente a essa ferramenta integrada.";
+  }
+
   try{
     const ep=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:streamGenerateContent?alt=sse&key=${apiKey}`;
+    
+    // Payload enviado para a API com suporte à propriedade systemInstruction
+    const reqBody = {
+      contents:[{role:'user',parts:[{text:prompt}]}],
+      generationConfig:{temperature:.85,maxOutputTokens:maxTok}
+    };
+    
+    if (systemText) {
+      reqBody.systemInstruction = {
+        parts: [{text: systemText}]
+      };
+    }
+
     const res=await fetch(ep,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        contents:[{role:'user',parts:[{text:prompt}]}],
-        generationConfig:{temperature:.85,maxOutputTokens:maxTok}
-      })
+      body:JSON.stringify(reqBody)
     });
     if(!res.ok) throw new Error(`HTTP ${res.status}`);
 
