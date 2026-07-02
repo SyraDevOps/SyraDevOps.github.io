@@ -1362,13 +1362,15 @@ Exemplo: ▶CALL_PLUGIN: duckduckgo | inteligência artificial no brasil◀`;
       addReasoningLog("Plano", `Identificada necessidade de integração com ferramenta externa.`, true);
       addReasoningLog("Análise", `Selecionando plugin: "${pluginName}" para processar: "${pluginParam}".`);
 
-      const pluginConfig = window.__yraActivePlugins.find(p => p.name === pluginName);
+      const pluginConfig = window.__yraActivePlugins.find(
+      p => p.name.toLowerCase().trim() === pluginName.toLowerCase().trim()
+      );
 
-      if (pluginConfig && pluginConfig.endpoint) {
-        addReasoningLog("Requisição", `Conectando ao endpoint remoto do plugin...`);
-        
-        try {
-          const targetUrl = `${pluginConfig.endpoint}${encodeURIComponent(pluginParam)}`;
+      if (pluginConfig && pluginConfig.request_endpoint) {
+      addReasoningLog("Requisição", `Conectando ao endpoint remoto do plugin...`);
+  
+      try {
+          const targetUrl = `${pluginConfig.request_endpoint}${encodeURIComponent(pluginParam)}`;
           const pluginResponse = await fetch(targetUrl);
           if (!pluginResponse.ok) throw new Error(`Status HTTP ${pluginResponse.status}`);
           
