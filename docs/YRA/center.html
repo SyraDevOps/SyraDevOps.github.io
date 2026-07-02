@@ -34,7 +34,6 @@ body {
   color: var(--text);
   display: flex;
   height: 100%;
-  /* dvh para mobile browsers com chrome dinâmico */
   height: 100dvh;
   overflow: hidden;
 }
@@ -48,7 +47,6 @@ body {
   flex-direction: column;
   height: 100%;
   flex-shrink: 0;
-  /* transição pronta para mobile drawer */
   transition: transform .3s cubic-bezier(.4,0,.2,1),
               box-shadow .3s ease;
 }
@@ -185,7 +183,7 @@ body {
 .tb-btn:hover { border-color:var(--g4); color:var(--g2); }
 .tb-btn svg { width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
 
-/* Hambúrguer — escondido no desktop */
+/* Hambúrguer */
 .menu-toggle {
   display:none;
   width:32px; height:32px; border-radius:8px;
@@ -197,10 +195,95 @@ body {
 }
 .menu-toggle svg { width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round; }
 
-/* ══ STAGE ═════════════════════════════════════════════ */
+/* ══ STAGE & LAYOUT DE TRABALHO ════════════════════════ */
 .stage {
   flex:1; display:flex; flex-direction:column;
   overflow:hidden; position:relative;
+}
+
+/* Container que divide Reasoning do Chat */
+.stage-layout {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+}
+
+.stage-content-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Painel de Reasoning */
+.reasoning-pane {
+  width: 300px;
+  background: var(--white);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transform: translateX(-100%);
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+  position: absolute;
+  left: 0; top: 0; z-index: 20;
+}
+.reasoning-pane.open {
+  transform: translateX(0);
+  position: relative;
+}
+.rp-header {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(46,125,50,0.03);
+}
+.rp-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--g1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.rp-title svg {
+  width: 14px; height: 14px;
+  stroke: var(--g2); fill: none; stroke-width: 2;
+}
+.rp-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.rp-log-entry {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--text-muted);
+  animation: msgIn .2s ease;
+}
+.rp-log-entry.active {
+  color: var(--g1);
+  font-weight: 500;
+}
+.rp-log-entry .badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  background: rgba(46,125,50,0.08);
+  color: var(--g2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
 }
 
 /* ── ORBE CONTAINER ── */
@@ -243,7 +326,6 @@ body {
   animation:orbSpin 7s linear infinite;
   opacity:.85;
 }
-/* Mascara interna — usa a mesma cor de fundo */
 .orb-ring::after {
   content:''; position:absolute; inset:3px;
   border-radius:50%; background:var(--white);
@@ -349,6 +431,20 @@ body {
   padding:4px 2px; color:var(--text);
 }
 
+/* Tag de Plugin Usado */
+.plugin-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(46,125,50,0.07);
+  color: var(--g1);
+  padding: 3px 8px;
+  border-radius: 6px;
+  margin-top: 8px;
+}
+
 /* Losango avatar */
 .model-avatar {
   width:24px; height:24px;
@@ -386,7 +482,7 @@ body {
 }
 .msg-content a { color:var(--g1); text-decoration:underline; text-underline-offset:3px; font-weight:500; }
 
-/* Cursor streaming — só no último parágrafo */
+/* Cursor streaming */
 .msg-content.streaming p:last-child::after,
 .msg-content.streaming > *:last-child::after,
 .msg-content.streaming::after {
@@ -413,7 +509,6 @@ body {
   flex-shrink:0;
   background:var(--white);
   border-top:1px solid var(--border);
-  /* safe area iOS */
   padding-bottom:max(20px, calc(14px + env(safe-area-inset-bottom)));
 }
 .input-wrap {
@@ -432,7 +527,7 @@ body {
 .msg-input {
   flex:1; border:none; outline:none;
   background:transparent;
-  font-size:16px; /* ≥16px evita zoom iOS */
+  font-size:16px;
   color:var(--text); font-family:inherit;
   resize:none; min-height:22px; max-height:140px;
   line-height:1.55; padding:0;
@@ -492,7 +587,6 @@ body {
   opacity:0;
   pointer-events:none;
   transition:opacity .3s ease;
-  /* sempre no DOM, mas invisível e sem eventos no desktop */
 }
 .sidebar-overlay.vis {
   opacity:1;
@@ -504,9 +598,16 @@ body {
    RESPONSIVO
 ══════════════════════════════════════════════════════ */
 
-/* TABLET ≤ 768px */
-@media (max-width: 768px) {
+@media (max-width: 900px) {
+  .reasoning-pane {
+    position: fixed;
+    height: 100dvh;
+    z-index: 95;
+    box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+  }
+}
 
+@media (max-width: 768px) {
   .sidebar {
     position:fixed;
     left:0; top:0; bottom:0;
@@ -533,7 +634,6 @@ body {
   .input-hint { display:none; }
 }
 
-/* PHONE ≤ 480px */
 @media (max-width: 480px) {
   .voice-orb { width:130px; height:130px; }
   .orb-status { font-size:13px; }
@@ -547,9 +647,12 @@ body {
 
   .input-wrap { padding:8px 8px 8px 14px; }
   .iact-btn { width:34px; height:34px; }
+  
+  .reasoning-pane {
+    width: 100%;
+  }
 }
 
-/* LANDSCAPE PHONE */
 @media (max-height:480px) and (max-width:900px) {
   .voice-orb { width:100px; height:100px; }
   .orb-stage { gap:10px; padding:10px 16px; }
@@ -630,32 +733,50 @@ body {
   </div>
 
   <div class="stage">
+    <div class="stage-layout">
+      
+      <!-- ABA DE REASONING (PENSAMENTO) -->
+      <div class="reasoning-pane" id="reasoningPane">
+        <div class="rp-header">
+          <span class="rp-title">
+            <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+            Análise e Integrações
+          </span>
+        </div>
+        <div class="rp-content" id="reasoningContent">
+          <!-- Logs de raciocínio inseridos dinamicamente -->
+        </div>
+      </div>
 
-    <!-- ORBE -->
-    <div class="orb-stage" id="orbStage">
-      <div class="voice-orb" id="voiceOrb">
-        <div class="orb-halo"></div>
-        <div class="orb-ring"></div>
-        <div class="orb-bg"></div>
-        <canvas id="orbCanvas"></canvas>
-        <div class="orb-icon">
-          <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+      <!-- CONTEÚDO DA ÁREA DE TRABALHO -->
+      <div class="stage-content-wrap">
+        <!-- ORBE -->
+        <div class="orb-stage" id="orbStage">
+          <div class="voice-orb" id="voiceOrb">
+            <div class="orb-halo"></div>
+            <div class="orb-ring"></div>
+            <div class="orb-bg"></div>
+            <canvas id="orbCanvas"></canvas>
+            <div class="orb-icon">
+              <svg viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </div>
+          </div>
+          <div class="orb-caption">
+            <div class="orb-status" id="orbStatus">Olá! Como posso ajudar?</div>
+            <div id="voiceLabel">
+              <div id="voiceUserText"></div>
+              <div id="voiceDivider"></div>
+              <div id="listenTranscript"></div>
+            </div>
+            <div id="placeholderText"></div>
+          </div>
         </div>
+
+        <!-- CHAT -->
+        <div class="chat-thread" id="chatThread"></div>
       </div>
-      <div class="orb-caption">
-        <div class="orb-status" id="orbStatus">Olá! Como posso ajudar?</div>
-        <div id="voiceLabel">
-          <div id="voiceUserText"></div>
-          <div id="voiceDivider"></div>
-          <div id="listenTranscript"></div>
-        </div>
-        <div id="placeholderText"></div>
-      </div>
+
     </div>
-
-    <!-- CHAT -->
-    <div class="chat-thread" id="chatThread"></div>
-
   </div>
 
   <footer class="footer">
@@ -697,7 +818,7 @@ const auth = getAuth(app);
 const db   = getFirestore(app);
 window.__yraAuth = auth;
 
-// Variáveis globais em memória para armazenar as configurações cognitivas do usuário
+// Variáveis globais em memória
 window.__yraActivePlugins = [];
 window.__yraSystemRules = "";
 window.__yraSystemFacts = [];
@@ -722,7 +843,7 @@ onAuthStateChanged(auth, async user => {
     if (!ks.empty) window.__yraApiKey = ks.docs[0].data().key;
   } catch(e){ console.error('key err:',e); }
 
-  // 2. Carrega as Instruções Globais e Fatos Aprendidos (da coleção System)
+  // 2. Carrega as Instruções Globais e Fatos Aprendidos
   try {
     const systemRef = doc(db, "System", user.uid);
     const systemSnap = await getDoc(systemRef);
@@ -823,7 +944,6 @@ function resizeOrb(){
   const sz=Math.max(voiceOrb.offsetWidth-6, 1);
   orbCanvas.width=sz; orbCanvas.height=sz;
 }
-// Resize com debounce para evitar flicker
 let resizeTimer=null;
 window.addEventListener('resize',()=>{
   clearTimeout(resizeTimer);
@@ -915,8 +1035,11 @@ const msgInput    = document.getElementById('msgInput');
 const voiceBtn    = document.getElementById('voiceBtn');
 const newChatBtn  = document.getElementById('newChatBtn');
 
+/* Reasoning DOM elements */
+const reasoningPane    = document.getElementById('reasoningPane');
+const reasoningContent = document.getElementById('reasoningContent');
+
 /* ── STATE ─────────────────────────────────────────────── */
-// 'idle' | 'listening' | 'thinking' | 'responding'
 let APP_STATE   = 'idle';
 let voiceActive = false;
 let isBusy      = false;
@@ -931,7 +1054,6 @@ function showOrb(resetChat=false){
 function hideOrb(){
   orbStageEl.classList.add('hidden');
   chatThread.classList.add('visible');
-  // re-render canvas size after transition
   setTimeout(resizeOrb,100);
 }
 function setOrbClass(cls){
@@ -965,7 +1087,6 @@ if(SR){
     const txt=(final||interim).trim();
     if(!txt)return;
 
-    // Usuário começa a falar durante resposta → limpa e volta a ouvir
     if(APP_STATE==='responding'){
       clearVoiceLabel();
       setOrbClass('active');
@@ -974,7 +1095,6 @@ if(SR){
       APP_STATE='listening';
     }
 
-    // Mostra transcrição
     ltEl.textContent=txt;
     ltEl.classList.remove('model-reply');
     ltEl.classList.add('vis');
@@ -997,7 +1117,6 @@ if(SR){
 
   recog.onend=()=>{
     isRecog=false;
-    // Reinicia automaticamente se ainda em modo voz e não pensando
     if(voiceActive&&(APP_STATE==='listening'||APP_STATE==='responding')){
       try{ recog.start(); isRecog=true; }catch(_){}
     }
@@ -1012,7 +1131,6 @@ async function activateVoice(){
   const ok=await setupAudio();
   if(!ok){ deactivateVoice(); return; }
 
-  // Mostra orbe sem resetar hasChat (histórico permanece)
   showOrb(false);
   stopPH();
   setOrbClass('active');
@@ -1033,7 +1151,6 @@ function deactivateVoice(){
   orbStatusEl.textContent='Olá! Como posso ajudar?';
   clearVoiceLabel();
   drawIdle();
-  // Volta para chat se tinha mensagens, senão exibe orbe idle
   if(hasChat){ hideOrb(); }
   else       { startPH(); }
   APP_STATE='idle';
@@ -1051,6 +1168,7 @@ newChatBtn.addEventListener('click',()=>{
   orbStatusEl.textContent='Olá! Como posso ajudar?';
   setOrbClass('');
   drawIdle();
+  closeReasoning();
   APP_STATE='idle';
 });
 
@@ -1095,18 +1213,45 @@ function addModelRow(){
   return c;
 }
 
-function addModelFinal(html){
+function addModelFinal(html, pluginUsed = null){
   const row=document.createElement('div');
   row.className='msg-row model';
   row.innerHTML=diamondAvatar();
   const c=document.createElement('div');
   c.className='msg-content';
-  c.innerHTML=html;
+  
+  let contentHtml = html;
+  if(pluginUsed) {
+    contentHtml += `<div class="plugin-tag-badge">
+      <span>🔌</span> <span>Integrado com <b>${escHtml(pluginUsed)}</b></span>
+    </div>`;
+  }
+  
+  c.innerHTML=contentHtml;
   row.appendChild(c);
   chatThread.appendChild(row);
+  scrollChat();
 }
 
 function scrollChat(){ chatThread.scrollTop=chatThread.scrollHeight; }
+
+/* ── REASONING PANE HELPERS ────────────────────────────── */
+function openReasoning(){
+  reasoningPane.classList.add('open');
+  reasoningContent.innerHTML = '';
+}
+
+function closeReasoning(){
+  reasoningPane.classList.remove('open');
+}
+
+function addReasoningLog(badge, text, isActive=false){
+  const item = document.createElement('div');
+  item.className = `rp-log-entry ${isActive ? 'active' : ''}`;
+  item.innerHTML = `<span class="badge">${escHtml(badge)}</span><p>${escHtml(text)}</p>`;
+  reasoningContent.appendChild(item);
+  reasoningContent.scrollTop = reasoningContent.scrollHeight;
+}
 
 /* ── SUBMIT ────────────────────────────────────────────── */
 async function submitMsg(text, isVoice=false){
@@ -1129,7 +1274,6 @@ async function submitMsg(text, isVoice=false){
   stopPH();
 
   if(isVoice){
-    /* Modo voz: fica no orbe, mostra msg do user acima e "…" abaixo */
     vuEl.textContent=text;
     vuEl.classList.add('vis');
     vdEl.classList.add('vis');
@@ -1139,13 +1283,10 @@ async function submitMsg(text, isVoice=false){
     setOrbClass('');
     orbStatusEl.textContent='Gerando resposta…';
     drawIdle();
-    /* Para o mic durante processamento */
     if(recog&&isRecog){ try{recog.stop();}catch(_){} isRecog=false; }
-    /* Salva no histórico (chat está hidden) */
     if(!hasChat) hasChat=true;
     addUserMsg(text);
   } else {
-    /* Modo texto: esconde orbe, mostra chat */
     if(!hasChat){ hasChat=true; hideOrb(); }
     addUserMsg(text);
   }
@@ -1157,16 +1298,14 @@ async function submitMsg(text, isVoice=false){
   }
 
   let accumulated='', firstChunk=true;
-  const maxTok = isVoice ? 100 : 1024;
+  const maxTok = isVoice ? 120 : 1024;
   const prompt  = isVoice
     ? text+'\n\n[INSTRUÇÃO: responda em no máximo 2 frases curtas e diretas.]'
     : text;
 
-  // ── [NOVO / COMPLETO] CONSTRUTOR DE SYSTEM INSTRUCTION ──
-  // Utiliza as regras operacionais da tela de memória (System -> admin_rules) ou adota uma padrão
+  // ── CONSTRUTOR DE SYSTEM INSTRUCTION ──
   let systemText = window.__yraSystemRules || "Você é o Yra Assistant, um assistente prestativo e inteligente de IA.";
 
-  // Se houverem Fatos Aprendidos salvos (System -> facts), injetamos como parte das instruções
   if (window.__yraSystemFacts && window.__yraSystemFacts.length > 0) {
     systemText += "\n\n### FATOS APRENDIDOS E CONTEXTO DO USUÁRIO:";
     window.__yraSystemFacts.forEach(fact => {
@@ -1174,79 +1313,139 @@ async function submitMsg(text, isVoice=false){
     });
   }
 
-  // Se houverem plugins ativos, injeta as diretrizes para que o modelo possa interagir com eles
   if (window.__yraActivePlugins && window.__yraActivePlugins.length > 0) {
     systemText += "\n\n### PLUGINS ATIVOS:\nVocê possui os seguintes plugins integrados ao ambiente do usuário:";
     window.__yraActivePlugins.forEach(p => {
-      systemText += `\n- ${p.icon || '🧩'} **${p.name}**: ${p.description || ''} (Rota: ${p.router_rule || ''})`;
+      systemText += `\n- Nome: "${p.name}". Regra de Uso: ${p.router_rule || ''}`;
     });
-    systemText += "\n\nSe o usuário solicitar tarefas pertinentes a estes plugins, simule a integração de forma proativa utilizando as regras descritas.";
+    systemText += `\n\n### PROTOCOLO DE EXECUÇÃO DE PLUGIN:
+Se a pergunta exigir o uso de algum plugin listado acima, responda estritamente seguindo o padrão e encerre:
+▶CALL_PLUGIN: [nome_do_plugin] | [argumento_de_busca_ou_parametro]◀
+
+Exemplo: ▶CALL_PLUGIN: duckduckgo | inteligência artificial no brasil◀`;
   }
 
-  try{
-    const ep=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:streamGenerateContent?alt=sse&key=${apiKey}`;
-    
-    // Configura o payload com a systemInstruction contendo as regras e fatos combinados
-    const reqBody = {
-      contents:[{role:'user',parts:[{text:prompt}]}],
-      generationConfig:{temperature:.85,maxOutputTokens:maxTok}
-    };
-    
-    if (systemText) {
-      reqBody.systemInstruction = {
-        parts: [{text: systemText}]
-      };
-    }
-
-    const res=await fetch(ep,{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify(reqBody)
+  // Função para executar a chamada ao Gemini
+  async function callGemini(contentsPayload) {
+    const ep = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`;
+    const response = await fetch(ep, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: contentsPayload,
+        systemInstruction: { parts: [{ text: systemText }] },
+        generationConfig: { temperature: 0.5, maxOutputTokens: maxTok }
+      })
     });
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    if(!response.ok) throw new Error(`HTTP ${response.status}`);
+    return await response.json();
+  }
 
-    const reader=res.body.getReader(), decoder=new TextDecoder();
-    let buf='';
+  try {
+    let conversationHistory = [
+      { role: 'user', parts: [{ text: prompt }] }
+    ];
 
-    while(true){
-      const {done,value}=await reader.read();
-      if(done)break;
-      buf+=decoder.decode(value,{stream:true});
-      const lines=buf.split('\n');
-      buf=lines.pop();
-      for(const line of lines){
-        if(!line.startsWith('data:'))continue;
-        const js=line.slice(5).trim();
-        if(js==='[DONE]')break;
-        try{
-          const chunk=JSON.parse(js);
-          const piece=chunk.candidates?.[0]?.content?.parts?.[0]?.text||'';
-          if(!piece)continue;
-          accumulated+=piece;
-          if(isVoice){
-            firstChunk=false;
-            ltEl.textContent=accumulated;
-            ltEl.classList.add('vis','model-reply');
+    // 1ª Chamada: Determinar necessidade de plugin
+    const firstResponse = await callGemini(conversationHistory);
+    const firstText = firstResponse.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    // Expressão regular para identificar a chamada de plugin
+    const pluginMatch = firstText.match(/▶CALL_PLUGIN:\s*([a-zA-Z0-9_-]+)\s*\|\s*(.+)◀/);
+
+    if (pluginMatch) {
+      const pluginName = pluginMatch[1].trim();
+      let pluginParam = pluginMatch[2].replace('◀', '').trim();
+
+      // Abrir aba de raciocínio
+      openReasoning();
+      addReasoningLog("Plano", `Identificada necessidade de integração com ferramenta externa.`, true);
+      addReasoningLog("Análise", `Selecionando plugin: "${pluginName}" para processar: "${pluginParam}".`);
+
+      const pluginConfig = window.__yraActivePlugins.find(p => p.name === pluginName);
+
+      if (pluginConfig && pluginConfig.endpoint) {
+        addReasoningLog("Requisição", `Conectando ao endpoint remoto do plugin...`);
+        
+        try {
+          const targetUrl = `${pluginConfig.endpoint}${encodeURIComponent(pluginParam)}`;
+          const pluginResponse = await fetch(targetUrl);
+          if (!pluginResponse.ok) throw new Error(`Status HTTP ${pluginResponse.status}`);
+          
+          const pluginData = await pluginResponse.json();
+          const pluginResultString = JSON.stringify(pluginData).substring(0, 3000);
+          
+          addReasoningLog("Retorno", `Dados recebidos de "${pluginName}". Integrando contexto...`);
+
+          // 2ª Chamada: Enviar dados de volta para sintetizar resposta
+          conversationHistory.push({ role: 'model', parts: [{ text: firstText }] });
+          conversationHistory.push({ 
+            role: 'user', 
+            parts: [{ text: `[DADOS RETORNADOS PELO PLUGIN ${pluginName}]: ${pluginResultString}\n\nCom base nas informações do plugin e na pergunta original do usuário, formule sua resposta final.` }] 
+          });
+
+          addReasoningLog("Processo", `Gerando resposta estruturada final com a inteligência cognitiva...`);
+          
+          const finalResponse = await callGemini(conversationHistory);
+          accumulated = finalResponse.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          
+          // Sucesso - Fechar a aba de raciocínio
+          closeReasoning();
+
+          if(isVoice) {
+            ltEl.textContent = accumulated;
+            ltEl.classList.add('vis', 'model-reply');
+            addModelFinal(renderMd(accumulated), pluginName);
           } else {
-            if(firstChunk){ contentEl.innerHTML=''; firstChunk=false; }
-            contentEl.innerHTML=renderMd(accumulated);
-            scrollChat();
+            if(contentEl) {
+              contentEl.parentNode.removeChild(contentEl); // remove o container streaming/loader temporário
+            }
+            addModelFinal(renderMd(accumulated), pluginName);
           }
-        }catch(_){}
+
+        } catch (pluginError) {
+          console.error("Erro na chamada de API do plugin:", pluginError);
+          addReasoningLog("Erro", `Falha de rede ou barreira de CORS ao conectar com ${pluginName}.`);
+          closeReasoning();
+          
+          const fallbackText = `Encontrei uma falha ao tentar consultar dados em tempo real utilizando o plugin ${pluginName}.`;
+          if (isVoice) {
+            ltEl.textContent = fallbackText;
+            ltEl.classList.add('vis', 'model-reply');
+          } else {
+            if(contentEl) contentEl.innerHTML = `⚠️ ${fallbackText}`;
+          }
+        }
+      } else {
+        addReasoningLog("Falha", `O plugin "${pluginName}" não pôde ser ativado.`);
+        closeReasoning();
+        
+        const errText = `O plugin requerido (${pluginName}) não está disponível nas configurações.`;
+        if (isVoice) {
+          ltEl.textContent = errText;
+          ltEl.classList.add('vis', 'model-reply');
+        } else {
+          if(contentEl) contentEl.innerHTML = `⚠️ ${errText}`;
+        }
+      }
+
+    } else {
+      // Resposta convencional (sem plugin)
+      accumulated = firstText;
+      if (isVoice) {
+        ltEl.textContent = accumulated;
+        ltEl.classList.add('vis', 'model-reply');
+        addModelFinal(renderMd(accumulated));
+      } else {
+        if(contentEl) {
+          contentEl.innerHTML = renderMd(accumulated);
+        }
       }
     }
 
-    // Render final
-    if(!isVoice){
-      if(accumulated){ contentEl.innerHTML=renderMd(accumulated); scrollChat(); }
-      else if(firstChunk){ contentEl.innerHTML='(sem resposta)'; }
-    } else if(firstChunk){
-      ltEl.textContent='(sem resposta)';
-      ltEl.classList.add('vis','model-reply');
-    }
-
-  } catch(err){
+  } catch(err) {
     const errMsg=`⚠️ Erro: ${err.message}`;
+    closeReasoning();
     if(isVoice){
       ltEl.textContent='Não foi possível conectar.';
       ltEl.classList.add('vis','model-reply');
@@ -1260,13 +1459,11 @@ async function submitMsg(text, isVoice=false){
     isBusy=false; sendBtn.disabled=false;
 
     if(isVoice){
-      /* Guarda resposta no histórico e espera o user falar */
-      addModelFinal(renderMd(accumulated||'(sem resposta)'));
+      if(accumulated) addModelFinal(renderMd(accumulated));
       APP_STATE='responding';
       setOrbClass('responding');
       orbStatusEl.textContent='Fale para continuar…';
       drawResponding();
-      /* Reativa mic */
       if(recog&&!isRecog){ try{recog.start();isRecog=true;}catch(_){} }
     } else {
       APP_STATE='idle';
@@ -1277,7 +1474,6 @@ async function submitMsg(text, isVoice=false){
 /* Chamado pelo recognition após silêncio */
 function fromVoice(text){
   if(!text||!voiceActive)return;
-  /* ltEl ainda mostrando transcrição — submitMsg vai sobrescrever com "…" */
   submitMsg(text, true);
 }
 
@@ -1313,7 +1509,6 @@ const menuToggle     = document.getElementById('menuToggle');
 function openDrawer(){
   sidebar.classList.add('open');
   sidebarOverlay.classList.add('vis');
-  // impede scroll do body enquanto drawer aberto
   document.body.style.overflow='hidden';
 }
 function closeDrawer(){
@@ -1327,19 +1522,16 @@ menuToggle.addEventListener('click', e=>{
   sidebar.classList.contains('open') ? closeDrawer() : openDrawer();
 });
 
-// Overlay: toque fecha o drawer
 sidebarOverlay.addEventListener('touchstart', e=>{
-  e.preventDefault(); // impede ghost click
+  e.preventDefault();
   closeDrawer();
 }, {passive:false});
 sidebarOverlay.addEventListener('click', closeDrawer);
 
-// Fechar ao clicar em item de nav no mobile
 document.querySelectorAll('.nav-item').forEach(el=>{
   el.addEventListener('click', ()=>{ if(window.innerWidth<=900) closeDrawer(); });
 });
 
-// Swipe esquerda na sidebar fecha
 let touchStartX=0, touchStartY=0;
 sidebar.addEventListener('touchstart', e=>{
   touchStartX=e.touches[0].clientX;
@@ -1348,11 +1540,9 @@ sidebar.addEventListener('touchstart', e=>{
 sidebar.addEventListener('touchmove', e=>{
   const dx=touchStartX-e.touches[0].clientX;
   const dy=Math.abs(touchStartY-e.touches[0].clientY);
-  // só fecha se movimento horizontal dominante
   if(dx>50 && dx>dy*1.5) closeDrawer();
 },{passive:true});
 
-// Fechar drawer com tecla Escape
 document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDrawer(); });
 </script>
 </body>
