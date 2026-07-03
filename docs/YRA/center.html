@@ -9,12 +9,17 @@
     <title>Yra Assistant</title>
 
     <!-- DEPENDÊNCIAS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js">
+    </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10.6.1/dist/mermaid.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs/loader.min.js">
+    </script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
@@ -702,12 +707,33 @@
             border-radius: var(--radius-md);
             margin: 8px 0;
         }
+        .msg-content pre {
+            background: #1e1e1e;
+            padding: 12px;
+            border-radius: 0 0 6px 6px;
+            overflow-x: auto;
+            margin: 0;
+        }
+        .msg-content pre code {
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #d4d4d4;
+            background: transparent;
+            padding: 0;
+        }
         .msg-row.user .msg-content {
             background: linear-gradient(135deg, var(--g2) 0%, #388E3C 100%);
             color: #fff;
             border-radius: 16px 16px 4px 16px;
             padding: 10px 14px;
             box-shadow: 0 2px 8px rgba(46, 125, 50, 0.06);
+        }
+        .msg-row.user .msg-content pre {
+            background: #2d2d2d;
+        }
+        .msg-row.user .msg-content pre code {
+            color: #d4d4d4;
         }
         .msg-row.model .msg-content {
             padding: 2px 0;
@@ -1630,6 +1656,18 @@
     <script>
         'use strict';
 
+        // ---- CONFIGURAÇÃO DO MARKED ----
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({
+                breaks: true,
+                gfm: true,
+                headerIds: false,
+                mangle: false,
+                sanitize: false
+            });
+        }
+
+        // ---- ESTADO GLOBAL ----
         window.activeSession = {
             messages: [],
             artifacts: []
@@ -1640,7 +1678,9 @@
         window.APP_STATE = 'idle';
         window.hasChat = false;
         window.voiceActive = false;
+        window.__yraSystemReady = Promise.resolve(); // será substituída
 
+        // ---- DOM ELEMENTOS ----
         const chatThread = document.getElementById('chatThread');
         const orbStatusEl = document.getElementById('orbStatus');
         const ltEl = document.getElementById('listenTranscript');
@@ -1667,6 +1707,7 @@
             waveData = null,
             isAudioOk = false;
 
+        // ---- ATUALIZA TOPBAR ----
         window.updateTopbarTokens = function() {
             let totalChars = 0;
             if (window.activeSession && window.activeSession.messages) {
@@ -1682,6 +1723,7 @@
             document.getElementById('topbarPlugins').textContent = count || 0;
         };
 
+        // ---- LAYOUT VISUALS ----
         window.showOrb = function(resetChat = false) {
             orbStageEl.classList.remove('hidden');
             chatThread.classList.remove('visible');
@@ -1728,6 +1770,7 @@
             window.updateTopbarTokens();
         };
 
+        // ---- MONACO ----
         if (typeof require !== 'undefined') {
             require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.39.0/min/vs' } });
             require(['vs/editor/editor.main'], function() {
@@ -1745,11 +1788,12 @@
             });
         }
 
+        // ---- PARSER DE MATEMÁTICA E MARKDOWN (CORRIGIDO) ----
         window.parseMathAndMarkdown = function(text) {
+            // 1. Extrair equações e substituir por placeholders seguros
             let mathBlocks = [];
-            // Usa placeholders do tipo <!--MATH_BLOCK_DISP_0--> para não serem afetados pelo Markdown
             let out = text.replace(/\$\$([\s\S]+?)\$\$/g, (m, equation) => {
-                let id = `<!--MATH_BLOCK_DISP_${mathBlocks.length}-->`;
+                let id = `%%MATH_DISP_${mathBlocks.length}%%`;
                 try {
                     let rendered = katex.renderToString(equation, { displayMode: true, throwOnError: false });
                     mathBlocks.push({ id, html: rendered });
@@ -1760,7 +1804,7 @@
             });
 
             out = out.replace(/\$([^\$\n]+?)\$/g, (m, equation) => {
-                let id = `<!--MATH_BLOCK_INL_${mathBlocks.length}-->`;
+                let id = `%%MATH_INL_${mathBlocks.length}%%`;
                 try {
                     let rendered = katex.renderToString(equation, { displayMode: false, throwOnError: false });
                     mathBlocks.push({ id, html: rendered });
@@ -1770,6 +1814,7 @@
                 return id;
             });
 
+            // 2. Processar Markdown
             let parsedHtml = '';
             if (typeof marked !== 'undefined') {
                 parsedHtml = marked.parse(out);
@@ -1777,6 +1822,7 @@
                 parsedHtml = out.replace(/\n/g, '<br>');
             }
 
+            // 3. Restaurar equações
             mathBlocks.forEach(item => {
                 parsedHtml = parsedHtml.split(item.id).join(item.html);
             });
@@ -1784,6 +1830,7 @@
             return parsedHtml;
         };
 
+        // ---- ARTEFATOS ----
         window.detectAndExtractArtifacts = function(text) {
             const pattern = /```([a-zA-Z0-9+#-]+)?\s*(?:\[title=([^\]]+)\]|\[([^\]]+)\])?\n([\s\S]*?)```/g;
             let match;
@@ -1880,6 +1927,7 @@
         window.closeArtifacts = function() { document.getElementById('artifactsPane').classList.remove('open'); };
         window.openArtifacts = function() { document.getElementById('artifactsPane').classList.add('open'); };
 
+        // ---- AÇÕES DE CÓDIGO ----
         window.copyCodeFromChat = function(btn) {
             const pre = btn.closest('.chat-code-header').nextElementSibling;
             const code = pre.querySelector('code').textContent;
@@ -1918,9 +1966,11 @@
           `;
         };
 
+        // ---- PÓS-PROCESSAMENTO DE BLOCOS DE CÓDIGO ----
         window.postProcessPreBlocks = function(element) {
             const pres = element.querySelectorAll('pre');
             pres.forEach(pre => {
+                // Se já foi processado, pula
                 if (pre.parentNode.classList.contains('code-wrapper-enriched')) return;
 
                 const code = pre.querySelector('code');
@@ -1958,6 +2008,7 @@
             });
         };
 
+        // ---- RENDERIZAÇÃO DE ÁUDIO ----
         window.drawIdle = function() {
             cancelAnimationFrame(rafId);
             let t = 0;
@@ -2062,9 +2113,13 @@
             frame();
         };
 
+        // ---- SUBMISSÃO DE MENSAGEM (AGUARDA SISTEMA) ----
         window.submitMsg = async function(text, isVoice = false) {
             text = text.trim();
             if (window.isBusy || (!text && !currentAttachedFile)) return;
+
+            // Aguarda o carregamento das regras do sistema
+            await window.__yraSystemReady;
 
             const apiKey = window.__yraApiKey;
             if (!apiKey) {
@@ -2257,6 +2312,7 @@
             }
         };
 
+        // ---- FUNÇÕES AUXILIARES ----
         function escHtml(str) {
             if (!str) return '';
             const div = document.createElement('div');
@@ -2361,6 +2417,7 @@
             if (ph) ph.classList.add('fade');
         }
 
+        // Stubs para plugins (substituir por implementação real)
         function runCognitiveRouter(text) { return []; }
 
         function executePluginsInParallel(matched, text) { return Promise.resolve([]); }
@@ -2370,6 +2427,7 @@
         let recog = null,
             isRecog = false;
 
+        // ---- EVENTOS ----
         msgInput.addEventListener('input', autoResize);
 
         msgInput.addEventListener('keydown', e => {
@@ -2412,6 +2470,8 @@
         });
 
         document.getElementById('closeArtifactsBtn').addEventListener('click', window.closeArtifacts);
+
+        document.getElementById('artifactsToggleBtn').addEventListener('click', window.openArtifacts);
 
         document.getElementById('apCopyBtn').addEventListener('click', () => {
             if (window.monacoEditorInstance) {
@@ -2470,12 +2530,13 @@
             }
         });
 
+        // ---- INICIALIZA ----
         window.drawIdle();
         window.updateTopbarTokens();
-
         console.log('Yra Assistant • State-of-the-art interface carregada.');
     </script>
 
+    <!-- FIREBASE CONEXÃO (MODULE) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -2499,6 +2560,12 @@
         window.__yraSystemRules = "";
         window.__yraSystemFacts = [];
 
+        // Promise que será resolvida quando os dados do sistema estiverem carregados
+        let systemReadyResolve;
+        window.__yraSystemReady = new Promise(resolve => {
+            systemReadyResolve = resolve;
+        });
+
         onAuthStateChanged(auth, async user => {
             if (!user) { window.location.href = 'index.html'; return; }
 
@@ -2510,21 +2577,37 @@
             document.getElementById('userEmailEl').textContent = email;
             document.getElementById('userAvatarEl').textContent = inits;
 
+            // Carrega chave API
             try {
                 const q = query(collection(db, 'Keys'), where('user_id', '==', user.uid), where('enabled', '==', true));
                 const ks = await getDocs(q);
                 if (!ks.empty) window.__yraApiKey = ks.docs[0].data().key;
             } catch (e) { console.error('Chave de API não localizada:', e); }
 
+            // Carrega regras do sistema e fatos
             try {
                 const systemSnap = await getDoc(doc(db, "System", user.uid));
                 if (systemSnap.exists()) {
                     const data = systemSnap.data();
                     window.__yraSystemRules = data.admin_rules || "";
                     window.__yraSystemFacts = data.facts || [];
+                } else {
+                    // Documento não existe: criar com valores padrão
+                    const defaultData = {
+                        admin_rules: "Você é a YRA, uma assistente pessoal inteligente voltada a otimização de rotina, automações de negócios e gestão de dados.",
+                        facts: [
+                            "O usuário prefere respostas diretas, estruturadas e sem formalidade excessiva.",
+                            "A empresa do usuário atua no ramo de desenvolvimento de software e soluções Cloud."
+                        ],
+                        updated_at: new Date()
+                    };
+                    await setDoc(doc(db, "System", user.uid), defaultData);
+                    window.__yraSystemRules = defaultData.admin_rules;
+                    window.__yraSystemFacts = defaultData.facts;
                 }
             } catch (e) { console.error('Erro na sincronização de memória:', e); }
 
+            // Carrega plugins
             try {
                 const qPlugins = query(collection(db, 'Plugins'), where('associated_users', 'array-contains', user.uid));
                 const snap = await getDocs(qPlugins);
@@ -2549,6 +2632,9 @@
                 });
                 window.updateTopbarPlugins(count);
             } catch (e) { console.error('Mapeamento falhou:', e); }
+
+            // Sinaliza que o sistema está pronto
+            systemReadyResolve();
 
             window.initTemporarySession();
             window.updateTopbarTokens();
