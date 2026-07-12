@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sya-Lib - Documentação</title>
+    <!-- Tailwind CSS para estilização rápida -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Ajuste fino para focar apenas em tons de cinza e preto */
+        ::selection {
+            background-color: #000000;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="bg-zinc-100 text-zinc-900 font-sans antialiased flex flex-col h-screen">
+
+    <!-- Cabeçalho Plano (Sem boxes, apenas separador sutil) -->
+    <header class="bg-zinc-100 border-b border-zinc-200 h-16 flex items-center justify-between px-8 z-10 shrink-0">
+        <div class="flex items-center space-x-3">
+            <span class="text-lg font-bold tracking-wider text-black">SYA-LIB</span>
+            <span class="text-xs text-zinc-500 font-mono">v1.0.0</span>
+        </div>
+        <div class="text-xs text-zinc-500 uppercase tracking-widest">
+            Documentação Técnica
+        </div>
+    </header>
+
+    <!-- Corpo Principal -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Barra Lateral Plana (Mesmo fundo cinza claro, sem divisões flutuantes) -->
+        <aside class="w-80 bg-zinc-100 flex flex-col justify-between overflow-y-auto px-8 py-6 border-r border-zinc-200">
+            <!-- Navegação (Sumário) -->
+            <div>
+                <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">Sumário</h2>
+                <nav id="sidebar-nav" class="space-y-2">
+                    <!-- Links dinâmicos -->
+                </nav>
+            </div>
+
+            <!-- Formulário Plano de Adição -->
+            <div class="mt-8 pt-6 border-t border-zinc-200">
+                <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-widest mb-4">Nova Seção</h3>
+                <form id="add-section-form" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-zinc-500 mb-1" for="section-title">Título</label>
+                        <input type="text" id="section-title" required placeholder="ex: Configuração" 
+                               class="w-full text-sm bg-transparent border-b border-zinc-300 py-1 focus:border-black focus:outline-none transition-colors">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] uppercase tracking-wider text-zinc-500 mb-1" for="section-content">Conteúdo</label>
+                        <textarea id="section-content" rows="3" required placeholder="Digite o texto ou HTML..." 
+                                  class="w-full text-sm bg-transparent border-b border-zinc-300 py-1 focus:border-black focus:outline-none resize-none transition-colors"></textarea>
+                    </div>
+                    <button type="submit" 
+                            class="w-full bg-black text-white hover:bg-zinc-800 text-xs font-bold uppercase tracking-widest py-2.5 transition-colors">
+                        Adicionar
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <!-- Área de Conteúdo Principal (Sem caixas ou blocos destacados) -->
+        <main class="flex-1 overflow-y-auto bg-zinc-100 px-12 py-10">
+            <div id="content-area" class="max-w-2xl space-y-16 pb-32">
+                <!-- Seções dinâmicas -->
+            </div>
+        </main>
+
+    </div>
+
+    <!-- Script de gerenciamento do estado -->
+    <script>
+        // Dados iniciais
+        let sections = [
+            {
+                id: "introducao",
+                title: "Introdução",
+                content: "O Sya-Lib é uma biblioteca minimalista desenvolvida para otimizar fluxos de trabalho. O foco do projeto está na simplicidade estrutural e no desempenho estável, sem excesso de dependências externas."
+            },
+            {
+                id: "uso-basico",
+                title: "Uso Básico",
+                content: "Após realizar a instalação padrão, importe a biblioteca diretamente no cabeçalho do seu arquivo principal. A inicialização ocorre de forma direta por meio de parâmetros declarativos simples."
+            }
+        ];
+
+        const navContainer = document.getElementById('sidebar-nav');
+        const contentContainer = document.getElementById('content-area');
+        const form = document.getElementById('add-section-form');
+
+        // Renderiza o sumário e as seções
+        function render() {
+            navContainer.innerHTML = '';
+            contentContainer.innerHTML = '';
+
+            sections.forEach(section => {
+                // Link do Sumário
+                const navLink = document.createElement('a');
+                navLink.href = `#${section.id}`;
+                navLink.className = "block text-sm text-zinc-600 hover:text-black hover:translate-x-1 transition-transform duration-150";
+                navLink.textContent = section.title;
+                navContainer.appendChild(navLink);
+
+                // Bloco de Conteúdo (Visual plano, sem bordas ou fundo branco)
+                const sectionBlock = document.createElement('section');
+                sectionBlock.id = section.id;
+                sectionBlock.className = "scroll-mt-24";
+                
+                sectionBlock.innerHTML = `
+                    <h2 class="text-xl font-bold text-black tracking-wide mb-3">${section.title}</h2>
+                    <div class="text-zinc-600 text-sm leading-relaxed space-y-3 font-normal">
+                        ${section.content}
+                    </div>
+                `;
+                contentContainer.appendChild(sectionBlock);
+            });
+        }
+
+        // Conversão de título em slug para âncora
+        function generateId(text) {
+            return text
+                .toString()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/\s+/g, '-')
+                .replace(/[^\w\-]+/g, '')
+                .replace(/\-\-+/g, '-')
+                .trim();
+        }
+
+        // Adiciona nova seção
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const titleInput = document.getElementById('section-title');
+            const contentInput = document.getElementById('section-content');
+
+            const title = titleInput.value.trim();
+            const content = contentInput.value.trim().replace(/\n/g, '<br>');
+            const id = generateId(title);
+
+            const idExists = sections.some(sec => sec.id === id);
+            if (idExists) {
+                alert("Uma seção com este título já existe.");
+                return;
+            }
+
+            sections.push({ id, title, content });
+            render();
+            form.reset();
+
+            // Rolagem suave até a nova seção
+            setTimeout(() => {
+                const target = document.getElementById(id);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, 50);
+        });
+
+        // Inicialização
+        render();
+    </script>
+</body>
+</html>
