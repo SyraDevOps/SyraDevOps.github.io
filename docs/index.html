@@ -1,257 +1,210 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="scroll-smooth">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYRA — Technology Ecosystem</title>
-    <!-- Tailwind CSS para estilização de alto padrão -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Fonte Inter para consistência e precisão -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+    <title>Syradevops</title>
     <style>
+        /* Configurações Globais */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #fafafa;
-            color: #171717;
+            background-color: #f2f2f5; /* Fundo cinza claro limpo */
+            color: #000000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Estrutura centralizada sem Box */
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            max-width: 440px;
+            width: 100%;
+        }
+
+        /* Tipografia de Marca Corporativa */
+        .brand-name {
+            font-size: 2.6rem;
+            font-weight: 700;
+            letter-spacing: -0.04em; /* Espaçamento corporativo clássico */
+            color: #000000;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid #000000;
+            width: 0;
+            margin-bottom: 1rem;
+            /* Animação de digitação baseada em 11 caracteres de '@Syradevops' */
+            animation: 
+                typing 1.6s steps(11, end) 0.3s forwards,
+                blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 11.5ch }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #000000; }
+        }
+
+        /* Linha divisória minimalista de alto contraste */
+        .separator {
+            width: 60px;
+            height: 2px;
+            background: #000000;
+            margin-bottom: 2.5rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards 1.9s;
+        }
+
+        /* Elementos interativos em contraste */
+        .interactive-area {
+            width: 100%;
+            opacity: 0;
+            animation: fadeIn 0.6s ease forwards 2.1s;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Botões Corporativos de Alto Contraste */
+        .buttons-group {
+            display: flex;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 2.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 14px 28px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase; /* Estética de portal corporativo */
+            text-decoration: none;
+            border-radius: 4px; /* Cantos mais retos e profissionais */
+            transition: all 0.2s ease-in-out;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background-color: #000000;
+            color: #ffffff;
+            border: 1px solid #000000;
+        }
+
+        .btn-primary:hover {
+            background-color: #222222;
+            border-color: #222222;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: #000000;
+            border: 1px solid #000000;
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(0, 0, 0, 0.06);
+        }
+
+        /* Ícones Sociais Diretos (Sem círculos ou fundos) */
+        .social-links {
+            display: flex;
+            gap: 24px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .social-icon {
+            color: #444446;
+            transition: color 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .social-icon:hover {
+            color: #000000; /* Contraste máximo ao interagir */
+        }
+
+        .social-icon svg {
+            width: 21px;
+            height: 21px;
+            fill: currentColor;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between selection:bg-neutral-200 selection:text-neutral-900">
+<body>
 
-    <!-- Header Fixo / Minimalista -->
-    <header class="w-full max-w-6xl mx-auto px-6 py-8 flex justify-between items-center z-10">
-        <div class="text-xl font-light tracking-[0.2em] text-neutral-900">SYRA</div>
-        <nav class="space-x-8 text-xs tracking-wider uppercase text-neutral-500">
-            <a href="#ecossistema" class="hover:text-black transition-colors">Ecossistema</a>
-            <a href="#filosofia" class="hover:text-black transition-colors">Filosofia</a>
-            <a href="#governanca" class="hover:text-black transition-colors">Governança</a>
-        </nav>
-    </header>
-
-    <!-- 1. Hero Institutional (Visão de Ecossistema) -->
-    <section class="min-h-[85vh] flex flex-col justify-center px-6 max-w-4xl mx-auto">
-        <div class="space-y-8">
-            <span class="text-xs font-medium tracking-[0.3em] text-neutral-400 uppercase">Engineering, AI & Publishing</span>
-            <h1 class="text-4xl md:text-6xl font-light tracking-tight leading-tight text-neutral-900">
-                Tecnologia para construir.<br>
-                Inteligência para evoluir.<br>
-                Conhecimento para permanecer.
-            </h1>
-            <p class="text-neutral-500 text-lg md:text-xl font-light leading-relaxed max-w-3xl">
-                A SYRA é uma empresa de tecnologia responsável pelo desenvolvimento de produtos digitais, inteligência artificial, infraestrutura e iniciativas editoriais. Nosso ecossistema reúne soluções próprias e projetos personalizados para organizações que buscam inovação com qualidade técnica.
-            </p>
-        </div>
-    </section>
-
-    <!-- 2. Diagrama do Ecossistema (Tipografia & Linhas Finas) -->
-    <section id="ecossistema" class="py-24 px-6 max-w-4xl mx-auto border-t border-neutral-200">
-        <div class="text-center mb-12">
-            <span class="text-xs tracking-[0.2em] text-neutral-400 uppercase">A Estrutura do Ecossistema</span>
-        </div>
+    <div class="wrapper">
+        <!-- Logo/Nome Corporativo -->
+        <h1 class="brand-name">@Syradevops</h1>
         
-        <!-- Renderização Visual do Diagrama -->
-        <div class="flex flex-col items-center">
-            <!-- Hub Central -->
-            <div class="text-center">
-                <span class="text-2xl font-light tracking-[0.2em] text-neutral-900">SYRA</span>
-                <span class="block text-[10px] tracking-[0.15em] text-neutral-400 uppercase mt-1">Engineering • Research • Innovation</span>
-            </div>
-            
-            <!-- Conectores (Visíveis em Telas Médias/Grandes) -->
-            <div class="hidden md:block w-full max-w-xl h-20 my-4">
-                <svg class="w-full h-full text-neutral-200" viewBox="0 0 600 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <!-- Linha do hub até a bifurcação -->
-                    <line x1="300" y1="0" x2="300" y2="25" stroke="currentColor" stroke-width="1"/>
-                    <!-- Diagonal Esquerda para YRA -->
-                    <line x1="300" y1="25" x2="100" y2="55" stroke="currentColor" stroke-width="1"/>
-                    <!-- Linha reta para OBY -->
-                    <line x1="300" y1="25" x2="300" y2="55" stroke="currentColor" stroke-width="1"/>
-                    <!-- Diagonal Direita para Enterprise -->
-                    <line x1="300" y1="25" x2="500" y2="55" stroke="currentColor" stroke-width="1"/>
-                    
-                    <!-- Terminais verticais curtos para acabamento -->
-                    <line x1="100" y1="55" x2="100" y2="80" stroke="currentColor" stroke-width="1"/>
-                    <line x1="300" y1="55" x2="300" y2="80" stroke="currentColor" stroke-width="1"/>
-                    <line x1="500" y1="55" x2="500" y2="80" stroke="currentColor" stroke-width="1"/>
-                </svg>
-            </div>
-            
-            <!-- Espaçador para mobile quando o SVG estiver oculto -->
-            <div class="md:hidden h-12 w-px bg-neutral-200 my-4"></div>
+        <!-- Elemento de ancoragem visual -->
+        <div class="separator"></div>
 
-            <!-- As Três Frentes -->
-            <div class="w-full max-w-3xl flex flex-col md:flex-row justify-between gap-12 md:gap-4 text-center mt-4">
-                <!-- YRA -->
-                <div class="md:w-1/3 flex flex-col items-center">
-                    <span class="text-lg font-light text-neutral-800 tracking-wider">YRA</span>
-                    <span class="text-[11px] text-neutral-400 uppercase tracking-widest mt-1">Artificial Intelligence</span>
-                </div>
-                <!-- OBY -->
-                <div class="md:w-1/3 flex flex-col items-center">
-                    <span class="text-lg font-light text-neutral-800 tracking-wider">OBY</span>
-                    <span class="text-[11px] text-neutral-400 uppercase tracking-widest mt-1">Editorial</span>
-                </div>
-                <!-- Enterprise (SYRA) -->
-                <div class="md:w-1/3 flex flex-col items-center">
-                    <span class="text-lg font-light text-neutral-800 tracking-wider">Enterprise</span>
-                    <span class="text-[11px] text-neutral-400 uppercase tracking-widest mt-1">Solutions</span>
-                </div>
+        <!-- Área de Ação -->
+        <div class="interactive-area">
+            <div class="buttons-group">
+                <a href="#" class="btn btn-primary">Projects</a>
+                <a href="#" class="btn btn-secondary">Aboout Us</a>
             </div>
-        </div>
-    </section>
 
-    <!-- 3. Blocos Verticais de Produto (Tema Claro com Marca d'Água Sutil) -->
-    <section class="space-y-6 py-6 px-4">
-        
-        <!-- Bloco SYRA (Enterprise) -->
-        <div class="relative overflow-hidden min-h-[65vh] flex flex-col justify-between p-12 bg-white border border-neutral-200/80 max-w-6xl mx-auto rounded-lg shadow-sm">
-            <!-- Marca d'Água sutil em tom de cinza muito claro -->
-            <div class="absolute right-8 bottom-0 text-[10rem] md:text-[20rem] font-bold tracking-tighter text-neutral-900/[0.015] select-none pointer-events-none leading-none">
-                SYRA
-            </div>
-            
-            <div class="relative z-10">
-                <span class="text-xs font-semibold tracking-[0.2em] text-neutral-400 uppercase">Enterprise</span>
-                <h2 class="text-3xl md:text-4xl font-light text-neutral-900 mt-4 mb-6">SYRA</h2>
-                <p class="text-neutral-500 text-lg leading-relaxed max-w-xl font-light">
-                    Desenvolvemos sistemas, produtos digitais e soluções sob medida para empresas que precisam de tecnologia construída para durar.
-                </p>
-            </div>
-            <div class="relative z-10 mt-12">
-                <a href="mailto:contato@syra.cloud" class="text-sm tracking-wider text-neutral-900 hover:underline inline-flex items-center gap-2">
-                    Conhecer →
+            <!-- Redes sociais puras em contraste -->
+            <div class="social-links">
+                <!-- Instagram -->
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Instagram">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+                    </svg>
+                </a>
+
+                <!-- LinkedIn -->
+                <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="LinkedIn">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                    </svg>
+                </a>
+
+                <!-- X (Twitter) -->
+                <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="X (Twitter)">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                    </svg>
+                </a>
+
+                <!-- GitHub -->
+                <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="GitHub">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                </a>
+
+                <!-- Google Calendar -->
+                <a href="https://calendar.google.com" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="Google Agenda">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm-5-7h5v5h-5v-5z"/>
+                    </svg>
                 </a>
             </div>
         </div>
-
-        <!-- Bloco YRA -->
-        <div class="relative overflow-hidden min-h-[65vh] flex flex-col justify-between p-12 bg-white border border-neutral-200/80 max-w-6xl mx-auto rounded-lg shadow-sm">
-            <!-- Marca d'Água -->
-            <div class="absolute right-12 bottom-4 text-[10rem] md:text-[22rem] font-bold tracking-tighter text-neutral-900/[0.015] select-none pointer-events-none leading-none">
-                &gt; _
-            </div>
-            
-            <div class="relative z-10">
-                <span class="text-xs font-semibold tracking-[0.2em] text-neutral-400 uppercase">Artificial Intelligence</span>
-                <h2 class="text-3xl md:text-4xl font-light text-neutral-900 mt-4 mb-6">YRA</h2>
-                <p class="text-neutral-500 text-lg leading-relaxed max-w-xl font-light">
-                    Inteligência artificial criada para conversar, automatizar processos, integrar sistemas e ampliar a produtividade de pessoas e empresas.
-                </p>
-            </div>
-            <div class="relative z-10 mt-12">
-                <a href="/YRA" class="text-sm tracking-wider text-neutral-900 hover:underline inline-flex items-center gap-2">
-                    Conhecer →
-                </a>
-            </div>
-        </div>
-
-        <!-- Bloco OBY -->
-        <div class="relative overflow-hidden min-h-[65vh] flex flex-col justify-between p-12 bg-white border border-neutral-200/80 max-w-6xl mx-auto rounded-lg shadow-sm">
-            <!-- Marca d'Água -->
-            <div class="absolute right-8 bottom-0 text-[10rem] md:text-[20rem] font-bold tracking-tighter text-neutral-900/[0.015] select-none pointer-events-none leading-none">
-                OBY
-            </div>
-            
-            <div class="relative z-10">
-                <span class="text-xs font-semibold tracking-[0.2em] text-neutral-400 uppercase">Editorial</span>
-                <h2 class="text-3xl md:text-4xl font-light text-neutral-900 mt-4 mb-6">OBY</h2>
-                <p class="text-neutral-500 text-lg leading-relaxed max-w-xl font-light">
-                    O selo editorial da SYRA. Livros, pesquisas e conteúdos exclusivos personalizados para permanecer relevantes muito além do momento em que são publicados.
-                </p>
-            </div>
-            <div class="relative z-10 mt-12">
-                <a href="/Oby/" class="text-sm tracking-wider text-neutral-900 hover:underline inline-flex items-center gap-2">
-                    Conhecer →
-                </a>
-            </div>
-        </div>
-
-    </section>
-
-    <!-- 4. Filosofia (Atualizada & Autoral) -->
-    <section id="filosofia" class="py-32 px-6 max-w-3xl mx-auto text-center">
-        <span class="text-xs tracking-[0.3em] text-neutral-400 uppercase block mb-10">Filosofia</span>
-        <h3 class="text-xl md:text-2xl font-medium leading-relaxed text-neutral-900 mb-6">
-            Tecnologia deve ser compreendida, não apenas utilizada.
-        </h3>
-        <p class="text-neutral-500 text-base md:text-lg font-light leading-relaxed">
-            Acreditamos que sistemas bem construídos permanecem relevantes por anos. Cada produto, algoritmo e publicação nasce da mesma convicção: qualidade não é um recurso, é uma decisão de engenharia.
-        </p>
-    </section>
-
-    <!-- 5. Conclusão / Call to Action Triplo -->
-    <section class="py-24 px-6 bg-white border-t border-neutral-200/80">
-        <div class="max-w-5xl mx-auto">
-            <h3 class="text-3xl font-light text-neutral-900 mb-4 text-center md:text-left">Comece pelo caminho certo.</h3>
-            <p class="text-neutral-500 text-sm mb-12 max-w-xl text-center md:text-left">
-                Selecione o segmento do nosso ecossistema que melhor atende à sua necessidade imediata.
-            </p>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- Direcionamento SYRA -->
-                <div class="p-6 border border-neutral-200/80 rounded bg-neutral-50/50 flex flex-col justify-between h-48">
-                    <div>
-                        <h4 class="text-sm font-medium text-neutral-900 mb-2">Se procura soluções para sua empresa</h4>
-                        <p class="text-xs text-neutral-500 leading-relaxed">Converse com a SYRA sobre engenharia, projetos customizados e infraestrutura de rede.</p>
-                    </div>
-                    <a href="mailto:contato@syra.cloud" class="text-xs tracking-wider text-neutral-900 hover:underline mt-4">Converse com a SYRA →</a>
-                </div>
-
-                <!-- Direcionamento YRA -->
-                <div class="p-6 border border-neutral-200/80 rounded bg-neutral-50/50 flex flex-col justify-between h-48">
-                    <div>
-                        <h4 class="text-sm font-medium text-neutral-900 mb-2">Se procura inteligência artificial</h4>
-                        <p class="text-xs text-neutral-500 leading-relaxed">Experimente nossa ferramenta inteligente e explore integrações cognitivas.</p>
-                    </div>
-                    <a href="/YRA" class="text-xs tracking-wider text-neutral-900 hover:underline mt-4">Conheça a YRA →</a>
-                </div>
-
-                <!-- Direcionamento OBY -->
-                <div class="p-6 border border-neutral-200/80 rounded bg-neutral-50/50 flex flex-col justify-between h-48">
-                    <div>
-                        <h4 class="text-sm font-medium text-neutral-900 mb-2">Se procura conhecimento</h4>
-                        <p class="text-xs text-neutral-500 leading-relaxed">Visite o selo OBY e encontre livros, artigos técnicos e pesquisas originais.</p>
-                    </div>
-                    <a href="/Oby/" class="text-xs tracking-wider text-neutral-900 hover:underline mt-4">Entre na OBY →</a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- 6. Governança & Transparência e Rodapé -->
-    <section id="governanca" class="py-16 px-6 bg-neutral-50 border-t border-neutral-200 text-neutral-500">
-        <div class="max-w-6xl mx-auto flex flex-col gap-12">
-            
-            <!-- Box de Governança corporativa que aponta para o diretório de documentos -->
-            <div class="border border-neutral-200/80 p-8 rounded bg-white flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm">
-                <div>
-                    <h4 class="text-xs font-semibold tracking-[0.2em] text-neutral-400 uppercase mb-2">Governança e Transparência</h4>
-                    <p class="text-xs text-neutral-500 max-w-xl">
-                        Acesse nossas políticas corporativas, estatutos sociais, regulamentos internos e termos de conformidade técnica em nossa base documental.
-                    </p>
-                </div>
-                <a href="/docs/" class="text-xs tracking-wider text-neutral-900 hover:underline whitespace-nowrap border border-neutral-200 px-4 py-2 rounded bg-neutral-50 hover:bg-neutral-100 transition-colors">
-                    Consulte os documentos institucionais →
-                </a>
-            </div>
-
-            <!-- Rodapé Clássico -->
-            <div class="flex flex-col md:flex-row justify-between items-center text-[11px] text-neutral-400 border-t border-neutral-200/80 pt-8 gap-4">
-                <div>
-                    © 2026 SYRA. Todos os direitos reservados.
-                </div>
-                <div class="space-x-4">
-                    <a href="/YRA" class="hover:text-black transition-colors">Yra</a>
-                    <span>•</span>
-                    <a href="/Oby/" class="hover:text-black transition-colors">Oby</a>
-                    <span>•</span>
-                    <a href="mailto:contato@syra.cloud" class="hover:text-black transition-colors">Contato</a>
-                </div>
-            </div>
-        </div>
-    </section>
+    </div>
 
 </body>
 </html>
