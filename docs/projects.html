@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sya-Lib - Documentação</title>
+    <title>Open by Syra - Documentação</title>
     <!-- Tailwind CSS para estilização rápida -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -15,6 +15,20 @@
             background-color: #000000;
             color: #ffffff;
         }
+        pre.code-block {
+            background-color: #18181b;
+            color: #e4e4e7;
+            border-radius: 6px;
+            padding: 16px;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.6;
+            max-height: 480px;
+        }
+        pre.code-block code {
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+            white-space: pre;
+        }
     </style>
 </head>
 <body class="bg-zinc-100 text-zinc-900 font-sans antialiased flex flex-col h-screen">
@@ -22,7 +36,7 @@
     <!-- Cabeçalho Plano (Sem boxes, apenas separador sutil) -->
     <header class="bg-zinc-100 border-b border-zinc-200 h-16 flex items-center justify-between px-8 z-10 shrink-0">
         <div class="flex items-center space-x-3">
-            <span class="text-lg font-bold tracking-wider text-black">SYA-LIB</span>
+            <span class="text-lg font-bold tracking-wider text-black">OPEN BY SYRA</span>
             <span class="text-xs text-zinc-500 font-mono">v1.0.0</span>
         </div>
         <div class="text-xs text-zinc-500 uppercase tracking-widest">
@@ -32,36 +46,15 @@
 
     <!-- Corpo Principal -->
     <div class="flex flex-1 overflow-hidden">
-        
+
         <!-- Barra Lateral Plana (Mesmo fundo cinza claro, sem divisões flutuantes) -->
-        <aside class="w-80 bg-zinc-100 flex flex-col justify-between overflow-y-auto px-8 py-6 border-r border-zinc-200">
+        <aside class="w-80 bg-zinc-100 flex flex-col overflow-y-auto px-8 py-6 border-r border-zinc-200">
             <!-- Navegação (Sumário) -->
             <div>
                 <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">Sumário</h2>
                 <nav id="sidebar-nav" class="space-y-2">
-                    <!-- Links dinâmicos -->
+                    <!-- Links dinâmicos, gerados a partir do módulo de seções -->
                 </nav>
-            </div>
-
-            <!-- Formulário Plano de Adição -->
-            <div class="mt-8 pt-6 border-t border-zinc-200">
-                <h3 class="text-xs font-bold text-zinc-900 uppercase tracking-widest mb-4">Nova Seção</h3>
-                <form id="add-section-form" class="space-y-4">
-                    <div>
-                        <label class="block text-[10px] uppercase tracking-wider text-zinc-500 mb-1" for="section-title">Título</label>
-                        <input type="text" id="section-title" required placeholder="ex: Configuração" 
-                               class="w-full text-sm bg-transparent border-b border-zinc-300 py-1 focus:border-black focus:outline-none transition-colors">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] uppercase tracking-wider text-zinc-500 mb-1" for="section-content">Conteúdo</label>
-                        <textarea id="section-content" rows="3" required placeholder="Digite o texto ou HTML..." 
-                                  class="w-full text-sm bg-transparent border-b border-zinc-300 py-1 focus:border-black focus:outline-none resize-none transition-colors"></textarea>
-                    </div>
-                    <button type="submit" 
-                            class="w-full bg-black text-white hover:bg-zinc-800 text-xs font-bold uppercase tracking-widest py-2.5 transition-colors">
-                        Adicionar
-                    </button>
-                </form>
             </div>
         </aside>
 
@@ -74,99 +67,804 @@
 
     </div>
 
-    <!-- Script de gerenciamento do estado -->
-    <script>
-        // Dados iniciais
-        let sections = [
-            {
-                id: "introducao",
-                title: "Introdução",
-                content: "O Sya-Lib é uma biblioteca minimalista desenvolvida para otimizar fluxos de trabalho. O foco do projeto está na simplicidade estrutural e no desempenho estável, sem excesso de dependências externas."
-            },
-            {
-                id: "uso-basico",
-                title: "Uso Básico",
-                content: "Após realizar a instalação padrão, importe a biblioteca diretamente no cabeçalho do seu arquivo principal. A inicialização ocorre de forma direta por meio de parâmetros declarativos simples."
+    <!-- ==========================================================
+         MÓDULO DE DADOS (metadados): título, tipo e conteúdo textual
+         de cada seção do sumário. Para adicionar uma nova seção,
+         basta inserir um novo objeto neste array.
+         Seções do tipo "code" buscam o código-fonte correspondente
+         em um <template> próprio (ver bloco "syra-home-code" abaixo),
+         evitando problemas de escaping dentro de JSON.
+         ========================================================== -->
+    <script id="sections-data" type="application/json">
+    [
+        {
+            "id": "open-by-syra",
+            "title": "Open by Syra",
+            "type": "text",
+            "content": "Open by Syra é a plataforma de projetos abertos da Syra, criada para reunir e disponibilizar soluções desenvolvidas pela empresa para toda a comunidade. Seu objetivo é promover inovação colaborativa, permitindo que desenvolvedores, estudantes e empresas utilizem, estudem, contribuam e expandam os projetos publicados.<br><br>A plataforma reúne aplicações, bibliotecas, ferramentas, APIs e sistemas modulares, desenvolvidos com foco em qualidade, transparência e extensibilidade. Entre suas características estão a arquitetura baseada em plugins, APIs abertas, gerenciamento de memória e configurações, suporte à integração com diferentes serviços e modelos de IA, além de uma estrutura preparada para funcionar tanto localmente quanto em nuvem.<br><br>Mais do que um repositório de código, o Open by Syra representa o compromisso da Syra com o software aberto, incentivando a colaboração da comunidade, a troca de conhecimento e o desenvolvimento conjunto de tecnologias que possam gerar impacto real."
+        },
+        {
+            "id": "introducao",
+            "title": "Introdução",
+            "type": "text",
+            "content": "O Sya-Lib é uma biblioteca minimalista desenvolvida para otimizar fluxos de trabalho. O foco do projeto está na simplicidade estrutural e no desempenho estável, sem excesso de dependências externas."
+        },
+        {
+            "id": "uso-basico",
+            "title": "Uso Básico",
+            "type": "text",
+            "content": "Após realizar a instalação padrão, importe a biblioteca diretamente no cabeçalho do seu arquivo principal. A inicialização ocorre de forma direta por meio de parâmetros declarativos simples."
+        },
+        {
+            "id": "sory",
+            "title": "Sory",
+            "type": "text",
+            "content": "Seção reservada para a documentação do projeto Sory."
+        },
+        {
+            "id": "selene",
+            "title": "Selene",
+            "type": "text",
+            "content": "<p class=\"italic text-zinc-500\">O Framework de Treinamento de Inteligência Artificial da Syra</p><p><b>Selene</b> é um framework desenvolvido pela <b>Syra</b> para criação, treinamento, gerenciamento, versionamento e distribuição de modelos de Inteligência Artificial de forma simples, modular e escalável.</p><p>O projeto nasceu com o objetivo de democratizar o treinamento de modelos personalizados, permitindo que desenvolvedores, empresas e pesquisadores criem soluções específicas para seus próprios domínios de conhecimento sem depender de grandes infraestruturas ou serviços externos.</p><p>Mais do que um chatbot, o Selene é uma plataforma de treinamento de modelos de IA.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Objetivos</h3><p>O Selene foi criado para resolver um problema comum no desenvolvimento de aplicações inteligentes: a dificuldade em criar modelos personalizados de maneira organizada.</p><p>O framework oferece uma arquitetura que centraliza:</p><ul class=\"list-disc pl-5 space-y-1\"><li>gerenciamento de datasets;</li><li>treinamento de modelos;</li><li>armazenamento de conhecimento;</li><li>versionamento;</li><li>exportação;</li><li>importação;</li><li>inferência;</li><li>evolução contínua dos modelos.</li></ul><p>Tudo isso utilizando uma arquitetura simples, portátil e independente.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Filosofia</h3><p>O Selene foi desenvolvido seguindo alguns princípios fundamentais.</p><p><b>Simplicidade</b> — O treinamento de um modelo não deve exigir dezenas de ferramentas diferentes. O framework concentra todas as etapas em um único ambiente.</p><p><b>Modularidade</b> — Cada componente possui responsabilidade própria. Isso permite substituir ou melhorar partes do sistema sem reescrever toda a aplicação.</p><p><b>Portabilidade</b> — Cada modelo é completamente independente. Um modelo pode ser exportado, compartilhado e importado em outro computador mantendo toda sua estrutura.</p><p><b>Evolução</b> — O framework foi projetado para crescer. Novos algoritmos, arquiteturas, tokenizadores, embeddings e modelos poderão ser incorporados futuramente sem alterar a experiência do usuário.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Arquitetura</h3><p>O Selene organiza todo o ciclo de vida de um modelo de IA:</p><pre class=\"code-block\"><code>Dataset\n  ↓\nPré-processamento\n  ↓\nVetorização\n  ↓\nTreinamento\n  ↓\nValidação\n  ↓\nPersistência\n  ↓\nInferência\n  ↓\nExportação</code></pre><p>Cada modelo possui seu próprio ambiente de trabalho. Exemplo:</p><pre class=\"code-block\"><code>models/\n    suporte/\n        data.db\n        torch_model.pt\n        vectorizer.pkl\n        manifest.json</code></pre><p>Essa organização torna os modelos independentes entre si.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Gerenciamento de Dados</h3><p>O Selene utiliza um banco de dados SQLite para armazenar o conhecimento utilizado durante o treinamento. Cada registro pode conter: pergunta, resposta e contexto.</p><p>No futuro, poderão ser adicionados: categorias, idiomas, pesos, autor, data de criação, prioridade, feedback e métricas de utilização. Essa estrutura permite evolução constante do conhecimento.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Pipeline de Treinamento</h3><p>O framework executa automaticamente todas as etapas do treinamento:</p><ol class=\"list-decimal pl-5 space-y-1\"><li>Importação dos dados.</li><li>Armazenamento em banco.</li><li>Processamento textual.</li><li>Vetorização.</li><li>Construção do dataset.</li><li>Treinamento.</li><li>Avaliação.</li><li>Persistência do modelo.</li></ol><p>Todo esse processo pode ser repetido continuamente conforme novos dados são adicionados.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Gerenciamento de Modelos</h3><p>Cada modelo possui sua própria estrutura, o que permite: múltiplos modelos simultâneos, diferentes bases de conhecimento, diferentes versões e isolamento completo entre projetos.</p><p>Exemplos: Suporte, Financeiro, Vendas, Jurídico, Assistente, IoT, API — todos convivendo no mesmo framework.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Exportação</h3><p>O Selene permite exportar modelos completos. São preservados: parâmetros treinados, vetorizadores, banco de dados e configurações. Isso facilita distribuição, backup e implantação.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Importação</h3><p>Modelos exportados podem ser importados para outro ambiente mantendo todas as informações necessárias para funcionamento. Essa característica permite compartilhar conhecimento entre equipes e servidores.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Inferência</h3><p>Após treinado, o modelo pode responder consultas utilizando o conhecimento adquirido durante o treinamento. O mecanismo de inferência utiliza exatamente a mesma configuração utilizada durante o treinamento, garantindo consistência nos resultados.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Registro de Eventos</h3><p>O framework registra automaticamente informações importantes como: criação de modelos, treinamentos, erros, avisos, exportações e importações. Esses registros facilitam auditoria, manutenção e depuração.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Escalabilidade</h3><p>O Selene foi pensado para evoluir em diversas direções. Entre as possibilidades futuras estão: suporte a múltiplos algoritmos, embeddings modernos, modelos Transformer, treinamento incremental, GPU, APIs REST, treinamento distribuído, interface gráfica, plugins, integração com bancos vetoriais, RAG, memória semântica, treinamento multimodal, avaliação automática de desempenho e métricas em tempo real.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Casos de Uso</h3><p>O Selene pode ser utilizado para desenvolver: assistentes virtuais, centrais de atendimento, bases de conhecimento, classificadores de texto, sistemas de FAQ, análise documental, automação empresarial, aplicações embarcadas, soluções educacionais e agentes especializados.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Público-Alvo</h3><p>O framework foi desenvolvido para: desenvolvedores, pesquisadores, empresas, startups, instituições de ensino, equipes de IA e projetos de automação.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Ecossistema Syra</h3><p>Dentro do ecossistema da Syra, o Selene representa o núcleo responsável pelo treinamento e gerenciamento de modelos de Inteligência Artificial.</p><p>Enquanto outros projetos do ecossistema atuam na interação com o usuário, infraestrutura ou aplicações finais, o Selene é responsável por transformar dados em modelos inteligentes reutilizáveis. Sua função é servir como a base de treinamento sobre a qual diferentes aplicações poderão ser construídas.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Visão de Longo Prazo</h3><p>A visão do projeto é tornar o Selene uma plataforma completa para desenvolvimento de Inteligência Artificial personalizada.</p><p>Em vez de estar limitado a uma única arquitetura de rede neural ou algoritmo específico, o framework busca oferecer uma infraestrutura flexível capaz de acompanhar a evolução da área de IA. O mesmo ambiente poderá treinar desde classificadores tradicionais até modelos baseados em embeddings, Transformers e arquiteturas futuras, mantendo uma interface consistente para gerenciamento, treinamento, avaliação e distribuição.</p><p>O objetivo final é que qualquer desenvolvedor possa criar, evoluir e compartilhar modelos especializados utilizando uma única plataforma, transformando o Selene no principal framework de treinamento de IA do ecossistema Syra.</p><p class=\"pt-2\">Repositório oficial: <a class=\"underline hover:text-black\" href=\"https://github.com/SyraDevOps/Selene\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/SyraDevOps/Selene</a>.</p>"
+        },
+        {
+            "id": "yra",
+            "title": "Yra",
+            "type": "text",
+            "content": "Seção reservada para a documentação do projeto Yra."
+        },
+        {
+            "id": "yravision",
+            "title": "YraVision",
+            "type": "text",
+            "content": "Seção reservada para a documentação do projeto YraVision."
+        },
+        {
+            "id": "syra-hardware",
+            "title": "Syra Hardware",
+            "type": "text",
+            "content": "O Syra Hardware reúne os firmwares e integrações da Syra voltados a dispositivos físicos e microcontroladores, conectando os projetos de software da plataforma ao mundo real."
+        },
+        {
+            "id": "syra-home",
+            "title": "Syra Home (ESP8266)",
+            "type": "code",
+            "parent": "syra-hardware",
+            "language": "cpp",
+            "codeTemplateId": "syra-home-code",
+            "description": "O Syra Home é o firmware da Syra para transformar um módulo <b>ESP8266</b> em um nó de automação residencial conectado. Ao ser ligado pela primeira vez, o dispositivo cria a rede Wi-Fi <b>Syra-Config</b>, através da qual é feita a configuração inicial de rede; depois disso, ele se conecta automaticamente à rede salva e fica acessível pelo endereço <b>Syra-Home-SYRA0156326.local</b> (mDNS).<br><br>O firmware expõe uma pequena API HTTP local com rotas para status do dispositivo (<code>/info</code>), gerenciamento de dispositivos vinculados (<code>/devices</code>), troca de mensagens entre dispositivos (<code>/bridge</code>), reconfiguração de rede (<code>/disconnect</code> e <code>/setwifi</code>) e atualização de firmware por OTA (<code>/update</code>), além de persistir credenciais e dispositivos na EEPROM interna do chip.<br><br>Para o código completo, histórico de versões e instruções de instalação, acesse o repositório oficial: <a class=\"underline hover:text-black\" href=\"https://github.com/SyraDevOps/Syra-Home\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/SyraDevOps/Syra-Home</a>."
+        }
+    ]
+    </script>
+
+    <!-- ==========================================================
+         TEMPLATE DE CÓDIGO-FONTE: Syra Home (firmware ESP8266).
+         Fica isolado do JSON de seções para evitar problemas de
+         escaping (aspas, barras invertidas, quebras de linha).
+         O conteúdo é lido como texto puro pelo módulo de código.
+         ========================================================== -->
+    <template id="syra-home-code">#include &lt;ESP8266WiFi.h&gt;
+#include &lt;ESP8266WebServer.h&gt;
+#include &lt;ESP8266mDNS.h&gt;
+#include &lt;ESP8266HTTPUpdateServer.h&gt;
+#include &lt;EEPROM.h&gt;
+
+const char* hostName = "Syra-Home-SYRA0156326";  // access http://Syra-Home-SYRA0156326.local
+const char* serialNumber = "SYRA0156326";
+const int EEPROM_SIZE = 512;
+const int SSID_ADDR = 0;
+const int PASS_ADDR = 32;
+
+// OTA credentials (change these!)
+const char* OTA_USER = "admin";
+const char* OTA_PASS = "syra-ota-2026";
+
+ESP8266WebServer server(80);
+ESP8266HTTPUpdateServer httpUpdater;
+bool mdnsRunning = false;
+
+// LED and connection state
+unsigned long lastBlink = 0;
+const unsigned long BLINK_INTERVAL = 2000; // blinks every 2s
+bool blinkEnabled = false;
+unsigned long lastConnOk = 0;
+
+// Simple device persistence
+const int DEV_LIST_ADDR = 64;
+const int DEV_MAX = 10;
+const int DEV_NAME_LEN = 32; // bytes per name (includes terminator)
+int deviceCount = 0;
+String devices[DEV_MAX];
+
+// Messaging (Bridge) in RAM
+const int MSG_MAX = 20;
+struct Msg { String to; String from; String body; unsigned long ts; bool used; };
+Msg msgs[MSG_MAX];
+
+// ---------- Utilities ----------
+String sanitizeName(const String &s) {
+  String out;
+  out.reserve(DEV_NAME_LEN);
+  for (size_t i = 0; i < s.length() && out.length() < DEV_NAME_LEN - 1; i++) {
+    char c = s[i];
+    if (isalnum((unsigned char)c) || c == ' ' || c == '-' || c == '_') {
+      out += c;
+    }
+  }
+  out.trim();
+  return out;
+}
+
+void setLEDConnected(bool connected) {
+  pinMode(LED_BUILTIN, OUTPUT);
+  if (connected) {
+    blinkEnabled = false;
+    digitalWrite(LED_BUILTIN, LOW); // on (active LOW)
+  } else {
+    blinkEnabled = true;
+  }
+}
+
+void startMDNS() {
+  if (MDNS.begin(hostName)) {
+    mdnsRunning = true;
+    MDNS.addService("http", "tcp", 80);
+    Serial.printf("mDNS: http://%s.local\n", hostName);
+  } else {
+    mdnsRunning = false;
+    Serial.println("Failed to start mDNS");
+  }
+}
+
+void startAP() {
+  WiFi.mode(WIFI_AP);
+  WiFi.softAP("Syra-Config");
+  Serial.print("AP IP: ");
+  Serial.println(WiFi.softAPIP());
+  setLEDConnected(false);
+  startMDNS();
+}
+
+// ---------- EEPROM device persistence ----------
+void loadDevices() {
+  int raw = EEPROM.read(DEV_LIST_ADDR);
+  deviceCount = (raw >= 0 && raw <= DEV_MAX) ? raw : 0;
+  for (int i = 0; i < deviceCount; i++) {
+    int base = DEV_LIST_ADDR + 1 + i * DEV_NAME_LEN;
+    String name;
+    name.reserve(DEV_NAME_LEN);
+    for (int j = 0; j < DEV_NAME_LEN - 1; j++) {
+      char ch = EEPROM.read(base + j);
+      if (ch == '\0') break;
+      name += ch;
+    }
+    devices[i] = name;
+  }
+}
+
+void saveDevices() {
+  EEPROM.write(DEV_LIST_ADDR, deviceCount);
+  for (int i = 0; i < DEV_MAX; i++) {
+    int base = DEV_LIST_ADDR + 1 + i * DEV_NAME_LEN;
+    for (int j = 0; j < DEV_NAME_LEN; j++) {
+      EEPROM.write(base + j, 0);
+    }
+  }
+  for (int i = 0; i < deviceCount; i++) {
+    int base = DEV_LIST_ADDR + 1 + i * DEV_NAME_LEN;
+    const String &name = devices[i];
+    int j = 0;
+    for (; j < (int)name.length() && j < DEV_NAME_LEN - 1; j++) {
+      EEPROM.write(base + j, name[j]);
+    }
+    EEPROM.write(base + j, '\0');
+  }
+  EEPROM.commit();
+}
+
+bool addDevice(const String &raw) {
+  String name = sanitizeName(raw);
+  if (name.length() == 0) return false;
+  for (int i = 0; i < deviceCount; i++) {
+    if (devices[i] == name) return true; // already exists
+  }
+  if (deviceCount >= DEV_MAX) return false;
+  devices[deviceCount++] = name;
+  saveDevices();
+  return true;
+}
+
+bool removeDeviceByName(const String &raw) {
+  String name = sanitizeName(raw);
+  if (name.length() == 0) return false;
+  int idx = -1;
+  for (int i = 0; i < deviceCount; i++) {
+    if (devices[i] == name) { idx = i; break; }
+  }
+  if (idx < 0) return false;
+  for (int i = idx; i < deviceCount - 1; i++) {
+    devices[i] = devices[i + 1];
+  }
+  devices[deviceCount - 1] = "";
+  deviceCount--;
+  saveDevices();
+  return true;
+}
+
+// ---------- Pages ----------
+const char MAIN_page[] PROGMEM = R"rawliteral(
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;Syra Node&lt;/title&gt;
+&lt;style&gt;
+body { font-family: Georgia, "Times New Roman", serif; background:#fff; color:#000; text-align:center; padding:48px 16px; }
+button { background:#000; color:#fff; border:1px solid #000; padding:10px 18px; border-radius:8px; cursor:pointer; font-size:16px; margin:4px; }
+button.btn-outline { background:#fff; color:#000; }
+pre { text-align:left; margin:30px auto; max-width:520px; background:#f6f6f6; padding:16px; border-radius:8px; border:1px solid #ddd; overflow:auto; }
+h1,h2{ font-weight:600; margin:0 0 16px; }
+p{ margin:8px 0; }
+small{ color:#444; }
+a.ota-link { display:inline-block; margin-top:8px; color:#000; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;Syra Home&lt;/h2&gt;
+&lt;p&gt;&lt;small&gt;mDNS domain:&lt;/small&gt;&lt;br&gt;&lt;b id="mdns"&gt;—&lt;/b&gt;&lt;/p&gt;
+&lt;p&gt;&lt;small&gt;IP address:&lt;/small&gt;&lt;br&gt;&lt;b id="ip"&gt;—&lt;/b&gt;&lt;/p&gt;
+&lt;p&gt;&lt;small&gt;Firmware:&lt;/small&gt;&lt;br&gt;&lt;b id="fw"&gt;—&lt;/b&gt;&lt;/p&gt;
+&lt;div style="margin-top:12px;"&gt;
+  &lt;button onclick="testInfo()"&gt;Test /info&lt;/button&gt;
+  &lt;button class="btn-outline" onclick="testAll()"&gt;Test all routes&lt;/button&gt;
+  &lt;button class="btn-outline" onclick="disconnect()"&gt;Disconnect&lt;/button&gt;
+  &lt;p style="margin-top:8px;"&gt;&lt;small&gt;Disconnecting activates the &lt;b&gt;Syra-Config&lt;/b&gt; network for reconfiguration.&lt;/small&gt;&lt;/p&gt;
+  &lt;a class="ota-link" href="/update"&gt;Firmware update (OTA)&lt;/a&gt;
+&lt;/div&gt;
+&lt;div style="margin:24px auto; max-width:520px; text-align:left;"&gt;
+  &lt;h3 style="margin:0 0 8px;"&gt;Connected devices&lt;/h3&gt;
+  &lt;ul id="devlist" style="padding-left:20px; margin:8px 0;"&gt;&lt;/ul&gt;
+  &lt;p id="devhint" style="color:#444;"&gt;No devices registered yet.&lt;/p&gt;
+&lt;/div&gt;
+&lt;pre id="out"&gt;&lt;/pre&gt;
+
+&lt;script&gt;
+window.addEventListener('load', ()=&gt;{ testInfo(); });
+async function testInfo(){
+  const out=document.getElementById('out');
+  out.textContent="Querying /info...";
+  try {
+    const controller=new AbortController();
+    const id=setTimeout(()=&gt;controller.abort(),1500);
+    const res=await fetch("/info",{signal:controller.signal});
+    clearTimeout(id);
+    const json=await res.json();
+    out.textContent=JSON.stringify(json,null,2);
+    document.getElementById('ip').textContent=json.ip||'—';
+    document.getElementById('mdns').textContent=json.mdns||'—';
+    document.getElementById('fw').textContent=json.fw||'—';
+    loadDevices();
+  }catch(e){
+    out.textContent="Error: "+e;
+  }
+}
+async function loadDevices(){
+  try{
+    const r = await fetch('/devices');
+    if(!r.ok) return;
+    const j = await r.json();
+    const ul = document.getElementById('devlist');
+    ul.innerHTML = '';
+    if (j.items &amp;&amp; j.items.length){
+      document.getElementById('devhint').style.display='none';
+      j.items.forEach(n=&gt;{
+        const li=document.createElement('li');
+        li.textContent=n;
+        ul.appendChild(li);
+      })
+    } else {
+      document.getElementById('devhint').style.display='block';
+    }
+  }catch(e){/* ignore */}
+}
+async function disconnect(){
+  const out=document.getElementById('out');
+  out.textContent='Disconnecting and activating Syra-Config network...';
+  try{
+    const res=await fetch('/disconnect');
+    if(res.ok){
+      out.textContent='Syra-Config network activated. Connect to "Syra-Config" and go to http://Syra-Home-SYRA0156326.local or 192.168.4.1';
+    } else {
+      out.textContent='Failed to disconnect.';
+    }
+  }catch(e){
+    out.textContent='Error: '+e;
+  }
+}
+async function testAll(){
+  const out = document.getElementById('out');
+  out.textContent = "Testing all routes...\n";
+  function log(msg){ out.textContent += msg + "\n"; }
+  try{
+    log("1) Testing /info...");
+    const infoRes = await fetch("/info");
+    log("   /info status: " + infoRes.status);
+    const infoJson = await infoRes.json();
+    log("   /info response: " + JSON.stringify(infoJson));
+
+    log("2) Testing GET /devices...");
+    const devGet = await fetch("/devices");
+    log("   GET /devices status: " + devGet.status);
+    const devGetJson = await devGet.json();
+    log("   GET /devices response: " + JSON.stringify(devGetJson));
+
+    log("3) Testing POST /devices (add TestDevice)...");
+    const devPost = await fetch("/devices", {
+      method: "POST",
+      headers: {"Content-Type":"application/x-www-form-urlencoded"},
+      body: "name=TestDevice"
+    });
+    log("   POST /devices status: " + devPost.status);
+    log("   POST /devices response: " + await devPost.text());
+
+    log("4) Testing DELETE /devices (remove TestDevice)...");
+    const devDel = await fetch("/devices?name=TestDevice", { method: "DELETE" });
+    log("   DELETE /devices status: " + devDel.status);
+    log("   DELETE /devices response: " + await devDel.text());
+
+    log("5) Testing POST /bridge...");
+    const bridgePost = await fetch("/bridge", {
+      method:"POST",
+      headers: {"Content-Type":"application/x-www-form-urlencoded"},
+      body:"to=DeviceA&from=Tester&data=Hello"
+    });
+    log("   POST /bridge status: " + bridgePost.status);
+    log("   POST /bridge response: " + await bridgePost.text());
+
+    log("6) Testing GET /bridge...");
+    const bridgeGet = await fetch("/bridge?device=DeviceA");
+    log("   GET /bridge status: " + bridgeGet.status);
+    log("   GET /bridge response: " + await bridgeGet.text());
+
+    log("7) Testing /disconnect (NOT recommended in production, switches to AP)...");
+    try{
+      const disRes = await fetch("/disconnect");
+      log("   /disconnect status: " + disRes.status);
+      log("   /disconnect response: " + await disRes.text());
+    }catch(e){
+      log("   Error testing /disconnect: "+e);
+    }
+
+    log("\n✅ Tests complete. Check the status of each route above.");
+  }catch(e){
+    log("❌ Test error: " + e);
+  }
+  loadDevices();
+}
+&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+)rawliteral";
+
+const char CONFIG_page[] PROGMEM = R"rawliteral(
+&lt;!DOCTYPE html&gt;
+&lt;html lang="en"&gt;
+&lt;head&gt;
+&lt;meta charset="UTF-8"&gt;
+&lt;title&gt;Syra Config&lt;/title&gt;
+&lt;style&gt;
+body { font-family: Georgia, "Times New Roman", serif; background:#fff; color:#000; text-align:center; padding:48px 16px; }
+input { margin:8px; padding:10px 12px; border:1px solid #000; border-radius:8px; width:260px; }
+button { background:#000; color:#fff; border:1px solid #000; padding:10px 18px; border-radius:8px; cursor:pointer; font-size:16px; margin-top:8px; }
+h2 { font-weight:600; }
+small{ color:#444; }
+&lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+&lt;h2&gt;Configure Wi-Fi — Syra Home&lt;/h2&gt;
+&lt;p&gt;&lt;small&gt;mDNS domain: &lt;b&gt;Syra-Home-SYRA0156326.local&lt;/b&gt;&lt;/small&gt;&lt;/p&gt;
+&lt;form action="/setwifi" method="post"&gt;
+  &lt;input name="ssid" placeholder="SSID" required&gt;&lt;br&gt;
+  &lt;input name="pass" type="password" placeholder="Password"&gt;&lt;br&gt;
+  &lt;button type="submit"&gt;Connect&lt;/button&gt;
+&lt;/form&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+)rawliteral";
+
+// ---------- Handlers ----------
+void handleRoot() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send_P(200, "text/html", MAIN_page);
+}
+
+void handleConfig() {
+  server.send_P(200, "text/html", CONFIG_page);
+}
+
+void handleRootDynamic() {
+  if (WiFi.status() == WL_CONNECTED && WiFi.getMode() == WIFI_STA) {
+    handleRoot();
+  } else {
+    handleConfig();
+  }
+}
+
+void handleInfo() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  String ip = (WiFi.getMode() == WIFI_AP) ? WiFi.softAPIP().toString() : WiFi.localIP().toString();
+  String status = (WiFi.status() == WL_CONNECTED) ? "online" : "config";
+  String json;
+  json.reserve(220);
+  json += "{\"id\":\"";      json += serialNumber;
+  json += "\",\"name\":\"Syra Node\",\"ip\":\""; json += ip;
+  json += "\",\"status\":\""; json += status;
+  json += "\",\"mdns\":\"";  json += hostName; json += ".local";
+  json += "\",\"fw\":\"";    json += __DATE__; json += " "; json += __TIME__;
+  json += "\"}";
+  server.send(200, "application/json", json);
+}
+
+void handleDevicesGet() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  String json;
+  json.reserve(64 + deviceCount * (DEV_NAME_LEN + 3));
+  json += "{\"count\":"; json += deviceCount; json += ",\"items\":[";
+  for (int i = 0; i < deviceCount; i++) {
+    if (i) json += ",";
+    json += "\""; json += devices[i]; json += "\"";
+  }
+  json += "]}";
+  server.send(200, "application/json", json);
+}
+
+String getArgAny(const String &key) {
+  if (server.hasArg(key)) return server.arg(key);
+  if (server.hasArg("plain")) {
+    String body = server.arg("plain");
+    int pos = body.indexOf(key);
+    if (pos >= 0) {
+      int q1 = body.indexOf('"', pos + key.length());
+      if (q1 >= 0) {
+        int q2 = body.indexOf('"', q1 + 1);
+        if (q2 > q1) return body.substring(q1 + 1, q2);
+      }
+    }
+  }
+  return "";
+}
+
+void handleDevicesPost() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  String name = getArgAny("name");
+  if (name.length() == 0) {
+    server.send(400, "application/json", "{\"ok\":false,\"err\":\"name required\"}");
+    return;
+  }
+  bool ok = addDevice(name);
+  if (ok) server.send(200, "application/json", "{\"ok\":true}");
+  else server.send(409, "application/json", "{\"ok\":false,\"err\":\"list full or duplicate\"}");
+}
+
+void handleDevicesDelete() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  String name = getArgAny("name");
+  if (name.length() == 0) {
+    server.send(400, "application/json", "{\"ok\":false,\"err\":\"name required\"}");
+    return;
+  }
+  bool ok = removeDeviceByName(name);
+  if (ok) server.send(200, "application/json", "{\"ok\":true}");
+  else server.send(404, "application/json", "{\"ok\":false,\"err\":\"device not found\"}");
+}
+
+int findFreeMsg() { for (int i = 0; i < MSG_MAX; i++) if (!msgs[i].used) return i; return -1; }
+int findOldestMsg() {
+  int idx = -1;
+  unsigned long oldest = ULONG_MAX;
+  for (int i = 0; i < MSG_MAX; i++) {
+    if (msgs[i].used && msgs[i].ts < oldest) { oldest = msgs[i].ts; idx = i; }
+  }
+  return idx;
+}
+
+void handleBridgePost() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  String to = sanitizeName(getArgAny("to"));
+  String from = sanitizeName(getArgAny("from"));
+  String body = getArgAny("data");
+  if (body.length() == 0) body = getArgAny("body");
+  if (to.length() == 0 || from.length() == 0 || body.length() == 0) {
+    server.send(400, "application/json", "{\"ok\":false,\"err\":\"required params: to, from, data\"}");
+    return;
+  }
+  if (body.length() > 256) body = body.substring(0, 256);
+  int idx = findFreeMsg();
+  if (idx < 0) idx = findOldestMsg();
+  if (idx < 0) {
+    server.send(507, "application/json", "{\"ok\":false,\"err\":\"mailbox full\"}");
+    return;
+  }
+  msgs[idx].to = to; msgs[idx].from = from; msgs[idx].body = body;
+  msgs[idx].ts = millis(); msgs[idx].used = true;
+  server.send(200, "application/json", "{\"ok\":true}");
+}
+
+void handleBridgeGet() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  String who = sanitizeName(server.hasArg("device") ? server.arg("device") : server.arg("to"));
+  if (who.length() == 0) {
+    server.send(400, "application/json", "{\"ok\":false,\"err\":\"device required\"}");
+    return;
+  }
+  String json;
+  json.reserve(512);
+  json += "{\"ok\":true,\"messages\":[";
+  bool first = true;
+  unsigned long now = millis();
+  for (int i = 0; i < MSG_MAX; i++) {
+    if (msgs[i].used && msgs[i].to == who) {
+      if (!first) json += ","; else first = false;
+      json += "{\"from\":\""; json += msgs[i].from;
+      json += "\",\"data\":\""; json += msgs[i].body;
+      json += "\",\"ts\":"; json += msgs[i].ts; json += "}";
+      msgs[i].used = false; // consumed
+      msgs[i].to = msgs[i].from = msgs[i].body = "";
+      msgs[i].ts = now;
+    }
+  }
+  json += "]}";
+  server.send(200, "application/json", json);
+}
+
+void writeStringToEEPROM(int addr, const String &data) {
+  size_t i = 0;
+  for (; i < data.length(); ++i) EEPROM.write(addr + i, data[i]);
+  EEPROM.write(addr + i, '\0');
+}
+
+String readStringFromEEPROM(int addr) {
+  String data;
+  data.reserve(32);
+  char ch = EEPROM.read(addr);
+  int i = 0;
+  while (ch != '\0' && i < 31) {
+    data += ch;
+    i++;
+    ch = EEPROM.read(addr + i);
+  }
+  return data;
+}
+
+void handleDisconnect() {
+  server.sendHeader("Access-Control-Allow-Origin", "*");
+  server.send(200, "text/plain", "Disconnecting and starting Syra-Config...");
+  WiFi.disconnect(true);
+  delay(300);
+  startAP();
+}
+
+void handleSetWiFi() {
+  String ssid = server.arg("ssid");
+  String pass = server.arg("pass");
+  writeStringToEEPROM(SSID_ADDR, ssid);
+  writeStringToEEPROM(PASS_ADDR, pass);
+  EEPROM.commit();
+  server.send(200, "text/html",
+    "<h2>Connecting...</h2><p>If the connection succeeds, the device will restart.</p>"
+    "<script>setTimeout(() => location.reload(), 10000);</script>");
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(ssid.c_str(), pass.c_str());
+
+  // Non-blocking-ish wait with watchdog feed
+  unsigned long start = millis();
+  while (WiFi.status() != WL_CONNECTED && millis() - start < 15000) {
+    delay(100);
+    yield();
+  }
+  if (WiFi.status() == WL_CONNECTED) {
+    startMDNS();
+    ESP.restart();
+  }
+}
+
+void handleNotFound() {
+  server.send(404, "application/json", "{\"ok\":false,\"err\":\"not found\"}");
+}
+
+// ---------- Setup / Loop ----------
+void setup() {
+  Serial.begin(115200);
+  EEPROM.begin(EEPROM_SIZE);
+  loadDevices();
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  String savedSSID = readStringFromEEPROM(SSID_ADDR);
+  String savedPass = readStringFromEEPROM(PASS_ADDR);
+  bool connected = false;
+
+  if (savedSSID.length() > 0) {
+    Serial.println("Trying to connect with saved credentials...");
+    WiFi.mode(WIFI_STA);
+    WiFi.setSleepMode(WIFI_NONE_SLEEP); // faster, more stable HTTP/OTA response
+    WiFi.begin(savedSSID.c_str(), savedPass.c_str());
+    int attempts = 0;
+    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
+      delay(500);
+      Serial.print(".");
+      attempts++;
+    }
+    if (WiFi.status() == WL_CONNECTED) {
+      connected = true;
+      Serial.println("\n✅ Connected with saved credentials!");
+      Serial.print("Local IP: ");
+      Serial.println(WiFi.localIP());
+      setLEDConnected(true);
+      lastConnOk = millis();
+    }
+  }
+
+  if (!connected) {
+    Serial.println("Starting AP mode for configuration...");
+    startAP();
+  }
+
+  server.on("/", handleRootDynamic);
+  server.on("/setwifi", HTTP_POST, handleSetWiFi);
+  server.on("/info", handleInfo);
+  server.on("/disconnect", handleDisconnect);
+  server.on("/devices", HTTP_GET, handleDevicesGet);
+  server.on("/devices", HTTP_POST, handleDevicesPost);
+  server.on("/devices", HTTP_DELETE, handleDevicesDelete);
+  server.on("/bridge", HTTP_GET, handleBridgeGet);
+  server.on("/bridge", HTTP_POST, handleBridgePost);
+  server.onNotFound(handleNotFound);
+
+  // OTA update endpoint: http://<ip-or-mdns>/update (browser upload of .bin)
+  httpUpdater.setup(&server, "/update", OTA_USER, OTA_PASS);
+
+  server.begin();
+  Serial.println("HTTP server started!");
+  Serial.println("OTA available at /update (Basic Auth protected)");
+
+  if (connected) {
+    startMDNS();
+  }
+}
+
+void loop() {
+  server.handleClient();
+  if (mdnsRunning) {
+    MDNS.update();
+  }
+
+  // Connection monitor
+  if (WiFi.getMode() == WIFI_STA) {
+    if (WiFi.status() == WL_CONNECTED) {
+      if (!blinkEnabled) digitalWrite(LED_BUILTIN, LOW); // ensure LED is on
+      lastConnOk = millis();
+    } else if (millis() - lastConnOk > 10000) { // 10s without connection => back to AP
+      Serial.println("Connection lost. Returning to Syra-Config...");
+      startAP();
+    }
+  }
+
+  // Blink LED in AP/config mode
+  if (blinkEnabled && millis() - lastBlink >= BLINK_INTERVAL) {
+    lastBlink = millis();
+    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  }
+}</template>
+
+    <!-- ==========================================================
+         MÓDULO DE NAVEGAÇÃO: constrói o sumário lateral, incluindo
+         suporte a subitens (seções com "parent").
+         ========================================================== -->
+    <script id="module-nav">
+        const NavModule = {
+            render(sections, container) {
+                container.innerHTML = '';
+                sections.forEach(section => {
+                    const isChild = Boolean(section.parent);
+                    const navLink = document.createElement('a');
+                    navLink.href = `#${section.id}`;
+                    navLink.className = isChild
+                        ? "block text-sm text-zinc-500 hover:text-black hover:translate-x-1 transition-transform duration-150 pl-4 border-l border-zinc-200"
+                        : "block text-sm text-zinc-600 hover:text-black hover:translate-x-1 transition-transform duration-150 font-medium";
+                    navLink.textContent = section.title;
+                    container.appendChild(navLink);
+                });
             }
-        ];
+        };
+    </script>
 
-        const navContainer = document.getElementById('sidebar-nav');
-        const contentContainer = document.getElementById('content-area');
-        const form = document.getElementById('add-section-form');
-
-        // Renderiza o sumário e as seções
-        function render() {
-            navContainer.innerHTML = '';
-            contentContainer.innerHTML = '';
-
-            sections.forEach(section => {
-                // Link do Sumário
-                const navLink = document.createElement('a');
-                navLink.href = `#${section.id}`;
-                navLink.className = "block text-sm text-zinc-600 hover:text-black hover:translate-x-1 transition-transform duration-150";
-                navLink.textContent = section.title;
-                navContainer.appendChild(navLink);
-
-                // Bloco de Conteúdo (Visual plano, sem bordas ou fundo branco)
-                const sectionBlock = document.createElement('section');
-                sectionBlock.id = section.id;
-                sectionBlock.className = "scroll-mt-24";
-                
-                sectionBlock.innerHTML = `
+    <!-- ==========================================================
+         MÓDULO DE SEÇÕES DE TEXTO
+         ========================================================== -->
+    <script id="module-text-section">
+        const TextSectionModule = {
+            render(section) {
+                const el = document.createElement('section');
+                el.id = section.id;
+                el.className = "scroll-mt-24";
+                el.innerHTML = `
                     <h2 class="text-xl font-bold text-black tracking-wide mb-3">${section.title}</h2>
                     <div class="text-zinc-600 text-sm leading-relaxed space-y-3 font-normal">
                         ${section.content}
                     </div>
                 `;
-                contentContainer.appendChild(sectionBlock);
-            });
-        }
-
-        // Conversão de título em slug para âncora
-        function generateId(text) {
-            return text
-                .toString()
-                .toLowerCase()
-                .normalize('NFD')
-                .replace(/[\u0300-\u036f]/g, '')
-                .replace(/\s+/g, '-')
-                .replace(/[^\w\-]+/g, '')
-                .replace(/\-\-+/g, '-')
-                .trim();
-        }
-
-        // Adiciona nova seção
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const titleInput = document.getElementById('section-title');
-            const contentInput = document.getElementById('section-content');
-
-            const title = titleInput.value.trim();
-            const content = contentInput.value.trim().replace(/\n/g, '<br>');
-            const id = generateId(title);
-
-            const idExists = sections.some(sec => sec.id === id);
-            if (idExists) {
-                alert("Uma seção com este título já existe.");
-                return;
+                return el;
             }
+        };
+    </script>
 
-            sections.push({ id, title, content });
-            render();
-            form.reset();
+    <!-- ==========================================================
+         MÓDULO DE SEÇÕES DE CÓDIGO (usado por Syra Hardware /
+         Syra Home): descrição + bloco de código destacado.
+         O código-fonte é lido de um <template> pelo id indicado em
+         "codeTemplateId", já em texto puro (sem escaping de JSON).
+         ========================================================== -->
+    <script id="module-code-section">
+        const CodeSectionModule = {
+            render(section) {
+                const el = document.createElement('section');
+                el.id = section.id;
+                el.className = "scroll-mt-24";
 
-            // Rolagem suave até a nova seção
-            setTimeout(() => {
-                const target = document.getElementById(id);
-                if (target) {
-                    target.scrollIntoView({ behavior: 'smooth' });
-                }
-            }, 50);
-        });
+                const templateEl = document.getElementById(section.codeTemplateId);
+                const code = templateEl ? templateEl.innerHTML.trim() : '';
 
-        // Inicialização
-        render();
+                el.innerHTML = `
+                    <h2 class="text-xl font-bold text-black tracking-wide mb-1">${section.title}</h2>
+                    <p class="text-[10px] uppercase tracking-widest text-zinc-400 mb-3">Firmware · ${section.language || 'code'}</p>
+                    <div class="text-zinc-600 text-sm leading-relaxed space-y-3 font-normal mb-4">
+                        ${section.description || ''}
+                    </div>
+                    <pre class="code-block"><code>${code}</code></pre>
+                `;
+                return el;
+            }
+        };
+    </script>
+
+    <!-- ==========================================================
+         MÓDULO DE CONTEÚDO: decide, por seção, qual módulo de
+         renderização usar (texto ou código) e monta a área principal.
+         ========================================================== -->
+    <script id="module-content">
+        const ContentModule = {
+            render(sections, container) {
+                container.innerHTML = '';
+                sections.forEach(section => {
+                    let el;
+                    if (section.type === 'code') {
+                        el = CodeSectionModule.render(section);
+                    } else {
+                        el = TextSectionModule.render(section);
+                    }
+                    container.appendChild(el);
+                });
+            }
+        };
+    </script>
+
+    <!-- ==========================================================
+         MÓDULO PRINCIPAL (App): carrega os dados e aciona os
+         demais módulos para montar a página.
+         ========================================================== -->
+    <script id="module-app">
+        const App = {
+            init() {
+                const sections = JSON.parse(document.getElementById('sections-data').textContent);
+                const navContainer = document.getElementById('sidebar-nav');
+                const contentContainer = document.getElementById('content-area');
+
+                NavModule.render(sections, navContainer);
+                ContentModule.render(sections, contentContainer);
+            }
+        };
+
+        App.init();
     </script>
 </body>
 </html>
