@@ -49,8 +49,14 @@
 
         <!-- Barra Lateral Plana (Mesmo fundo cinza claro, sem divisões flutuantes) -->
         <aside class="w-80 bg-zinc-100 flex flex-col overflow-y-auto px-8 py-6 border-r border-zinc-200">
+            <!-- Busca -->
+            <div class="mb-6">
+                <input type="text" id="search-input" placeholder="Pesquisar..."
+                       class="w-full text-sm bg-transparent border-b border-zinc-300 py-1.5 focus:border-black focus:outline-none transition-colors placeholder:text-zinc-400">
+                <div id="search-results" class="mt-3 space-y-3 hidden"></div>
+            </div>
             <!-- Navegação (Sumário) -->
-            <div>
+            <div id="nav-wrapper">
                 <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">Sumário</h2>
                 <nav id="sidebar-nav" class="space-y-2">
                     <!-- Links dinâmicos, gerados a partir do módulo de seções -->
@@ -79,700 +85,159 @@
     [
         {
             "id": "open-by-syra",
-            "title": "Open by Syra",
+            "title": "Sobre",
+            "category": "Plataforma",
             "type": "text",
             "content": "Open by Syra é a plataforma de projetos abertos da Syra, criada para reunir e disponibilizar soluções desenvolvidas pela empresa para toda a comunidade. Seu objetivo é promover inovação colaborativa, permitindo que desenvolvedores, estudantes e empresas utilizem, estudem, contribuam e expandam os projetos publicados.<br><br>A plataforma reúne aplicações, bibliotecas, ferramentas, APIs e sistemas modulares, desenvolvidos com foco em qualidade, transparência e extensibilidade. Entre suas características estão a arquitetura baseada em plugins, APIs abertas, gerenciamento de memória e configurações, suporte à integração com diferentes serviços e modelos de IA, além de uma estrutura preparada para funcionar tanto localmente quanto em nuvem.<br><br>Mais do que um repositório de código, o Open by Syra representa o compromisso da Syra com o software aberto, incentivando a colaboração da comunidade, a troca de conhecimento e o desenvolvimento conjunto de tecnologias que possam gerar impacto real."
         },
         {
             "id": "introducao",
-            "title": "Introdução",
+            "title": "Filosofia",
+            "category": "Plataforma",
             "type": "text",
             "content": "O Sya-Lib é uma biblioteca minimalista desenvolvida para otimizar fluxos de trabalho. O foco do projeto está na simplicidade estrutural e no desempenho estável, sem excesso de dependências externas."
         },
         {
             "id": "uso-basico",
-            "title": "Uso Básico",
+            "title": "Como contribuir",
+            "category": "Plataforma",
             "type": "text",
             "content": "Após realizar a instalação padrão, importe a biblioteca diretamente no cabeçalho do seu arquivo principal. A inicialização ocorre de forma direta por meio de parâmetros declarativos simples."
         },
         {
             "id": "sory",
             "title": "Sory",
+            "category": "Inteligência Artificial",
             "type": "text",
             "content": "Seção reservada para a documentação do projeto Sory."
         },
         {
             "id": "selene",
             "title": "Selene",
+            "category": "Inteligência Artificial",
             "type": "text",
-            "content": "<p class=\"italic text-zinc-500\">O Framework de Treinamento de Inteligência Artificial da Syra</p><p><b>Selene</b> é um framework desenvolvido pela <b>Syra</b> para criação, treinamento, gerenciamento, versionamento e distribuição de modelos de Inteligência Artificial de forma simples, modular e escalável.</p><p>O projeto nasceu com o objetivo de democratizar o treinamento de modelos personalizados, permitindo que desenvolvedores, empresas e pesquisadores criem soluções específicas para seus próprios domínios de conhecimento sem depender de grandes infraestruturas ou serviços externos.</p><p>Mais do que um chatbot, o Selene é uma plataforma de treinamento de modelos de IA.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Objetivos</h3><p>O Selene foi criado para resolver um problema comum no desenvolvimento de aplicações inteligentes: a dificuldade em criar modelos personalizados de maneira organizada.</p><p>O framework oferece uma arquitetura que centraliza:</p><ul class=\"list-disc pl-5 space-y-1\"><li>gerenciamento de datasets;</li><li>treinamento de modelos;</li><li>armazenamento de conhecimento;</li><li>versionamento;</li><li>exportação;</li><li>importação;</li><li>inferência;</li><li>evolução contínua dos modelos.</li></ul><p>Tudo isso utilizando uma arquitetura simples, portátil e independente.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Filosofia</h3><p>O Selene foi desenvolvido seguindo alguns princípios fundamentais.</p><p><b>Simplicidade</b> — O treinamento de um modelo não deve exigir dezenas de ferramentas diferentes. O framework concentra todas as etapas em um único ambiente.</p><p><b>Modularidade</b> — Cada componente possui responsabilidade própria. Isso permite substituir ou melhorar partes do sistema sem reescrever toda a aplicação.</p><p><b>Portabilidade</b> — Cada modelo é completamente independente. Um modelo pode ser exportado, compartilhado e importado em outro computador mantendo toda sua estrutura.</p><p><b>Evolução</b> — O framework foi projetado para crescer. Novos algoritmos, arquiteturas, tokenizadores, embeddings e modelos poderão ser incorporados futuramente sem alterar a experiência do usuário.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Arquitetura</h3><p>O Selene organiza todo o ciclo de vida de um modelo de IA:</p><pre class=\"code-block\"><code>Dataset\n  ↓\nPré-processamento\n  ↓\nVetorização\n  ↓\nTreinamento\n  ↓\nValidação\n  ↓\nPersistência\n  ↓\nInferência\n  ↓\nExportação</code></pre><p>Cada modelo possui seu próprio ambiente de trabalho. Exemplo:</p><pre class=\"code-block\"><code>models/\n    suporte/\n        data.db\n        torch_model.pt\n        vectorizer.pkl\n        manifest.json</code></pre><p>Essa organização torna os modelos independentes entre si.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Gerenciamento de Dados</h3><p>O Selene utiliza um banco de dados SQLite para armazenar o conhecimento utilizado durante o treinamento. Cada registro pode conter: pergunta, resposta e contexto.</p><p>No futuro, poderão ser adicionados: categorias, idiomas, pesos, autor, data de criação, prioridade, feedback e métricas de utilização. Essa estrutura permite evolução constante do conhecimento.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Pipeline de Treinamento</h3><p>O framework executa automaticamente todas as etapas do treinamento:</p><ol class=\"list-decimal pl-5 space-y-1\"><li>Importação dos dados.</li><li>Armazenamento em banco.</li><li>Processamento textual.</li><li>Vetorização.</li><li>Construção do dataset.</li><li>Treinamento.</li><li>Avaliação.</li><li>Persistência do modelo.</li></ol><p>Todo esse processo pode ser repetido continuamente conforme novos dados são adicionados.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Gerenciamento de Modelos</h3><p>Cada modelo possui sua própria estrutura, o que permite: múltiplos modelos simultâneos, diferentes bases de conhecimento, diferentes versões e isolamento completo entre projetos.</p><p>Exemplos: Suporte, Financeiro, Vendas, Jurídico, Assistente, IoT, API — todos convivendo no mesmo framework.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Exportação</h3><p>O Selene permite exportar modelos completos. São preservados: parâmetros treinados, vetorizadores, banco de dados e configurações. Isso facilita distribuição, backup e implantação.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Importação</h3><p>Modelos exportados podem ser importados para outro ambiente mantendo todas as informações necessárias para funcionamento. Essa característica permite compartilhar conhecimento entre equipes e servidores.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Inferência</h3><p>Após treinado, o modelo pode responder consultas utilizando o conhecimento adquirido durante o treinamento. O mecanismo de inferência utiliza exatamente a mesma configuração utilizada durante o treinamento, garantindo consistência nos resultados.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Registro de Eventos</h3><p>O framework registra automaticamente informações importantes como: criação de modelos, treinamentos, erros, avisos, exportações e importações. Esses registros facilitam auditoria, manutenção e depuração.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Escalabilidade</h3><p>O Selene foi pensado para evoluir em diversas direções. Entre as possibilidades futuras estão: suporte a múltiplos algoritmos, embeddings modernos, modelos Transformer, treinamento incremental, GPU, APIs REST, treinamento distribuído, interface gráfica, plugins, integração com bancos vetoriais, RAG, memória semântica, treinamento multimodal, avaliação automática de desempenho e métricas em tempo real.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Casos de Uso</h3><p>O Selene pode ser utilizado para desenvolver: assistentes virtuais, centrais de atendimento, bases de conhecimento, classificadores de texto, sistemas de FAQ, análise documental, automação empresarial, aplicações embarcadas, soluções educacionais e agentes especializados.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Público-Alvo</h3><p>O framework foi desenvolvido para: desenvolvedores, pesquisadores, empresas, startups, instituições de ensino, equipes de IA e projetos de automação.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Ecossistema Syra</h3><p>Dentro do ecossistema da Syra, o Selene representa o núcleo responsável pelo treinamento e gerenciamento de modelos de Inteligência Artificial.</p><p>Enquanto outros projetos do ecossistema atuam na interação com o usuário, infraestrutura ou aplicações finais, o Selene é responsável por transformar dados em modelos inteligentes reutilizáveis. Sua função é servir como a base de treinamento sobre a qual diferentes aplicações poderão ser construídas.</p><h3 class=\"text-base font-bold text-black mt-8 mb-2\">Visão de Longo Prazo</h3><p>A visão do projeto é tornar o Selene uma plataforma completa para desenvolvimento de Inteligência Artificial personalizada.</p><p>Em vez de estar limitado a uma única arquitetura de rede neural ou algoritmo específico, o framework busca oferecer uma infraestrutura flexível capaz de acompanhar a evolução da área de IA. O mesmo ambiente poderá treinar desde classificadores tradicionais até modelos baseados em embeddings, Transformers e arquiteturas futuras, mantendo uma interface consistente para gerenciamento, treinamento, avaliação e distribuição.</p><p>O objetivo final é que qualquer desenvolvedor possa criar, evoluir e compartilhar modelos especializados utilizando uma única plataforma, transformando o Selene no principal framework de treinamento de IA do ecossistema Syra.</p><p class=\"pt-2\">Repositório oficial: <a class=\"underline hover:text-black\" href=\"https://github.com/SyraDevOps/Selene\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/SyraDevOps/Selene</a>.</p>"
+            "content": "<p class=\"italic text-zinc-500\">O Framework de Treinamento de Inteligência Artificial da Syra</p><p><b>Selene</b> é um framework desenvolvido pela <b>Syra</b> para criação, treinamento, gerenciamento, versionamento e distribuição de modelos de Inteligência Artificial de forma simples, modular e escalável — mais do que um chatbot, uma plataforma completa de treinamento.</p><p>O framework centraliza todo o ciclo de vida de um modelo: gerenciamento de datasets, vetorização, treinamento, validação, persistência, inferência e exportação — permitindo múltiplos modelos independentes convivendo lado a lado (Suporte, Financeiro, Vendas, Assistente, IoT, etc.), cada um com seu próprio banco de dados, vetorizador e configurações, podendo ser exportado e importado livremente entre ambientes.</p><p>Seus princípios são <b>simplicidade</b> (tudo em um único ambiente), <b>modularidade</b> (componentes substituíveis), <b>portabilidade</b> (modelos autocontidos) e <b>evolução</b> (pronto para novos algoritmos, embeddings e arquiteturas Transformer no futuro). Dentro do ecossistema Syra, o Selene é o núcleo responsável por transformar dados em modelos inteligentes reutilizáveis para as demais aplicações.</p>",
+            "githubUrl": "https://github.com/SyraDevOps/Selene"
         },
         {
             "id": "yra",
             "title": "Yra",
+            "category": "Inteligência Artificial",
             "type": "text",
             "content": "Seção reservada para a documentação do projeto Yra."
         },
         {
             "id": "yravision",
             "title": "YraVision",
+            "category": "Inteligência Artificial",
             "type": "text",
             "content": "Seção reservada para a documentação do projeto YraVision."
         },
         {
+            "id": "skymonitor",
+            "title": "SkyMonitor",
+            "category": "Computer Vision",
+            "type": "text",
+            "content": "<p class=\"italic text-zinc-500\">Sistema de Monitoramento e Análise de Céu Noturno</p><p>O <b>SkyMonitor</b> é uma plataforma em Python com interface gráfica (Tkinter) desenvolvida para a análise e o monitoramento contínuo do céu. Projetada para auxiliar astrônomos amadores, estações de observação e entusiastas, a ferramenta é compatível com múltiplas fontes de entrada, como câmeras de segurança IP (via protocolo RTSP), webcams locais, arquivos de vídeo e sequências de imagens de uma pasta.</p><p>O sistema processa as imagens em tempo real utilizando técnicas de processamento digital, dividindo sua atuação em quatro frentes principais:</p><ul class=\"list-disc pl-5 space-y-2\"><li><b>Rastreamento Estelar:</b> identifica e acompanha estrelas estáticas ao longo do tempo. Com base nessas posições confirmadas, a ferramenta aplica algoritmos de triangulação geométrica para gerar padrões estáveis de constelações, desenhando as conexões na tela.</li><li><b>Detecção de Transientes (Meteoros):</b> analisa trajetórias lineares rápidas e variações de intensidade luminosa para registrar a passagem de potenciais meteoros, gerando imagens com o traçado estimado do fenômeno.</li><li><b>Monitoramento de Nuvens:</b> utiliza segmentação morfológica para identificar a presença de nebulosidade na imagem, calculando a área aproximada de cobertura e alertando sobre a obstrução do céu.</li><li><b>Registro de Dados:</b> salva automaticamente relatórios estatísticos, grades de imagens (grids) de estrelas identificadas, mapas celestes periódicos e capturas de eventos transientes de forma estruturada em disco.</li></ul><p>A aplicação foi estruturada de maneira independente, utilizando bibliotecas consolidadas como OpenCV, NumPy e Pillow, o que facilita sua distribuição e permite a compilação em um arquivo executável único (via PyInstaller).</p>"
+        },
+        {
+            "id": "syra-voicelab",
+            "title": "Syra VoiceLab",
+            "category": "Computer Vision",
+            "type": "text",
+            "content": "<p>O <b>Syra VoiceLab</b> é uma ferramenta open source para experimentação e desenvolvimento de aplicações baseadas em voz diretamente no navegador. A plataforma integra reconhecimento de fala em tempo real, visualização do sinal de áudio e detecção de palavras-chave, oferecendo uma base simples e extensível para pesquisas, assistentes virtuais, automação, acessibilidade e interfaces controladas por voz.</p><p>Desenvolvido utilizando APIs nativas da Web, o projeto serve tanto como ambiente de testes quanto como ponto de partida para aplicações mais complexas.</p>",
+            "githubUrl": ""
+        },
+        {
+            "id": "visioneye",
+            "title": "VisionEye",
+            "category": "Computer Vision",
+            "type": "text",
+            "content": "<p><b>VisionEye</b> é uma ferramenta open source de rastreamento ocular desenvolvida pela Syra para aplicações de visão computacional em tempo real. Utilizando o MediaPipe Face Mesh, o projeto detecta a posição da íris, acompanha o movimento dos olhos, estima a direção do olhar e calcula métricas como abertura ocular, fornecendo uma interface visual para experimentação, pesquisa e desenvolvimento de sistemas baseados em eye tracking.</p><p>O VisionEye pode servir como base para aplicações de acessibilidade, interfaces controladas pelo olhar, realidade aumentada, monitoramento de atenção, análise comportamental e interação homem-computador.</p>",
+            "githubUrl": ""
+        },
+        {
+            "id": "visionhand",
+            "title": "VisionHand",
+            "category": "Computer Vision",
+            "type": "text",
+            "content": "<p><b>VisionHand</b> é uma ferramenta open source de rastreamento de mãos desenvolvida pela Syra para aplicações de visão computacional em tempo real. Baseado no MediaPipe Hands, o projeto detecta e acompanha até duas mãos simultaneamente, identificando os 21 pontos anatômicos de cada mão, desenhando seu esqueleto e disponibilizando as coordenadas dos landmarks para desenvolvimento de aplicações interativas.</p><p>O VisionHand pode ser utilizado como base para reconhecimento de gestos, interfaces sem contato, realidade aumentada, robótica, controle por movimentos e pesquisa em interação homem-computador.</p>",
+            "githubUrl": ""
+        },
+        {
+            "id": "visiondetect",
+            "title": "VisionDetect",
+            "category": "Computer Vision",
+            "type": "text",
+            "content": "<p><b>VisionDetect</b> é uma ferramenta open source para detecção de objetos em tempo real desenvolvida pela Syra. Utilizando TensorFlow.js e o modelo COCO-SSD, o projeto identifica e classifica automaticamente dezenas de categorias de objetos presentes em imagens ou vídeo, exibindo caixas delimitadoras, nível de confiança e visualização das detecções em tempo real.</p><p>O VisionDetect serve como base para aplicações de visão computacional, robótica, automação, monitoramento inteligente, sistemas de segurança e projetos de Inteligência Artificial executados diretamente no navegador.</p>",
+            "githubUrl": ""
+        },
+        {
             "id": "syra-hardware",
             "title": "Syra Hardware",
+            "category": "Hardware",
             "type": "text",
             "content": "O Syra Hardware reúne os firmwares e integrações da Syra voltados a dispositivos físicos e microcontroladores, conectando os projetos de software da plataforma ao mundo real."
         },
         {
             "id": "syra-home",
-            "title": "Syra Home (ESP8266)",
-            "type": "code",
-            "parent": "syra-hardware",
-            "language": "cpp",
-            "codeTemplateId": "syra-home-code",
-            "description": "O Syra Home é o firmware da Syra para transformar um módulo <b>ESP8266</b> em um nó de automação residencial conectado. Ao ser ligado pela primeira vez, o dispositivo cria a rede Wi-Fi <b>Syra-Config</b>, através da qual é feita a configuração inicial de rede; depois disso, ele se conecta automaticamente à rede salva e fica acessível pelo endereço <b>Syra-Home-SYRA0156326.local</b> (mDNS).<br><br>O firmware expõe uma pequena API HTTP local com rotas para status do dispositivo (<code>/info</code>), gerenciamento de dispositivos vinculados (<code>/devices</code>), troca de mensagens entre dispositivos (<code>/bridge</code>), reconfiguração de rede (<code>/disconnect</code> e <code>/setwifi</code>) e atualização de firmware por OTA (<code>/update</code>), além de persistir credenciais e dispositivos na EEPROM interna do chip.<br><br>Para o código completo, histórico de versões e instruções de instalação, acesse o repositório oficial: <a class=\"underline hover:text-black\" href=\"https://github.com/SyraDevOps/Syra-Home\" target=\"_blank\" rel=\"noopener noreferrer\">github.com/SyraDevOps/Syra-Home</a>."
+            "title": "Syra Home",
+            "category": "Hardware",
+            "type": "text",
+            "content": "O Syra Home é o firmware da Syra para transformar um módulo <b>ESP8266</b> em um nó de automação residencial conectado. Ao ser ligado pela primeira vez, o dispositivo cria a rede Wi-Fi <b>Syra-Config</b>, através da qual é feita a configuração inicial de rede; depois disso, ele se conecta automaticamente à rede salva e fica acessível pelo endereço <b>Syra-Home-SYRA0156326.local</b> (mDNS).<br><br>O firmware expõe uma pequena API HTTP local com rotas para status do dispositivo (<code>/info</code>), gerenciamento de dispositivos vinculados (<code>/devices</code>), troca de mensagens entre dispositivos (<code>/bridge</code>), reconfiguração de rede (<code>/disconnect</code> e <code>/setwifi</code>) e atualização de firmware por OTA (<code>/update</code>), além de persistir credenciais e dispositivos na EEPROM interna do chip.",
+            "githubUrl": "https://github.com/SyraDevOps/Syra-Home"
         }
     ]
     </script>
 
-    <!-- ==========================================================
-         TEMPLATE DE CÓDIGO-FONTE: Syra Home (firmware ESP8266).
-         Fica isolado do JSON de seções para evitar problemas de
-         escaping (aspas, barras invertidas, quebras de linha).
-         O conteúdo é lido como texto puro pelo módulo de código.
-         ========================================================== -->
-    <template id="syra-home-code">#include &lt;ESP8266WiFi.h&gt;
-#include &lt;ESP8266WebServer.h&gt;
-#include &lt;ESP8266mDNS.h&gt;
-#include &lt;ESP8266HTTPUpdateServer.h&gt;
-#include &lt;EEPROM.h&gt;
-
-const char* hostName = "Syra-Home-SYRA0156326";  // access http://Syra-Home-SYRA0156326.local
-const char* serialNumber = "SYRA0156326";
-const int EEPROM_SIZE = 512;
-const int SSID_ADDR = 0;
-const int PASS_ADDR = 32;
-
-// OTA credentials (change these!)
-const char* OTA_USER = "admin";
-const char* OTA_PASS = "syra-ota-2026";
-
-ESP8266WebServer server(80);
-ESP8266HTTPUpdateServer httpUpdater;
-bool mdnsRunning = false;
-
-// LED and connection state
-unsigned long lastBlink = 0;
-const unsigned long BLINK_INTERVAL = 2000; // blinks every 2s
-bool blinkEnabled = false;
-unsigned long lastConnOk = 0;
-
-// Simple device persistence
-const int DEV_LIST_ADDR = 64;
-const int DEV_MAX = 10;
-const int DEV_NAME_LEN = 32; // bytes per name (includes terminator)
-int deviceCount = 0;
-String devices[DEV_MAX];
-
-// Messaging (Bridge) in RAM
-const int MSG_MAX = 20;
-struct Msg { String to; String from; String body; unsigned long ts; bool used; };
-Msg msgs[MSG_MAX];
-
-// ---------- Utilities ----------
-String sanitizeName(const String &s) {
-  String out;
-  out.reserve(DEV_NAME_LEN);
-  for (size_t i = 0; i < s.length() && out.length() < DEV_NAME_LEN - 1; i++) {
-    char c = s[i];
-    if (isalnum((unsigned char)c) || c == ' ' || c == '-' || c == '_') {
-      out += c;
-    }
-  }
-  out.trim();
-  return out;
-}
-
-void setLEDConnected(bool connected) {
-  pinMode(LED_BUILTIN, OUTPUT);
-  if (connected) {
-    blinkEnabled = false;
-    digitalWrite(LED_BUILTIN, LOW); // on (active LOW)
-  } else {
-    blinkEnabled = true;
-  }
-}
-
-void startMDNS() {
-  if (MDNS.begin(hostName)) {
-    mdnsRunning = true;
-    MDNS.addService("http", "tcp", 80);
-    Serial.printf("mDNS: http://%s.local\n", hostName);
-  } else {
-    mdnsRunning = false;
-    Serial.println("Failed to start mDNS");
-  }
-}
-
-void startAP() {
-  WiFi.mode(WIFI_AP);
-  WiFi.softAP("Syra-Config");
-  Serial.print("AP IP: ");
-  Serial.println(WiFi.softAPIP());
-  setLEDConnected(false);
-  startMDNS();
-}
-
-// ---------- EEPROM device persistence ----------
-void loadDevices() {
-  int raw = EEPROM.read(DEV_LIST_ADDR);
-  deviceCount = (raw >= 0 && raw <= DEV_MAX) ? raw : 0;
-  for (int i = 0; i < deviceCount; i++) {
-    int base = DEV_LIST_ADDR + 1 + i * DEV_NAME_LEN;
-    String name;
-    name.reserve(DEV_NAME_LEN);
-    for (int j = 0; j < DEV_NAME_LEN - 1; j++) {
-      char ch = EEPROM.read(base + j);
-      if (ch == '\0') break;
-      name += ch;
-    }
-    devices[i] = name;
-  }
-}
-
-void saveDevices() {
-  EEPROM.write(DEV_LIST_ADDR, deviceCount);
-  for (int i = 0; i < DEV_MAX; i++) {
-    int base = DEV_LIST_ADDR + 1 + i * DEV_NAME_LEN;
-    for (int j = 0; j < DEV_NAME_LEN; j++) {
-      EEPROM.write(base + j, 0);
-    }
-  }
-  for (int i = 0; i < deviceCount; i++) {
-    int base = DEV_LIST_ADDR + 1 + i * DEV_NAME_LEN;
-    const String &name = devices[i];
-    int j = 0;
-    for (; j < (int)name.length() && j < DEV_NAME_LEN - 1; j++) {
-      EEPROM.write(base + j, name[j]);
-    }
-    EEPROM.write(base + j, '\0');
-  }
-  EEPROM.commit();
-}
-
-bool addDevice(const String &raw) {
-  String name = sanitizeName(raw);
-  if (name.length() == 0) return false;
-  for (int i = 0; i < deviceCount; i++) {
-    if (devices[i] == name) return true; // already exists
-  }
-  if (deviceCount >= DEV_MAX) return false;
-  devices[deviceCount++] = name;
-  saveDevices();
-  return true;
-}
-
-bool removeDeviceByName(const String &raw) {
-  String name = sanitizeName(raw);
-  if (name.length() == 0) return false;
-  int idx = -1;
-  for (int i = 0; i < deviceCount; i++) {
-    if (devices[i] == name) { idx = i; break; }
-  }
-  if (idx < 0) return false;
-  for (int i = idx; i < deviceCount - 1; i++) {
-    devices[i] = devices[i + 1];
-  }
-  devices[deviceCount - 1] = "";
-  deviceCount--;
-  saveDevices();
-  return true;
-}
-
-// ---------- Pages ----------
-const char MAIN_page[] PROGMEM = R"rawliteral(
-&lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-&lt;meta charset="UTF-8"&gt;
-&lt;title&gt;Syra Node&lt;/title&gt;
-&lt;style&gt;
-body { font-family: Georgia, "Times New Roman", serif; background:#fff; color:#000; text-align:center; padding:48px 16px; }
-button { background:#000; color:#fff; border:1px solid #000; padding:10px 18px; border-radius:8px; cursor:pointer; font-size:16px; margin:4px; }
-button.btn-outline { background:#fff; color:#000; }
-pre { text-align:left; margin:30px auto; max-width:520px; background:#f6f6f6; padding:16px; border-radius:8px; border:1px solid #ddd; overflow:auto; }
-h1,h2{ font-weight:600; margin:0 0 16px; }
-p{ margin:8px 0; }
-small{ color:#444; }
-a.ota-link { display:inline-block; margin-top:8px; color:#000; }
-&lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;h2&gt;Syra Home&lt;/h2&gt;
-&lt;p&gt;&lt;small&gt;mDNS domain:&lt;/small&gt;&lt;br&gt;&lt;b id="mdns"&gt;—&lt;/b&gt;&lt;/p&gt;
-&lt;p&gt;&lt;small&gt;IP address:&lt;/small&gt;&lt;br&gt;&lt;b id="ip"&gt;—&lt;/b&gt;&lt;/p&gt;
-&lt;p&gt;&lt;small&gt;Firmware:&lt;/small&gt;&lt;br&gt;&lt;b id="fw"&gt;—&lt;/b&gt;&lt;/p&gt;
-&lt;div style="margin-top:12px;"&gt;
-  &lt;button onclick="testInfo()"&gt;Test /info&lt;/button&gt;
-  &lt;button class="btn-outline" onclick="testAll()"&gt;Test all routes&lt;/button&gt;
-  &lt;button class="btn-outline" onclick="disconnect()"&gt;Disconnect&lt;/button&gt;
-  &lt;p style="margin-top:8px;"&gt;&lt;small&gt;Disconnecting activates the &lt;b&gt;Syra-Config&lt;/b&gt; network for reconfiguration.&lt;/small&gt;&lt;/p&gt;
-  &lt;a class="ota-link" href="/update"&gt;Firmware update (OTA)&lt;/a&gt;
-&lt;/div&gt;
-&lt;div style="margin:24px auto; max-width:520px; text-align:left;"&gt;
-  &lt;h3 style="margin:0 0 8px;"&gt;Connected devices&lt;/h3&gt;
-  &lt;ul id="devlist" style="padding-left:20px; margin:8px 0;"&gt;&lt;/ul&gt;
-  &lt;p id="devhint" style="color:#444;"&gt;No devices registered yet.&lt;/p&gt;
-&lt;/div&gt;
-&lt;pre id="out"&gt;&lt;/pre&gt;
-
-&lt;script&gt;
-window.addEventListener('load', ()=&gt;{ testInfo(); });
-async function testInfo(){
-  const out=document.getElementById('out');
-  out.textContent="Querying /info...";
-  try {
-    const controller=new AbortController();
-    const id=setTimeout(()=&gt;controller.abort(),1500);
-    const res=await fetch("/info",{signal:controller.signal});
-    clearTimeout(id);
-    const json=await res.json();
-    out.textContent=JSON.stringify(json,null,2);
-    document.getElementById('ip').textContent=json.ip||'—';
-    document.getElementById('mdns').textContent=json.mdns||'—';
-    document.getElementById('fw').textContent=json.fw||'—';
-    loadDevices();
-  }catch(e){
-    out.textContent="Error: "+e;
-  }
-}
-async function loadDevices(){
-  try{
-    const r = await fetch('/devices');
-    if(!r.ok) return;
-    const j = await r.json();
-    const ul = document.getElementById('devlist');
-    ul.innerHTML = '';
-    if (j.items &amp;&amp; j.items.length){
-      document.getElementById('devhint').style.display='none';
-      j.items.forEach(n=&gt;{
-        const li=document.createElement('li');
-        li.textContent=n;
-        ul.appendChild(li);
-      })
-    } else {
-      document.getElementById('devhint').style.display='block';
-    }
-  }catch(e){/* ignore */}
-}
-async function disconnect(){
-  const out=document.getElementById('out');
-  out.textContent='Disconnecting and activating Syra-Config network...';
-  try{
-    const res=await fetch('/disconnect');
-    if(res.ok){
-      out.textContent='Syra-Config network activated. Connect to "Syra-Config" and go to http://Syra-Home-SYRA0156326.local or 192.168.4.1';
-    } else {
-      out.textContent='Failed to disconnect.';
-    }
-  }catch(e){
-    out.textContent='Error: '+e;
-  }
-}
-async function testAll(){
-  const out = document.getElementById('out');
-  out.textContent = "Testing all routes...\n";
-  function log(msg){ out.textContent += msg + "\n"; }
-  try{
-    log("1) Testing /info...");
-    const infoRes = await fetch("/info");
-    log("   /info status: " + infoRes.status);
-    const infoJson = await infoRes.json();
-    log("   /info response: " + JSON.stringify(infoJson));
-
-    log("2) Testing GET /devices...");
-    const devGet = await fetch("/devices");
-    log("   GET /devices status: " + devGet.status);
-    const devGetJson = await devGet.json();
-    log("   GET /devices response: " + JSON.stringify(devGetJson));
-
-    log("3) Testing POST /devices (add TestDevice)...");
-    const devPost = await fetch("/devices", {
-      method: "POST",
-      headers: {"Content-Type":"application/x-www-form-urlencoded"},
-      body: "name=TestDevice"
-    });
-    log("   POST /devices status: " + devPost.status);
-    log("   POST /devices response: " + await devPost.text());
-
-    log("4) Testing DELETE /devices (remove TestDevice)...");
-    const devDel = await fetch("/devices?name=TestDevice", { method: "DELETE" });
-    log("   DELETE /devices status: " + devDel.status);
-    log("   DELETE /devices response: " + await devDel.text());
-
-    log("5) Testing POST /bridge...");
-    const bridgePost = await fetch("/bridge", {
-      method:"POST",
-      headers: {"Content-Type":"application/x-www-form-urlencoded"},
-      body:"to=DeviceA&from=Tester&data=Hello"
-    });
-    log("   POST /bridge status: " + bridgePost.status);
-    log("   POST /bridge response: " + await bridgePost.text());
-
-    log("6) Testing GET /bridge...");
-    const bridgeGet = await fetch("/bridge?device=DeviceA");
-    log("   GET /bridge status: " + bridgeGet.status);
-    log("   GET /bridge response: " + await bridgeGet.text());
-
-    log("7) Testing /disconnect (NOT recommended in production, switches to AP)...");
-    try{
-      const disRes = await fetch("/disconnect");
-      log("   /disconnect status: " + disRes.status);
-      log("   /disconnect response: " + await disRes.text());
-    }catch(e){
-      log("   Error testing /disconnect: "+e);
-    }
-
-    log("\n✅ Tests complete. Check the status of each route above.");
-  }catch(e){
-    log("❌ Test error: " + e);
-  }
-  loadDevices();
-}
-&lt;/script&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-)rawliteral";
-
-const char CONFIG_page[] PROGMEM = R"rawliteral(
-&lt;!DOCTYPE html&gt;
-&lt;html lang="en"&gt;
-&lt;head&gt;
-&lt;meta charset="UTF-8"&gt;
-&lt;title&gt;Syra Config&lt;/title&gt;
-&lt;style&gt;
-body { font-family: Georgia, "Times New Roman", serif; background:#fff; color:#000; text-align:center; padding:48px 16px; }
-input { margin:8px; padding:10px 12px; border:1px solid #000; border-radius:8px; width:260px; }
-button { background:#000; color:#fff; border:1px solid #000; padding:10px 18px; border-radius:8px; cursor:pointer; font-size:16px; margin-top:8px; }
-h2 { font-weight:600; }
-small{ color:#444; }
-&lt;/style&gt;
-&lt;/head&gt;
-&lt;body&gt;
-&lt;h2&gt;Configure Wi-Fi — Syra Home&lt;/h2&gt;
-&lt;p&gt;&lt;small&gt;mDNS domain: &lt;b&gt;Syra-Home-SYRA0156326.local&lt;/b&gt;&lt;/small&gt;&lt;/p&gt;
-&lt;form action="/setwifi" method="post"&gt;
-  &lt;input name="ssid" placeholder="SSID" required&gt;&lt;br&gt;
-  &lt;input name="pass" type="password" placeholder="Password"&gt;&lt;br&gt;
-  &lt;button type="submit"&gt;Connect&lt;/button&gt;
-&lt;/form&gt;
-&lt;/body&gt;
-&lt;/html&gt;
-)rawliteral";
-
-// ---------- Handlers ----------
-void handleRoot() {
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  server.send_P(200, "text/html", MAIN_page);
-}
-
-void handleConfig() {
-  server.send_P(200, "text/html", CONFIG_page);
-}
-
-void handleRootDynamic() {
-  if (WiFi.status() == WL_CONNECTED && WiFi.getMode() == WIFI_STA) {
-    handleRoot();
-  } else {
-    handleConfig();
-  }
-}
-
-void handleInfo() {
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  String ip = (WiFi.getMode() == WIFI_AP) ? WiFi.softAPIP().toString() : WiFi.localIP().toString();
-  String status = (WiFi.status() == WL_CONNECTED) ? "online" : "config";
-  String json;
-  json.reserve(220);
-  json += "{\"id\":\"";      json += serialNumber;
-  json += "\",\"name\":\"Syra Node\",\"ip\":\""; json += ip;
-  json += "\",\"status\":\""; json += status;
-  json += "\",\"mdns\":\"";  json += hostName; json += ".local";
-  json += "\",\"fw\":\"";    json += __DATE__; json += " "; json += __TIME__;
-  json += "\"}";
-  server.send(200, "application/json", json);
-}
-
-void handleDevicesGet() {
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  String json;
-  json.reserve(64 + deviceCount * (DEV_NAME_LEN + 3));
-  json += "{\"count\":"; json += deviceCount; json += ",\"items\":[";
-  for (int i = 0; i < deviceCount; i++) {
-    if (i) json += ",";
-    json += "\""; json += devices[i]; json += "\"";
-  }
-  json += "]}";
-  server.send(200, "application/json", json);
-}
-
-String getArgAny(const String &key) {
-  if (server.hasArg(key)) return server.arg(key);
-  if (server.hasArg("plain")) {
-    String body = server.arg("plain");
-    int pos = body.indexOf(key);
-    if (pos >= 0) {
-      int q1 = body.indexOf('"', pos + key.length());
-      if (q1 >= 0) {
-        int q2 = body.indexOf('"', q1 + 1);
-        if (q2 > q1) return body.substring(q1 + 1, q2);
-      }
-    }
-  }
-  return "";
-}
-
-void handleDevicesPost() {
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  String name = getArgAny("name");
-  if (name.length() == 0) {
-    server.send(400, "application/json", "{\"ok\":false,\"err\":\"name required\"}");
-    return;
-  }
-  bool ok = addDevice(name);
-  if (ok) server.send(200, "application/json", "{\"ok\":true}");
-  else server.send(409, "application/json", "{\"ok\":false,\"err\":\"list full or duplicate\"}");
-}
-
-void handleDevicesDelete() {
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  String name = getArgAny("name");
-  if (name.length() == 0) {
-    server.send(400, "application/json", "{\"ok\":false,\"err\":\"name required\"}");
-    return;
-  }
-  bool ok = removeDeviceByName(name);
-  if (ok) server.send(200, "application/json", "{\"ok\":true}");
-  else server.send(404, "application/json", "{\"ok\":false,\"err\":\"device not found\"}");
-}
-
-int findFreeMsg() { for (int i = 0; i < MSG_MAX; i++) if (!msgs[i].used) return i; return -1; }
-int findOldestMsg() {
-  int idx = -1;
-  unsigned long oldest = ULONG_MAX;
-  for (int i = 0; i < MSG_MAX; i++) {
-    if (msgs[i].used && msgs[i].ts < oldest) { oldest = msgs[i].ts; idx = i; }
-  }
-  return idx;
-}
-
-void handleBridgePost() {
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  String to = sanitizeName(getArgAny("to"));
-  String from = sanitizeName(getArgAny("from"));
-  String body = getArgAny("data");
-  if (body.length() == 0) body = getArgAny("body");
-  if (to.length() == 0 || from.length() == 0 || body.length() == 0) {
-    server.send(400, "application/json", "{\"ok\":false,\"err\":\"required params: to, from, data\"}");
-    return;
-  }
-  if (body.length() > 256) body = body.substring(0, 256);
-  int idx = findFreeMsg();
-  if (idx < 0) idx = findOldestMsg();
-  if (idx < 0) {
-    server.send(507, "application/json", "{\"ok\":false,\"err\":\"mailbox full\"}");
-    return;
-  }
-  msgs[idx].to = to; msgs[idx].from = from; msgs[idx].body = body;
-  msgs[idx].ts = millis(); msgs[idx].used = true;
-  server.send(200, "application/json", "{\"ok\":true}");
-}
-
-void handleBridgeGet() {
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  String who = sanitizeName(server.hasArg("device") ? server.arg("device") : server.arg("to"));
-  if (who.length() == 0) {
-    server.send(400, "application/json", "{\"ok\":false,\"err\":\"device required\"}");
-    return;
-  }
-  String json;
-  json.reserve(512);
-  json += "{\"ok\":true,\"messages\":[";
-  bool first = true;
-  unsigned long now = millis();
-  for (int i = 0; i < MSG_MAX; i++) {
-    if (msgs[i].used && msgs[i].to == who) {
-      if (!first) json += ","; else first = false;
-      json += "{\"from\":\""; json += msgs[i].from;
-      json += "\",\"data\":\""; json += msgs[i].body;
-      json += "\",\"ts\":"; json += msgs[i].ts; json += "}";
-      msgs[i].used = false; // consumed
-      msgs[i].to = msgs[i].from = msgs[i].body = "";
-      msgs[i].ts = now;
-    }
-  }
-  json += "]}";
-  server.send(200, "application/json", json);
-}
-
-void writeStringToEEPROM(int addr, const String &data) {
-  size_t i = 0;
-  for (; i < data.length(); ++i) EEPROM.write(addr + i, data[i]);
-  EEPROM.write(addr + i, '\0');
-}
-
-String readStringFromEEPROM(int addr) {
-  String data;
-  data.reserve(32);
-  char ch = EEPROM.read(addr);
-  int i = 0;
-  while (ch != '\0' && i < 31) {
-    data += ch;
-    i++;
-    ch = EEPROM.read(addr + i);
-  }
-  return data;
-}
-
-void handleDisconnect() {
-  server.sendHeader("Access-Control-Allow-Origin", "*");
-  server.send(200, "text/plain", "Disconnecting and starting Syra-Config...");
-  WiFi.disconnect(true);
-  delay(300);
-  startAP();
-}
-
-void handleSetWiFi() {
-  String ssid = server.arg("ssid");
-  String pass = server.arg("pass");
-  writeStringToEEPROM(SSID_ADDR, ssid);
-  writeStringToEEPROM(PASS_ADDR, pass);
-  EEPROM.commit();
-  server.send(200, "text/html",
-    "<h2>Connecting...</h2><p>If the connection succeeds, the device will restart.</p>"
-    "<script>setTimeout(() => location.reload(), 10000);</script>");
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid.c_str(), pass.c_str());
-
-  // Non-blocking-ish wait with watchdog feed
-  unsigned long start = millis();
-  while (WiFi.status() != WL_CONNECTED && millis() - start < 15000) {
-    delay(100);
-    yield();
-  }
-  if (WiFi.status() == WL_CONNECTED) {
-    startMDNS();
-    ESP.restart();
-  }
-}
-
-void handleNotFound() {
-  server.send(404, "application/json", "{\"ok\":false,\"err\":\"not found\"}");
-}
-
-// ---------- Setup / Loop ----------
-void setup() {
-  Serial.begin(115200);
-  EEPROM.begin(EEPROM_SIZE);
-  loadDevices();
-  pinMode(LED_BUILTIN, OUTPUT);
-
-  String savedSSID = readStringFromEEPROM(SSID_ADDR);
-  String savedPass = readStringFromEEPROM(PASS_ADDR);
-  bool connected = false;
-
-  if (savedSSID.length() > 0) {
-    Serial.println("Trying to connect with saved credentials...");
-    WiFi.mode(WIFI_STA);
-    WiFi.setSleepMode(WIFI_NONE_SLEEP); // faster, more stable HTTP/OTA response
-    WiFi.begin(savedSSID.c_str(), savedPass.c_str());
-    int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 20) {
-      delay(500);
-      Serial.print(".");
-      attempts++;
-    }
-    if (WiFi.status() == WL_CONNECTED) {
-      connected = true;
-      Serial.println("\n✅ Connected with saved credentials!");
-      Serial.print("Local IP: ");
-      Serial.println(WiFi.localIP());
-      setLEDConnected(true);
-      lastConnOk = millis();
-    }
-  }
-
-  if (!connected) {
-    Serial.println("Starting AP mode for configuration...");
-    startAP();
-  }
-
-  server.on("/", handleRootDynamic);
-  server.on("/setwifi", HTTP_POST, handleSetWiFi);
-  server.on("/info", handleInfo);
-  server.on("/disconnect", handleDisconnect);
-  server.on("/devices", HTTP_GET, handleDevicesGet);
-  server.on("/devices", HTTP_POST, handleDevicesPost);
-  server.on("/devices", HTTP_DELETE, handleDevicesDelete);
-  server.on("/bridge", HTTP_GET, handleBridgeGet);
-  server.on("/bridge", HTTP_POST, handleBridgePost);
-  server.onNotFound(handleNotFound);
-
-  // OTA update endpoint: http://<ip-or-mdns>/update (browser upload of .bin)
-  httpUpdater.setup(&server, "/update", OTA_USER, OTA_PASS);
-
-  server.begin();
-  Serial.println("HTTP server started!");
-  Serial.println("OTA available at /update (Basic Auth protected)");
-
-  if (connected) {
-    startMDNS();
-  }
-}
-
-void loop() {
-  server.handleClient();
-  if (mdnsRunning) {
-    MDNS.update();
-  }
-
-  // Connection monitor
-  if (WiFi.getMode() == WIFI_STA) {
-    if (WiFi.status() == WL_CONNECTED) {
-      if (!blinkEnabled) digitalWrite(LED_BUILTIN, LOW); // ensure LED is on
-      lastConnOk = millis();
-    } else if (millis() - lastConnOk > 10000) { // 10s without connection => back to AP
-      Serial.println("Connection lost. Returning to Syra-Config...");
-      startAP();
-    }
-  }
-
-  // Blink LED in AP/config mode
-  if (blinkEnabled && millis() - lastBlink >= BLINK_INTERVAL) {
-    lastBlink = millis();
-    digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
-  }
-}</template>
 
     <!-- ==========================================================
-         MÓDULO DE NAVEGAÇÃO: constrói o sumário lateral, incluindo
-         suporte a subitens (seções com "parent").
+         MÓDULO DE NAVEGAÇÃO: agrupa as seções por categoria
+         (ex: Plataforma, Inteligência Artificial, Hardware) e,
+         dentro de cada grupo, ainda respeita subitens via "parent"
+         (ex: Syra Home dentro de Syra Hardware).
+         Seções sem "category" caem em um grupo "Outros" ao final.
          ========================================================== -->
     <script id="module-nav">
         const NavModule = {
+            groupByCategory(sections) {
+                const groups = new Map();
+                sections.forEach(section => {
+                    const key = section.category || 'Outros';
+                    if (!groups.has(key)) groups.set(key, []);
+                    groups.get(key).push(section);
+                });
+                return groups;
+            },
             render(sections, container) {
                 container.innerHTML = '';
-                sections.forEach(section => {
-                    const isChild = Boolean(section.parent);
-                    const navLink = document.createElement('a');
-                    navLink.href = `#${section.id}`;
-                    navLink.className = isChild
-                        ? "block text-sm text-zinc-500 hover:text-black hover:translate-x-1 transition-transform duration-150 pl-4 border-l border-zinc-200"
-                        : "block text-sm text-zinc-600 hover:text-black hover:translate-x-1 transition-transform duration-150 font-medium";
-                    navLink.textContent = section.title;
-                    container.appendChild(navLink);
+                const groups = this.groupByCategory(sections);
+
+                groups.forEach((groupSections, categoryName) => {
+                    const groupWrapper = document.createElement('div');
+                    groupWrapper.className = "mb-6";
+
+                    const groupLabel = document.createElement('h3');
+                    groupLabel.className = "text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2";
+                    groupLabel.textContent = categoryName;
+                    groupWrapper.appendChild(groupLabel);
+
+                    const groupNav = document.createElement('div');
+                    groupNav.className = "space-y-2";
+
+                    groupSections.forEach(section => {
+                        const isChild = Boolean(section.parent);
+                        const navLink = document.createElement('a');
+                        navLink.href = `#${section.id}`;
+                        navLink.className = isChild
+                            ? "block text-sm text-zinc-500 hover:text-black hover:translate-x-1 transition-transform duration-150 pl-4 border-l border-zinc-200"
+                            : "block text-sm text-zinc-600 hover:text-black hover:translate-x-1 transition-transform duration-150 font-medium";
+                        navLink.textContent = section.title;
+                        groupNav.appendChild(navLink);
+                    });
+
+                    groupWrapper.appendChild(groupNav);
+                    container.appendChild(groupWrapper);
                 });
             }
         };
@@ -780,9 +245,23 @@ void loop() {
 
     <!-- ==========================================================
          MÓDULO DE SEÇÕES DE TEXTO
+         Quando a seção possui "githubUrl", um botão estilizado com
+         o ícone do GitHub é renderizado ao final do conteúdo,
+         apontando para o repositório específico do projeto.
          ========================================================== -->
     <script id="module-text-section">
         const TextSectionModule = {
+            githubIconSvg: `<svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>`,
+            renderGithubButton(url) {
+                if (!url) return '';
+                return `
+                    <a href="${url}" target="_blank" rel="noopener noreferrer"
+                       class="group inline-flex items-center gap-2 mt-6 bg-black text-white hover:bg-zinc-800 text-xs font-bold uppercase tracking-widest px-4 py-2.5 transition-colors duration-150">
+                        ${this.githubIconSvg}
+                        <span>Ver no GitHub</span>
+                    </a>
+                `;
+            },
             render(section) {
                 const el = document.createElement('section');
                 el.id = section.id;
@@ -792,6 +271,7 @@ void loop() {
                     <div class="text-zinc-600 text-sm leading-relaxed space-y-3 font-normal">
                         ${section.content}
                     </div>
+                    ${this.renderGithubButton(section.githubUrl)}
                 `;
                 return el;
             }
@@ -849,6 +329,94 @@ void loop() {
     </script>
 
     <!-- ==========================================================
+         MÓDULO DE BUSCA: indexa título + conteúdo (texto puro, sem
+         tags) de cada seção e mostra, ao digitar, em quais seções
+         específicas o termo pesquisado aparece, com um trecho de
+         contexto. Clicar num resultado leva direto à seção.
+         ========================================================== -->
+    <script id="module-search">
+        const SearchModule = {
+            stripHtml(html) {
+                const tmp = document.createElement('div');
+                tmp.innerHTML = html || '';
+                return tmp.textContent || tmp.innerText || '';
+            },
+            buildIndex(sections) {
+                return sections.map(section => ({
+                    id: section.id,
+                    title: section.title,
+                    category: section.category || 'Outros',
+                    plainText: this.stripHtml(section.content)
+                }));
+            },
+            getSnippet(plainText, query) {
+                const lower = plainText.toLowerCase();
+                const idx = lower.indexOf(query.toLowerCase());
+                if (idx === -1) return plainText.slice(0, 90).trim() + '…';
+                const start = Math.max(0, idx - 40);
+                const end = Math.min(plainText.length, idx + query.length + 60);
+                let snippet = plainText.slice(start, end).trim();
+                if (start > 0) snippet = '…' + snippet;
+                if (end < plainText.length) snippet = snippet + '…';
+                return snippet;
+            },
+            highlight(text, query) {
+                const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                return text.replace(new RegExp(`(${escaped})`, 'ig'), '<mark class="bg-black text-white px-0.5">$1</mark>');
+            },
+            search(index, query) {
+                const q = query.trim().toLowerCase();
+                if (!q) return [];
+                return index.filter(item =>
+                    item.title.toLowerCase().includes(q) || item.plainText.toLowerCase().includes(q)
+                );
+            },
+            render(results, query, container) {
+                container.innerHTML = '';
+                if (results.length === 0) {
+                    container.innerHTML = '<p class="text-sm text-zinc-400 italic">Nenhuma seção encontrada.</p>';
+                    return;
+                }
+                results.forEach(item => {
+                    const a = document.createElement('a');
+                    a.href = `#${item.id}`;
+                    a.className = "block hover:translate-x-1 transition-transform duration-150";
+
+                    const titleMatch = item.title.toLowerCase().includes(query.toLowerCase());
+                    const snippetSource = titleMatch ? item.title : this.getSnippet(item.plainText, query);
+
+                    a.innerHTML = `
+                        <p class="text-[9px] uppercase tracking-widest text-zinc-400">${item.category}</p>
+                        <p class="text-sm font-medium text-black">${item.title}</p>
+                        <p class="text-xs text-zinc-500 leading-snug mt-0.5">${this.highlight(snippetSource, query)}</p>
+                    `;
+                    container.appendChild(a);
+                });
+            },
+            init(sections) {
+                const index = this.buildIndex(sections);
+                const input = document.getElementById('search-input');
+                const resultsContainer = document.getElementById('search-results');
+                const navWrapper = document.getElementById('nav-wrapper');
+
+                input.addEventListener('input', () => {
+                    const query = input.value;
+                    if (!query.trim()) {
+                        resultsContainer.classList.add('hidden');
+                        resultsContainer.innerHTML = '';
+                        navWrapper.classList.remove('hidden');
+                        return;
+                    }
+                    const results = this.search(index, query);
+                    this.render(results, query, resultsContainer);
+                    resultsContainer.classList.remove('hidden');
+                    navWrapper.classList.add('hidden');
+                });
+            }
+        };
+    </script>
+
+    <!-- ==========================================================
          MÓDULO PRINCIPAL (App): carrega os dados e aciona os
          demais módulos para montar a página.
          ========================================================== -->
@@ -861,6 +429,7 @@ void loop() {
 
                 NavModule.render(sections, navContainer);
                 ContentModule.render(sections, contentContainer);
+                SearchModule.init(sections);
             }
         };
 
