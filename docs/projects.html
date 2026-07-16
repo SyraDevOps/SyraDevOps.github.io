@@ -105,13 +105,6 @@
             "content": "Após realizar a instalação padrão, importe a biblioteca diretamente no cabeçalho do seu arquivo principal. A inicialização ocorre de forma direta por meio de parâmetros declarativos simples."
         },
         {
-            "id": "sory",
-            "title": "Sory",
-            "category": "Inteligência Artificial",
-            "type": "text",
-            "content": "Seção reservada para a documentação do projeto Sory."
-        },
-        {
             "id": "selene",
             "title": "Selene",
             "category": "Inteligência Artificial",
@@ -124,7 +117,8 @@
             "title": "Yra",
             "category": "Inteligência Artificial",
             "type": "text",
-            "content": "Seção reservada para a documentação do projeto Yra."
+            "content": "Seção reservada para a documentação do projeto Yra.",
+            "githubUrl": "https://github.com/SyraDevOps/Yra"
         },
         {
             "id": "yravision",
@@ -134,11 +128,36 @@
             "content": "Seção reservada para a documentação do projeto YraVision."
         },
         {
+            "id": "syrafin",
+            "title": "SyraFin",
+            "category": "Inteligência Artificial",
+            "type": "text",
+            "content": "<p><b>SyraFin</b> é uma plataforma de inteligência financeira que combina Machine Learning com análise técnica tradicional para gerar previsões probabilísticas sobre o mercado de ações, com dados públicos obtidos via API do Yahoo Finance.</p><p>O pipeline extrai indicadores técnicos consolidados (RSI, Bandas de Bollinger, MACD, volatilidade, momentum e médias móveis) e treina três modelos quantílicos em <b>LightGBM</b> (mediana, piso e teto de confiança), validados com Walk-Forward (TimeSeriesSplit) para evitar vazamento temporal. O resultado é entregue como um relatório em PDF com gráficos de candlestick, indicadores técnicos e a série de previsões para os próximos dias, incluindo intervalos de confiança e as métricas de desempenho do modelo (R², MAE, RMSE).</p><p>Por trabalhar apenas com dados públicos de mercado e processamento local, o SyraFin serve como base analítica para equipes de research, consultorias de investimento e fintechs que queiram automatizar relatórios técnicos de ativos.</p>",
+            "githubUrl": "https://github.com/SyraDevOps/SyraFin"
+        },
+        {
+            "id": "syrablock",
+            "title": "SYRABLOCK",
+            "category": "Inteligência Artificial",
+            "type": "text",
+            "content": "<p>O <b>SYRABLOCK</b> (PTW Blockchain) é uma blockchain desenvolvida em Go pensada para conciliar descentralização com segurança e conformidade regulatória, voltada a empresas, instituições financeiras e mercados regulados.</p><p>Utiliza um consenso <b>PoS híbrido</b> com reputação de validadores e penalidades automáticas, contratos inteligentes em uma linguagem própria (<b>SyraScript</b>) executados em uma VM com gas metering, e uma camada de segurança com RSA 2048, TLS 1.3, proteção anti-replay e rate limiting. Diferente de blockchains públicas genéricas, a rede já nasce com <b>KYC nativo</b> integrado à criação de carteiras e módulos de auditoria com logs estruturados e alertas em tempo real, voltados a casos de uso como rastreabilidade de supply chain, consórcios empresariais e DeFi com compliance.</p>",
+            "githubUrl": "https://github.com/SyraDevOps/SYRABLOCK"
+        },
+        {
+            "id": "luna",
+            "title": "Luna",
+            "category": "Inteligência Artificial",
+            "type": "text",
+            "content": "<p><b>Luna</b> (versão 2.6) é o modelo de diálogo neural da Syra, desenvolvido especificamente para o português. Combina uma arquitetura híbrida — Transformer, camadas State-Space para contexto de longo alcance e blocos de Mixture of Experts — com um tokenizador próprio treinado em corpus PT-BR, buscando maior precisão em conjugações, contrações e expressões idiomáticas do que tokenizadores genéricos.</p><p>O modelo integra um sistema de <b>RAG</b> (recuperação aumentada, com FAISS e sentence embeddings) para respostas com base em documentos externos, um conjunto de <b>personas</b> pré-definidas que ajustam tom e complexidade da resposta, e suporte a quantização (INT8/INT4) para rodar tanto em GPU quanto em CPU com hardware mais limitado.</p><p>O Luna é um projeto em desenvolvimento ativo, com desafios conhecidos em aberto — como gestão de memória em contextos longos e estabilidade do treinamento com curriculum learning — e recebe contribuições da comunidade em código, dados e testes.</p>",
+            "githubUrl": "https://github.com/SyraDevOps/Luna"
+        },
+        {
             "id": "skymonitor",
             "title": "SkyMonitor",
             "category": "Computer Vision",
             "type": "text",
-            "content": "<p class=\"italic text-zinc-500\">Sistema de Monitoramento e Análise de Céu Noturno</p><p>O <b>SkyMonitor</b> é uma plataforma em Python com interface gráfica (Tkinter) desenvolvida para a análise e o monitoramento contínuo do céu. Projetada para auxiliar astrônomos amadores, estações de observação e entusiastas, a ferramenta é compatível com múltiplas fontes de entrada, como câmeras de segurança IP (via protocolo RTSP), webcams locais, arquivos de vídeo e sequências de imagens de uma pasta.</p><p>O sistema processa as imagens em tempo real utilizando técnicas de processamento digital, dividindo sua atuação em quatro frentes principais:</p><ul class=\"list-disc pl-5 space-y-2\"><li><b>Rastreamento Estelar:</b> identifica e acompanha estrelas estáticas ao longo do tempo. Com base nessas posições confirmadas, a ferramenta aplica algoritmos de triangulação geométrica para gerar padrões estáveis de constelações, desenhando as conexões na tela.</li><li><b>Detecção de Transientes (Meteoros):</b> analisa trajetórias lineares rápidas e variações de intensidade luminosa para registrar a passagem de potenciais meteoros, gerando imagens com o traçado estimado do fenômeno.</li><li><b>Monitoramento de Nuvens:</b> utiliza segmentação morfológica para identificar a presença de nebulosidade na imagem, calculando a área aproximada de cobertura e alertando sobre a obstrução do céu.</li><li><b>Registro de Dados:</b> salva automaticamente relatórios estatísticos, grades de imagens (grids) de estrelas identificadas, mapas celestes periódicos e capturas de eventos transientes de forma estruturada em disco.</li></ul><p>A aplicação foi estruturada de maneira independente, utilizando bibliotecas consolidadas como OpenCV, NumPy e Pillow, o que facilita sua distribuição e permite a compilação em um arquivo executável único (via PyInstaller).</p>"
+            "content": "<p class=\"italic text-zinc-500\">Sistema de Monitoramento e Análise de Céu Noturno</p><p>O <b>SkyMonitor</b> é uma plataforma em Python com interface gráfica (Tkinter) desenvolvida para a análise e o monitoramento contínuo do céu. Projetada para auxiliar astrônomos amadores, estações de observação e entusiastas, a ferramenta é compatível com múltiplas fontes de entrada, como câmeras de segurança IP (via protocolo RTSP), webcams locais, arquivos de vídeo e sequências de imagens de uma pasta.</p><p>O sistema processa as imagens em tempo real utilizando técnicas de processamento digital, dividindo sua atuação em quatro frentes principais:</p><ul class=\"list-disc pl-5 space-y-2\"><li><b>Rastreamento Estelar:</b> identifica e acompanha estrelas estáticas ao longo do tempo. Com base nessas posições confirmadas, a ferramenta aplica algoritmos de triangulação geométrica para gerar padrões estáveis de constelações, desenhando as conexões na tela.</li><li><b>Detecção de Transientes (Meteoros):</b> analisa trajetórias lineares rápidas e variações de intensidade luminosa para registrar a passagem de potenciais meteoros, gerando imagens com o traçado estimado do fenômeno.</li><li><b>Monitoramento de Nuvens:</b> utiliza segmentação morfológica para identificar a presença de nebulosidade na imagem, calculando a área aproximada de cobertura e alertando sobre a obstrução do céu.</li><li><b>Registro de Dados:</b> salva automaticamente relatórios estatísticos, grades de imagens (grids) de estrelas identificadas, mapas celestes periódicos e capturas de eventos transientes de forma estruturada em disco.</li></ul><p>A aplicação foi estruturada de maneira independente, utilizando bibliotecas consolidadas como OpenCV, NumPy e Pillow, o que facilita sua distribuição e permite a compilação em um arquivo executável único (via PyInstaller).</p>",
+            "githubUrl": "https://github.com/SyraDevOps/Vigilis/blob/Meteor/main.py"
         },
         {
             "id": "syra-voicelab",
@@ -146,7 +165,7 @@
             "category": "Computer Vision",
             "type": "text",
             "content": "<p>O <b>Syra VoiceLab</b> é uma ferramenta open source para experimentação e desenvolvimento de aplicações baseadas em voz diretamente no navegador. A plataforma integra reconhecimento de fala em tempo real, visualização do sinal de áudio e detecção de palavras-chave, oferecendo uma base simples e extensível para pesquisas, assistentes virtuais, automação, acessibilidade e interfaces controladas por voz.</p><p>Desenvolvido utilizando APIs nativas da Web, o projeto serve tanto como ambiente de testes quanto como ponto de partida para aplicações mais complexas.</p>",
-            "githubUrl": ""
+            "githubUrl": "https://github.com/SyraDevOps/Scripts"
         },
         {
             "id": "visioneye",
@@ -154,7 +173,7 @@
             "category": "Computer Vision",
             "type": "text",
             "content": "<p><b>VisionEye</b> é uma ferramenta open source de rastreamento ocular desenvolvida pela Syra para aplicações de visão computacional em tempo real. Utilizando o MediaPipe Face Mesh, o projeto detecta a posição da íris, acompanha o movimento dos olhos, estima a direção do olhar e calcula métricas como abertura ocular, fornecendo uma interface visual para experimentação, pesquisa e desenvolvimento de sistemas baseados em eye tracking.</p><p>O VisionEye pode servir como base para aplicações de acessibilidade, interfaces controladas pelo olhar, realidade aumentada, monitoramento de atenção, análise comportamental e interação homem-computador.</p>",
-            "githubUrl": ""
+            "githubUrl": "https://github.com/SyraDevOps/Scripts"
         },
         {
             "id": "visionhand",
@@ -162,7 +181,7 @@
             "category": "Computer Vision",
             "type": "text",
             "content": "<p><b>VisionHand</b> é uma ferramenta open source de rastreamento de mãos desenvolvida pela Syra para aplicações de visão computacional em tempo real. Baseado no MediaPipe Hands, o projeto detecta e acompanha até duas mãos simultaneamente, identificando os 21 pontos anatômicos de cada mão, desenhando seu esqueleto e disponibilizando as coordenadas dos landmarks para desenvolvimento de aplicações interativas.</p><p>O VisionHand pode ser utilizado como base para reconhecimento de gestos, interfaces sem contato, realidade aumentada, robótica, controle por movimentos e pesquisa em interação homem-computador.</p>",
-            "githubUrl": ""
+            "githubUrl": "https://github.com/SyraDevOps/Scripts"
         },
         {
             "id": "visiondetect",
@@ -170,7 +189,15 @@
             "category": "Computer Vision",
             "type": "text",
             "content": "<p><b>VisionDetect</b> é uma ferramenta open source para detecção de objetos em tempo real desenvolvida pela Syra. Utilizando TensorFlow.js e o modelo COCO-SSD, o projeto identifica e classifica automaticamente dezenas de categorias de objetos presentes em imagens ou vídeo, exibindo caixas delimitadoras, nível de confiança e visualização das detecções em tempo real.</p><p>O VisionDetect serve como base para aplicações de visão computacional, robótica, automação, monitoramento inteligente, sistemas de segurança e projetos de Inteligência Artificial executados diretamente no navegador.</p>",
-            "githubUrl": ""
+            "githubUrl": "https://github.com/SyraDevOps/Scripts"
+        },
+        {
+            "id": "tls",
+            "title": "TLS - Trusted Link Security",
+            "category": "Segurança",
+            "type": "text",
+            "content": "<p>O <b>TLS (Trusted Link Security)</b> é um pacote de ferramentas de segurança digital da Syra, voltado a colaboradores internos que precisam avaliar a própria máquina e rede local — cobrindo cenários de red team, blue team e OSINT em um único conjunto de utilitários.</p><p>O pacote reúne três ferramentas com escopos distintos: <b>Wolfex</b>, que orquestra frameworks de varredura (arquivos, RATs, APIs, hardware) restritos à máquina onde é executado — não pode ser apontado para outros alvos; <b>Haven</b>, voltado a análise de tráfego na rede em que o usuário está conectado (usando Nmap e Wireshark, entre outras ferramentas); e <b>Mike</b>, um scanner geral que atua apenas internamente, varrendo arquivos, conexões, softwares, hardware, discos, redes e aplicativos do próprio sistema.</p>",
+            "githubUrl": "https://github.com/SyraDevOps/TheLastSystem"
         },
         {
             "id": "syra-hardware",
