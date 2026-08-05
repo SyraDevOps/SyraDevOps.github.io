@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+<title>Como funciona — Nexus</title>
+<meta name="description" content="Por que o Nexus existe, como a conexão direta funciona, e para que usar.">
+
+<link rel="manifest" href="./manifest.json">
+<meta name="theme-color" content="#080B10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Nexus">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void:      #080B10;
+    --bg-panel:     #11161E;
+    --bg-panel-2:   #161C26;
+    --line:         #232B38;
+    --line-soft:    #1A212C;
+    --signal:       #3FE8B0;
+    --signal-dim:   #1F7A5C;
+    --signal-glow:  rgba(63, 232, 176, 0.35);
+    --amber:        #E8A33F;
+    --danger:       #E85A5A;
+    --ink:          #E7ECF2;
+    --ink-soft:     #8E99A8;
+    --ink-faint:    #545F6E;
+    --serif: 'Playfair Display', Georgia, serif;
+    --mono:  'JetBrains Mono', 'SF Mono', Menlo, monospace;
+    --vh: 1vh;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --content-width: 1040px;
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  html{ color-scheme:dark; scroll-behavior:smooth; }
+  body{
+    background: var(--bg-void);
+    color: var(--ink);
+    font-family: var(--mono);
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+  ::selection{ background: var(--signal); color:#04120C; }
+  a{ color:inherit; }
+
+  .field-grain{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background-image:
+      radial-gradient(circle at 15% 10%, rgba(63,232,176,0.045), transparent 40%),
+      radial-gradient(circle at 88% 60%, rgba(232,163,63,0.03), transparent 45%);
+  }
+  .scanlines{
+    position:fixed; inset:0; pointer-events:none; z-index:1;
+    background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
+    opacity:0.5;
+  }
+  .stage{ position:relative; z-index:2; }
+
+  /* =================== HEADER =================== */
+  header{
+    padding: max(24px, var(--safe-top)) clamp(16px,5vw,64px) 18px;
+    display:flex; align-items:center; justify-content:space-between;
+    border-bottom:1px solid var(--line-soft);
+    gap:12px; flex-wrap:wrap;
+  }
+  .brand{ display:flex; align-items:center; gap:12px; min-width:0; text-decoration:none; }
+  .brand-mark{ width:32px; height:32px; flex-shrink:0; }
+  .brand-name{ font-family:var(--serif); font-weight:700; font-size:clamp(18px,4vw,22px); color:var(--ink); white-space:nowrap; }
+  .brand-tag{ font-size:9.5px; letter-spacing:0.2em; text-transform:uppercase; color:var(--ink-faint); margin-top:2px; white-space:nowrap; }
+  .header-actions{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+
+  .nav-link{
+    font-size:12px; color:var(--ink-soft); text-decoration:none; letter-spacing:0.01em;
+    position:relative; padding-bottom:2px; transition: color .18s ease; white-space:nowrap;
+  }
+  .nav-link::after{
+    content:''; position:absolute; left:0; right:100%; bottom:0; height:1px;
+    background: var(--signal); transition: right .22s ease;
+  }
+  .nav-link:hover{ color:var(--ink); }
+  .nav-link:hover::after{ right:0; }
+
+  .lang-btn{
+    font-family:var(--mono); font-size:11px; font-weight:700;
+    border:1px solid var(--line); border-radius:8px; background:transparent; color:var(--ink-soft);
+    width:auto; padding:9px 12px; height:38px; cursor:pointer; transition:all .18s ease;
+  }
+  .lang-btn:hover{ border-color:var(--ink-faint); color:var(--ink); }
+
+  .btn-primary{
+    display:inline-flex; align-items:center; justify-content:center; gap:8px;
+    font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:0.03em;
+    background: var(--signal); border:1px solid var(--signal); color:#04140D;
+    padding:15px 26px; border-radius:10px; text-decoration:none; cursor:pointer;
+    transition: all .18s ease; white-space:nowrap;
+  }
+  .btn-primary:hover{ background:#5CF0C0; border-color:#5CF0C0; box-shadow: 0 0 28px -4px var(--signal-glow); transform:translateY(-1px); }
+  .btn-primary:active{ transform:translateY(0) scale(0.98); }
+
+  main{ max-width:var(--content-width); margin:0 auto; padding:0 clamp(20px,5vw,64px); }
+
+  /* =================== HERO =================== */
+  .hero{ padding: clamp(56px,10vw,120px) 0 clamp(40px,7vw,72px); text-align:center; }
+  .eyebrow{
+    font-size:11px; letter-spacing:0.28em; text-transform:uppercase; color:var(--signal);
+    margin-bottom:18px; opacity:0.9;
+  }
+  .hero h1{
+    font-family:var(--serif); font-weight:700; font-size:clamp(34px,7.5vw,68px);
+    line-height:1.12; color:var(--ink); letter-spacing:-0.01em; max-width:820px; margin:0 auto;
+  }
+  .hero h1 em{ font-style:italic; font-weight:500; color:var(--signal); }
+  .hero p{ max-width:580px; margin:24px auto 0; color:var(--ink-soft); font-size:clamp(14px,3.2vw,16px); line-height:1.75; }
+  .hero-cta{ margin-top:36px; display:flex; justify-content:center; }
+
+  .waveform{ width:100%; max-width:520px; height:44px; margin:44px auto 0; opacity:0.8; }
+  .waveform path{ stroke:var(--signal); stroke-width:1.4; fill:none; filter: drop-shadow(0 0 6px var(--signal-glow)); }
+  .wf1{ animation: wf-drift 7s ease-in-out infinite; }
+  .wf2{ animation: wf-drift 9s ease-in-out infinite reverse; opacity:0.35; }
+  @keyframes wf-drift{ 0%,100%{ transform:translateY(0) scaleY(1); } 50%{ transform:translateY(-2px) scaleY(1.1); } }
+
+  /* =================== SECTION SHELL =================== */
+  section.block{ padding: clamp(56px,9vw,96px) 0; border-top:1px solid var(--line-soft); }
+  .section-head{ text-align:center; max-width:640px; margin:0 auto clamp(40px,6vw,64px); }
+  .section-head h2{ font-family:var(--serif); font-weight:600; font-size:clamp(26px,5vw,40px); color:var(--ink); margin-top:14px; }
+  .section-head p{ color:var(--ink-soft); font-size:14px; line-height:1.7; margin-top:14px; }
+
+  /* reveal-on-scroll (leve, respeitando prefers-reduced-motion) */
+  .reveal{ opacity:0; transform:translateY(18px); transition: opacity .6s ease, transform .6s cubic-bezier(.2,.7,.3,1); }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+  @media (prefers-reduced-motion: reduce){ .reveal{ opacity:1; transform:none; transition:none; } }
+
+  /* =================== COMO FUNCIONA — tira de sintonia =================== */
+  .tuning-steps{ display:flex; gap:20px; position:relative; }
+  .tuning-step{ flex:1; position:relative; display:flex; flex-direction:column; align-items:center; text-align:center; padding-top:0; }
+  .tuning-node{
+    width:44px; height:44px; border-radius:50%; flex-shrink:0;
+    background: var(--bg-panel); border:1.5px solid var(--signal-dim);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--mono); font-weight:700; font-size:14px; color:var(--signal);
+    position:relative; z-index:2;
+    box-shadow: 0 0 0 6px var(--bg-void);
+  }
+  .tuning-step:not(:last-child)::after{
+    content:''; position:absolute; top:22px; left:calc(50% + 22px); right:calc(-50% + 22px);
+    height:1px; background: var(--line); z-index:1;
+  }
+  .tuning-pulse-track{ position:absolute; top:22px; left:22px; right:22px; height:1px; z-index:1; pointer-events:none; }
+  .tuning-pulse{
+    position:absolute; top:-3px; width:7px; height:7px; border-radius:50%;
+    background: var(--signal); box-shadow: 0 0 12px 2px var(--signal-glow);
+    animation: tuning-travel-x 5s ease-in-out infinite;
+  }
+  @keyframes tuning-travel-x{
+    0%{ left:0%; opacity:0; }
+    8%{ opacity:1; }
+    92%{ opacity:1; }
+    100%{ left:100%; opacity:0; }
+  }
+  .tuning-step h3{ font-family:var(--serif); font-weight:600; font-size:17px; color:var(--ink); margin:20px 0 8px; }
+  .tuning-step p{ font-size:12.5px; color:var(--ink-soft); line-height:1.65; max-width:230px; }
+
+  @media (max-width: 820px){
+    .tuning-steps{ flex-direction:column; gap:36px; align-items:stretch; }
+    .tuning-step{ flex-direction:row; text-align:left; align-items:flex-start; gap:18px; }
+    .tuning-step h3, .tuning-step p{ margin-left:0; }
+    .tuning-step p{ max-width:none; }
+    .tuning-step:not(:last-child)::after{
+      top:44px; left:22px; right:auto; bottom:-36px; width:1px; height:auto;
+    }
+    .tuning-pulse-track{ top:22px; bottom:22px; left:22px; right:auto; width:1px; height:auto; }
+    .tuning-pulse{ left:-3px; top:0; animation: tuning-travel-y 5s ease-in-out infinite; }
+    @keyframes tuning-travel-y{
+      0%{ top:0%; opacity:0; }
+      8%{ opacity:1; }
+      92%{ opacity:1; }
+      100%{ top:100%; opacity:0; }
+    }
+  }
+  @media (prefers-reduced-motion: reduce){ .tuning-pulse{ animation:none; opacity:0; } }
+
+  /* =================== PRIMEIROS PASSOS =================== */
+  .steps-list{ max-width:620px; margin:0 auto; display:flex; flex-direction:column; gap:0; }
+  .step-row{
+    display:flex; gap:20px; align-items:flex-start; padding:22px 0;
+    border-bottom:1px solid var(--line-soft);
+  }
+  .step-row:last-child{ border-bottom:none; }
+  .step-num{
+    font-family:var(--serif); font-style:italic; font-weight:600; font-size:22px; color:var(--signal);
+    flex-shrink:0; width:36px;
+  }
+  .step-text{ font-size:14.5px; color:var(--ink); line-height:1.65; padding-top:4px; }
+  .step-text b{ color:var(--signal); font-weight:600; }
+
+  /* =================== CASOS DE USO =================== */
+  .uc-grid{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+    gap:18px;
+  }
+  .uc-card{
+    background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%);
+    border:1px solid var(--line); border-radius:14px; padding:26px;
+    transition: border-color .25s ease, transform .25s ease, box-shadow .25s ease;
+  }
+  @media (hover:hover) and (pointer:fine){
+    .uc-card:hover{ border-color:var(--line-soft); transform:translateY(-3px); box-shadow: 0 20px 44px -22px rgba(0,0,0,0.5); }
+  }
+  .uc-icon{
+    width:42px; height:42px; border-radius:50%; background: var(--bg-void); border:1px solid var(--line);
+    display:flex; align-items:center; justify-content:center; margin-bottom:18px;
+  }
+  .uc-card h3{ font-family:var(--serif); font-weight:600; font-size:17px; color:var(--ink); line-height:1.35; margin-bottom:10px; }
+  .uc-card p{ font-size:13px; color:var(--ink-soft); line-height:1.65; }
+
+  /* =================== CTA FINAL =================== */
+  .final-cta{ text-align:center; padding: clamp(64px,10vw,100px) 0 clamp(48px,8vw,72px); }
+  .final-cta h2{ font-family:var(--serif); font-weight:600; font-size:clamp(26px,5.5vw,42px); color:var(--ink); margin-bottom:30px; }
+
+  footer.page-footer{
+    display:flex; flex-direction:column; align-items:center; gap:14px;
+    padding: 28px 0 max(48px, var(--safe-bottom));
+    border-top:1px solid var(--line-soft);
+    text-align:center;
+  }
+  .credit-line{ font-size:10.5px; color:var(--ink-faint); letter-spacing:0.02em; }
+  .credit-line a{
+    color:var(--ink-soft); text-decoration:none; font-weight:600;
+    border-bottom:1px solid var(--line); transition: color .18s ease, border-color .18s ease;
+  }
+  .credit-line a:hover{ color:var(--signal); border-color:var(--signal-dim); }
+
+  @media (prefers-reduced-motion: reduce){ html{ scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+
+<div class="field-grain"></div>
+<div class="scanlines"></div>
+
+<div class="stage">
+  <header>
+    <a class="brand" href="./index.html">
+      <svg class="brand-mark" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="15.5" stroke="#3FE8B0" stroke-width="1.2" opacity="0.5"/>
+        <circle cx="17" cy="17" r="9.5" stroke="#3FE8B0" stroke-width="1.2" opacity="0.8"/>
+        <circle cx="17" cy="17" r="2.6" fill="#3FE8B0"/>
+      </svg>
+      <div>
+        <div class="brand-name">Nexus</div>
+        <div class="brand-tag" data-i18n="brandTag">Sinal para Sinal</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <a class="nav-link" href="./index.html" data-i18n="backToApp">← Abrir o Nexus</a>
+      <button class="lang-btn" id="langToggle" title="Português / English" aria-label="Alternar idioma">EN</button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ================= HERO ================= -->
+    <section class="hero">
+      <div class="eyebrow" data-i18n="heroEyebrow">A ideia por trás do Nexus</div>
+      <h1 data-i18n="heroTitle" data-i18n-html="1">Uma conversa <em>não devia</em><br>precisar de um dono.</h1>
+      <p data-i18n="heroSub">A maioria dos chats passa por um servidor que guarda cada mensagem, cada arquivo, cada nome. O Nexus troca isso por uma coisa mais simples: dois navegadores encontram a mesma frequência e conversam direto — sem ninguém no meio guardando nada.</p>
+      <div class="hero-cta">
+        <a class="btn-primary" href="./index.html" data-i18n="heroCta">Abrir uma rota agora</a>
+      </div>
+      <svg class="waveform" viewBox="0 0 520 44" preserveAspectRatio="none">
+        <path class="wf1" d="M0,22 C30,22 30,6 60,6 C90,6 90,36 120,36 C150,36 150,14 180,14 C210,14 210,30 240,30 C270,30 270,10 300,10 C330,10 330,34 360,34 C390,34 390,18 420,18 C450,18 450,26 480,26 C495,26 505,22 520,22"/>
+        <path class="wf2" d="M0,22 C40,22 40,32 80,32 C120,32 120,14 160,14 C200,14 200,28 240,28 C280,28 280,10 320,10 C360,10 360,34 400,34 C430,34 445,22 520,22"/>
+      </svg>
+    </section>
+
+    <!-- ================= COMO FUNCIONA ================= -->
+    <section class="block reveal" id="mecanismo">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="howEyebrow">O mecanismo</div>
+        <h2 data-i18n="howTitle">Como funciona, de verdade</h2>
+        <p data-i18n="howSub">Nenhuma mágica — só um protocolo aberto (WebRTC) e uma ideia simples: apresentar dois navegadores um ao outro e depois sair da frente.</p>
+      </div>
+
+      <div class="tuning-steps">
+        <div class="tuning-pulse-track"><div class="tuning-pulse"></div></div>
+
+        <div class="tuning-step">
+          <div class="tuning-node">01</div>
+          <h3 data-i18n="step1Title">Uma rota nasce</h3>
+          <p data-i18n="step1Desc">Ao abrir o Nexus, seu navegador já gera um identificador — sua rota. Nenhuma conta, nenhum cadastro, nenhum e-mail.</p>
+        </div>
+        <div class="tuning-step">
+          <div class="tuning-node">02</div>
+          <h3 data-i18n="step2Title">Duas frequências se encontram</h3>
+          <p data-i18n="step2Desc">Uma rede pública de sinalização — não nossa, compartilhada por milhares de apps — faz uma única coisa: apresenta uma rota à outra.</p>
+        </div>
+        <div class="tuning-step">
+          <div class="tuning-node">03</div>
+          <h3 data-i18n="step3Title">O intermediário sai de cena</h3>
+          <p data-i18n="step3Desc">Assim que os dois navegadores se enxergam, abrem um canal direto entre si via WebRTC. A rede de sinalização não participa mais a partir daqui.</p>
+        </div>
+        <div class="tuning-step">
+          <div class="tuning-node">04</div>
+          <h3 data-i18n="step4Title">A conversa acontece só ali</h3>
+          <p data-i18n="step4Desc">Mensagens, arquivos e áudios trafegam criptografados ponto a ponto. Fechou a aba? Não sobra nada guardado em lugar nenhum.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= PRIMEIROS PASSOS ================= -->
+    <section class="block reveal" id="comecar">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="startEyebrow">Comece agora</div>
+        <h2 data-i18n="startTitle">Primeiros passos</h2>
+        <p data-i18n="startSub">Leva menos tempo pra fazer do que pra explicar.</p>
+      </div>
+
+      <div class="steps-list">
+        <div class="step-row">
+          <div class="step-num">1</div>
+          <div class="step-text" data-i18n="start1" data-i18n-html="1">Abra o Nexus — sua <b>rota</b> já existe, pronta pra ser compartilhada.</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">2</div>
+          <div class="step-text" data-i18n="start2" data-i18n-html="1">Copie o <b>identificador</b> (ou mostre o QR) e mande pra pessoa que você quer encontrar.</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">3</div>
+          <div class="step-text" data-i18n="start3" data-i18n-html="1">Peça pra ela colar esse identificador em <b>"Sintonizar"</b> — ou escanear o QR.</div>
+        </div>
+        <div class="step-row">
+          <div class="step-num">4</div>
+          <div class="step-text" data-i18n="start4" data-i18n-html="1">Assim que ela entrar, o <b>canal</b> abre sozinho. É só conversar.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CASOS DE USO ================= -->
+    <section class="block reveal" id="casos">
+      <div class="section-head">
+        <div class="eyebrow" data-i18n="useCasesEyebrow">Casos de uso</div>
+        <h2 data-i18n="useCasesTitle">Para que as pessoas usam</h2>
+      </div>
+
+      <div class="uc-grid">
+        <div class="uc-card">
+          <div class="uc-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="2" y="6" width="8" height="12" rx="1.5" stroke="#3FE8B0" stroke-width="1.4"/><rect x="14" y="4" width="8" height="16" rx="1.5" stroke="#3FE8B0" stroke-width="1.4"/><path d="M10.5 12H14" stroke="#3FE8B0" stroke-width="1.4" stroke-linecap="round"/><path d="M12.3 10L14 12L12.3 14" stroke="#3FE8B0" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3 data-i18n="uc1Title">Levar um arquivo grande do PC pro celular</h3>
+          <p data-i18n="uc1Desc">Sem mandar por e-mail pra si mesmo, sem subir pra nuvem só pra baixar de novo. Abra o Nexus nos dois aparelhos, sintonize, arraste o arquivo.</p>
+        </div>
+
+        <div class="uc-card">
+          <div class="uc-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#3FE8B0" stroke-width="1.4" stroke-dasharray="2.5 3.2"/><circle cx="12" cy="12" r="2.2" fill="#3FE8B0"/></svg>
+          </div>
+          <h3 data-i18n="uc2Title">Uma conversa que não devia virar histórico</h3>
+          <p data-i18n="uc2Desc">Combinar um presente-surpresa, tratar de algo delicado, ou só não querer que aquilo fique registrado em lugar nenhum.</p>
+        </div>
+
+        <div class="uc-card">
+          <div class="uc-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="13" rx="1.5" stroke="#3FE8B0" stroke-width="1.4"/><path d="M9 21H15" stroke="#3FE8B0" stroke-width="1.4" stroke-linecap="round"/><path d="M12 17V21" stroke="#3FE8B0" stroke-width="1.4"/><circle cx="12" cy="10.5" r="2.2" stroke="#3FE8B0" stroke-width="1.3"/></svg>
+          </div>
+          <h3 data-i18n="uc3Title">Suporte técnico rápido, sem instalar nada</h3>
+          <p data-i18n="uc3Desc">Manda o link, a pessoa entra direto pelo navegador. Ideal pra guiar alguém remotamente ou pedir um print sem fricção.</p>
+        </div>
+
+        <div class="uc-card">
+          <div class="uc-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><rect x="3" y="4.5" width="18" height="15" rx="1.5" stroke="#3FE8B0" stroke-width="1.4"/><circle cx="8.5" cy="10" r="1.6" stroke="#3FE8B0" stroke-width="1.3"/><path d="M4 17L9 12.5L13 15.5L16.5 12L20 15.5" stroke="#3FE8B0" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3 data-i18n="uc4Title">Compartilhar fotos na qualidade original</h3>
+          <p data-i18n="uc4Desc">Apps de mensagem populares recomprimem tudo. Aqui, o arquivo chega do jeito que saiu.</p>
+        </div>
+
+        <div class="uc-card">
+          <div class="uc-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" stroke="#3FE8B0" stroke-width="1.4" opacity="0.55"/><circle cx="12" cy="12" r="2.4" fill="#3FE8B0"/></svg>
+          </div>
+          <h3 data-i18n="uc5Title">Uma sala só para essa conversa</h3>
+          <p data-i18n="uc5Desc">Sem histórico acumulando, sem grupo permanente. Cada rota é uma conversa nova, do zero.</p>
+        </div>
+
+        <div class="uc-card">
+          <div class="uc-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="2.6" stroke="#3FE8B0" stroke-width="1.4"/><circle cx="18" cy="12" r="2.6" stroke="#3FE8B0" stroke-width="1.4"/><path d="M9 10.5C10.5 9.5 13.5 9.5 15 10.5" stroke="#3FE8B0" stroke-width="1.3" stroke-linecap="round"/><path d="M9 13.5C10.5 14.5 13.5 14.5 15 13.5" stroke="#3FE8B0" stroke-width="1.3" stroke-linecap="round"/></svg>
+          </div>
+          <h3 data-i18n="uc6Title">Falar com alguém sem trocar contato</h3>
+          <p data-i18n="uc6Desc">Só o identificador da rota. Depois que a conversa acaba, não fica vínculo nenhum entre vocês dois.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CTA FINAL ================= -->
+    <section class="final-cta reveal">
+      <h2 data-i18n="finalCtaTitle">Sua próxima conversa pode começar direto.</h2>
+      <a class="btn-primary" href="./index.html" data-i18n="finalCtaBtn">Abrir o Nexus</a>
+    </section>
+
+    <footer class="page-footer">
+      <div class="credit-line">
+        <span data-i18n="madeBy">Feito por</span> <a href="https://github.com/Syradevops" target="_blank" rel="noopener noreferrer">@Syradevops</a>
+      </div>
+    </footer>
+
+  </main>
+</div>
+
+<script>
+(function(){
+  const I18N = {
+    pt: {
+      pageTitle: 'Como funciona — Nexus',
+      pageDescription: 'Por que o Nexus existe, como a conexão direta funciona, e para que usar.',
+      brandTag: 'Sinal para Sinal',
+      backToApp: '← Abrir o Nexus',
+      heroEyebrow: 'A ideia por trás do Nexus',
+      heroTitle: 'Uma conversa <em>não devia</em><br>precisar de um dono.',
+      heroSub: 'A maioria dos chats passa por um servidor que guarda cada mensagem, cada arquivo, cada nome. O Nexus troca isso por uma coisa mais simples: dois navegadores encontram a mesma frequência e conversam direto — sem ninguém no meio guardando nada.',
+      heroCta: 'Abrir uma rota agora',
+      howEyebrow: 'O mecanismo',
+      howTitle: 'Como funciona, de verdade',
+      howSub: 'Nenhuma mágica — só um protocolo aberto (WebRTC) e uma ideia simples: apresentar dois navegadores um ao outro e depois sair da frente.',
+      step1Title: 'Uma rota nasce',
+      step1Desc: 'Ao abrir o Nexus, seu navegador já gera um identificador — sua rota. Nenhuma conta, nenhum cadastro, nenhum e-mail.',
+      step2Title: 'Duas frequências se encontram',
+      step2Desc: 'Uma rede pública de sinalização — não nossa, compartilhada por milhares de apps — faz uma única coisa: apresenta uma rota à outra.',
+      step3Title: 'O intermediário sai de cena',
+      step3Desc: 'Assim que os dois navegadores se enxergam, abrem um canal direto entre si via WebRTC. A rede de sinalização não participa mais a partir daqui.',
+      step4Title: 'A conversa acontece só ali',
+      step4Desc: 'Mensagens, arquivos e áudios trafegam criptografados ponto a ponto. Fechou a aba? Não sobra nada guardado em lugar nenhum.',
+      startEyebrow: 'Comece agora',
+      startTitle: 'Primeiros passos',
+      startSub: 'Leva menos tempo pra fazer do que pra explicar.',
+      start1: 'Abra o Nexus — sua <b>rota</b> já existe, pronta pra ser compartilhada.',
+      start2: 'Copie o <b>identificador</b> (ou mostre o QR) e mande pra pessoa que você quer encontrar.',
+      start3: 'Peça pra ela colar esse identificador em <b>"Sintonizar"</b> — ou escanear o QR.',
+      start4: 'Assim que ela entrar, o <b>canal</b> abre sozinho. É só conversar.',
+      useCasesEyebrow: 'Casos de uso',
+      useCasesTitle: 'Para que as pessoas usam',
+      uc1Title: 'Levar um arquivo grande do PC pro celular',
+      uc1Desc: 'Sem mandar por e-mail pra si mesmo, sem subir pra nuvem só pra baixar de novo. Abra o Nexus nos dois aparelhos, sintonize, arraste o arquivo.',
+      uc2Title: 'Uma conversa que não devia virar histórico',
+      uc2Desc: 'Combinar um presente-surpresa, tratar de algo delicado, ou só não querer que aquilo fique registrado em lugar nenhum.',
+      uc3Title: 'Suporte técnico rápido, sem instalar nada',
+      uc3Desc: 'Manda o link, a pessoa entra direto pelo navegador. Ideal pra guiar alguém remotamente ou pedir um print sem fricção.',
+      uc4Title: 'Compartilhar fotos na qualidade original',
+      uc4Desc: 'Apps de mensagem populares recomprimem tudo. Aqui, o arquivo chega do jeito que saiu.',
+      uc5Title: 'Uma sala só para essa conversa',
+      uc5Desc: 'Sem histórico acumulando, sem grupo permanente. Cada rota é uma conversa nova, do zero.',
+      uc6Title: 'Falar com alguém sem trocar contato',
+      uc6Desc: 'Só o identificador da rota. Depois que a conversa acaba, não fica vínculo nenhum entre vocês dois.',
+      finalCtaTitle: 'Sua próxima conversa pode começar direto.',
+      finalCtaBtn: 'Abrir o Nexus',
+      madeBy: 'Feito por'
+    },
+    en: {
+      pageTitle: 'How it works — Nexus',
+      pageDescription: 'Why Nexus exists, how the direct connection works, and what to use it for.',
+      brandTag: 'Signal to Signal',
+      backToApp: '← Open Nexus',
+      heroEyebrow: 'The idea behind Nexus',
+      heroTitle: "A conversation <em>shouldn't</em><br>need an owner.",
+      heroSub: "Most chat apps run through a server that keeps every message, every file, every name. Nexus trades that for something simpler: two browsers find the same frequency and talk directly — with nothing in between keeping a copy.",
+      heroCta: 'Open a route now',
+      howEyebrow: 'The mechanism',
+      howTitle: 'How it actually works',
+      howSub: "No magic — just an open protocol (WebRTC) and one simple idea: introduce two browsers to each other, then get out of the way.",
+      step1Title: 'A route is born',
+      step1Desc: "The moment you open Nexus, your browser already generates an identifier — your route. No account, no sign-up, no email.",
+      step2Title: 'Two frequencies meet',
+      step2Desc: "A public signaling network — not ours, shared by thousands of apps — does exactly one thing: introduces one route to the other.",
+      step3Title: 'The middleman steps aside',
+      step3Desc: "The moment the two browsers can see each other, they open a direct WebRTC channel. The signaling network stops being involved from here on.",
+      step4Title: 'The conversation happens only there',
+      step4Desc: "Messages, files, and voice notes travel encrypted, peer to peer. Close the tab, and nothing is left stored anywhere.",
+      startEyebrow: 'Get started',
+      startTitle: 'First steps',
+      startSub: 'Takes less time to do than to explain.',
+      start1: 'Open Nexus — your <b>route</b> already exists, ready to share.',
+      start2: 'Copy the <b>identifier</b> (or show the QR code) and send it to whoever you want to reach.',
+      start3: 'Ask them to paste that identifier into <b>"Tune in"</b> — or scan the QR.',
+      start4: 'The moment they join, the <b>channel</b> opens on its own. Just talk.',
+      useCasesEyebrow: 'Use cases',
+      useCasesTitle: 'What people use it for',
+      uc1Title: 'Move a big file from your computer to your phone',
+      uc1Desc: 'No emailing it to yourself, no uploading to the cloud just to download it again. Open Nexus on both devices, tune in, drag the file over.',
+      uc2Title: "A conversation that shouldn't become a permanent record",
+      uc2Desc: 'Planning a surprise, discussing something sensitive, or simply not wanting it saved anywhere.',
+      uc3Title: 'Quick tech support, no install required',
+      uc3Desc: 'Send the link, they open it straight in the browser. Great for guiding someone remotely or grabbing a screenshot without friction.',
+      uc4Title: 'Share photos at full quality',
+      uc4Desc: 'Popular messaging apps recompress everything. Here, the file arrives exactly as it left.',
+      uc5Title: 'A room built for just this one conversation',
+      uc5Desc: 'No history piling up, no permanent group. Every route is a fresh start, from zero.',
+      uc6Title: 'Talk to someone without exchanging contact info',
+      uc6Desc: "Just the route identifier. Once the conversation ends, there's no lasting link between you two.",
+      finalCtaTitle: 'Your next conversation can start right now.',
+      finalCtaBtn: 'Open Nexus',
+      madeBy: 'Made by'
+    }
+  };
+
+  function detectLang(){
+    try{
+      const saved = localStorage.getItem('nexus_lang');
+      if(saved === 'pt' || saved === 'en') return saved;
+    }catch(e){}
+    const nav = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
+    return nav.startsWith('pt') ? 'pt' : 'en';
+  }
+
+  let currentLang = detectLang();
+  function t(key){
+    return (I18N[currentLang] && I18N[currentLang][key] !== undefined) ? I18N[currentLang][key] : I18N.en[key];
+  }
+
+  const langToggle = document.getElementById('langToggle');
+
+  function applyTranslations(){
+    document.documentElement.lang = currentLang === 'pt' ? 'pt-BR' : 'en';
+    document.title = t('pageTitle');
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if(metaDesc) metaDesc.setAttribute('content', t('pageDescription'));
+
+    document.querySelectorAll('[data-i18n]').forEach((node) => {
+      const key = node.getAttribute('data-i18n');
+      const value = t(key);
+      if(value === undefined) return;
+      if(node.hasAttribute('data-i18n-html')){ node.innerHTML = value; }
+      else{ node.textContent = value; }
+    });
+
+    if(langToggle) langToggle.textContent = currentLang === 'pt' ? 'EN' : 'PT';
+  }
+
+  if(langToggle){
+    langToggle.addEventListener('click', () => {
+      currentLang = currentLang === 'pt' ? 'en' : 'pt';
+      try{ localStorage.setItem('nexus_lang', currentLang); }catch(e){}
+      applyTranslations();
+    });
+  }
+
+  applyTranslations();
+
+  // ---------- reveal on scroll (leve, com fallback se IntersectionObserver faltar) ----------
+  const revealEls = document.querySelectorAll('.reveal');
+  if('IntersectionObserver' in window){
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if(entry.isIntersecting){
+          entry.target.classList.add('in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    revealEls.forEach((el) => io.observe(el));
+  } else {
+    revealEls.forEach((el) => el.classList.add('in'));
+  }
+
+  // ---------- Service Worker (mesmo cache-shell do app; silencioso se ausente no preview) ----------
+  if('serviceWorker' in navigator && (window.location.protocol === 'http:' || window.location.protocol === 'https:')){
+    window.addEventListener('load', () => {
+      fetch('./sw.js', { method:'HEAD' })
+        .then((res) => { if(res.ok){ navigator.serviceWorker.register('./sw.js').catch(()=>{}); } })
+        .catch(()=>{});
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
