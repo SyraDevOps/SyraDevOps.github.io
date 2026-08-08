@@ -52,6 +52,14 @@
   }
 
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color: transparent; }
+
+  .icon{
+    width:1em; height:1em;
+    flex-shrink:0;
+    display:inline-block;
+    vertical-align:-0.15em;
+    color: currentColor;
+  }
   html{ color-scheme: dark; height:100%; }
 
   body{
@@ -531,8 +539,7 @@
   }
   .bubble.attachment img:hover{ filter:brightness(1.06); transform:scale(1.008); }
   .img-frame{ position:relative; line-height:0; border-radius:9px; overflow:hidden; }
-  .img-frame::after{
-    content:'⤢';
+  .img-expand-indicator{
     position:absolute; top:8px; right:8px;
     width:26px; height:26px; border-radius:7px;
     background:rgba(8,11,16,0.55);
@@ -542,7 +549,8 @@
     opacity:0; transition:opacity .18s ease;
     pointer-events:none;
   }
-  .img-frame:hover::after{ opacity:1; }
+  .img-expand-indicator .icon{ width:13px; height:13px; }
+  .img-frame:hover .img-expand-indicator{ opacity:1; }
 
   .file-card{
     display:flex; align-items:center; gap:11px;
@@ -806,12 +814,15 @@
 
   /* Mobile fino: telas muito pequenas */
   @media (max-width: 380px){
-    .room-id-badge{ max-width: 34vw; }
+    .room-id-badge{ max-width: 26vw; }
     .btn{ font-size:11px; padding:12px 12px; }
     .file-name{ max-width:130px; }
     .transfer-card{ min-width:0; }
     .lightbox-bar{ top: max(14px, var(--safe-top)); right:14px; gap:6px; }
     .lightbox-bar button{ width:34px; height:34px; font-size:13px; }
+    .room-bar-actions{ gap:6px; }
+    .room-bar-actions .icon-btn{ width:34px; height:34px; }
+    .leave-btn{ padding:9px 10px; font-size:10.5px; }
   }
 
   @media (max-width: 480px){
@@ -820,6 +831,132 @@
 
   /* Inputs de arquivo ficam ocultos, ativados via botão */
   #fileInput{ display:none; }
+
+  /* =================== CHAMADA DE VOZ / VÍDEO =================== */
+  .call-overlay{
+    position:fixed; inset:0;
+    height:100vh; height: calc(var(--vh,1vh)*100);
+    background: var(--bg-void);
+    z-index:150;
+    display:none;
+    flex-direction:column;
+    align-items:center; justify-content:space-between;
+    overflow:hidden;
+  }
+  .call-overlay.show{ display:flex; animation: call-in .32s cubic-bezier(.16,.85,.3,1); }
+  @keyframes call-in{ from{ opacity:0; transform:scale(1.02); } to{ opacity:1; transform:scale(1); } }
+
+  .call-remote-video{
+    position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+    background:#000; display:none;
+  }
+  .call-overlay.remote-connected.kind-video .call-remote-video{ display:block; }
+
+  .call-local-video{
+    position:absolute;
+    width:104px; height:150px; object-fit:cover;
+    border-radius:14px; border:1.5px solid rgba(255,255,255,0.15);
+    bottom: max(150px, calc(var(--safe-bottom) + 150px));
+    right:20px; z-index:5;
+    background:#0A0D12;
+    display:none;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    transform: scaleX(-1);
+  }
+  .call-overlay.kind-video .call-local-video{ display:block; }
+
+  .call-voice-visual{
+    position:absolute; inset:0;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .call-overlay.remote-connected.kind-video .call-voice-visual{ display:none; }
+
+  .call-pulse-ring{
+    position:absolute; border-radius:50%;
+    border:1px solid var(--signal-dim);
+    opacity:0;
+    animation: call-pulse 2.8s ease-out infinite;
+  }
+  .call-pulse-ring.r2{ animation-delay:1.4s; }
+  @keyframes call-pulse{
+    0%{ width:140px; height:140px; opacity:0.55; }
+    100%{ width:360px; height:360px; opacity:0; }
+  }
+  .call-avatar-mark{
+    width:118px; height:118px; border-radius:50%;
+    background: var(--bg-panel); border:1.5px solid var(--line);
+    display:flex; align-items:center; justify-content:center;
+    position:relative; z-index:2;
+  }
+  .call-avatar-mark svg{ width:52px; height:52px; color:var(--signal); }
+
+  .call-info{
+    position:relative; z-index:3; text-align:center;
+    padding: max(64px, calc(var(--safe-top) + 40px)) 24px 0;
+  }
+  .call-peer-name{
+    font-family:var(--serif); font-style:italic; font-weight:600;
+    font-size:clamp(21px,5vw,29px); color:var(--ink);
+    max-width:80vw; margin:0 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .call-status-text{
+    font-size:12.5px; color:var(--ink-soft); margin-top:9px;
+    font-variant-numeric: tabular-nums; letter-spacing:0.02em;
+  }
+
+  .call-incoming-actions, .call-controls{
+    position:relative; z-index:4;
+    display:none; align-items:center; justify-content:center; gap:26px;
+    padding-bottom: max(48px, calc(var(--safe-bottom) + 24px));
+    width:100%;
+  }
+  .call-overlay.state-incoming .call-incoming-actions{ display:flex; }
+  .call-overlay.state-outgoing .call-controls,
+  .call-overlay.state-active .call-controls{ display:flex; }
+
+  .call-action-btn{
+    width:62px; height:62px; border-radius:50%;
+    border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+  .call-action-btn .icon{ width:25px; height:25px; }
+  .call-action-btn:active{ transform:scale(0.92); }
+  .call-action-btn.decline{ background: var(--danger); color:#fff; }
+  .call-action-btn.accept{ background: var(--signal); color:#04140D; animation: accept-pulse 1.7s ease-in-out infinite; }
+  @keyframes accept-pulse{
+    0%,100%{ box-shadow:0 0 0 0 rgba(63,232,176,0.35); }
+    50%{ box-shadow:0 0 0 10px rgba(63,232,176,0); }
+  }
+
+  .call-ctrl-btn{
+    width:52px; height:52px; border-radius:50%;
+    border:1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(6px);
+    color:#fff; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition: all .16s ease;
+  }
+  .call-ctrl-btn .icon{ width:20px; height:20px; }
+  .call-ctrl-btn:hover{ background: rgba(255,255,255,0.12); }
+  .call-ctrl-btn.active-off{ background:#EDEDED; color:#0A0E14; border-color:#EDEDED; }
+  .call-ctrl-btn.hangup{ background: var(--danger); border-color:var(--danger); width:58px; height:58px; }
+  .call-ctrl-btn.hangup:hover{ background:#F06868; }
+
+  .call-btn-row{ display:flex; align-items:center; gap:8px; }
+
+  @media (max-width: 380px){
+    .call-local-video{ width:82px; height:118px; right:14px; bottom: max(134px, calc(var(--safe-bottom) + 134px)); }
+    .call-action-btn{ width:56px; height:56px; }
+    .call-ctrl-btn{ width:46px; height:46px; }
+    .call-incoming-actions, .call-controls{ gap:18px; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .call-overlay.show{ animation:none; }
+    .call-pulse-ring{ animation:none; opacity:0.3; }
+    .call-action-btn.accept{ animation:none; }
+  }
 
   /* =================== LIGHTBOX DE IMAGEM (visualização em tela cheia) =================== */
   .lightbox-overlay{
@@ -1076,6 +1213,35 @@
 </head>
 <body>
 
+<!-- ================= SPRITE DE ÍCONES (substitui todos os emojis por SVG consistente) ================= -->
+<svg width="0" height="0" style="position:absolute; overflow:hidden;" aria-hidden="true">
+  <defs>
+    <symbol id="icon-paperclip" viewBox="0 0 24 24"><path d="M21.44 11.05l-9.19 9.19a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a1.5 1.5 0 0 1-2.12-2.12l8.49-8.48" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 10v1a7 7 0 0 1-14 0v-1" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18v4M8 22h8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="icon-mic-off" viewBox="0 0 24 24"><path d="M15 9.4V5a3 3 0 0 0-5.9-.7M9 9.2V12a3 3 0 0 0 4.3 2.7" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 10v1a7 7 0 0 1-10.7 5.9M5 10.3V11c0 .8.1 1.6.4 2.3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 18v4M8 22h8M2 2l20 20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></symbol>
+    <symbol id="icon-stop" viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2" fill="currentColor"/></symbol>
+    <symbol id="icon-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/><rect x="14" y="3" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/><rect x="3" y="14" width="7" height="7" rx="1" stroke="currentColor" stroke-width="1.6" fill="none"/><rect x="14.5" y="14.5" width="2.4" height="2.4" fill="currentColor"/><rect x="18.6" y="14.5" width="2.4" height="2.4" fill="currentColor"/><rect x="14.5" y="18.6" width="2.4" height="2.4" fill="currentColor"/><rect x="18.6" y="18.6" width="2.4" height="2.4" fill="currentColor"/></symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 15.3-6.4L21 8M21 8V4M21 8h-4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M21 12a9 9 0 0 1-15.3 6.4L3 16M3 16v4M3 16h4" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M12 20h9" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="icon-expand" viewBox="0 0 24 24"><path d="M9 3H3v6M15 3h6v6M21 15v6h-6M3 15v6h6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="M7 5.3v13.4l11-6.7-11-6.7z" fill="currentColor"/></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><rect x="6" y="5" width="4.5" height="14" rx="1.2" fill="currentColor"/><rect x="13.5" y="5" width="4.5" height="14" rx="1.2" fill="currentColor"/></symbol>
+    <symbol id="icon-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="8.5" cy="9.5" r="1.6" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M4 17l5-5 3.5 3.5L16 12l4 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="icon-pdf" viewBox="0 0 24 24"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M7.3 17.5v-4.2h1.1c.8 0 1.4.6 1.4 1.4v1.4c0 .8-.6 1.4-1.4 1.4H7.3zM11.6 17.5v-4.2h2M11.6 15.5h1.6M15.8 13.3v4.2M15.8 15.2h1.5" stroke="currentColor" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="icon-audio" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6" cy="18" r="3" stroke="currentColor" stroke-width="1.6" fill="none"/><circle cx="17" cy="16" r="3" stroke="currentColor" stroke-width="1.6" fill="none"/></symbol>
+    <symbol id="icon-video-file" viewBox="0 0 24 24"><rect x="2" y="5" width="14" height="14" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M16 9.5l5-3v11l-5-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></symbol>
+    <symbol id="icon-archive" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M3 9h18M9.5 4v2M9.5 8.5v2M9.5 13v2M9.5 17v1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+    <symbol id="icon-document" viewBox="0 0 24 24"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M8 13h8M8 16.5h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></symbol>
+    <symbol id="icon-file" viewBox="0 0 24 24"><path d="M6 2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/><path d="M15 2v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.2.2 2.4.6 3.6.1.4 0 .8-.2 1L6.6 10.8z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-phone-off" viewBox="0 0 24 24"><path d="M10.7 6.3c-.2-.7-.3-1.5-.3-2.3 0-.6-.4-1-1-1H5.9c-.6 0-1 .4-1 1 0 9.4 7.6 17 17 17 .6 0 1-.4 1-1v-3.5c0-.6-.4-1-1-1-.8 0-1.6-.1-2.3-.3-.4-.1-.8 0-1 .2l-2.2 2.2c-1.9-1-3.6-2.3-4.9-4M2 2l20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-video-camera" viewBox="0 0 24 24"><rect x="2" y="6" width="14" height="12" rx="2.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 10l5.2-3v10l-5.2-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="icon-video-off" viewBox="0 0 24 24"><path d="M16 8.5V6a2 2 0 0 0-2-2H6.5M2 2l20 20M9.5 4H4a2 2 0 0 0-2 2v10a2 2 0 0 0 1 1.7M16 16v.5A2 2 0 0 1 14 18H4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 10l5.2-3v10l-5.2-3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
 <div class="field-grain"></div>
 <div class="scanlines"></div>
 
@@ -1131,15 +1297,15 @@
           <input type="text" id="myRoomId" placeholder="aguardando..." readonly inputmode="none">
         </div>
         <div class="id-actions">
-          <button class="btn" id="randomizeBtn" data-i18n="btnRandomize">⟳ Novo aleatório</button>
-          <button class="btn" id="customizeBtn" data-i18n="btnCustomize">✎ Escrever o meu</button>
+          <button class="btn" id="randomizeBtn"><svg class="icon"><use href="#icon-refresh"></use></svg><span data-i18n="btnRandomize">Novo aleatório</span></button>
+          <button class="btn" id="customizeBtn"><svg class="icon"><use href="#icon-edit"></use></svg><span data-i18n="btnCustomize">Escrever o meu</span></button>
         </div>
 
         <div class="id-actions" style="margin-top:20px;">
           <button class="btn btn-primary" id="copyBtn" style="flex:2;">
             <span id="copyBtnLabel" data-i18n="btnCopy">Copiar identificador</span>
           </button>
-          <button class="btn" id="qrBtnHost" style="flex:1; min-width:110px;" data-i18n="btnQr">⌗ QR code</button>
+          <button class="btn" id="qrBtnHost" style="flex:1; min-width:110px;"><svg class="icon"><use href="#icon-qr"></use></svg> <span data-i18n="btnQr">QR code</span></button>
         </div>
 
         <p class="helper-text" data-i18n="hostHelper" data-i18n-html="1">Sua rota fica <b>ativa e aguardando</b> assim que a página carrega. Não é preciso apertar nada — apenas compartilhe o código acima.</p>
@@ -1203,7 +1369,9 @@
         <span class="room-peer-note"><span class="dot online"></span> <span data-i18n="channelOpen">canal aberto</span></span>
       </div>
       <div class="room-bar-actions">
-        <button class="icon-btn" id="shareBtn" title="Compartilhar via QR code" aria-label="Compartilhar">⌗</button>
+        <button class="icon-btn" id="voiceCallBtn" title="Ligação de voz" aria-label="Ligação de voz"><svg class="icon"><use href="#icon-phone"></use></svg></button>
+        <button class="icon-btn" id="videoCallBtn" title="Chamada de vídeo" aria-label="Chamada de vídeo"><svg class="icon"><use href="#icon-video-camera"></use></svg></button>
+        <button class="icon-btn" id="shareBtn" title="Compartilhar via QR code" aria-label="Compartilhar"><svg class="icon"><use href="#icon-qr"></use></svg></button>
         <button class="leave-btn" id="leaveBtn" data-i18n="btnEnd">Encerrar</button>
       </div>
     </div>
@@ -1224,9 +1392,9 @@
   <div class="composer">
     <div class="pending-file" id="pendingFile">
       <img id="pendingPreviewImg" style="display:none;">
-      <div class="pf-icon" id="pendingPreviewIcon" style="display:none;">📄</div>
+      <div class="pf-icon" id="pendingPreviewIcon" style="display:none;"><svg class="icon"><use href="#icon-document"></use></svg></div>
       <div class="pf-name" id="pendingFileName">arquivo.png</div>
-      <button class="pf-cancel" id="pendingCancel" title="Cancelar" aria-label="Cancelar anexo">✕</button>
+      <button class="pf-cancel" id="pendingCancel" title="Cancelar" aria-label="Cancelar anexo"><svg class="icon"><use href="#icon-close"></use></svg></button>
     </div>
 
     <div class="recording-bar" id="recordingBar">
@@ -1237,9 +1405,9 @@
     </div>
 
     <div class="composer-row" id="composerRow">
-      <button class="attach-btn" id="attachBtn" title="Anexar arquivo ou imagem" aria-label="Anexar arquivo">📎</button>
+      <button class="attach-btn" id="attachBtn" title="Anexar arquivo ou imagem" aria-label="Anexar arquivo"><svg class="icon"><use href="#icon-paperclip"></use></svg></button>
       <input type="text" id="msgInput" placeholder="Escreva sua mensagem..." autocomplete="off">
-      <button class="voice-btn" id="voiceBtn" title="Segure para gravar um áudio" aria-label="Gravar mensagem de voz">🎙️</button>
+      <button class="voice-btn" id="voiceBtn" title="Segure para gravar um áudio" aria-label="Gravar mensagem de voz"><svg class="icon"><use href="#icon-mic"></use></svg></button>
       <button class="send" id="sendBtn" data-i18n="btnSend">Enviar</button>
     </div>
     <input type="file" id="fileInput" accept="image/*,.pdf,.txt,.doc,.docx,.zip,.mp3,.mp4,.json,.csv">
@@ -1252,7 +1420,7 @@
 <!-- ================= MODAL: COMPARTILHAR / QR CODE ================= -->
 <div class="modal-overlay" id="shareModal">
   <div class="modal-card">
-    <button class="modal-close" id="shareModalClose" aria-label="Fechar">✕</button>
+    <button class="modal-close" id="shareModalClose" aria-label="Fechar"><svg class="icon"><use href="#icon-close"></use></svg></button>
     <div class="modal-eyebrow" data-i18n="shareEyebrow">Compartilhar rota</div>
     <h3 data-i18n="shareTitle">Sua frequência em QR</h3>
     <p class="modal-sub" data-i18n="shareSub">Quem escanear este código entra direto na sua rota — sem precisar digitar nada.</p>
@@ -1271,7 +1439,7 @@
     </div>
 
     <div class="modal-actions">
-      <button class="btn" id="qrDownloadBtn" data-i18n="btnDownloadImg">⬇ Baixar imagem</button>
+      <button class="btn" id="qrDownloadBtn"><svg class="icon"><use href="#icon-download"></use></svg> <span data-i18n="btnDownloadImg">Baixar imagem</span></button>
       <button class="btn btn-primary" id="qrCopyLinkBtn" style="flex:1;" data-i18n="btnCopyLink">Copiar link</button>
     </div>
   </div>
@@ -1280,11 +1448,46 @@
 <!-- ================= LIGHTBOX DE IMAGEM ================= -->
 <div class="lightbox-overlay" id="lightbox">
   <div class="lightbox-bar">
-    <button id="lightboxDownloadBtn" title="Baixar imagem" aria-label="Baixar imagem">⬇</button>
-    <button id="lightboxCloseBtn" title="Fechar" aria-label="Fechar">✕</button>
+    <button id="lightboxDownloadBtn" title="Baixar imagem" aria-label="Baixar imagem"><svg class="icon"><use href="#icon-download"></use></svg></button>
+    <button id="lightboxCloseBtn" title="Fechar" aria-label="Fechar"><svg class="icon"><use href="#icon-close"></use></svg></button>
   </div>
   <img class="lightbox-img" id="lightboxImg" src="" alt="">
   <div class="lightbox-caption" id="lightboxCaption"></div>
+</div>
+
+<!-- ================= CHAMADA DE VOZ / VÍDEO ================= -->
+<div class="call-overlay" id="callOverlay">
+  <video class="call-remote-video" id="callRemoteVideo" autoplay playsinline></video>
+  <video class="call-local-video" id="callLocalVideo" autoplay playsinline muted></video>
+  <audio id="callRemoteAudio" autoplay></audio>
+
+  <div class="call-voice-visual">
+    <div class="call-pulse-ring r1"></div>
+    <div class="call-pulse-ring r2"></div>
+    <div class="call-avatar-mark">
+      <svg viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="15.5" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+        <circle cx="17" cy="17" r="9.5" stroke="currentColor" stroke-width="1.2" opacity="0.8"/>
+        <circle cx="17" cy="17" r="2.6" fill="currentColor"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="call-info">
+    <div class="call-peer-name" id="callPeerName">—</div>
+    <div class="call-status-text" id="callStatusText"></div>
+  </div>
+
+  <div class="call-incoming-actions">
+    <button class="call-action-btn decline" id="callDeclineBtn" aria-label="Recusar"><svg class="icon"><use href="#icon-phone-off"></use></svg></button>
+    <button class="call-action-btn accept" id="callAcceptBtn" aria-label="Aceitar"><svg class="icon"><use href="#icon-phone"></use></svg></button>
+  </div>
+
+  <div class="call-controls">
+    <button class="call-ctrl-btn" id="callMuteBtn" aria-label="Mudo"><svg class="icon"><use href="#icon-mic"></use></svg></button>
+    <button class="call-ctrl-btn" id="callCameraBtn" aria-label="Câmera"><svg class="icon"><use href="#icon-video-camera"></use></svg></button>
+    <button class="call-ctrl-btn hangup" id="callHangupBtn" aria-label="Encerrar chamada"><svg class="icon"><use href="#icon-phone-off"></use></svg></button>
+  </div>
 </div>
 
 <!-- banner de instalação (PWA) -->
@@ -1374,6 +1577,21 @@
   const lightboxCloseBtn    = el('lightboxCloseBtn');
   const lightboxDownloadBtn = el('lightboxDownloadBtn');
 
+  // chamada de voz/vídeo
+  const voiceCallBtn      = el('voiceCallBtn');
+  const videoCallBtn      = el('videoCallBtn');
+  const callOverlay       = el('callOverlay');
+  const callRemoteVideo   = el('callRemoteVideo');
+  const callLocalVideo    = el('callLocalVideo');
+  const callRemoteAudio   = el('callRemoteAudio');
+  const callPeerName      = el('callPeerName');
+  const callStatusText    = el('callStatusText');
+  const callAcceptBtn     = el('callAcceptBtn');
+  const callDeclineBtn    = el('callDeclineBtn');
+  const callMuteBtn       = el('callMuteBtn');
+  const callCameraBtn     = el('callCameraBtn');
+  const callHangupBtn     = el('callHangupBtn');
+
   // ================= palavras para IDs aleatórios elegantes =================
   const WORDS_A = ['maré','bruma','vento','âmbar','sombra','eco','vidro','lume','cinza','vale','norte','onda','prata','cobre','musgo','deriva'];
   const WORDS_B = ['azul','baixa','solta','fria','longa','clara','densa','leve','fixa','pura','larga','viva','antiga','suave','rara','funda'];
@@ -1406,6 +1624,19 @@
   let isSending = false;
   const incomingTransfers = new Map();       // transferId -> { meta, chunks[], receivedBytes, ... } do lado de quem recebe
 
+  // ---- chamada de voz/vídeo (WebRTC MediaConnection via PeerJS) ----
+  let activeCall = null;        // MediaConnection atual (chamando, tocando ou em andamento)
+  let localCallStream = null;   // MediaStream do nosso microfone/câmera
+  let callKind = null;          // 'voice' | 'video'
+  let callState = 'idle';       // 'idle' | 'outgoing' | 'incoming' | 'active'
+  let callStartTime = 0;
+  let callDurationInterval = null;
+  let ringtoneInterval = null;
+  let callTimeoutHandle = null;
+  let isCallMuted = false;
+  let isCallCameraOff = false;
+  const CALL_RING_TIMEOUT_MS = 45000;
+
   // ================= i18n (detecção via navigator.language, PT / EN) =================
   const I18N = {
     pt: {
@@ -1421,10 +1652,10 @@
       hostTitle: 'Abra sua rota',
       hostSub: 'Gere um identificador aleatório ou escreva o seu. Compartilhe com a pessoa que você quer encontrar — é só isso que ela vai precisar.',
       labelMyRoute: 'Identificador da rota',
-      btnRandomize: '⟳ Novo aleatório',
-      btnCustomize: '✎ Escrever o meu',
+      btnRandomize: 'Novo aleatório',
+      btnCustomize: 'Escrever o meu',
       btnCopy: 'Copiar identificador',
-      btnQr: '⌗ QR code',
+      btnQr: 'QR code',
       hostHelper: 'Sua rota fica <b>ativa e aguardando</b> assim que a página carrega. Não é preciso apertar nada — apenas compartilhe o código acima.',
       hostStatusWaiting: 'Aguardando alguém sintonizar...',
       dividerOr: 'ou',
@@ -1449,7 +1680,7 @@
       shareSub: 'Quem escanear este código entra direto na sua rota — sem precisar digitar nada.',
       shareNameLabel: 'Seu nome (aparece no código)',
       qrDefaultName: 'Sua rota',
-      btnDownloadImg: '⬇ Baixar imagem',
+      btnDownloadImg: 'Baixar imagem',
       btnCopyLink: 'Copiar link',
       btnDownloadFile: 'Baixar arquivo',
       installTitle: 'Instalar o Nexus',
@@ -1488,6 +1719,12 @@
       idFromLink: 'Identificador preenchido a partir do link.',
       micAccessDenied: 'Não foi possível acessar o microfone.',
       channelNotOpen: 'Canal não está aberto.',
+      callCameraPermissionDenied: 'Não foi possível acessar a câmera.',
+      callCalling: 'Chamando...',
+      callIncomingVoice: 'Chamada de voz',
+      callIncomingVideo: 'Chamada de vídeo',
+      callConnecting: 'Conectando...',
+      callNoAnswer: 'Sem resposta.',
       recordingCancelled: 'Gravação cancelada.',
       audioTooLong: (size) => `Áudio muito longo (${size}). Grave algo mais curto.`,
       audioPlayFailed: 'Não foi possível tocar o áudio.',
@@ -1517,10 +1754,10 @@
       hostTitle: 'Open your route',
       hostSub: "Generate a random identifier or write your own. Share it with the person you want to find — that's all they'll need.",
       labelMyRoute: 'Route identifier',
-      btnRandomize: '⟳ New random',
-      btnCustomize: '✎ Write my own',
+      btnRandomize: 'New random',
+      btnCustomize: 'Write my own',
       btnCopy: 'Copy identifier',
-      btnQr: '⌗ QR code',
+      btnQr: 'QR code',
       hostHelper: 'Your route is <b>active and waiting</b> as soon as the page loads. No need to press anything — just share the code above.',
       hostStatusWaiting: 'Waiting for someone to tune in...',
       dividerOr: 'or',
@@ -1545,7 +1782,7 @@
       shareSub: 'Whoever scans this code joins your route directly — no typing required.',
       shareNameLabel: 'Your name (shown on the code)',
       qrDefaultName: 'Your route',
-      btnDownloadImg: '⬇ Download image',
+      btnDownloadImg: 'Download image',
       btnCopyLink: 'Copy link',
       btnDownloadFile: 'Download file',
       installTitle: 'Install Nexus',
@@ -1583,6 +1820,12 @@
       idFromLink: 'Identifier filled in from the link.',
       micAccessDenied: 'Could not access the microphone.',
       channelNotOpen: 'Channel is not open.',
+      callCameraPermissionDenied: 'Could not access the camera.',
+      callCalling: 'Calling...',
+      callIncomingVoice: 'Voice call',
+      callIncomingVideo: 'Video call',
+      callConnecting: 'Connecting...',
+      callNoAnswer: 'No answer.',
       recordingCancelled: 'Recording cancelled.',
       audioTooLong: (size) => `Audio too long (${size}). Record something shorter.`,
       audioPlayFailed: 'Could not play the audio.',
@@ -2029,6 +2272,16 @@
       });
     });
 
+    peer.on('call', (call) => {
+      // Só aceita chamada de quem já está no canal de chat ativo — evita que qualquer
+      // pessoa que apenas conheça o identificador da rota consiga ligar sem antes sintonizar.
+      if(!activeConn || !activeConn.open || call.peer !== activeConn.peer){
+        try{ call.close(); }catch(e){}
+        return;
+      }
+      handleIncomingCall(call);
+    });
+
     peer.on('error', (err) => {
       console.warn('Peer error:', err.type, err);
       if(err.type === 'unavailable-id'){
@@ -2209,6 +2462,7 @@
     conn.on('close', () => {
       addSystemMessage(t('peerEndedChannel'));
       markAllTransfersInterrupted();
+      if(callState !== 'idle'){ endCallCleanup(); }
       sendBtn.disabled = true;
       msgInput.disabled = true;
       attachBtn.disabled = true;
@@ -2217,6 +2471,7 @@
     conn.on('error', () => {
       addSystemMessage(t('channelInterrupted'));
       markAllTransfersInterrupted();
+      if(callState !== 'idle'){ endCallCleanup(); }
     });
   }
 
@@ -2294,14 +2549,18 @@
     scrollToBottom();
   }
 
+  function iconHtml(name){
+    return `<svg class="icon"><use href="#icon-${name}"></use></svg>`;
+  }
+
   function fileIconFor(mime, name){
-    if(mime && mime.startsWith('image/')) return '🖼️';
-    if(mime === 'application/pdf') return '📕';
-    if(mime && mime.startsWith('audio/')) return '🎵';
-    if(mime && mime.startsWith('video/')) return '🎬';
-    if(/\.(zip|rar|7z)$/i.test(name||'')) return '🗜️';
-    if(/\.(doc|docx)$/i.test(name||'')) return '📄';
-    return '📎';
+    if(mime && mime.startsWith('image/')) return iconHtml('image');
+    if(mime === 'application/pdf') return iconHtml('pdf');
+    if(mime && mime.startsWith('audio/')) return iconHtml('audio');
+    if(mime && mime.startsWith('video/')) return iconHtml('video-file');
+    if(/\.(zip|rar|7z)$/i.test(name||'')) return iconHtml('archive');
+    if(/\.(doc|docx)$/i.test(name||'')) return iconHtml('document');
+    return iconHtml('file');
   }
 
   function formatBytes(bytes){
@@ -2333,7 +2592,7 @@
 
     const icon = document.createElement('div');
     icon.className = 'file-icon';
-    icon.textContent = fileIconFor(mime, name);
+    icon.innerHTML = fileIconFor(mime, name);
 
     const info = document.createElement('div');
     info.className = 'file-info';
@@ -2364,7 +2623,7 @@
       cancelBtn.className = 'transfer-cancel-btn';
       cancelBtn.title = t('btnCancelTransfer');
       cancelBtn.setAttribute('aria-label', t('btnCancelTransfer'));
-      cancelBtn.textContent = '✕';
+      cancelBtn.innerHTML = iconHtml('close');
       cardRow.appendChild(cancelBtn);
     }
 
@@ -2404,6 +2663,10 @@
     img.loading = 'lazy';
     img.addEventListener('click', () => openLightbox(dataUrl, name));
     frame.appendChild(img);
+    const expandIndicator = document.createElement('div');
+    expandIndicator.className = 'img-expand-indicator';
+    expandIndicator.innerHTML = iconHtml('expand');
+    frame.appendChild(expandIndicator);
     ui.bubble.appendChild(frame);
 
     const meta = document.createElement('div');
@@ -2423,7 +2686,7 @@
     size2.textContent = formatBytes(size) + ' · ' + nowLabel();
     const dl = document.createElement('a');
     dl.className = 'file-download';
-    dl.textContent = '⬇ ' + t('btnDownloadFile');
+    dl.innerHTML = iconHtml('download') + ' ' + t('btnDownloadFile');
     dl.href = blobUrl;
     dl.download = name || 'arquivo';
     ui.card.querySelector('.file-info').appendChild(size2);
@@ -2726,7 +2989,7 @@
     recordStartTime = Date.now();
 
     voiceBtn.classList.add('recording');
-    voiceBtn.textContent = '●';
+    voiceBtn.innerHTML = iconHtml('stop');
     composerRow.style.display = 'none';
     recordingBar.classList.add('show');
     recHint.textContent = t('recHintCancel');
@@ -2754,7 +3017,7 @@
 
   function resetRecordingUI(){
     voiceBtn.classList.remove('recording');
-    voiceBtn.textContent = '🎙️';
+    voiceBtn.innerHTML = iconHtml('mic');
     composerRow.style.display = 'flex';
     recordingBar.classList.remove('show');
   }
@@ -2815,7 +3078,7 @@
 
     const playBtn = document.createElement('button');
     playBtn.className = 'voice-play-btn';
-    playBtn.textContent = '▶';
+    playBtn.innerHTML = iconHtml('play');
     playBtn.setAttribute('aria-label', 'Reproduzir áudio');
 
     const body = document.createElement('div');
@@ -2868,9 +3131,9 @@
       }
     });
 
-    audioEl.addEventListener('play', () => { isPlaying = true; playBtn.textContent = '❚❚'; });
-    audioEl.addEventListener('pause', () => { isPlaying = false; playBtn.textContent = '▶'; });
-    audioEl.addEventListener('ended', () => { isPlaying = false; playBtn.textContent = '▶'; setProgress(0); });
+    audioEl.addEventListener('play', () => { isPlaying = true; playBtn.innerHTML = iconHtml('pause'); });
+    audioEl.addEventListener('pause', () => { isPlaying = false; playBtn.innerHTML = iconHtml('play'); });
+    audioEl.addEventListener('ended', () => { isPlaying = false; playBtn.innerHTML = iconHtml('play'); setProgress(0); });
     audioEl.addEventListener('timeupdate', () => {
       if(audioEl.duration){ setProgress(audioEl.currentTime / audioEl.duration); }
     });
@@ -2883,6 +3146,246 @@
       setProgress(ratio);
     });
   }
+
+  // ================= chamada de voz/vídeo =================
+
+  function setCallState(state){
+    callState = state;
+    callOverlay.classList.remove('state-outgoing','state-incoming','state-active');
+    if(state !== 'idle'){ callOverlay.classList.add('state-' + state); }
+  }
+
+  function setCallKindClass(kind){
+    callKind = kind;
+    callOverlay.classList.toggle('kind-video', kind === 'video');
+    callOverlay.classList.toggle('kind-voice', kind === 'voice');
+  }
+
+  function getCallStream(kind){
+    const constraints = kind === 'video'
+      ? { audio:true, video:{ facingMode:'user' } }
+      : { audio:true, video:false };
+    return navigator.mediaDevices.getUserMedia(constraints);
+  }
+
+  function callPeerLabel(overrideName){
+    return overrideName || (roomIdBadge ? roomIdBadge.textContent : '');
+  }
+
+  function openCallOverlay(){
+    callOverlay.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeCallOverlayUI(){
+    callOverlay.classList.remove('show','remote-connected','kind-video','kind-voice');
+    setCallState('idle');
+    document.body.style.overflow = room.classList.contains('active') ? 'hidden' : '';
+  }
+
+  function updateCallControlIcons(){
+    callMuteBtn.innerHTML = iconHtml(isCallMuted ? 'mic-off' : 'mic');
+    callMuteBtn.classList.toggle('active-off', isCallMuted);
+    callCameraBtn.innerHTML = iconHtml(isCallCameraOff ? 'video-off' : 'video-camera');
+    callCameraBtn.classList.toggle('active-off', isCallCameraOff);
+    callCameraBtn.style.display = callKind === 'video' ? 'flex' : 'none';
+  }
+
+  function formatCallDuration(ms){
+    const totalSec = Math.floor(ms/1000);
+    const m = Math.floor(totalSec/60);
+    const s = totalSec % 60;
+    return m + ':' + s.toString().padStart(2,'0');
+  }
+
+  function updateCallDurationTick(){
+    callStatusText.textContent = formatCallDuration(Date.now() - callStartTime);
+  }
+
+  function onRemoteStreamReceived(remoteStream){
+    clearTimeout(callTimeoutHandle);
+    if(callKind === 'video'){
+      callRemoteVideo.srcObject = remoteStream;
+      callOverlay.classList.add('remote-connected');
+    } else {
+      callRemoteAudio.srcObject = remoteStream;
+      callRemoteAudio.play().catch(()=>{});
+    }
+    setCallState('active');
+    callStartTime = Date.now();
+    callStatusText.textContent = '0:00';
+    clearInterval(callDurationInterval);
+    callDurationInterval = setInterval(updateCallDurationTick, 1000);
+    playNotifyTone();
+  }
+
+  async function startCall(kind){
+    if(!activeConn || !activeConn.open){ showToast(t('channelNotOpen')); return; }
+    if(callState !== 'idle') return;
+
+    let stream;
+    try{
+      stream = await getCallStream(kind);
+    }catch(e){
+      showToast(kind === 'video' ? t('callCameraPermissionDenied') : t('micAccessDenied'));
+      return;
+    }
+
+    localCallStream = stream;
+    isCallMuted = false;
+    isCallCameraOff = false;
+    setCallKindClass(kind);
+    setCallState('outgoing');
+    openCallOverlay();
+    callPeerName.textContent = callPeerLabel();
+    callStatusText.textContent = t('callCalling');
+    if(kind === 'video'){ callLocalVideo.srcObject = stream; }
+    updateCallControlIcons();
+
+    const call = peer.call(activeConn.peer, stream, {
+      metadata: { kind: kind, callerName: savedUserName() || null }
+    });
+    activeCall = call;
+
+    call.on('stream', onRemoteStreamReceived);
+    call.on('close', endCallCleanup);
+    call.on('error', endCallCleanup);
+
+    callTimeoutHandle = setTimeout(() => {
+      if(callState === 'outgoing'){
+        showToast(t('callNoAnswer'));
+        hangupCall();
+      }
+    }, CALL_RING_TIMEOUT_MS);
+  }
+
+  function handleIncomingCall(call){
+    if(callState !== 'idle'){
+      try{ call.close(); }catch(e){}
+      return;
+    }
+    activeCall = call;
+    const meta = call.metadata || {};
+    const kind = meta.kind === 'video' ? 'video' : 'voice';
+    isCallMuted = false;
+    isCallCameraOff = false;
+    setCallKindClass(kind);
+    setCallState('incoming');
+    openCallOverlay();
+    callPeerName.textContent = callPeerLabel(meta.callerName);
+    callStatusText.textContent = kind === 'video' ? t('callIncomingVideo') : t('callIncomingVoice');
+    updateCallControlIcons();
+    startRingtone();
+
+    callTimeoutHandle = setTimeout(() => {
+      if(callState === 'incoming'){ declineCall(); }
+    }, CALL_RING_TIMEOUT_MS);
+  }
+
+  async function acceptCall(){
+    if(!activeCall) return;
+    stopRingtone();
+    clearTimeout(callTimeoutHandle);
+
+    let stream;
+    try{
+      stream = await getCallStream(callKind);
+    }catch(e){
+      showToast(callKind === 'video' ? t('callCameraPermissionDenied') : t('micAccessDenied'));
+      hangupCall();
+      return;
+    }
+    localCallStream = stream;
+    if(callKind === 'video'){ callLocalVideo.srcObject = stream; }
+    updateCallControlIcons();
+
+    activeCall.answer(stream);
+    activeCall.on('stream', onRemoteStreamReceived);
+    activeCall.on('close', endCallCleanup);
+    activeCall.on('error', endCallCleanup);
+
+    callStatusText.textContent = t('callConnecting');
+  }
+
+  function declineCall(){
+    stopRingtone();
+    clearTimeout(callTimeoutHandle);
+    if(activeCall){ try{ activeCall.close(); }catch(e){} }
+    endCallCleanup();
+  }
+
+  function hangupCall(){
+    stopRingtone();
+    clearTimeout(callTimeoutHandle);
+    if(activeCall){ try{ activeCall.close(); }catch(e){} }
+    endCallCleanup();
+  }
+
+  function endCallCleanup(){
+    stopRingtone();
+    clearTimeout(callTimeoutHandle);
+    clearInterval(callDurationInterval);
+    if(localCallStream){
+      localCallStream.getTracks().forEach((tr) => tr.stop());
+      localCallStream = null;
+    }
+    if(callRemoteVideo) callRemoteVideo.srcObject = null;
+    if(callLocalVideo) callLocalVideo.srcObject = null;
+    if(callRemoteAudio) callRemoteAudio.srcObject = null;
+    activeCall = null;
+    closeCallOverlayUI();
+  }
+
+  // toque de chamada recebida — reaproveita a mesma Web Audio API do beep de notificação
+  function ringtoneBeep(){
+    const ctx = getAudioCtx();
+    if(!ctx) return;
+    if(ctx.state === 'suspended'){ ctx.resume(); }
+    const now = ctx.currentTime;
+    [0, 1].forEach((i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = 740;
+      const start = now + i * 0.22;
+      const dur = 0.15;
+      gain.gain.setValueAtTime(0, start);
+      gain.gain.linearRampToValueAtTime(0.15, start + 0.012);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + dur);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(start); osc.stop(start + dur + 0.02);
+    });
+  }
+  function startRingtone(){
+    ringtoneBeep();
+    clearInterval(ringtoneInterval);
+    ringtoneInterval = setInterval(ringtoneBeep, 1800);
+  }
+  function stopRingtone(){
+    clearInterval(ringtoneInterval);
+    ringtoneInterval = null;
+  }
+
+  voiceCallBtn.addEventListener('click', () => startCall('voice'));
+  videoCallBtn.addEventListener('click', () => startCall('video'));
+  callAcceptBtn.addEventListener('click', acceptCall);
+  callDeclineBtn.addEventListener('click', declineCall);
+  callHangupBtn.addEventListener('click', hangupCall);
+
+  callMuteBtn.addEventListener('click', () => {
+    isCallMuted = !isCallMuted;
+    if(localCallStream){
+      localCallStream.getAudioTracks().forEach((tr) => { tr.enabled = !isCallMuted; });
+    }
+    updateCallControlIcons();
+  });
+
+  callCameraBtn.addEventListener('click', () => {
+    isCallCameraOff = !isCallCameraOff;
+    if(localCallStream){
+      localCallStream.getVideoTracks().forEach((tr) => { tr.enabled = !isCallCameraOff; });
+    }
+    updateCallControlIcons();
+  });
 
   // ---------- indicador de digitando (local -> remoto) ----------
   msgInput.addEventListener('input', () => {
@@ -2954,7 +3457,7 @@
     } else {
       pendingPreviewImg.style.display = 'none';
       pendingPreviewIcon.style.display = 'flex';
-      pendingPreviewIcon.textContent = fileIconFor(file.type, file.name);
+      pendingPreviewIcon.innerHTML = fileIconFor(file.type, file.name);
     }
 
     msgInput.placeholder = t('msgInputPlaceholderCaption');
@@ -3008,6 +3511,7 @@
 
   // ---------- sair do canal ----------
   leaveBtn.addEventListener('click', () => {
+    if(callState !== 'idle'){ hangupCall(); }
     if(activeConn){ try{ activeConn.close(); }catch(e){} }
     if(mediaRecorder && mediaRecorder.state === 'recording'){ stopRecording(true); }
     room.classList.remove('active');
