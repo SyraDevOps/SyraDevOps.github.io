@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#050716" />
+    <title>Aurora</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/story.css" />
+    <link rel="stylesheet" href="css/fixes.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="stylesheet" href="css/academy.css" />
+    <link rel="stylesheet" href="css/academy-plus.css" />
+  </head>
+  <body>
+    <main class="aurora-menu" aria-labelledby="game-title">
+      <div class="backdrop" aria-hidden="true"></div>
+      <div class="starfield" aria-hidden="true"></div>
+      <div class="scanlines" aria-hidden="true"></div>
+
+      <header class="topbar">
+        <a class="studio-mark" href="#" aria-label="Aurora, página inicial">
+          <span class="mark-orbit"></span><span>AURORA</span>
+        </a>
+        <button class="sound-toggle" type="button" aria-pressed="false" data-sound-toggle>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 10v4h4l5 4V6L8 10H4Zm12.5 2a4.5 4.5 0 0 0-2-3.74v7.48A4.5 4.5 0 0 0 16.5 12Z"/></svg>
+          <span data-i18n="sound">Som</span>
+        </button>
+      </header>
+
+      <section class="menu-panel" aria-label="Menu principal">
+        <p class="eyebrow" data-i18n="eyebrow">UMA JORNADA ALÉM DO HORIZONTE</p>
+        <h1 id="game-title">AURORA</h1>
+        <p class="tagline" data-i18n="tagline">O universo deixa sinais para quem aprende a escutar.</p>
+        <p class="launch-note" data-i18n="learningNote">Aurora é uma ficção científica educativa: as explicações simplificam conceitos reais e convidam você a continuar pesquisando.</p>
+
+        <nav class="main-nav" aria-label="Opções do jogo">
+          <button class="menu-option active" type="button" data-action="new-game">
+            <span class="option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7L8 5Z"/></svg></span>
+            <span data-i18n="newGame">Novo jogo</span><span class="option-line"></span>
+          </button>
+          <button class="menu-option continue-option" type="button" data-action="resume">
+            <span class="option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4v16l13-8L6 4Zm3 5.3L13.4 12 9 14.7V9.3Z"/></svg></span>
+            <span data-i18n="resumeGame">Continuar jornada</span><span class="option-line"></span>
+          </button>
+          <button class="menu-option" type="button" data-action="settings">
+            <span class="option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Zm8.4 5.2v-2.4l-2.1-.7a7.2 7.2 0 0 0-.6-1.4l1-2-1.7-1.7-2 1a7.2 7.2 0 0 0-1.4-.6l-.7-2.1h-2.4l-.7 2.1a7.2 7.2 0 0 0-1.4.6l-2-1-1.7 1.7 1 2a7.2 7.2 0 0 0-.6 1.4l-2.1.7v2.4l2.1.7c.1.5.3 1 .6 1.4l-1 2 1.7 1.7 2-1c.4.3.9.5 1.4.6l.7 2.1h2.4l.7-2.1c.5-.1 1-.3 1.4-.6l2 1 1.7-1.7-1-2c.3-.4.5-.9.6-1.4l2.1-.7Z"/></svg></span>
+            <span data-i18n="settings">Configurações</span><span class="option-line"></span>
+          </button>
+          <button class="menu-option" type="button" data-action="about">
+            <span class="option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm1 15h-2v-6h2v6Zm0-8h-2V7h2v2Z"/></svg></span>
+            <span data-i18n="about">Sobre</span><span class="option-line"></span>
+          </button>
+          <button class="menu-option" type="button" data-action="academy">
+            <span class="option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 9l10 6 8-4.8V17h2v-8L12 3Zm-6 10.2V17l6 4 6-4v-3.8l-6 3.6-6-3.6Z"/></svg></span>
+            <span data-i18n="academy">Academia Estelar</span><span class="option-line"></span>
+          </button>
+          <button class="menu-option" type="button" data-action="achievements">
+            <span class="option-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 2.4 5 5.5.8-4 3.9.9 5.5-4.8-2.6-4.8 2.6.9-5.5-4-3.9L9.6 7 12 2Zm-7 17h14v2H5v-2Z"/></svg></span>
+            <span data-i18n="achievements">Conquistas</span><span class="option-line"></span>
+          </button>
+        </nav>
+      </section>
+
+      <footer class="footer"><span>© 2026 AURORA</span><span class="coordinates">07° 32' 17" S &nbsp; 46° 18' 22" W</span></footer>
+    </main>
+
+    <section class="academy-screen" hidden aria-labelledby="academy-title">
+      <div class="academy-stars" aria-hidden="true"></div><header class="academy-header"><button type="button" class="return-academy" data-close-academy data-i18n="returnMenu">← Menu</button><span>AURORA / ACADEMIA</span></header>
+      <section class="academy-home academy-panel"><p class="eyebrow" data-i18n="academyEyebrow">ACADEMIA ESTELAR</p><h2 id="academy-title" data-i18n="academyTitle">Escolha a sua órbita de estudo</h2><p data-i18n="academyCopy">Desafios separados da campanha para aprender no seu ritmo.</p><section class="academy-brief"><img src="assets/academy/aurora-tutor.webp" loading="eager" decoding="async" alt="Aurora, tutora da Academia"/><div><p class="eyebrow" data-i18n="academyGuideEyebrow">AURORA · GUIA DE CAMPO</p><h3 data-i18n="academyGuideTitle">Aprender também é traçar uma rota.</h3><p data-i18n="academyGuideCopy">Eu mostro o conceito, você toma a decisão e o mapa responde ao que aprendeu.</p><div class="academy-brief-stats"><span>✦ <b data-academy-question-total>32</b> <small data-i18n="academyQuestions">desafios</small></span><span>◎ <b>12</b> <small data-i18n="academyMaps">mapas</small></span></div></div></section><section class="academy-profile" data-academy-profile aria-label="Perfil da Academia"><div class="avatar-choice" data-avatar-choice><button type="button" class="avatar-option male" data-avatar="male" aria-label="Avatar masculino"><i></i></button><button type="button" class="avatar-option female" data-avatar="female" aria-label="Avatar feminino"><i></i></button></div><div class="profile-copy"><label><span data-i18n="academyName">Seu nome de explorador</span><input data-profile-name maxlength="18" autocomplete="nickname" /></label><div class="profile-stats"><span><b data-profile-level>1</b><small data-i18n="academyLevel">Nível</small></span><span><b data-profile-xp>0</b><small>XP</small></span><span><b data-profile-streak>0</b><small data-i18n="streak">Sequência</small></span></div></div><div class="profile-xp"><div><i data-profile-xp-bar></i></div><small data-profile-xp-copy>0 / 60 XP</small></div></section><div class="level-grid" data-level-grid></div><button class="constellation-mode" type="button" data-open-constellations><span>✦</span><b data-i18n="constellationLab">Laboratório de constelações</b><small data-constellation-home-copy data-i18n="constellationLabCopy">Reconheça padrões e construa seus mapas estelares.</small></button></section>
+      <section class="academy-quiz academy-panel" hidden><button class="academy-back" type="button" data-back-academy data-i18n="back">Voltar</button><div class="academy-hud"><span data-study-level></span><span data-study-progress></span></div><article class="academy-tutor-card"><img data-study-tutor-art src="assets/academy/aurora-tutor.webp" loading="lazy" decoding="async" alt="Aurora explica a missão"/><div><p class="eyebrow" data-study-speaker>AURORA · GUIA DE CAMPO</p><p data-study-dialogue></p><span class="lesson-chip" data-study-mode-label></span></div></article><p class="eyebrow" data-study-type></p><h2 data-study-title></h2><p data-study-context></p><div class="study-formula" data-study-formula hidden></div><figure class="study-image" data-study-image hidden><img alt="" loading="lazy" decoding="async"/></figure><p class="study-instruction" data-study-instruction></p><div class="study-answers" data-study-answers></div><article class="study-feedback" data-study-feedback hidden><p data-study-feedback-title></p><p data-study-feedback-copy></p><a data-study-source target="_blank" rel="noopener" data-i18n="source">Fonte</a><button type="button" data-study-next data-i18n="nextStudy">Próxima questão</button></article></section>
+      <section class="constellation-lab academy-panel" hidden><button class="academy-back" type="button" data-back-academy data-i18n="back">Voltar</button><div class="academy-hud"><span data-i18n="constellationLab">Laboratório de constelações</span><span data-constellation-progress></span></div><article class="constellation-radio"><img src="assets/academy/json-studying.webp" loading="lazy" decoding="async" alt="Json acompanha o mapa"/><div><p class="eyebrow">JSON</p><p data-constellation-dialogue></p></div></article><p class="eyebrow" data-i18n="recognition">RECONHECIMENTO</p><h2 data-constellation-question></h2><p data-constellation-copy></p><div class="constellation-answers" data-constellation-answers></div><div class="builder" data-builder hidden><p data-i18n="buildConstellation">Ligue as estrelas corretas para reconstruir o mapa.</p><svg viewBox="0 0 420 260" data-builder-svg aria-label="Mapa de estrelas interativo"></svg><p class="builder-status" data-builder-status></p></div><button type="button" class="study-next" data-next-constellation hidden data-i18n="nextMap">Próximo mapa</button></section>
+    </section>
+
+    <section class="menu-achievements-screen" hidden aria-labelledby="menu-achievements-title">
+      <div class="academy-stars" aria-hidden="true"></div><header class="academy-header"><button type="button" class="return-academy" data-close-menu-achievements data-i18n="returnMenu">← Menu</button><span>AURORA / REGISTROS</span></header>
+      <section class="academy-panel achievement-codex"><p class="eyebrow" data-i18n="achievements">CONQUISTAS</p><h2 id="menu-achievements-title" data-i18n="achievementTitle">Registro de conquistas</h2><p data-i18n="achievementCopy">Toda descoberta deixa uma marca na rota de Aurora.</p><div class="achievement-summary" data-achievement-summary></div><div class="achievement-cards" data-menu-achievements></div></section>
+    </section>
+
+    <section class="story-screen" aria-live="polite" aria-label="Prólogo de Aurora" hidden>
+      <div class="story-backdrop"></div><div class="story-stars"></div>
+      <header class="story-header"><button class="return-menu" type="button" data-i18n="returnMenu">← Menu</button><span class="chapter" data-i18n="chapter">PRÓLOGO · O ÚLTIMO SINAL</span><button class="route-toggle" type="button" data-open-route data-i18n="routeMap">Mapa da jornada</button><span class="campaign-progress" data-progress>Capítulo 1 de 4 · 0/32</span><span class="story-index">01 / 06</span></header>
+      <div class="story-stage">
+        <img class="character character-left" src="assets/json.webp" decoding="async" alt="Json" />
+        <img class="character character-right" src="assets/cartographer.webp" decoding="async" alt="O Cartógrafo" />
+        <img class="character character-center" src="assets/aurora.webp" decoding="async" alt="Aurora" />
+        <img class="character character-guide" src="assets/mira-vale.webp" decoding="async" alt="Mira Vale" />
+        <div class="signal-map" aria-hidden="true"><span></span><i></i><b></b></div>
+      </div>
+      <article class="dialogue-box"><p class="speaker">NARRADOR</p><p class="dialogue-text"></p><button class="next-scene" type="button"><span data-i18n="continue">Continuar</span><b>→</b></button></article>
+      <section class="class-screen mission-panel" hidden aria-labelledby="class-title">
+        <p class="eyebrow" data-i18n="classEyebrow">IDENTIFIQUE O SEU VETOR</p><h2 id="class-title" data-i18n="classTitle">Como Json vai ler o céu?</h2><p class="mission-copy" data-i18n="classCopy">A classe não limita suas escolhas: ela mostra o que você aprende a enxergar primeiro.</p>
+        <div class="class-grid">
+          <button class="class-card" type="button" data-class="physicist"><span class="class-symbol">∿</span><strong data-i18n="physicist">Físico</strong><small data-i18n="physicistText">Lê energia, matéria, espectros e gravidade.</small></button>
+          <button class="class-card" type="button" data-class="pilot"><span class="class-symbol">⌁</span><strong data-i18n="pilot">Piloto</strong><small data-i18n="pilotText">Lê trajetórias, referências e decisões sob pressão.</small></button>
+          <button class="class-card" type="button" data-class="navigator"><span class="class-symbol">✦</span><strong data-i18n="navigator">Navegador Astral</strong><small data-i18n="navigatorText">Une céu, ciência e rota para encontrar o próximo sinal.</small></button>
+        </div><button class="mission-continue" type="button" disabled data-i18n="beginTrial">Iniciar as provas</button>
+      </section>
+      <section class="chapter-screen mission-panel" hidden aria-labelledby="chapter-screen-title"><p class="eyebrow" data-chapter-number>CAPÍTULO 01</p><h2 id="chapter-screen-title" data-chapter-title></h2><p class="mission-copy" data-chapter-copy></p><article class="chapter-interlude"><img data-interlude-art alt=""/><div><p class="eyebrow" data-interlude-speaker></p><p data-interlude-text></p></div></article><div class="chapter-rule"><span>✦</span><p data-chapter-rule></p></div><button class="mission-continue" type="button" data-start-chapter data-i18n="enterChapter">Entrar no capítulo</button></section>
+      <section class="challenge-screen mission-panel" hidden aria-labelledby="challenge-title">
+        <div class="mission-hud"><p class="eyebrow" data-challenge-label>PROVA 01 / 08</p><div class="hud-stat"><span data-i18n="lives">Vidas</span><span class="life-pips" data-lives aria-label="3 vidas">✦ ✦ ✦</span></div><span class="score" data-score>0 / 32</span></div>
+        <article class="mission-radio" data-mission-radio aria-live="polite"><img data-radio-art src="assets/aurora.png" alt=""/><div><p class="eyebrow" data-radio-speaker>AURORA</p><p data-radio-text></p></div><span class="radio-signal" aria-hidden="true"></span></article>
+        <div class="question-stage" data-question-stage hidden>
+          <h2 id="challenge-title" data-challenge-title></h2><p class="mission-copy" data-challenge-context></p>
+          <div class="constellation-card" data-constellation hidden aria-label="Constelação ilustrada"><svg viewBox="0 0 420 200" aria-hidden="true"><path d="M66 46 156 82 241 39 300 116 368 162M156 82 167 157 300 116"/><circle cx="66" cy="46" r="7"/><circle cx="156" cy="82" r="8"/><circle cx="241" cy="39" r="6"/><circle cx="300" cy="116" r="9"/><circle cx="368" cy="162" r="6"/><circle cx="167" cy="157" r="7"/></svg><span data-i18n="constellationHint">Padrões ajudam a localizar o céu, mas não unem as estrelas fisicamente.</span></div>
+          <figure class="mission-image" data-mission-image hidden><img alt="Imagem real de missão espacial"/><figcaption><span data-i18n="realMissionImage">Imagem real de missão espacial</span> · <a target="_blank" rel="noopener" data-image-credit>NASA</a></figcaption></figure>
+          <div class="answers" data-answers></div>
+        </div>
+      </section>
+      <section class="route-screen mission-panel" hidden aria-labelledby="route-title"><button class="route-close" type="button" data-close-route data-i18n="back">Voltar</button><p class="eyebrow" data-i18n="routeEyebrow">ROTA DE AURORA</p><h2 id="route-title" data-i18n="routeMap">Mapa da jornada</h2><p class="mission-copy" data-route-detail></p><div class="route-track" data-route-track aria-label="Progresso da campanha"></div><section class="achievements" aria-labelledby="achievement-title"><p class="eyebrow" id="achievement-title" data-i18n="achievements">Conquistas</p><div data-achievements></div></section></section>
+      <section class="ending-screen mission-panel" hidden aria-labelledby="ending-title"><p class="eyebrow" data-i18n="chapterEnd">REGISTRO RESTAURADO</p><h2 id="ending-title" data-i18n="endingTitle">Aurora não é um prêmio.</h2><p class="mission-copy" data-i18n="endingText">Ela é uma pergunta aberta: o que faremos quando finalmente entendermos o céu?</p><div class="cast"><figure><img src="assets/json.png" loading="lazy" decoding="async" alt="Json"/><figcaption>JSON</figcaption></figure><figure><img src="assets/aurora.png" loading="lazy" decoding="async" alt="Aurora"/><figcaption>AURORA</figcaption></figure><figure><img src="assets/mira-vale.png" loading="lazy" decoding="async" alt="Mira Vale"/><figcaption>MIRA VALE</figcaption></figure><figure><img src="assets/cartographer.png" loading="lazy" decoding="async" alt="O Cartógrafo"/><figcaption data-i18n="cartographer">O CARTÓGRAFO</figcaption></figure></div><p class="ending-score" data-ending-score></p><button class="mission-continue" type="button" data-show-credits data-i18n="credits">Créditos</button></section>
+      <section class="credits-screen mission-panel" hidden aria-labelledby="credits-title"><p class="eyebrow" data-i18n="creditsEyebrow">FIM DO PRIMEIRO MAPA</p><h2 id="credits-title" data-i18n="credits">Créditos</h2><div class="credits-list"><p><span data-i18n="creditStory">História e universo</span><b>AURORA</b></p><p><span data-i18n="creditCreator">Criado por</span><b>Kayque F S Alves</b></p><p><span data-i18n="creditProduction">Produzido por</span><b>@SyraDevOps</b></p><p><span data-i18n="creditScience">Ciência em cada descoberta</span><b data-i18n="creditScienceValue">Física, astronomia e curiosidade</b></p><p><span data-i18n="creditLesson">Lição final</span><b data-i18n="creditLessonValue">Olhar para o céu é começar a fazer perguntas.</b></p></div><button class="mission-continue" type="button" data-restart data-i18n="playAgain">Jogar novamente</button></section>
+      <section class="outcome-screen" hidden aria-live="assertive"><div class="outcome-art"></div><article class="outcome-copy"><img class="outcome-portrait" data-outcome-portrait src="assets/aurora.png" alt=""/><p class="eyebrow" data-outcome-state></p><h2 data-outcome-title></h2><p data-outcome-dialogue></p><p data-outcome-text></p><p class="class-insight" data-outcome-insight></p><button class="skip-result" type="button" data-skip-result><span data-i18n="continueStory">Continuar história</span> <b data-result-countdown>06</b></button></article></section>
+      <section class="game-over-screen mission-panel" hidden aria-labelledby="game-over-title"><p class="eyebrow" data-i18n="signalLost">SINAL PERDIDO</p><h2 id="game-over-title" data-i18n="gameOverTitle">A rota se fechou — por enquanto.</h2><p class="mission-copy" data-i18n="gameOverText">Mira usa o último pulso do mapa para devolver Json ao começo deste capítulo. Três novas vidas, a mesma curiosidade.</p><img class="game-over-art" src="assets/vesper-card.webp" loading="lazy" decoding="async" alt="Vesper segura uma carta estelar"/><button class="mission-continue" type="button" data-retry-checkpoint data-i18n="retryChapter">Tentar o capítulo outra vez</button></section>
+      <div class="achievement-toast" data-achievement-toast hidden aria-live="polite"></div>
+    </section>
+
+    <dialog class="modal" id="settings-modal" aria-labelledby="settings-title">
+      <form method="dialog" class="modal-card">
+        <button class="close" value="cancel" aria-label="Fechar">×</button>
+        <p class="eyebrow" data-i18n="systems">SISTEMAS</p>
+        <h2 id="settings-title" data-i18n="settings">Configurações</h2>
+        <label class="field"><span data-i18n="language">Idioma</span><select id="language-select"><option value="pt-BR">Português (BR)</option><option value="en">English</option></select></label>
+        <label class="field"><span data-i18n="volume">Volume</span><output id="volume-output">70%</output><input id="volume-slider" type="range" min="0" max="100" value="70" /></label>
+        <label class="field"><span data-i18n="textSize">Tamanho do texto</span><select id="text-size-select"><option value="normal" data-i18n="textNormal">Normal</option><option value="large" data-i18n="textLarge">Grande</option></select></label>
+        <label class="toggle-field"><input id="reduce-motion" type="checkbox"/><span data-i18n="reduceMotion">Reduzir animações</span></label>
+        <p class="sound-note" data-i18n="soundNote">Os sinais sonoros confirmam escolhas e transições.</p>
+        <button class="reset-save" type="button" data-reset-save data-i18n="resetProgress">Apagar progresso da jornada</button>
+        <button class="confirm" value="default" data-i18n="continue">Continuar</button>
+      </form>
+    </dialog>
+
+    <dialog class="modal" id="about-modal" aria-labelledby="about-title">
+      <form method="dialog" class="modal-card">
+        <button class="close" value="cancel" aria-label="Fechar">×</button>
+        <p class="eyebrow" data-i18n="transmission">TRANSMISSÃO 01</p>
+        <h2 id="about-title" data-i18n="about">Sobre</h2>
+        <p data-i18n="aboutText">Aurora é uma história sobre seguir uma constelação que ninguém mais consegue ver.</p>
+        <button class="confirm" value="default" data-i18n="back">Voltar</button>
+      </form>
+    </dialog>
+    <script src="js/i18n.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/academy.js"></script>
+  </body>
+</html>

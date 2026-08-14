@@ -1,0 +1,2 @@
+/* Garantia de alternância entre menu e prólogo em todos os navegadores. */
+.aurora-menu[hidden], .story-screen[hidden] { display: none !important; }
