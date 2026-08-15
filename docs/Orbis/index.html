@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f7f6f2">
+  <meta name="description" content="Syra-Sat: observação meteorológica do Brasil em tempo quase real.">
+  <link rel="manifest" href="manifest.webmanifest?v=12">
+  <link rel="icon" href="assets/icons/orbis-icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="assets/icons/orbis-icon.svg">
+  <link rel="stylesheet" href="styles/app.css?v=12">
+  <title>Orbis · Feito pela @SyraDevOps</title>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <button id="menuButton" class="menu-button" type="button" aria-label="Abrir menu" aria-expanded="false" aria-controls="sideMenu">
+        <span></span><span></span><span></span>
+      </button>
+      <a class="brand" href="./" aria-label="Orbis — início">
+        <img src="assets/logo-orbis-symbol.svg" alt="">
+        <span class="brand-copy"><strong>ORBIS</strong><small>Feito pela @SyraDevOps</small></span>
+      </a>
+      <div class="live-status" aria-live="polite">
+        <span id="statusDot" class="status-dot"></span><span id="statusText">Iniciando conexão...</span>
+      </div>
+      <button id="installButton" class="icon-button install-button" type="button" hidden aria-label="Instalar Orbis" title="Instalar Orbis">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m0 0 4-4m-4 4-4-4M5 17v3h14v-3"/></svg>
+      </button>
+    </header>
+
+    <section class="hero">
+      <p class="kicker">SYRA-SAT · BRASIL</p>
+      <h1>Veja a atmosfera em movimento.</h1>
+      <p>Imagens meteorológicas atualizadas em intervalos de 10 minutos.</p>
+    </section>
+
+    <section class="orbital-card" aria-label="Visualizador Syra-Sat">
+      <div id="viewer" class="viewer">
+        <img id="satelliteImage" alt="Imagem Syra-Sat sobre o Brasil">
+        <button id="exitFullscreenButton" class="viewer-fullscreen-close" type="button" aria-label="Sair da tela cheia">×</button>
+        <div id="watermark" class="watermark" aria-label="Créditos da transmissão">
+          <strong>ORBIS</strong><span>Feito pela @SyraDevOps · @planetariosj</span>
+        </div>
+        <div id="loading" class="loading" role="status"><span class="loader-ring"></span><span id="loadingText">Buscando imagens recentes...</span></div>
+        <div class="viewer-top"><span id="viewLabel" class="country-chip"><i></i>Brasil completo</span><span id="modeBadge" class="mode-badge">GeoColor</span></div>
+        <div class="viewer-bottom"><time id="imageTime">--</time><span id="frameCounter">—</span></div>
+      </div>
+
+      <div class="control-panel">
+        <div class="mode-control">
+          <label for="modeSelect">Produto meteorológico</label>
+          <select id="modeSelect">
+            <option value="geocolor">GeoColor · visão natural</option>
+            <option value="infrared">Infravermelho · nuvens e tempestades</option>
+            <option value="waterVapor">Vapor d'água · alta atmosfera</option>
+            <option value="airMass">Massas de ar · frentes</option>
+            <option value="cloudPhase">Fase de nuvens · dia e noite</option>
+          </select>
+          <p id="modeHelp">Visual natural de dia e nuvens realçadas à noite.</p>
+        </div>
+
+        <div class="timeline-control">
+          <div class="control-caption"><span>Ritmo da animação</span><output id="speedOutput">500 ms</output></div>
+          <input id="speedRange" type="range" min="100" max="1500" step="100" value="500" aria-label="Velocidade da animação">
+        </div>
+
+        <div class="playback" aria-label="Controles da animação">
+          <button id="previousButton" class="control-button" type="button" aria-label="Frame anterior"><svg viewBox="0 0 24 24"><path d="m14 6-6 6 6 6M20 6l-6 6 6 6"/></svg></button>
+          <button id="playButton" class="control-button primary" type="button"><svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span id="playLabel">Pausar</span></button>
+          <button id="nextButton" class="control-button" type="button" aria-label="Próximo frame"><svg viewBox="0 0 24 24"><path d="m10 6 6 6-6 6M4 6l6 6-6 6"/></svg></button>
+          <button id="refreshButton" class="control-button refresh" type="button" aria-label="Atualizar imagens"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0 2 5M20 4v7h-7"/></svg></button>
+        </div>
+
+        <div class="export-controls" aria-label="Tela cheia da transmissão">
+          <span>Syra-Sat · transmissão ao vivo</span>
+          <button id="fullscreenButton" class="export-kit" type="button"><span id="fullscreenLabel">Tela cheia</span></button>
+          <label class="watermark-toggle" for="watermarkToggle"><input id="watermarkToggle" type="checkbox" checked><span aria-hidden="true"></span>Marca d’água</label>
+        </div>
+      </div>
+    </section>
+
+    <aside class="data-note"><span class="pulse"></span><p id="sourceNote">Orbis · Feito pela @SyraDevOps · Syra-Sat</p><span>Dados informativos, não operacionais.</span></aside>
+  </main>
+  <div id="menuBackdrop" class="menu-backdrop" hidden></div>
+  <aside id="sideMenu" class="side-menu" aria-hidden="true" aria-label="Menu Orbis">
+    <div class="menu-head"><img src="assets/logo-orbis-symbol.svg" alt=""><div><strong>Orbis</strong><span>Feito pela @SyraDevOps</span></div><button id="closeMenuButton" class="close-menu" type="button" aria-label="Fechar menu">×</button></div>
+    <section class="view-switch" aria-label="Enquadramentos do Brasil">
+      <p>Regiões do Brasil</p>
+      <div>
+        <button class="view-button active" type="button" data-view="brasil">Brasil completo</button>
+        <button class="view-button" type="button" data-view="norte">Norte</button>
+        <button class="view-button" type="button" data-view="nordeste">Nordeste</button>
+        <button class="view-button" type="button" data-view="centroOeste">Centro-Oeste</button>
+        <button class="view-button" type="button" data-view="sudeste">Sudeste</button>
+        <button class="view-button" type="button" data-view="sul">Sul</button>
+      </div>
+    </section>
+    <div class="menu-foot"><p>Orbis · Feito pela @SyraDevOps</p><small>Syra-Sat. A visualização é informativa e não substitui fontes operacionais.</small></div>
+  </aside>
+  <script defer src="scripts/app.js?v=12"></script>
+</body>
+</html>
