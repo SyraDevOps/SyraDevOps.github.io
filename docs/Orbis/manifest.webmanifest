@@ -1,0 +1,15 @@
+{
+  "name": "Orbis — Observação orbital",
+  "short_name": "Orbis",
+  "description": "Observação meteorológica do Brasil com imagens do GOES-19.",
+  "lang": "pt-BR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f6f2",
+  "theme_color": "#f7f6f2",
+  "icons": [
+    { "src": "assets/icons/orbis-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "assets/icons/orbis-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
