@@ -1,466 +1,58 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open by Syra - Documentação</title>
-    <!-- Tailwind CSS para estilização rápida -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        html {
-            scroll-behavior: smooth;
-        }
-        /* Ajuste fino para focar apenas em tons de cinza e preto */
-        ::selection {
-            background-color: #000000;
-            color: #ffffff;
-        }
-        pre.code-block {
-            background-color: #18181b;
-            color: #e4e4e7;
-            border-radius: 6px;
-            padding: 16px;
-            overflow-x: auto;
-            font-size: 12px;
-            line-height: 1.6;
-            max-height: 480px;
-        }
-        pre.code-block code {
-            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
-            white-space: pre;
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpenBySyra — Projetos</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html{scroll-behavior:smooth} ::selection{background:#000;color:#fff}
+    .project-card{transition:transform .18s ease,border-color .18s ease}.project-card:hover{transform:translateX(4px);border-color:#000}
+  </style>
 </head>
-<body class="bg-zinc-100 text-zinc-900 font-sans antialiased flex flex-col h-screen">
+<body class="bg-zinc-100 text-zinc-900 font-sans antialiased min-h-screen">
+  <header class="sticky top-0 z-20 h-16 bg-zinc-100/95 backdrop-blur border-b border-zinc-200 flex items-center justify-between px-6 md:px-8">
+    <a href="#top" class="font-bold tracking-wider text-black">OPEN BY SYRA</a>
+    <a href="https://github.com/SyraDevOps/OpenBySyra" target="_blank" rel="noopener" class="text-xs text-zinc-500 uppercase tracking-widest hover:text-black">GitHub ↗</a>
+  </header>
 
-    <!-- Cabeçalho Plano (Sem boxes, apenas separador sutil) -->
-    <header class="bg-zinc-100 border-b border-zinc-200 h-16 flex items-center justify-between px-8 z-10 shrink-0">
-        <div class="flex items-center space-x-3">
-            <span class="text-lg font-bold tracking-wider text-black">OPEN BY SYRA</span>
-            <span class="text-xs text-zinc-500 font-mono">v1.0.0</span>
-        </div>
-        <div class="text-xs text-zinc-500 uppercase tracking-widest">
-            Documentação Técnica
-        </div>
-    </header>
+  <div id="top" class="max-w-7xl mx-auto grid lg:grid-cols-[280px_1fr]">
+    <aside class="lg:sticky lg:top-16 lg:h-[calc(100vh-4rem)] border-r border-zinc-200 px-6 py-8">
+      <p class="text-[10px] font-bold uppercase tracking-[.22em] text-zinc-400">Coleção 01</p>
+      <h1 class="text-2xl font-bold tracking-tight mt-2">Projetos abertos.</h1>
+      <p class="text-sm text-zinc-500 leading-relaxed mt-3">Visão computacional, voz, hardware e observação do céu pela SyraDevOps.</p>
+      <input id="search" class="w-full mt-7 bg-transparent border-b border-zinc-300 py-2 text-sm outline-none focus:border-black" placeholder="Pesquisar projeto…">
+      <nav id="nav" class="mt-7 space-y-5"></nav>
+    </aside>
 
-    <!-- Corpo Principal -->
-    <div class="flex flex-1 overflow-hidden">
+    <main class="px-6 py-10 md:px-12 md:py-14">
+      <section class="max-w-3xl border-b border-zinc-200 pb-12">
+        <p class="text-xs uppercase tracking-[.2em] text-zinc-400">SyraDevOps / OpenBySyra</p>
+        <h2 class="text-4xl md:text-6xl font-bold tracking-tight mt-3">Tecnologia que sai da tela.</h2>
+        <p class="mt-5 text-zinc-600 leading-relaxed max-w-2xl">Uma coleção de ferramentas para estudar, usar e conectar câmera, voz, sensores, dispositivos e dados do céu. Cada módulo tem código, documentação e demonstração quando aplicável.</p>
+        <a href="https://github.com/SyraDevOps/OpenBySyra" target="_blank" rel="noopener" class="inline-flex mt-7 bg-black text-white text-xs font-bold uppercase tracking-widest px-4 py-3 hover:bg-zinc-800">Explorar repositório ↗</a>
+      </section>
+      <div id="projects" class="max-w-3xl py-10 space-y-10"></div>
+    </main>
+  </div>
 
-        <!-- Barra Lateral Plana (Mesmo fundo cinza claro, sem divisões flutuantes) -->
-        <aside class="w-80 bg-zinc-100 flex flex-col overflow-y-auto px-8 py-6 border-r border-zinc-200">
-            <!-- Busca -->
-            <div class="mb-6">
-                <input type="text" id="search-input" placeholder="Pesquisar..."
-                       class="w-full text-sm bg-transparent border-b border-zinc-300 py-1.5 focus:border-black focus:outline-none transition-colors placeholder:text-zinc-400">
-                <div id="search-results" class="mt-3 space-y-3 hidden"></div>
-            </div>
-            <!-- Navegação (Sumário) -->
-            <div id="nav-wrapper">
-                <h2 class="text-xs font-bold text-zinc-400 uppercase tracking-widest mb-4">Sumário</h2>
-                <nav id="sidebar-nav" class="space-y-2">
-                    <!-- Links dinâmicos, gerados a partir do módulo de seções -->
-                </nav>
-            </div>
-        </aside>
-
-        <!-- Área de Conteúdo Principal (Sem caixas ou blocos destacados) -->
-        <main class="flex-1 overflow-y-auto bg-zinc-100 px-12 py-10">
-            <div id="content-area" class="max-w-2xl space-y-16 pb-32">
-                <!-- Seções dinâmicas -->
-            </div>
-        </main>
-
-    </div>
-
-    <!-- ==========================================================
-         MÓDULO DE DADOS (metadados): título, tipo e conteúdo textual
-         de cada seção do sumário. Para adicionar uma nova seção,
-         basta inserir um novo objeto neste array.
-         Seções do tipo "code" buscam o código-fonte correspondente
-         em um <template> próprio (ver bloco "syra-home-code" abaixo),
-         evitando problemas de escaping dentro de JSON.
-         ========================================================== -->
-    <script id="sections-data" type="application/json">
-    [
-        {
-            "id": "open-by-syra",
-            "title": "Sobre",
-            "category": "Plataforma",
-            "type": "text",
-            "content": "Open by Syra é a plataforma de projetos abertos da Syra, criada para reunir e disponibilizar soluções desenvolvidas pela empresa para toda a comunidade. Seu objetivo é promover inovação colaborativa, permitindo que desenvolvedores, estudantes e empresas utilizem, estudem, contribuam e expandam os projetos publicados.<br><br>A plataforma reúne aplicações, bibliotecas, ferramentas, APIs e sistemas modulares, desenvolvidos com foco em qualidade, transparência e extensibilidade. Entre suas características estão a arquitetura baseada em plugins, APIs abertas, gerenciamento de memória e configurações, suporte à integração com diferentes serviços e modelos de IA, além de uma estrutura preparada para funcionar tanto localmente quanto em nuvem.<br><br>Mais do que um repositório de código, o Open by Syra representa o compromisso da Syra com o software aberto, incentivando a colaboração da comunidade, a troca de conhecimento e o desenvolvimento conjunto de tecnologias que possam gerar impacto real."
-        },
-        {
-            "id": "introducao",
-            "title": "Filosofia",
-            "category": "Plataforma",
-            "type": "text",
-            "content": "O Sya-Lib é uma biblioteca minimalista desenvolvida para otimizar fluxos de trabalho. O foco do projeto está na simplicidade estrutural e no desempenho estável, sem excesso de dependências externas."
-        },
-        {
-            "id": "uso-basico",
-            "title": "Como contribuir",
-            "category": "Plataforma",
-            "type": "text",
-            "content": "Após realizar a instalação padrão, importe a biblioteca diretamente no cabeçalho do seu arquivo principal. A inicialização ocorre de forma direta por meio de parâmetros declarativos simples."
-        },
-        {
-            "id": "selene",
-            "title": "Selene",
-            "category": "Inteligência Artificial",
-            "type": "text",
-            "content": "<p class=\"italic text-zinc-500\">O Framework de Treinamento de Inteligência Artificial da Syra</p><p><b>Selene</b> é um framework desenvolvido pela <b>Syra</b> para criação, treinamento, gerenciamento, versionamento e distribuição de modelos de Inteligência Artificial de forma simples, modular e escalável — mais do que um chatbot, uma plataforma completa de treinamento.</p><p>O framework centraliza todo o ciclo de vida de um modelo: gerenciamento de datasets, vetorização, treinamento, validação, persistência, inferência e exportação — permitindo múltiplos modelos independentes convivendo lado a lado (Suporte, Financeiro, Vendas, Assistente, IoT, etc.), cada um com seu próprio banco de dados, vetorizador e configurações, podendo ser exportado e importado livremente entre ambientes.</p><p>Seus princípios são <b>simplicidade</b> (tudo em um único ambiente), <b>modularidade</b> (componentes substituíveis), <b>portabilidade</b> (modelos autocontidos) e <b>evolução</b> (pronto para novos algoritmos, embeddings e arquiteturas Transformer no futuro). Dentro do ecossistema Syra, o Selene é o núcleo responsável por transformar dados em modelos inteligentes reutilizáveis para as demais aplicações.</p>",
-            "githubUrl": "https://github.com/SyraDevOps/Selene"
-        },
-        {
-            "id": "yra",
-            "title": "Yra",
-            "category": "Inteligência Artificial",
-            "type": "text",
-            "content": "Seção reservada para a documentação do projeto Yra.",
-            "githubUrl": "https://github.com/SyraDevOps/Yra"
-        },
-        {
-            "id": "yravision",
-            "title": "YraVision",
-            "category": "Inteligência Artificial",
-            "type": "text",
-            "content": "Seção reservada para a documentação do projeto YraVision."
-        },
-        {
-            "id": "syrafin",
-            "title": "SyraFin",
-            "category": "Inteligência Artificial",
-            "type": "text",
-            "content": "<p><b>SyraFin</b> é uma plataforma de inteligência financeira que combina Machine Learning com análise técnica tradicional para gerar previsões probabilísticas sobre o mercado de ações, com dados públicos obtidos via API do Yahoo Finance.</p><p>O pipeline extrai indicadores técnicos consolidados (RSI, Bandas de Bollinger, MACD, volatilidade, momentum e médias móveis) e treina três modelos quantílicos em <b>LightGBM</b> (mediana, piso e teto de confiança), validados com Walk-Forward (TimeSeriesSplit) para evitar vazamento temporal. O resultado é entregue como um relatório em PDF com gráficos de candlestick, indicadores técnicos e a série de previsões para os próximos dias, incluindo intervalos de confiança e as métricas de desempenho do modelo (R², MAE, RMSE).</p><p>Por trabalhar apenas com dados públicos de mercado e processamento local, o SyraFin serve como base analítica para equipes de research, consultorias de investimento e fintechs que queiram automatizar relatórios técnicos de ativos.</p>",
-            "githubUrl": "https://github.com/SyraDevOps/SyraFin"
-        },
-        {
-            "id": "syrablock",
-            "title": "SYRABLOCK",
-            "category": "Inteligência Artificial",
-            "type": "text",
-            "content": "<p>O <b>SYRABLOCK</b> (PTW Blockchain) é uma blockchain desenvolvida em Go pensada para conciliar descentralização com segurança e conformidade regulatória, voltada a empresas, instituições financeiras e mercados regulados.</p><p>Utiliza um consenso <b>PoS híbrido</b> com reputação de validadores e penalidades automáticas, contratos inteligentes em uma linguagem própria (<b>SyraScript</b>) executados em uma VM com gas metering, e uma camada de segurança com RSA 2048, TLS 1.3, proteção anti-replay e rate limiting. Diferente de blockchains públicas genéricas, a rede já nasce com <b>KYC nativo</b> integrado à criação de carteiras e módulos de auditoria com logs estruturados e alertas em tempo real, voltados a casos de uso como rastreabilidade de supply chain, consórcios empresariais e DeFi com compliance.</p>",
-            "githubUrl": "https://github.com/SyraDevOps/SYRABLOCK"
-        },
-        {
-            "id": "luna",
-            "title": "Luna",
-            "category": "Inteligência Artificial",
-            "type": "text",
-            "content": "<p><b>Luna</b> (versão 2.6) é o modelo de diálogo neural da Syra, desenvolvido especificamente para o português. Combina uma arquitetura híbrida — Transformer, camadas State-Space para contexto de longo alcance e blocos de Mixture of Experts — com um tokenizador próprio treinado em corpus PT-BR, buscando maior precisão em conjugações, contrações e expressões idiomáticas do que tokenizadores genéricos.</p><p>O modelo integra um sistema de <b>RAG</b> (recuperação aumentada, com FAISS e sentence embeddings) para respostas com base em documentos externos, um conjunto de <b>personas</b> pré-definidas que ajustam tom e complexidade da resposta, e suporte a quantização (INT8/INT4) para rodar tanto em GPU quanto em CPU com hardware mais limitado.</p><p>O Luna é um projeto em desenvolvimento ativo, com desafios conhecidos em aberto — como gestão de memória em contextos longos e estabilidade do treinamento com curriculum learning — e recebe contribuições da comunidade em código, dados e testes.</p>",
-            "githubUrl": "https://github.com/SyraDevOps/Luna"
-        },
-        {
-            "id": "skymonitor",
-            "title": "SkyMonitor",
-            "category": "Computer Vision",
-            "type": "text",
-            "content": "<p class=\"italic text-zinc-500\">Sistema de Monitoramento e Análise de Céu Noturno</p><p>O <b>SkyMonitor</b> é uma plataforma em Python com interface gráfica (Tkinter) desenvolvida para a análise e o monitoramento contínuo do céu. Projetada para auxiliar astrônomos amadores, estações de observação e entusiastas, a ferramenta é compatível com múltiplas fontes de entrada, como câmeras de segurança IP (via protocolo RTSP), webcams locais, arquivos de vídeo e sequências de imagens de uma pasta.</p><p>O sistema processa as imagens em tempo real utilizando técnicas de processamento digital, dividindo sua atuação em quatro frentes principais:</p><ul class=\"list-disc pl-5 space-y-2\"><li><b>Rastreamento Estelar:</b> identifica e acompanha estrelas estáticas ao longo do tempo. Com base nessas posições confirmadas, a ferramenta aplica algoritmos de triangulação geométrica para gerar padrões estáveis de constelações, desenhando as conexões na tela.</li><li><b>Detecção de Transientes (Meteoros):</b> analisa trajetórias lineares rápidas e variações de intensidade luminosa para registrar a passagem de potenciais meteoros, gerando imagens com o traçado estimado do fenômeno.</li><li><b>Monitoramento de Nuvens:</b> utiliza segmentação morfológica para identificar a presença de nebulosidade na imagem, calculando a área aproximada de cobertura e alertando sobre a obstrução do céu.</li><li><b>Registro de Dados:</b> salva automaticamente relatórios estatísticos, grades de imagens (grids) de estrelas identificadas, mapas celestes periódicos e capturas de eventos transientes de forma estruturada em disco.</li></ul><p>A aplicação foi estruturada de maneira independente, utilizando bibliotecas consolidadas como OpenCV, NumPy e Pillow, o que facilita sua distribuição e permite a compilação em um arquivo executável único (via PyInstaller).</p>",
-            "githubUrl": "https://github.com/SyraDevOps/Vigilis/blob/Meteor/main.py"
-        },
-        {
-            "id": "syra-voicelab",
-            "title": "Syra VoiceLab",
-            "category": "Computer Vision",
-            "type": "text",
-            "content": "<p>O <b>Syra VoiceLab</b> é uma ferramenta open source para experimentação e desenvolvimento de aplicações baseadas em voz diretamente no navegador. A plataforma integra reconhecimento de fala em tempo real, visualização do sinal de áudio e detecção de palavras-chave, oferecendo uma base simples e extensível para pesquisas, assistentes virtuais, automação, acessibilidade e interfaces controladas por voz.</p><p>Desenvolvido utilizando APIs nativas da Web, o projeto serve tanto como ambiente de testes quanto como ponto de partida para aplicações mais complexas.</p>",
-            "githubUrl": "https://github.com/SyraDevOps/Scripts"
-        },
-        {
-            "id": "visioneye",
-            "title": "VisionEye",
-            "category": "Computer Vision",
-            "type": "text",
-            "content": "<p><b>VisionEye</b> é uma ferramenta open source de rastreamento ocular desenvolvida pela Syra para aplicações de visão computacional em tempo real. Utilizando o MediaPipe Face Mesh, o projeto detecta a posição da íris, acompanha o movimento dos olhos, estima a direção do olhar e calcula métricas como abertura ocular, fornecendo uma interface visual para experimentação, pesquisa e desenvolvimento de sistemas baseados em eye tracking.</p><p>O VisionEye pode servir como base para aplicações de acessibilidade, interfaces controladas pelo olhar, realidade aumentada, monitoramento de atenção, análise comportamental e interação homem-computador.</p>",
-            "githubUrl": "https://github.com/SyraDevOps/Scripts"
-        },
-        {
-            "id": "visionhand",
-            "title": "VisionHand",
-            "category": "Computer Vision",
-            "type": "text",
-            "content": "<p><b>VisionHand</b> é uma ferramenta open source de rastreamento de mãos desenvolvida pela Syra para aplicações de visão computacional em tempo real. Baseado no MediaPipe Hands, o projeto detecta e acompanha até duas mãos simultaneamente, identificando os 21 pontos anatômicos de cada mão, desenhando seu esqueleto e disponibilizando as coordenadas dos landmarks para desenvolvimento de aplicações interativas.</p><p>O VisionHand pode ser utilizado como base para reconhecimento de gestos, interfaces sem contato, realidade aumentada, robótica, controle por movimentos e pesquisa em interação homem-computador.</p>",
-            "githubUrl": "https://github.com/SyraDevOps/Scripts"
-        },
-        {
-            "id": "visiondetect",
-            "title": "VisionDetect",
-            "category": "Computer Vision",
-            "type": "text",
-            "content": "<p><b>VisionDetect</b> é uma ferramenta open source para detecção de objetos em tempo real desenvolvida pela Syra. Utilizando TensorFlow.js e o modelo COCO-SSD, o projeto identifica e classifica automaticamente dezenas de categorias de objetos presentes em imagens ou vídeo, exibindo caixas delimitadoras, nível de confiança e visualização das detecções em tempo real.</p><p>O VisionDetect serve como base para aplicações de visão computacional, robótica, automação, monitoramento inteligente, sistemas de segurança e projetos de Inteligência Artificial executados diretamente no navegador.</p>",
-            "githubUrl": "https://github.com/SyraDevOps/Scripts"
-        },
-        {
-            "id": "tls",
-            "title": "TLS - Trusted Link Security",
-            "category": "Segurança",
-            "type": "text",
-            "content": "<p>O <b>TLS (Trusted Link Security)</b> é um pacote de ferramentas de segurança digital da Syra, voltado a colaboradores internos que precisam avaliar a própria máquina e rede local — cobrindo cenários de red team, blue team e OSINT em um único conjunto de utilitários.</p><p>O pacote reúne três ferramentas com escopos distintos: <b>Wolfex</b>, que orquestra frameworks de varredura (arquivos, RATs, APIs, hardware) restritos à máquina onde é executado — não pode ser apontado para outros alvos; <b>Haven</b>, voltado a análise de tráfego na rede em que o usuário está conectado (usando Nmap e Wireshark, entre outras ferramentas); e <b>Mike</b>, um scanner geral que atua apenas internamente, varrendo arquivos, conexões, softwares, hardware, discos, redes e aplicativos do próprio sistema.</p>",
-            "githubUrl": "https://github.com/SyraDevOps/TheLastSystem"
-        },
-        {
-            "id": "syra-hardware",
-            "title": "Syra Hardware",
-            "category": "Hardware",
-            "type": "text",
-            "content": "O Syra Hardware reúne os firmwares e integrações da Syra voltados a dispositivos físicos e microcontroladores, conectando os projetos de software da plataforma ao mundo real."
-        },
-        {
-            "id": "syra-home",
-            "title": "Syra Home",
-            "category": "Hardware",
-            "type": "text",
-            "content": "O Syra Home é o firmware da Syra para transformar um módulo <b>ESP8266</b> em um nó de automação residencial conectado. Ao ser ligado pela primeira vez, o dispositivo cria a rede Wi-Fi <b>Syra-Config</b>, através da qual é feita a configuração inicial de rede; depois disso, ele se conecta automaticamente à rede salva e fica acessível pelo endereço <b>Syra-Home-SYRA0156326.local</b> (mDNS).<br><br>O firmware expõe uma pequena API HTTP local com rotas para status do dispositivo (<code>/info</code>), gerenciamento de dispositivos vinculados (<code>/devices</code>), troca de mensagens entre dispositivos (<code>/bridge</code>), reconfiguração de rede (<code>/disconnect</code> e <code>/setwifi</code>) e atualização de firmware por OTA (<code>/update</code>), além de persistir credenciais e dispositivos na EEPROM interna do chip.",
-            "githubUrl": "https://github.com/SyraDevOps/Syra-Home"
-        }
-    ]
-    </script>
-
-
-    <!-- ==========================================================
-         MÓDULO DE NAVEGAÇÃO: agrupa as seções por categoria
-         (ex: Plataforma, Inteligência Artificial, Hardware) e,
-         dentro de cada grupo, ainda respeita subitens via "parent"
-         (ex: Syra Home dentro de Syra Hardware).
-         Seções sem "category" caem em um grupo "Outros" ao final.
-         ========================================================== -->
-    <script id="module-nav">
-        const NavModule = {
-            groupByCategory(sections) {
-                const groups = new Map();
-                sections.forEach(section => {
-                    const key = section.category || 'Outros';
-                    if (!groups.has(key)) groups.set(key, []);
-                    groups.get(key).push(section);
-                });
-                return groups;
-            },
-            render(sections, container) {
-                container.innerHTML = '';
-                const groups = this.groupByCategory(sections);
-
-                groups.forEach((groupSections, categoryName) => {
-                    const groupWrapper = document.createElement('div');
-                    groupWrapper.className = "mb-6";
-
-                    const groupLabel = document.createElement('h3');
-                    groupLabel.className = "text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2";
-                    groupLabel.textContent = categoryName;
-                    groupWrapper.appendChild(groupLabel);
-
-                    const groupNav = document.createElement('div');
-                    groupNav.className = "space-y-2";
-
-                    groupSections.forEach(section => {
-                        const isChild = Boolean(section.parent);
-                        const navLink = document.createElement('a');
-                        navLink.href = `#${section.id}`;
-                        navLink.className = isChild
-                            ? "block text-sm text-zinc-500 hover:text-black hover:translate-x-1 transition-transform duration-150 pl-4 border-l border-zinc-200"
-                            : "block text-sm text-zinc-600 hover:text-black hover:translate-x-1 transition-transform duration-150 font-medium";
-                        navLink.textContent = section.title;
-                        groupNav.appendChild(navLink);
-                    });
-
-                    groupWrapper.appendChild(groupNav);
-                    container.appendChild(groupWrapper);
-                });
-            }
-        };
-    </script>
-
-    <!-- ==========================================================
-         MÓDULO DE SEÇÕES DE TEXTO
-         Quando a seção possui "githubUrl", um botão estilizado com
-         o ícone do GitHub é renderizado ao final do conteúdo,
-         apontando para o repositório específico do projeto.
-         ========================================================== -->
-    <script id="module-text-section">
-        const TextSectionModule = {
-            githubIconSvg: `<svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>`,
-            renderGithubButton(url) {
-                if (!url) return '';
-                return `
-                    <a href="${url}" target="_blank" rel="noopener noreferrer"
-                       class="group inline-flex items-center gap-2 mt-6 bg-black text-white hover:bg-zinc-800 text-xs font-bold uppercase tracking-widest px-4 py-2.5 transition-colors duration-150">
-                        ${this.githubIconSvg}
-                        <span>Ver no GitHub</span>
-                    </a>
-                `;
-            },
-            render(section) {
-                const el = document.createElement('section');
-                el.id = section.id;
-                el.className = "scroll-mt-24";
-                el.innerHTML = `
-                    <h2 class="text-xl font-bold text-black tracking-wide mb-3">${section.title}</h2>
-                    <div class="text-zinc-600 text-sm leading-relaxed space-y-3 font-normal">
-                        ${section.content}
-                    </div>
-                    ${this.renderGithubButton(section.githubUrl)}
-                `;
-                return el;
-            }
-        };
-    </script>
-
-    <!-- ==========================================================
-         MÓDULO DE SEÇÕES DE CÓDIGO (usado por Syra Hardware /
-         Syra Home): descrição + bloco de código destacado.
-         O código-fonte é lido de um <template> pelo id indicado em
-         "codeTemplateId", já em texto puro (sem escaping de JSON).
-         ========================================================== -->
-    <script id="module-code-section">
-        const CodeSectionModule = {
-            render(section) {
-                const el = document.createElement('section');
-                el.id = section.id;
-                el.className = "scroll-mt-24";
-
-                const templateEl = document.getElementById(section.codeTemplateId);
-                const code = templateEl ? templateEl.innerHTML.trim() : '';
-
-                el.innerHTML = `
-                    <h2 class="text-xl font-bold text-black tracking-wide mb-1">${section.title}</h2>
-                    <p class="text-[10px] uppercase tracking-widest text-zinc-400 mb-3">Firmware · ${section.language || 'code'}</p>
-                    <div class="text-zinc-600 text-sm leading-relaxed space-y-3 font-normal mb-4">
-                        ${section.description || ''}
-                    </div>
-                    <pre class="code-block"><code>${code}</code></pre>
-                `;
-                return el;
-            }
-        };
-    </script>
-
-    <!-- ==========================================================
-         MÓDULO DE CONTEÚDO: decide, por seção, qual módulo de
-         renderização usar (texto ou código) e monta a área principal.
-         ========================================================== -->
-    <script id="module-content">
-        const ContentModule = {
-            render(sections, container) {
-                container.innerHTML = '';
-                sections.forEach(section => {
-                    let el;
-                    if (section.type === 'code') {
-                        el = CodeSectionModule.render(section);
-                    } else {
-                        el = TextSectionModule.render(section);
-                    }
-                    container.appendChild(el);
-                });
-            }
-        };
-    </script>
-
-    <!-- ==========================================================
-         MÓDULO DE BUSCA: indexa título + conteúdo (texto puro, sem
-         tags) de cada seção e mostra, ao digitar, em quais seções
-         específicas o termo pesquisado aparece, com um trecho de
-         contexto. Clicar num resultado leva direto à seção.
-         ========================================================== -->
-    <script id="module-search">
-        const SearchModule = {
-            stripHtml(html) {
-                const tmp = document.createElement('div');
-                tmp.innerHTML = html || '';
-                return tmp.textContent || tmp.innerText || '';
-            },
-            buildIndex(sections) {
-                return sections.map(section => ({
-                    id: section.id,
-                    title: section.title,
-                    category: section.category || 'Outros',
-                    plainText: this.stripHtml(section.content)
-                }));
-            },
-            getSnippet(plainText, query) {
-                const lower = plainText.toLowerCase();
-                const idx = lower.indexOf(query.toLowerCase());
-                if (idx === -1) return plainText.slice(0, 90).trim() + '…';
-                const start = Math.max(0, idx - 40);
-                const end = Math.min(plainText.length, idx + query.length + 60);
-                let snippet = plainText.slice(start, end).trim();
-                if (start > 0) snippet = '…' + snippet;
-                if (end < plainText.length) snippet = snippet + '…';
-                return snippet;
-            },
-            highlight(text, query) {
-                const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                return text.replace(new RegExp(`(${escaped})`, 'ig'), '<mark class="bg-black text-white px-0.5">$1</mark>');
-            },
-            search(index, query) {
-                const q = query.trim().toLowerCase();
-                if (!q) return [];
-                return index.filter(item =>
-                    item.title.toLowerCase().includes(q) || item.plainText.toLowerCase().includes(q)
-                );
-            },
-            render(results, query, container) {
-                container.innerHTML = '';
-                if (results.length === 0) {
-                    container.innerHTML = '<p class="text-sm text-zinc-400 italic">Nenhuma seção encontrada.</p>';
-                    return;
-                }
-                results.forEach(item => {
-                    const a = document.createElement('a');
-                    a.href = `#${item.id}`;
-                    a.className = "block hover:translate-x-1 transition-transform duration-150";
-
-                    const titleMatch = item.title.toLowerCase().includes(query.toLowerCase());
-                    const snippetSource = titleMatch ? item.title : this.getSnippet(item.plainText, query);
-
-                    a.innerHTML = `
-                        <p class="text-[9px] uppercase tracking-widest text-zinc-400">${item.category}</p>
-                        <p class="text-sm font-medium text-black">${item.title}</p>
-                        <p class="text-xs text-zinc-500 leading-snug mt-0.5">${this.highlight(snippetSource, query)}</p>
-                    `;
-                    container.appendChild(a);
-                });
-            },
-            init(sections) {
-                const index = this.buildIndex(sections);
-                const input = document.getElementById('search-input');
-                const resultsContainer = document.getElementById('search-results');
-                const navWrapper = document.getElementById('nav-wrapper');
-
-                input.addEventListener('input', () => {
-                    const query = input.value;
-                    if (!query.trim()) {
-                        resultsContainer.classList.add('hidden');
-                        resultsContainer.innerHTML = '';
-                        navWrapper.classList.remove('hidden');
-                        return;
-                    }
-                    const results = this.search(index, query);
-                    this.render(results, query, resultsContainer);
-                    resultsContainer.classList.remove('hidden');
-                    navWrapper.classList.add('hidden');
-                });
-            }
-        };
-    </script>
-
-    <!-- ==========================================================
-         MÓDULO PRINCIPAL (App): carrega os dados e aciona os
-         demais módulos para montar a página.
-         ========================================================== -->
-    <script id="module-app">
-        const App = {
-            init() {
-                const sections = JSON.parse(document.getElementById('sections-data').textContent);
-                const navContainer = document.getElementById('sidebar-nav');
-                const contentContainer = document.getElementById('content-area');
-
-                NavModule.render(sections, navContainer);
-                ContentModule.render(sections, contentContainer);
-                SearchModule.init(sections);
-            }
-        };
-
-        App.init();
-    </script>
+  <script>
+    const base = 'https://github.com/SyraDevOps/OpenBySyra';
+    const projects = [
+      {id:'colecao',category:'Plataforma',title:'OpenBySyra',subtitle:'A coleção',description:'O ponto de entrada de todos os projetos: instruções de instalação, índice, estrutura dos arquivos e links para cada módulo.',files:['README.md','LICENSE.md'],url:`${base}`},
+      {id:'visage',category:'Visão computacional',title:'SyraVisage',subtitle:'Coordenadas faciais',description:'Captura landmarks do rosto em tempo real pela câmera, retornando coordenadas normalizadas e em pixels, caixa delimitadora e pontos-chave de olhos, nariz e boca.',files:['Scripts/SyraVisage.js','Scripts/demo-syravisage.html','mds/SyraVisage.md'],url:`${base}/tree/main/Scripts`},
+      {id:'iris',category:'Visão computacional',title:'SyraIris',subtitle:'Rastreamento de íris',description:'Mede e disponibiliza pontos da íris e dos olhos, com métricas de abertura ocular e direção média do olhar para experiências baseadas em eye tracking.',files:['Scripts/SyraIris.js','Scripts/demo-syrairis.html','mds/SyraIris.md'],url:`${base}/tree/main/Scripts`},
+      {id:'hands',category:'Visão computacional',title:'SyraVisionHands',subtitle:'Mãos e gestos',description:'Detecta até duas mãos, entrega os 21 landmarks de cada uma e calcula a distância entre polegar e indicador para interações por gesto.',files:['Scripts/SyraVisionHands.js','Scripts/demo-syravisionhands.html','mds/SyraVisionHands.md'],url:`${base}/tree/main/Scripts`},
+      {id:'echo',category:'Voz',title:'SyraEcho',subtitle:'Voz para texto',description:'Reconhecimento de fala contínuo com demonstrações em português e inglês, palavras-chave e visualização de áudio em tempo real.',files:['Scripts/SyraEcho.js','Scripts/demo-syraecho-pt.html','Scripts/demo-syraecho-en.html','mds/SyraEcho.md'],url:`${base}/tree/main/Scripts`},
+      {id:'bridge',category:'Hardware',title:'Open-Bridge-Syra',subtitle:'Nó ESP8266',description:'Firmware para um nó local de comunicação: configuração Wi-Fi, mDNS, dispositivos conectados, ponte de mensagens e interface web.',files:['Firmware/Open-Bridge-Syra.ino','Firmware/Open-Bridge-Syra.md'],url:`${base}/tree/main/Firmware`},
+      {id:'sky',category:'Astronomia',title:'SkyMonitor',subtitle:'Observação do céu',description:'Aplicação Python que processa RTSP, webcam, vídeos ou imagens para acompanhar estrelas, meteoros, nuvens e triangulações no céu.',files:['Scripts/SkyMonitor.py','Scripts/requirements.txt','mds/SkyMonitor.md'],url:`${base}/tree/main/Scripts`},
+      {id:'mkt',category:'Comunidade',title:'Materiais de divulgação',subtitle:'Identidade OpenBySyra',description:'Artes SVG/PNG e legendas de postagem para apresentar cada ferramenta de forma clara, visual e consistente.',files:['Mkt/*.svg','Mkt/*.png','Mkt/Instagram_*.md'],url:`${base}/tree/main/Mkt`}
+    ];
+    const groups = [...new Set(projects.map(p=>p.category))];
+    document.querySelector('#nav').innerHTML = groups.map(group => `<div><p class="text-[10px] uppercase tracking-widest font-bold text-zinc-400 mb-2">${group}</p>${projects.filter(p=>p.category===group).map(p=>`<a class="block text-sm text-zinc-600 hover:text-black hover:translate-x-1 transition" href="#${p.id}">${p.title}</a>`).join('')}</div>`).join('');
+    const render = list => document.querySelector('#projects').innerHTML = list.length ? list.map(p => `<article id="${p.id}" class="project-card scroll-mt-24 border-l-2 border-zinc-300 pl-6 py-1"><p class="text-[10px] uppercase tracking-[.18em] text-zinc-400">${p.category} · ${p.subtitle}</p><h3 class="text-2xl font-bold tracking-tight mt-1">${p.title}</h3><p class="text-sm leading-relaxed text-zinc-600 mt-3">${p.description}</p><div class="mt-4 flex flex-wrap gap-2">${p.files.map(file=>`<span class="font-mono text-[10px] bg-zinc-200 text-zinc-600 px-2 py-1">${file}</span>`).join('')}</div><a href="${p.url}" target="_blank" rel="noopener" class="inline-flex mt-5 text-xs font-bold uppercase tracking-widest border-b border-black pb-1 hover:text-zinc-500 hover:border-zinc-500">Ver arquivos no GitHub ↗</a></article>`).join('') : '<p class="text-zinc-500 italic">Nenhum projeto encontrado.</p>';
+    render(projects);
+    document.querySelector('#search').addEventListener('input', e => { const query=e.target.value.toLowerCase().trim(); render(projects.filter(p=>!query || `${p.title} ${p.category} ${p.subtitle} ${p.description} ${p.files.join(' ')}`.toLowerCase().includes(query))); });
+  </script>
 </body>
 </html>
