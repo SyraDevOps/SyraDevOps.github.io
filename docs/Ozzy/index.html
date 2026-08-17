@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#6d28d9"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/ozzy.svg" type="image/svg+xml">
+<meta name="color-scheme" content="light">
+<title>Ozzy — entrar</title>
+<style>
+:root{--ink:#11110f;--muted:#74746d;--line:#e2e2dc;--violet:#6d28d9;--violet2:#ede9fe;--bg:#f7f7f5}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 8% 5%,#eee8ff 0,transparent 30%),radial-gradient(circle at 100% 90%,#e9e4ff 0,transparent 34%),var(--bg);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}.wrap{width:min(1120px,92vw);min-height:100vh;margin:auto;display:grid;grid-template-columns:1.05fr .95fr;gap:46px;align-items:center;padding:38px 0}.brand{max-width:560px}.eyebrow{color:var(--violet);font-size:11px;font-weight:900;letter-spacing:.15em}.wordmark{color:var(--violet);font-size:48px;font-weight:900;letter-spacing:-.1em;line-height:.9;margin-bottom:25px}.wordmark span{font-style:italic}h1{font-size:clamp(44px,6vw,76px);line-height:.93;letter-spacing:-.07em;margin:0}.brand p{max-width:445px;color:var(--muted);font-size:17px;line-height:1.6;margin:22px 0}.feature{display:flex;gap:12px;align-items:center;margin-top:13px;color:#33332e;font-size:14px}.dot{height:10px;width:10px;border-radius:50%;background:var(--violet)}.card{background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:0 25px 70px rgba(25,18,50,.09)}.tabs{display:grid;grid-template-columns:1fr 1fr;background:#f2f2ef;border-radius:13px;padding:4px;margin-bottom:22px}.tabs button{border:0;background:transparent;border-radius:9px;padding:10px;color:var(--muted);font-weight:800;cursor:pointer}.tabs button.active{color:#fff;background:var(--ink)}h2{margin:0;font-size:26px;letter-spacing:-.04em}.sub{margin:8px 0 21px;color:var(--muted);font-size:14px}.form{display:grid;gap:12px}.signupOnly{display:grid;gap:12px}.hide{display:none!important}.field{display:grid;gap:6px}.field label{font-size:12px;font-weight:750;color:#4d4d46}.field input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;color:var(--ink);outline:none;font:inherit;background:#fff}.field input:focus{border-color:var(--violet);box-shadow:0 0 0 3px var(--violet2)}.primary,.google{width:100%;padding:13px;border-radius:11px;font:inherit;font-weight:800;cursor:pointer}.primary{border:1px solid var(--ink);background:var(--ink);color:white}.google{border:1px solid var(--line);background:#fff;color:var(--ink);display:flex;justify-content:center;gap:10px;align-items:center}.google b{font-size:18px;color:#4285f4}.divider{display:flex;gap:10px;align-items:center;color:var(--muted);font-size:11px;margin:2px 0}.divider:before,.divider:after{content:"";height:1px;background:var(--line);flex:1}.status{min-height:19px;font-size:13px;color:#b42318;margin:14px 0 0}.legal{font-size:11px;color:var(--muted);line-height:1.5;margin:17px 0 0}@media(max-width:780px){.wrap{grid-template-columns:1fr;gap:28px;padding:36px 0}.brand{max-width:none}.brand p{font-size:15px}.card{padding:22px}h1{font-size:52px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="brand"><div class="wordmark">Ozzy<span>.</span></div><div class="eyebrow">OZZY / CONTROL</div><h1>O seu mundo,<br>em uma olhada.</h1><p>Entre para sincronizar seu display, seus módulos e suas notas pessoais em qualquer lugar.</p><div class="feature"><span class="dot"></span>Notas criadas para caber no LCD 16×2</div><div class="feature"><span class="dot"></span>Dados e configurações por conta</div><div class="feature"><span class="dot"></span>Ozzy Link pronto para o seu display</div></section>
+  <section class="card">
+    <div class="tabs"><button id="loginTab" class="active">Entrar</button><button id="signupTab">Criar conta</button></div>
+    <h2 id="formTitle">Bem-vindo de volta.</h2><p id="formSub" class="sub">Entre para abrir o seu Ozzy Control.</p>
+    <form id="authForm" class="form">
+      <div id="signupFields" class="signupOnly hide"><div class="field"><label>Nome de usuário</label><input id="username" maxlength="28" placeholder="Como o Ozzy chama você?"></div><div class="field"><label>Data de nascimento</label><input id="birthDate" type="date"></div></div>
+      <div class="field"><label>E-mail</label><input id="email" type="email" autocomplete="email" required placeholder="voce@email.com"></div>
+      <div class="field"><label>Senha</label><input id="password" type="password" autocomplete="current-password" minlength="6" required placeholder="Mínimo de 6 caracteres"></div>
+      <button id="submitAuth" class="primary" type="submit">Entrar</button>
+    </form>
+    <div class="divider">ou</div><button id="googleAuth" class="google" type="button"><b>G</b> Continuar com Google</button>
+    <div id="status" class="status" role="status"></div><p class="legal">Ao continuar, você cria um espaço pessoal no Ozzy. O acesso aos dados será protegido pelas regras do Firestore do projeto.</p>
+  </section>
+</main>
+<script type="module">
+import {initializeApp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+import {getAuth,onAuthStateChanged,createUserWithEmailAndPassword,signInWithEmailAndPassword,GoogleAuthProvider,signInWithPopup,updateProfile} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+import {getFirestore,doc,getDoc,setDoc,serverTimestamp} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+const firebaseConfig={apiKey:"AIzaSyAguVXfdMjv_qCBz7NXp_NcTEpk1Z--eK4",authDomain:"ozzy-96249.firebaseapp.com",projectId:"ozzy-96249",storageBucket:"ozzy-96249.firebasestorage.app",messagingSenderId:"11444217680",appId:"1:11444217680:web:f4afef4e53bf5c09c0ee55"};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);let mode="login",ready=false;
+onAuthStateChanged(auth,user=>{if(ready&&user)location.replace("main.html");ready=true});
+function setMode(next){mode=next;const signup=mode==="signup";$("loginTab").classList.toggle("active",!signup);$("signupTab").classList.toggle("active",signup);$("signupFields").classList.toggle("hide",!signup);$("formTitle").textContent=signup?"Crie seu Ozzy.":"Bem-vindo de volta.";$("formSub").textContent=signup?"Seu perfil e suas notas estarão sempre com você.":"Entre para abrir o seu Ozzy Control.";$("submitAuth").textContent=signup?"Criar conta":"Entrar";$("password").autocomplete=signup?"new-password":"current-password";$("status").textContent=""}
+$("loginTab").onclick=()=>setMode("login");$("signupTab").onclick=()=>setMode("signup");
+function profileInput(){const username=$("username").value.trim(),birthDate=$("birthDate").value;if(!username||!birthDate)throw new Error("Informe nome de usuário e data de nascimento.");return{username,birthDate}}
+async function writeProfile(user,data={}){await setDoc(doc(db,"users",user.uid),{email:user.email||"",username:data.username||user.displayName||"",birthDate:data.birthDate||"",provider:user.providerData?.[0]?.providerId||"password",createdAt:serverTimestamp(),updatedAt:serverTimestamp()},{merge:true})}
+function showError(e){const map={"auth/invalid-credential":"E-mail ou senha incorretos.","auth/email-already-in-use":"Este e-mail já está em uso.","auth/weak-password":"A senha precisa ter ao menos 6 caracteres.","auth/popup-closed-by-user":"A janela do Google foi fechada."};$("status").textContent=map[e.code]||e.message||"Não foi possível continuar."}
+$("authForm").onsubmit=async e=>{e.preventDefault();$("status").textContent="";try{const email=$("email").value.trim(),password=$("password").value;if(mode==="signup"){const data=profileInput(),cred=await createUserWithEmailAndPassword(auth,email,password);await updateProfile(cred.user,{displayName:data.username});await writeProfile(cred.user,data)}else await signInWithEmailAndPassword(auth,email,password)}catch(err){showError(err)}};
+$("googleAuth").onclick=async()=>{if(mode!=="signup"){setMode("signup");$("status").textContent="Para criar sua conta Google, informe nome e data de nascimento.";return}try{const data=profileInput(),cred=await signInWithPopup(auth,new GoogleAuthProvider()),ref=doc(db,"users",cred.user.uid),snap=await getDoc(ref);if(!snap.exists()){await updateProfile(cred.user,{displayName:data.username});await writeProfile(cred.user,data)}}catch(err){showError(err)}};
+</script>
+<script src="pwa.js"></script>
+</body>
+</html>

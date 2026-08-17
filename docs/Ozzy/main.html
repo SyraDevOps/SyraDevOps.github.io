@@ -1,0 +1,1232 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#6d28d9"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icons/ozzy.svg" type="image/svg+xml">
+<meta name="color-scheme" content="dark">
+<title>Ozzy Control</title>
+<style>
+:root{
+  --bg:#080a0e;--panel:#11151b;--panel2:#161b23;--line:#262d38;
+  --text:#f5f7fa;--muted:#8e98a8;--soft:#c3cad4;--ok:#7ee787;--bad:#ff7b72;
+  --warn:#f2cc60;--accent:#a8c7fa;--lcd:#a8ca57;--lcdText:#152007;
+  --r:22px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:
+    radial-gradient(circle at 10% 0%,rgba(93,126,190,.15),transparent 34%),
+    radial-gradient(circle at 100% 15%,rgba(116,71,156,.10),transparent 30%),
+    var(--bg);
+  color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.shell{width:min(1220px,94vw);margin:auto;padding:30px 0 55px}
+header{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:20px;margin-bottom:20px
+}
+.kicker{font-size:11px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:8px}
+h1{font-size:clamp(30px,5vw,50px);letter-spacing:-.05em;line-height:.96;margin:0}
+.lead{max-width:760px;color:var(--muted);line-height:1.55;margin:13px 0 0}
+.badge{
+  border:1px solid var(--line);background:rgba(17,21,27,.9);border-radius:999px;
+  padding:10px 13px;display:flex;gap:8px;align-items:center;font-size:13px;color:var(--soft);
+  white-space:nowrap
+}
+.dot{width:8px;height:8px;border-radius:50%;background:#697280}
+.badge.ok .dot{background:var(--ok)}
+.badge.warn .dot{background:var(--warn)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tabs button{
+  border:1px solid var(--line);background:#11151b;color:var(--muted);padding:10px 13px;border-radius:999px
+}
+.tabs button.active{background:#f5f7fa;color:#0c0f14;border-color:#f5f7fa}
+.view{display:none}.view.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.card{
+  background:linear-gradient(180deg,rgba(20,26,35,.96),rgba(13,17,23,.96));
+  border:1px solid var(--line);border-radius:var(--r);padding:18px;min-width:0;
+  box-shadow:0 18px 50px rgba(0,0,0,.20)
+}
+.span12{grid-column:span 12}.span8{grid-column:span 8}.span7{grid-column:span 7}
+.span6{grid-column:span 6}.span5{grid-column:span 5}.span4{grid-column:span 4}.span3{grid-column:span 3}
+.head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.title{font-size:15px;font-weight:750}.meta{color:var(--muted);font-size:11px}
+.label{font-size:10px;text-transform:uppercase;letter-spacing:.10em;color:var(--muted)}
+.heroCity{font-size:32px;font-weight:780;letter-spacing:-.04em;margin-top:5px}
+.heroTemp{font-size:66px;font-weight:800;letter-spacing:-.07em;line-height:.95;margin:12px 0}
+.sub{color:var(--soft)}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin-top:18px}
+.metric{border:1px solid rgba(255,255,255,.055);background:rgba(255,255,255,.024);padding:11px;border-radius:14px}
+.metric small{display:block;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.06em}
+.metric strong{display:block;margin-top:5px;font-size:17px}
+.clock{font-size:58px;font-weight:770;letter-spacing:-.06em;margin:7px 0 0}
+.rows{display:grid;gap:8px}
+.row{
+  display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:12px;padding:11px 12px;
+  border-radius:14px;border:1px solid rgba(255,255,255,.05);background:rgba(255,255,255,.025)
+}
+.asset{display:flex;gap:10px;align-items:center;min-width:0}.ico{
+  width:32px;height:32px;display:grid;place-items:center;border-radius:10px;background:#191f29;
+  border:1px solid #2a3341;font-size:10px;font-weight:800;color:#d4dbe5;flex:0 0 auto
+}
+.name{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.desc{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.value{font-variant-numeric:tabular-nums;text-align:right}.chg{min-width:62px;text-align:right;font-size:13px;font-weight:750}
+.up{color:var(--ok)}.down{color:var(--bad)}.flat{color:var(--muted)}
+.lcd{
+  background:var(--lcd);color:var(--lcdText);border-radius:18px;padding:22px 24px;
+  box-shadow:inset 0 0 35px rgba(39,62,3,.27),0 12px 40px rgba(0,0,0,.25)
+}
+.lcdLine{
+  font:800 clamp(20px,4vw,30px)/1.42 ui-monospace,SFMono-Regular,Consolas,monospace;
+  width:16ch;max-width:100%;white-space:pre;overflow:hidden
+}
+.progress{height:4px;border-radius:999px;overflow:hidden;background:#1b2029;margin-top:13px}
+.progress>div{height:100%;background:#a7bad5;width:0}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{
+  border:1px solid var(--line);background:#171c24;color:var(--text);padding:10px 13px;border-radius:12px;font-weight:680
+}
+.btn.primary{background:#f5f7fa;color:#0d1015;border-color:#f5f7fa}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.settingsGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.switch{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);
+  background:rgba(255,255,255,.02);border-radius:14px;padding:11px 12px;color:var(--soft)
+}
+.switch input{accent-color:#cbd9ef}
+.field{display:grid;gap:6px}.field label{font-size:11px;color:var(--muted)}
+.field input,.field select{
+  width:100%;border:1px solid var(--line);background:#0c1015;color:var(--text);padding:10px 11px;border-radius:11px
+}
+.formGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.list{display:grid;gap:8px}
+.item{
+  display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px 12px;
+  border:1px solid rgba(255,255,255,.05);border-radius:13px;background:rgba(255,255,255,.02)
+}
+.itemMain{min-width:0}.itemTitle{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.itemSub{font-size:11px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pill{font-size:11px;color:var(--soft);padding:6px 8px;border-radius:999px;border:1px solid var(--line);white-space:nowrap}
+.sourceGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.source{
+  border:1px solid var(--line);padding:12px;border-radius:14px;background:rgba(255,255,255,.02)
+}
+.sourceTop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.sourceName{font-weight:700}.sourceState{font-size:11px;color:var(--muted)}
+.sourceState.ok{color:var(--ok)}.sourceState.bad{color:var(--bad)}
+.note{color:var(--muted);font-size:12px;line-height:1.55}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+.empty{color:var(--muted);font-size:13px;padding:10px 0}
+.toast{
+  position:fixed;right:18px;bottom:18px;background:#151a22;border:1px solid var(--line);color:var(--text);
+  border-radius:13px;padding:12px 14px;box-shadow:0 16px 50px rgba(0,0,0,.35);opacity:0;transform:translateY(10px);
+  pointer-events:none;transition:.2s;max-width:min(380px,90vw);z-index:20;font-size:13px
+}
+.toast.show{opacity:1;transform:none}
+@media(max-width:900px){
+  .span8,.span7,.span6,.span5,.span4{grid-column:span 12}.span3{grid-column:span 6}
+  .settingsGrid,.sourceGrid{grid-template-columns:1fr 1fr}.formGrid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:620px){
+  header{flex-direction:column}.span3{grid-column:span 12}.metrics{grid-template-columns:1fr 1fr}
+  .settingsGrid,.sourceGrid,.formGrid{grid-template-columns:1fr}.clock{font-size:48px}
+  .heroTemp{font-size:58px}
+}
+</style>
+<style>
+:root{--bg:#f7f7f5;--panel:#fff;--panel2:#f2f2ef;--line:#dfdfda;--text:#11110f;--muted:#73736d;--soft:#34342f;--ok:#147a43;--bad:#c52a22;--warn:#a96800;--accent:#6d28d9;--lcd:#d9e98b;--lcdText:#19220d;--r:18px}
+body{background:linear-gradient(180deg,#fff 0%,#f5f5f2 100%);color:var(--text)}
+.shell{width:min(1320px,94vw);padding:28px 0 64px}
+header{align-items:center;margin-bottom:24px}.kicker{color:var(--accent);font-weight:800}.lead{color:var(--muted);max-width:650px}.badge{background:#fff;border-color:var(--line);box-shadow:0 4px 18px rgba(0,0,0,.04)}
+h1{font-size:clamp(38px,5vw,62px);color:#11110f}.tabs{padding:7px;border:1px solid var(--line);background:rgba(255,255,255,.82);border-radius:16px;position:sticky;top:12px;z-index:10;box-shadow:0 8px 30px rgba(0,0,0,.05)}
+.tabs button{border:0;background:transparent;color:var(--muted);font-weight:750;padding:11px 14px}.tabs button.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:none}
+.card{background:var(--panel);border-color:var(--line);box-shadow:0 8px 28px rgba(20,20,18,.045);border-radius:var(--r)}.title{color:#171714}.label,.meta,.note{color:var(--muted)}
+.metric,.row,.item,.switch,.source{background:#fafaf8;border-color:#e8e8e2}.row{border-radius:12px}.ico{background:#f0eef8;border-color:#ded9ef;color:#4c1d95}.field input,.field select{background:#fff;color:#111;border-color:#deded8}.btn{background:#fff;color:#171714;border-color:#d8d8d1}.btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.lcd{border:1px solid #b9c979;box-shadow:inset 0 0 35px rgba(39,62,3,.18),0 10px 25px rgba(0,0,0,.08)}
+.progress{background:#e9e9e4}.progress>div{background:var(--accent)}.up{color:var(--ok)}.down{color:var(--bad)}.toast{background:#11110f;border-color:#111;color:#fff}.legacy{display:none!important}
+.profileHero{display:flex;align-items:center;gap:16px}.avatar{width:58px;height:58px;border-radius:18px;background:#11110f;color:#fff;display:grid;place-items:center;font-weight:900;font-size:20px}.pluginTag{color:#5b21b6;background:#f0eaff;border:1px solid #ddd0fb;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:750}.notesArea{min-height:190px;resize:vertical;line-height:1.55}
+.brandLogo{color:var(--accent);font-size:clamp(32px,4vw,46px);font-weight:900;letter-spacing:-.09em;line-height:.8;margin-bottom:13px}.brandLogo span{font-style:italic}.flowHint{margin:6px 0 18px;color:var(--muted);font-size:13px;line-height:1.5}.flowBoard{display:grid;grid-template-columns:1fr 1fr;gap:14px}.flowColumn{background:#fafaf8;border:1px solid var(--line);border-radius:15px;padding:12px}.flowColumnHead{display:flex;justify-content:space-between;align-items:center;margin:0 0 9px}.flowColumnHead strong{font-size:13px}.flowColumnHead small{color:var(--muted)}.dropzone{min-height:74px;display:grid;gap:7px;align-content:start;padding:2px;border-radius:11px;transition:.18s}.dropzone.dragover{background:#f0eaff;box-shadow:inset 0 0 0 2px #c4b5fd}.flowEmpty{color:var(--muted);font-size:12px;padding:13px 8px;text-align:center}.flowItem{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e5df;border-radius:11px;padding:9px 8px;cursor:grab;box-shadow:0 2px 8px rgba(17,17,15,.035)}.flowItem.dragging{opacity:.45}.flowGrip{color:#a3a39b;letter-spacing:-2px;font-size:16px;line-height:1}.flowName{flex:1;font-size:13px;font-weight:700}.flowMove{width:27px;height:27px;border:1px solid #deded8;background:#fff;border-radius:8px;color:var(--accent);font-weight:900;cursor:pointer}.presetBar{display:flex;gap:9px;flex-wrap:wrap;align-items:end;margin-top:15px;padding-top:15px;border-top:1px solid var(--line)}.presetBar .field{flex:1;min-width:150px}.presetBar input,.presetBar select{width:100%}.quickPresets{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.quickPresets button{font-size:12px}.settingsIntro{display:flex;justify-content:space-between;gap:16px;align-items:start}
+@media(max-width:620px){.tabs{top:6px}.tabs button{padding:9px 10px;font-size:12px}.profileHero{align-items:flex-start}}
+@media(max-width:720px){.shell{width:min(100% - 24px,1320px);padding-top:18px}.brandLogo{font-size:38px}.lead{font-size:14px}.tabs{overflow:auto;white-space:nowrap;display:flex}.tabs button{flex:0 0 auto}.flowBoard{grid-template-columns:1fr}.settingsIntro{display:block}.presetBar .field{flex-basis:100%}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+  <div>
+    <div class="brandLogo">Ozzy<span>.</span></div>
+    <div class="kicker">CONTROL / SEU DISPLAY</div>
+    <h1>O seu mundo,<br>em uma olhada.</h1>
+    <p class="lead">Controle elegante para o display Ozzy: dados ao vivo, plugins, automações e tudo que importa sem abrir o celular.</p>
+  </div>
+  <div id="serialBadge" class="badge"><span class="dot"></span><span id="serialStatus">Serial desconectada</span></div>
+</header>
+
+<nav class="tabs">
+  <button class="active" data-tab="home">Painel</button>
+  <button data-tab="settings">Configurações</button>
+  <button data-tab="plugins">Plugins e notas</button>
+  <button data-tab="profile">Perfil</button>
+</nav>
+
+<section id="home" class="view active">
+<div class="grid">
+  <article class="card span7">
+    <div class="label">Agora em</div>
+    <div id="city" class="heroCity">Localizando…</div>
+    <div id="condition" class="sub">Obtendo clima</div>
+    <div id="temperature" class="heroTemp">--°</div>
+    <div class="metrics">
+      <div class="metric"><small>Sensação</small><strong id="feels">--°C</strong></div>
+      <div class="metric"><small>Umidade</small><strong id="humidity">--%</strong></div>
+      <div class="metric"><small>Chuva</small><strong id="rain">--%</strong></div>
+      <div class="metric"><small>Vento</small><strong id="wind">-- km/h</strong></div>
+    </div>
+  </article>
+
+  <article class="card span5">
+    <div class="label">Horário de Brasília</div>
+    <div id="clock" class="clock">--:--</div>
+    <div id="date" class="sub">--</div>
+    <hr>
+    <div class="metrics" style="grid-template-columns:1fr 1fr;margin-top:0">
+      <div class="metric"><small>Hoje</small><strong id="minmax">-- / --</strong></div>
+      <div class="metric"><small>Pressão</small><strong id="pressure">-- hPa</strong></div>
+      <div class="metric"><small>UV</small><strong id="uv">--</strong></div>
+      <div class="metric"><small>AQI</small><strong id="aqi">--</strong></div>
+    </div>
+  </article>
+
+  <article class="card span6">
+    <div class="head"><div class="title">Moedas → Real</div><div id="fxUpdated" class="meta">aguardando</div></div>
+    <div id="fxRows" class="rows"></div>
+  </article>
+
+  <article class="card span6">
+    <div class="head"><div class="title">Cripto · últimas 24h</div><div id="cryptoUpdated" class="meta">aguardando</div></div>
+    <div id="cryptoRows" class="rows"></div>
+  </article>
+
+  <article class="card span8">
+    <div class="head"><div class="title">LCD 16×2 · carrossel</div><div id="screenCounter" class="meta">1 / 1</div></div>
+    <div class="lcd">
+      <div id="lcd1" class="lcdLine">OZZY            </div>
+      <div id="lcd2" class="lcdLine">Carregando...   </div>
+    </div>
+    <div class="progress"><div id="progress"></div></div>
+    <div style="display:flex;justify-content:space-between;gap:12px;margin-top:10px">
+      <span id="screenName" class="meta">Inicialização</span>
+      <span id="rotationLabel" class="meta">4,5 s</span>
+    </div>
+  </article>
+
+  <article class="card span4">
+    <div class="head"><div class="title">Controle rápido</div><div class="meta">Web Serial</div></div>
+    <div class="actions">
+      <button id="connect" class="btn primary">Conectar Serial</button>
+      <button id="refresh" class="btn">Atualizar tudo</button>
+      <button id="prev" class="btn">←</button>
+      <button id="next" class="btn">→</button>
+    </div>
+    <p id="statusText" class="note">A página tenta reabrir automaticamente uma porta já autorizada. Na primeira vez, use “Conectar Serial”.</p>
+  </article>
+
+  <article class="card span6">
+    <div class="head"><div class="title">Próximo feriado</div><div class="meta">Brasil</div></div>
+    <div id="holidayMain" style="font-size:25px;font-weight:760">Carregando…</div>
+    <div id="holidaySub" class="sub" style="margin-top:6px">--</div>
+  </article>
+
+  <article class="card span6">
+    <div class="head"><div class="title">Destaque de hoje</div><div class="meta">TV / streaming</div></div>
+    <div id="highlightMain" style="font-size:25px;font-weight:760">Carregando…</div>
+    <div id="highlightSub" class="sub" style="margin-top:6px">--</div>
+  </article>
+
+  <article class="card span6">
+    <div class="head"><div class="title">Alertas, conforto e saúde</div><div id="alertCount" class="meta">analisando</div></div>
+    <div id="alertList" class="list"><div class="empty">Analisando condições locais…</div></div>
+  </article>
+
+  <article class="card span3">
+    <div class="head"><div class="title">Lua e noite</div><div class="meta">local</div></div>
+    <div id="moonMain" style="font-size:19px;font-weight:760">Carregando…</div>
+    <div id="moonSub" class="sub" style="margin-top:6px">--</div>
+  </article>
+
+  <article class="card span3">
+    <div class="head"><div class="title">Economia Brasil</div><div class="meta">BCB</div></div>
+    <div id="economyRows" class="rows"><div class="empty">Carregando…</div></div>
+  </article>
+</div>
+</section>
+
+<section id="plugins" class="view">
+<div class="grid">
+  <article class="card span12">
+    <div class="head"><div class="title">Plugins Ozzy</div><div class="pluginTag">MODULAR</div></div>
+    <p class="note">Ative ou desative cada experiência em Configurações. O display recebe somente os módulos escolhidos no seu carrossel.</p>
+  </article>
+  <article class="card span4"><div class="label">Em construção</div><div class="title" style="font-size:20px;margin-top:7px">Pulse</div><p class="note">Esporte, tendências, música, games, animes e filmes chegam como plugins do Ozzy.</p></article>
+  <article class="card span4"><div class="label">Em construção</div><div class="title" style="font-size:20px;margin-top:7px">Essenciais+</div><p class="note">Novos packs de clima, economia, mobilidade e informação local.</p></article>
+  <article class="card span4"><div class="label">Em construção</div><div class="title" style="font-size:20px;margin-top:7px">Ozzy Link</div><p class="note">Experiências conectadas e automações para o seu display.</p></article>
+  <article class="card span7">
+    <div class="head"><div class="title">Notas para o LCD</div><div class="meta">2 linhas · até 16 caracteres</div></div>
+    <div class="formGrid"><div class="field"><label>Linha superior</label><input id="noteLine1" maxlength="16" placeholder="Ex.: LIGAR PARA ANA"><small id="noteCount1" class="meta">0 / 16</small></div><div class="field"><label>Linha inferior</label><input id="noteLine2" maxlength="16" placeholder="Ex.: AS 19:30"><small id="noteCount2" class="meta">0 / 16</small></div></div>
+    <label class="switch" style="margin-top:12px"><span>Exibir esta nota no carrossel LCD</span><input id="noteShowLcd" type="checkbox" checked></label>
+    <div class="actions" style="margin-top:12px"><button id="saveNote" class="btn primary">Adicionar nota</button><button id="cancelNoteEdit" class="btn" hidden>Cancelar edição</button></div>
+    <div id="notesList" class="list" style="margin-top:14px"><div class="empty">Entre na sua conta para carregar suas notas.</div></div>
+  </article>
+  <article class="card span5">
+    <div class="head"><div class="title">Saúde das fontes</div><div class="meta">atualização ao vivo</div></div>
+    <div id="sourceGrid" class="sourceGrid"></div>
+  </article>
+</div>
+</section>
+
+<section id="profile" class="view">
+<div class="grid">
+  <article class="card span7">
+    <div class="head"><div class="title">Seu perfil</div><div class="meta">Ozzy Control</div></div>
+    <div class="profileHero"><div id="profileAvatar" class="avatar">OZ</div><div><div id="profileHeading" class="title" style="font-size:22px">Meu Ozzy</div><div class="note">Personalize a experiência do seu display.</div></div></div>
+    <hr>
+    <div class="formGrid"><div class="field"><label>Nome de usuário</label><input id="profileName" maxlength="28" placeholder="Ex.: Kayque"></div><div class="field"><label>Cidade principal</label><input id="profileCity" maxlength="40" placeholder="Ex.: Poços de Caldas"></div></div>
+    <div class="actions" style="margin-top:14px"><button id="saveProfile" class="btn primary">Salvar perfil</button></div>
+  </article>
+  <article class="card span5">
+    <div class="head"><div class="title">Conta e sincronização</div><div class="pill">FIREBASE</div></div>
+    <div class="item"><div class="itemMain"><div id="accountEmail" class="itemTitle">Carregando conta…</div><div id="accountBirth" class="itemSub">Sincronização segura do perfil.</div></div><span class="pill">ONLINE</span></div>
+    <div class="actions" style="margin-top:14px"><button id="signOut" class="btn">Sair da conta</button></div>
+  </article>
+</div>
+</section>
+
+<section id="pulse" class="view legacy">
+<div class="grid">
+  <article class="card span12">
+    <div class="head"><div class="title">Ozzy Pulse</div><div class="meta">o que está acontecendo agora</div></div>
+    <p class="note">Fontes públicas de cultura e esporte. Os módulos marcados como beta têm fallback isolado: se uma fonte mudar ou bloquear CORS, o restante do Hub continua funcionando.</p>
+  </article>
+  <article class="card span6"><div class="head"><div class="title">Futebol hoje</div><div id="sportsMeta" class="meta">TheSportsDB</div></div><div id="sportsList" class="list"><div class="empty">Carregando partidas…</div></div></article>
+  <article class="card span6"><div class="head"><div class="title">Assuntos em alta · Brasil</div><div id="trendsMeta" class="meta">beta</div></div><div id="trendsList" class="list"><div class="empty">Carregando trends…</div></div></article>
+  <article class="card span4"><div class="head"><div class="title">Top música Brasil</div><div class="meta">Apple</div></div><div id="musicList" class="list"><div class="empty">Carregando…</div></div></article>
+  <article class="card span4"><div class="head"><div class="title">Games em oferta</div><div class="meta">Steam · beta</div></div><div id="gamesList" class="list"><div class="empty">Carregando…</div></div></article>
+  <article class="card span4"><div class="head"><div class="title">Anime em alta</div><div class="meta">Jikan</div></div><div id="animeList" class="list"><div class="empty">Carregando…</div></div></article>
+  <article class="card span12"><div class="head"><div class="title">Filmes em alta</div><div class="meta">Apple / iTunes · beta</div></div><div id="moviesList" class="list"><div class="empty">Carregando…</div></div></article>
+</div>
+</section>
+
+<section id="ent" class="view legacy">
+<div class="grid">
+  <article class="card span12">
+    <div class="head"><div class="title">Entretenimento</div><div class="meta">TVmaze</div></div>
+    <div class="formGrid">
+      <div class="field"><label>País da TV</label>
+        <select id="tvCountry"><option value="BR">Brasil</option><option value="US">Estados Unidos</option><option value="GB">Reino Unido</option></select>
+      </div>
+      <div class="field"><label>Canal / emissora</label><select id="networkFilter"><option value="">Todos</option></select></div>
+      <div class="field"><label>Streaming / plataforma</label><select id="streamFilter"><option value="">Todos</option></select></div>
+    </div>
+  </article>
+
+  <article class="card span6">
+    <div class="head"><div class="title">Programação de TV hoje</div><div id="tvCount" class="meta">0 itens</div></div>
+    <div id="tvList" class="list"><div class="empty">Carregando programação…</div></div>
+  </article>
+
+  <article class="card span6">
+    <div class="head"><div class="title">Streaming hoje</div><div id="streamCount" class="meta">0 itens</div></div>
+    <div id="streamList" class="list"><div class="empty">Carregando lançamentos…</div></div>
+  </article>
+
+  <article class="card span6">
+    <div class="head"><div class="title">Destaques de hoje</div><div class="meta">ordenado por avaliação</div></div>
+    <div id="highlightsList" class="list"><div class="empty">Carregando destaques…</div></div>
+  </article>
+
+  <article class="card span6">
+    <div class="head"><div class="title">Séries favoritas</div><div class="meta">salvas neste navegador</div></div>
+    <div class="formGrid" style="grid-template-columns:1fr auto">
+      <div class="field"><label>Buscar série</label><input id="showSearch" placeholder="Ex.: The Boys"></div>
+      <div class="field"><label>&nbsp;</label><button id="searchShowBtn" class="btn primary">Buscar</button></div>
+    </div>
+    <div id="searchResults" class="list" style="margin-top:10px"></div>
+    <hr>
+    <div id="favoritesList" class="list"><div class="empty">Nenhuma série favorita ainda.</div></div>
+  </article>
+</div>
+</section>
+
+<section id="fipe" class="view legacy">
+<div class="grid">
+  <article class="card span12">
+    <div class="head"><div class="title">Tabela FIPE</div><div id="fipeState" class="meta">BrasilAPI</div></div>
+    <p class="note">Selecione o tipo, marca e modelo. O veículo escolhido pode entrar no carrossel do LCD. Se a fonte FIPE estiver temporariamente indisponível, o restante do painel continua funcionando.</p>
+    <div class="formGrid">
+      <div class="field"><label>Tipo</label>
+        <select id="vehicleType"><option value="carros">Carro</option><option value="motos">Moto</option><option value="caminhoes">Caminhão</option></select>
+      </div>
+      <div class="field"><label>Marca</label><select id="vehicleBrand"><option value="">Carregando…</option></select></div>
+      <div class="field"><label>Modelo</label><select id="vehicleModel"><option value="">Selecione a marca</option></select></div>
+    </div>
+    <div id="fipeResult" style="margin-top:16px"></div>
+  </article>
+</div>
+</section>
+
+<section id="settings" class="view">
+<div class="grid">
+  <article class="card span8">
+    <div class="settingsIntro"><div><div class="head"><div class="title">Fluxo do carrossel</div><div class="meta">arraste para organizar</div></div><p class="flowHint">Arraste os cartões entre o carrossel e a biblioteca. A ordem à esquerda é exatamente a ordem enviada ao LCD.</p></div><div class="pluginTag">SEU FLUXO</div></div>
+    <div class="flowBoard"><div class="flowColumn"><div class="flowColumnHead"><strong>No carrossel</strong><small id="activeFlowCount">0 ativos</small></div><div id="activeFlow" class="dropzone"></div></div><div class="flowColumn"><div class="flowColumnHead"><strong>Biblioteca</strong><small>arraste para ativar</small></div><div id="availableFlow" class="dropzone"></div></div></div>
+    <div id="moduleSettings" hidden></div>
+    <div class="quickPresets"><button class="btn" data-quick-preset="essential">Essenciais</button><button class="btn" data-quick-preset="pulse">Pulse</button><button class="btn" data-quick-preset="focus">Foco</button></div>
+    <div class="presetBar"><div class="field"><label>Preset salvo</label><select id="presetSelect"><option value="">Selecione um preset</option></select></div><div class="field"><label>Novo preset</label><input id="presetName" maxlength="24" placeholder="Ex.: Minha manhã"></div><button id="savePreset" class="btn primary">Salvar</button><button id="applyPreset" class="btn">Aplicar</button><button id="deletePreset" class="btn">Apagar</button></div>
+  </article>
+  <article class="card span4">
+    <div class="head"><div class="title">Comportamento</div><div class="meta">LCD</div></div>
+    <div class="field"><label>Tempo por tela</label>
+      <select id="speed"><option value="3000">3 segundos</option><option value="4500">4,5 segundos</option><option value="6000">6 segundos</option><option value="8000">8 segundos</option></select>
+    </div>
+    <div class="field" style="margin-top:10px"><label>Aplicar limite a todas as fontes</label>
+      <input id="entLimit" type="number" min="1" step="1" inputmode="numeric" value="1">
+    </div>
+    <div class="field" style="margin-top:10px"><label>Exibição de cripto</label>
+      <select id="cryptoMode"><option value="grouped">Agrupadas</option><option value="individual">Separadas</option></select>
+    </div>
+    <hr>
+    <button id="resetSettings" class="btn">Restaurar padrão</button>
+  </article>
+  <article class="card span12">
+    <div class="head"><div class="title">Cripto · atualização independente</div><div class="meta">cada ativo consulta no seu próprio intervalo</div></div>
+    <div id="cryptoIntervals" class="formGrid"></div>
+  </article>
+  <article class="card span12">
+    <div class="head"><div class="title">Densidade das fontes</div><div class="meta">quantos itens entram por volta</div></div>
+    <p class="note" style="margin-top:0">Escolha quanto cada assunto ocupa no carrossel. “1” mantém o Ozzy mais direto; números maiores mostram mais animes, promoções, partidas ou lançamentos antes de repetir.</p>
+    <div id="sourceLimits" class="formGrid"></div>
+  </article>
+</div>
+</section>
+
+<section id="sources" class="view legacy">
+<div class="grid">
+  <article class="card span12">
+    <div class="head"><div class="title">Saúde das fontes</div><div class="meta">falhas isoladas</div></div>
+    <div id="sourceGridLegacy" class="sourceGrid"></div>
+    <p class="note" style="margin-top:14px">Cada integração tem tratamento de erro próprio e cache local. Uma fonte indisponível não impede Serial, relógio nem os demais módulos.</p>
+  </article>
+</div>
+</section>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAguVXfdMjv_qCBz7NXp_NcTEpk1Z--eK4",
+    authDomain: "ozzy-96249.firebaseapp.com",
+    projectId: "ozzy-96249",
+    storageBucket: "ozzy-96249.firebasestorage.app",
+    messagingSenderId: "11444217680",
+    appId: "1:11444217680:web:f4afef4e53bf5c09c0ee55"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  window.ozzyFirebaseApp = app;
+  window.ozzyServices = {auth,db,doc,getDoc,setDoc,collection,onSnapshot,addDoc,updateDoc,deleteDoc,serverTimestamp,signOut};
+
+  onAuthStateChanged(auth, async user=>{
+    if(!user){location.replace("index.html");return}
+    const userRef=doc(db,"users",user.uid);
+    let data={};
+    try{const snap=await getDoc(userRef);data=snap.exists()?snap.data():{};if(!snap.exists())await setDoc(userRef,{email:user.email||"",username:user.displayName||"",createdAt:serverTimestamp()},{merge:true})}catch(e){console.warn("Perfil indisponível",e)}
+    window.ozzyUser=user;window.ozzyProfile=data;
+    window.dispatchEvent(new CustomEvent("ozzy-auth-ready",{detail:{user,data}}));
+    onSnapshot(collection(db,"users",user.uid,"notes"),snap=>{
+      window.ozzyNotes=snap.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0));
+      window.dispatchEvent(new Event("ozzy-notes-updated"));
+    },e=>console.warn("Notas indisponíveis",e));
+    onSnapshot(collection(db,"users",user.uid,"presets"),snap=>{
+      window.ozzyPresets=snap.docs.map(x=>({id:x.id,...x.data()})).sort((a,b)=>(b.updatedAt?.seconds||0)-(a.updatedAt?.seconds||0));
+      window.dispatchEvent(new Event("ozzy-presets-updated"));
+    },e=>console.warn("Presets indisponíveis",e));
+  });
+</script>
+
+<script>
+const API={
+  weather:"https://api.open-meteo.com/v1/forecast",
+  air:"https://air-quality-api.open-meteo.com/v1/air-quality",
+  fx:"https://api.frankfurter.dev/v1",
+  crypto:"https://data-api.binance.vision/api/v3/ticker/24hr",
+  sports:"https://www.thesportsdb.com/api/v1/json/123",
+  espn:"https://site.api.espn.com/apis/site/v2/sports/soccer",
+  trends:"https://trends.google.com/trending/rss?geo=BR",
+  music:"https://rss.applemarketingtools.com/api/v2/br/music/most-played/10/songs.json",
+  musicFallback:"https://api.deezer.com/chart/0/tracks?limit=20",
+  games:"https://store.steampowered.com/api/featuredcategories/?cc=br&l=portuguese",
+  anime:"https://api.jikan.moe/v4/top/anime?filter=airing&limit=10",
+  movies:"https://itunes.apple.com/br/rss/topmovies/limit=10/json",
+  cors:"https://api.allorigins.win/raw?url=",
+  bcb:"https://api.bcb.gov.br/dados/serie/bcdata.sgs",
+  holidays:"https://brasilapi.com.br/api/feriados/v1",
+  fipe:"https://brasilapi.com.br/api/fipe",
+  tv:"https://api.tvmaze.com"
+};
+
+const MODULES=[
+  ["weather","Clima"],["clock","Hora"],["fx","Moedas"],["crypto","Cripto"],
+  ["alerts","Alertas"],["moon","Lua e noite"],["comfort","Conforto / saúde"],["economy","Economia BR"],
+  ["holiday","Feriado"],["air","Ar / UV"],["sun","Sol"],["tv","TV"],
+  ["stream","Streaming"],["highlight","Destaques"],["favorites","Favoritas"],
+  ["sports","Futebol"],["trends","Trends Brasil"],["music","Música"],["games","Games"],
+  ["anime","Anime"],["movies","Filmes"],["fipe","FIPE"],["notes","Notas LCD"],["system","Sistema"]
+];
+
+const DEFAULTS={
+  rotationMs:4500, entLimit:1,cryptoMode:"individual",
+  cryptoIntervals:{BTC:60000,ETH:120000,SOL:300000,BNB:600000},
+  sourceLimits:{tv:1,stream:1,favorites:1,sports:1,trends:1,music:1,games:1,anime:1,movies:1},
+  modules:Object.fromEntries(MODULES.map(([k])=>[k,true])),
+  flow:MODULES.map(([k])=>k)
+};
+
+let prefs=loadJSON("osekkai_prefs",DEFAULTS);
+prefs={...DEFAULTS,...prefs,modules:{...DEFAULTS.modules,...(prefs.modules||{})},cryptoIntervals:{...DEFAULTS.cryptoIntervals,...(prefs.cryptoIntervals||{})},sourceLimits:{...DEFAULTS.sourceLimits,...(prefs.sourceLimits||{})}};
+function normalizeFlow(){const all=MODULES.map(([k])=>k), current=Array.isArray(prefs.flow)?prefs.flow:[];prefs.flow=[...current.filter(k=>all.includes(k)),...all.filter(k=>!current.includes(k))]}
+normalizeFlow();
+if(prefs.cryptoScreenVersion!==2){prefs.cryptoMode="individual";prefs.cryptoScreenVersion=2;localStorage.setItem("osekkai_prefs",JSON.stringify(prefs))}
+let favorites=loadJSON("osekkai_favorites",[]);
+let selectedFipe=loadJSON("osekkai_fipe",null);
+let profile=loadJSON("ozzy_profile",{name:"",city:"",birthDate:"",email:""});
+
+let state={
+  lat:null,lon:null,city:"Minha cidade",weather:null,air:null,
+  fx:{USD:null,EUR:null,GBP:null,JPY:null},fxWeek:{},
+  crypto:{BTC:null,ETH:null,SOL:null,BNB:null},cryptoPrice:{BTC:null,ETH:null,SOL:null,BNB:null},cryptoUpdated:{},economy:{selic:null,cdi:null,ipca:null},holiday:null,
+  notes:[],
+  sports:[],trends:[],music:[],games:[],anime:[],movies:[],
+  tvSchedule:[],webSchedule:[],favoritesData:[],fipe:null
+};
+
+let health={};
+let port=null,writer=null,reader=null,keepReading=false,serialBuffer="",linkReady=false;
+let screenIndex=0,rotationTimer=null,progressTimer=null,progressStart=Date.now(),cryptoTimers={},sportsTimer=null;
+
+const $=id=>document.getElementById(id);
+
+function loadJSON(k,fallback){
+  try{const v=localStorage.getItem(k);return v?JSON.parse(v):structuredClone(fallback)}
+  catch{return structuredClone(fallback)}
+}
+function savePrefs(){localStorage.setItem("osekkai_prefs",JSON.stringify(prefs))}
+function saveFavorites(){localStorage.setItem("osekkai_favorites",JSON.stringify(favorites))}
+function saveFipe(){localStorage.setItem("osekkai_fipe",JSON.stringify(selectedFipe))}
+function saveProfile(){localStorage.setItem("ozzy_profile",JSON.stringify(profile))}
+function toast(msg){
+  const t=$("toast");t.textContent=msg;t.classList.add("show");
+  clearTimeout(t._to);t._to=setTimeout(()=>t.classList.remove("show"),2600);
+}
+function setHealth(name,ok,msg=""){
+  health[name]={ok,msg,time:new Date()};
+  renderSources();
+}
+async function getJSON(url,source,opts={}){
+  const ctrl=new AbortController();const timer=setTimeout(()=>ctrl.abort(),opts.timeout||12000);
+  try{
+    const r=await fetch(url,{signal:ctrl.signal,headers:opts.headers||{}});
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    const d=await r.json();setHealth(source,true,"OK");return d;
+  }catch(e){setHealth(source,false,e.name==="AbortError"?"timeout":e.message);throw e}
+  finally{clearTimeout(timer)}
+}
+async function getText(url,source,opts={}){
+  const ctrl=new AbortController(),timer=setTimeout(()=>ctrl.abort(),opts.timeout||12000);
+  try{const r=await fetch(url,{signal:ctrl.signal});if(!r.ok)throw new Error("HTTP "+r.status);const d=await r.text();setHealth(source,true,"OK");return d}
+  catch(e){setHealth(source,false,e.name==="AbortError"?"timeout":e.message);throw e}
+  finally{clearTimeout(timer)}
+}
+async function getJSONFallback(url,source,opts={}){
+  try{return await getJSON(url,source,opts)}catch{return getJSON(`${API.cors}${encodeURIComponent(url)}`,source,{...opts,timeout:16000})}
+}
+async function getTextFallback(url,source,opts={}){
+  try{return await getText(url,source,opts)}catch{return getText(`${API.cors}${encodeURIComponent(url)}`,source,{...opts,timeout:16000})}
+}
+function ascii(s){return String(s??"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\x20-\x7E]/g,"")}
+function lcdText(s){return ascii(s).substring(0,16).padEnd(16," ")}
+function pct(v,d=1){if(v==null||!isFinite(v))return "--%";return `${v>0?"+":""}${Number(v).toFixed(d)}%`}
+function money(v,d=2){if(v==null)return "R$ --";return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL",minimumFractionDigits:d,maximumFractionDigits:d})}
+function brClock(){
+  const now=new Date();
+  return{
+    time:new Intl.DateTimeFormat("pt-BR",{timeZone:"America/Sao_Paulo",hour:"2-digit",minute:"2-digit",hour12:false}).format(now),
+    date:new Intl.DateTimeFormat("pt-BR",{timeZone:"America/Sao_Paulo",weekday:"short",day:"2-digit",month:"2-digit"}).format(now).replace(".","")
+  };
+}
+function ymd(d=new Date()){return new Intl.DateTimeFormat("en-CA",{timeZone:"America/Sao_Paulo",year:"numeric",month:"2-digit",day:"2-digit"}).format(d)}
+function weatherLabel(c){
+  c=Number(c);if(c===0)return"Ceu limpo";if([1,2].includes(c))return"Poucas nuvens";if(c===3)return"Nublado";
+  if([45,48].includes(c))return"Neblina";if([51,53,55,56,57].includes(c))return"Garoa";
+  if([61,63,65,66,67].includes(c))return"Chuva";if([80,81,82].includes(c))return"Pancadas";
+  if([95,96,99].includes(c))return"Trovoada";return"Clima atual"
+}
+function aqiState(v){if(v==null)return"--";if(v<=50)return"Bom";if(v<=100)return"Moderado";if(v<=150)return"Ruim sens.";if(v<=200)return"Ruim";if(v<=300)return"Muito ruim";return"Perigoso"}
+function uvState(v){v=Number(v);if(v<3)return"Baixo";if(v<6)return"Moderado";if(v<8)return"Alto";if(v<11)return"Muito alto";return"Extremo"}
+function moonLabel(v){
+  const n=Number(v);if(!isFinite(n))return"Lua indisponível";
+  if(n<0.03||n>=0.97)return"Lua nova";if(n<0.22)return"Crescente";if(n<0.28)return"Quarto crescente";
+  if(n<0.47)return"Gibosa crescente";if(n<0.53)return"Lua cheia";if(n<0.72)return"Gibosa minguante";
+  if(n<0.78)return"Quarto minguante";return"Minguante";
+}
+function lastValue(rows){const v=Array.isArray(rows)?rows.at(-1)?.valor:null;return v==null?null:Number(String(v).replace(",","."))}
+function rate(v){return v==null||!isFinite(v)?"--":`${Number(v).toLocaleString("pt-BR",{maximumFractionDigits:2})}%`}
+function stripHtml(s){const d=document.createElement("div");d.innerHTML=s||"";return d.textContent||""}
+function daysUntil(dateStr){const a=new Date(ymd()+"T12:00:00"),b=new Date(dateStr+"T12:00:00");return Math.ceil((b-a)/86400000)}
+function setSerialStatus(text,type=""){$("serialStatus").textContent=text;$("serialBadge").className="badge"+(type?" "+type:"")}
+
+function setupTabs(){
+  document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>{
+    document.querySelectorAll(".tabs button").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active");$(b.dataset.tab).classList.add("active");
+  });
+}
+
+let draggingFlowKey=null;
+function flowKeys(active){return prefs.flow.filter(k=>(prefs.modules[k]!==false)===active)}
+function renderFlowColumn(id,keys,active){
+  const host=$(id);host.innerHTML=keys.length?keys.map(k=>{const name=MODULES.find(x=>x[0]===k)?.[1]||k;return `<div class="flowItem" draggable="true" data-flow-key="${k}"><span class="flowGrip" aria-hidden="true">⋮⋮</span><span class="flowName">${name}</span><button class="flowMove" title="${active?"Retirar do carrossel":"Adicionar ao carrossel"}" data-flow-toggle="${k}">${active?"×":"+"}</button></div>`}).join(""):`<div class="flowEmpty">Solte opções aqui</div>`;
+}
+function moveFlow(key,active,beforeKey=null){
+  prefs.modules[key]=active;prefs.flow=prefs.flow.filter(x=>x!==key);
+  const target=beforeKey?prefs.flow.indexOf(beforeKey):-1;
+  if(target>=0)prefs.flow.splice(target,0,key);else prefs.flow.push(key);
+  normalizeFlow();savePrefs();renderModuleSettings();restartRotation();
+}
+function bindFlowDrop(id,active){
+  const host=$(id);host.ondragover=e=>{e.preventDefault();host.classList.add("dragover")};host.ondragleave=()=>host.classList.remove("dragover");host.ondrop=e=>{e.preventDefault();host.classList.remove("dragover");if(!draggingFlowKey)return;const card=e.target.closest(".flowItem"),before=card?.dataset.flowKey||null;moveFlow(draggingFlowKey,active,before);draggingFlowKey=null};
+}
+function renderPresets(){
+  const select=$("presetSelect");if(!select)return;const selected=select.value;const presets=window.ozzyPresets||[];
+  select.innerHTML=`<option value="">Selecione um preset</option>`+presets.map(p=>`<option value="${p.id}">${escapeHTML(p.name||"Preset")}</option>`).join("");select.value=presets.some(p=>p.id===selected)?selected:"";
+}
+function renderModuleSettings(){
+  normalizeFlow();const active=flowKeys(true),available=flowKeys(false);renderFlowColumn("activeFlow",active,true);renderFlowColumn("availableFlow",available,false);$("activeFlowCount").textContent=`${active.length} ativos`;
+  document.querySelectorAll(".flowItem").forEach(x=>{x.ondragstart=()=>{draggingFlowKey=x.dataset.flowKey;x.classList.add("dragging")};x.ondragend=()=>x.classList.remove("dragging")});
+  document.querySelectorAll("[data-flow-toggle]").forEach(x=>x.onclick=()=>moveFlow(x.dataset.flowToggle,prefs.modules[x.dataset.flowToggle]===false));
+  bindFlowDrop("activeFlow",true);bindFlowDrop("availableFlow",false);renderPresets();
+  $("speed").value=String(prefs.rotationMs||4500);
+  $("entLimit").value=String(prefs.entLimit||1);
+  $("cryptoMode").value=prefs.cryptoMode||"grouped";
+  $("cryptoIntervals").innerHTML=["BTC","ETH","SOL","BNB"].map(k=>`<div class="field"><label>${k} · intervalo de coleta</label><select data-crypto-interval="${k}"><option value="60000">1 minuto</option><option value="120000">2 minutos</option><option value="300000">5 minutos</option><option value="600000">10 minutos</option><option value="1800000">30 minutos</option></select></div>`).join("");
+  document.querySelectorAll("[data-crypto-interval]").forEach(x=>{x.value=String(prefs.cryptoIntervals[x.dataset.cryptoInterval]||300000);x.onchange=()=>{prefs.cryptoIntervals[x.dataset.cryptoInterval]=Number(x.value);savePrefs();scheduleCryptoPolling();toast(`${x.dataset.cryptoInterval} atualizado`)}});
+  const sourceNames={tv:"Programação de TV",stream:"Streaming",favorites:"Séries favoritas",sports:"Futebol",trends:"Trends Brasil",music:"Música",games:"Games / promoções",anime:"Anime",movies:"Filmes"};
+  $("sourceLimits").innerHTML=Object.entries(sourceNames).map(([k,n])=>`<div class="field"><label>${n}</label><input data-source-limit="${k}" type="number" min="1" step="1" inputmode="numeric" value="${prefs.sourceLimits[k]===0?"":prefs.sourceLimits[k]||prefs.entLimit||1}" placeholder="Contínuo"><small class="meta">Número livre · vazio = contínuo</small></div>`).join("");
+  document.querySelectorAll("[data-source-limit]").forEach(x=>{x.onchange=()=>{const v=x.value.trim();prefs.sourceLimits[x.dataset.sourceLimit]=v===""?0:Math.max(1,Number(v)||1);savePrefs();restartRotation();toast(`${sourceNames[x.dataset.sourceLimit]}: ${v===""?"contínuo":v+" itens"}`)}});
+}
+function snapshotPrefs(){return {flow:[...prefs.flow],modules:{...prefs.modules},rotationMs:prefs.rotationMs,entLimit:prefs.entLimit,cryptoMode:prefs.cryptoMode,cryptoIntervals:{...prefs.cryptoIntervals},sourceLimits:{...prefs.sourceLimits}}}
+function applyPresetData(data){
+  if(!data)return;const next=data.prefs||data;prefs={...DEFAULTS,...snapshotPrefs(),...next,modules:{...DEFAULTS.modules,...(next.modules||{})},cryptoIntervals:{...DEFAULTS.cryptoIntervals,...(next.cryptoIntervals||{})},sourceLimits:{...DEFAULTS.sourceLimits,...(next.sourceLimits||{})},flow:Array.isArray(next.flow)?next.flow:[...prefs.flow]};normalizeFlow();savePrefs();renderModuleSettings();scheduleCryptoPolling();restartRotation();toast("Preset aplicado")
+}
+function applyQuickPreset(kind){
+  const sets={essential:["weather","clock","alerts","comfort","moon","notes"],pulse:["sports","trends","music","games","anime","movies","highlight"],focus:["clock","weather","crypto","economy","notes","system"]};
+  const enabled=sets[kind]||[];applyPresetData({flow:[...enabled,...MODULES.map(x=>x[0]).filter(k=>!enabled.includes(k))],modules:Object.fromEntries(MODULES.map(([k])=>[k,enabled.includes(k)]))});
+}
+async function saveCurrentPreset(){
+  const name=$("presetName").value.trim().slice(0,24);if(!name){toast("Dê um nome ao preset");return}const s=window.ozzyServices,u=window.ozzyUser;if(!s||!u){toast("Entre na conta para salvar presets");return}
+  try{await s.addDoc(s.collection(s.db,"users",u.uid,"presets"),{name,prefs:snapshotPrefs(),createdAt:s.serverTimestamp(),updatedAt:s.serverTimestamp()});$("presetName").value="";toast("Preset salvo na sua conta")}catch{toast("Não foi possível salvar o preset")}
+}
+async function applySelectedPreset(){const p=(window.ozzyPresets||[]).find(x=>x.id===$("presetSelect").value);if(!p){toast("Selecione um preset");return}applyPresetData(p)}
+async function deleteSelectedPreset(){const id=$("presetSelect").value,s=window.ozzyServices,u=window.ozzyUser;if(!id){toast("Selecione um preset");return}if(!confirm("Apagar este preset?"))return;try{await s.deleteDoc(s.doc(s.db,"users",u.uid,"presets",id));toast("Preset apagado")}catch{toast("Não foi possível apagar o preset")}}
+function renderProfile(){
+  if(!$("profileName"))return;
+  $("profileName").value=profile.name||"";$("profileCity").value=profile.city||"";
+  const name=profile.name?.trim()||"Meu Ozzy",initials=name.split(/\s+/).slice(0,2).map(x=>x[0]).join("").toUpperCase();
+  $("profileHeading").textContent=name;$("profileAvatar").textContent=initials||"OZ";
+  if($("accountEmail"))$("accountEmail").textContent=profile.email||window.ozzyUser?.email||"Conta Ozzy";
+  if($("accountBirth"))$("accountBirth").textContent=profile.birthDate?`Nascimento: ${profile.birthDate.split("-").reverse().join("/")}`:"Data de nascimento não informada";
+}
+let editingNoteId=null;
+function cleanNote(v){return ascii(String(v||"")).replace(/\s+/g," ").trim().slice(0,16)}
+function updateNoteCounters(){
+  if(!$("noteLine1"))return;
+  $("noteCount1").textContent=`${$("noteLine1").value.length} / 16`;
+  $("noteCount2").textContent=`${$("noteLine2").value.length} / 16`;
+}
+function clearNoteForm(){editingNoteId=null;$("noteLine1").value="";$("noteLine2").value="";$("noteShowLcd").checked=true;$("saveNote").textContent="Adicionar nota";$("cancelNoteEdit").hidden=true;updateNoteCounters()}
+function renderNotes(){
+  const host=$("notesList");if(!host)return;
+  host.innerHTML=state.notes.length?state.notes.map(n=>`<div class="item"><div class="itemMain"><div class="itemTitle">${escapeHTML(n.line1||"Nota")}</div><div class="itemSub">${escapeHTML(n.line2||"")}</div></div><div class="actions"><span class="pill">${n.showOnLcd?"LCD ON":"LCD OFF"}</span><button class="btn" data-edit-note="${n.id}">Editar</button><button class="btn" data-delete-note="${n.id}">Apagar</button></div></div>`).join(""):`<div class="empty">Nenhuma nota criada ainda.</div>`;
+  document.querySelectorAll("[data-edit-note]").forEach(b=>b.onclick=()=>{const n=state.notes.find(x=>x.id===b.dataset.editNote);if(!n)return;editingNoteId=n.id;$("noteLine1").value=n.line1||"";$("noteLine2").value=n.line2||"";$("noteShowLcd").checked=!!n.showOnLcd;$("saveNote").textContent="Salvar edição";$("cancelNoteEdit").hidden=false;updateNoteCounters()});
+  document.querySelectorAll("[data-delete-note]").forEach(b=>b.onclick=async()=>{if(!confirm("Apagar esta nota?"))return;try{const s=window.ozzyServices,u=window.ozzyUser;await s.deleteDoc(s.doc(s.db,"users",u.uid,"notes",b.dataset.deleteNote));toast("Nota apagada")}catch{toast("Não foi possível apagar a nota")}});
+}
+async function saveNote(){
+  const line1=cleanNote($("noteLine1").value),line2=cleanNote($("noteLine2").value);if(!line1&&!line2){toast("Escreva pelo menos uma linha");return}
+  const s=window.ozzyServices,u=window.ozzyUser;if(!s||!u){toast("Aguardando sua conta");return}
+  const data={line1,line2,showOnLcd:$("noteShowLcd").checked,updatedAt:s.serverTimestamp()};
+  try{if(editingNoteId)await s.updateDoc(s.doc(s.db,"users",u.uid,"notes",editingNoteId),data);else await s.addDoc(s.collection(s.db,"users",u.uid,"notes"),{...data,createdAt:s.serverTimestamp()});clearNoteForm();toast("Nota salva")}catch(e){toast("Não foi possível salvar a nota")}
+}
+function renderSources(){
+  const sources=[
+    ["Open-Meteo","weather"],["Open-Meteo Air","air"],["Banco Central do Brasil","economy"],["Frankfurter","fx"],
+    ["Binance Market Data","crypto"],["BrasilAPI Feriados","holidays"],["BrasilAPI FIPE","fipe"],
+    ["ESPN Live · TheSportsDB","sports"],["TVmaze TV","tv"],["TVmaze Streaming","stream"],["Google Trends RSS","trends"],
+    ["Apple RSS","music"],["Steam Store","games"],["Jikan Anime","anime"],["iTunes Movies","movies"],["Web Serial","serial"]
+  ];
+  $("sourceGrid").innerHTML=sources.map(([name,key])=>{
+    const h=health[key];let cls="",txt="Aguardando";
+    if(h){cls=h.ok?"ok":"bad";txt=h.ok?"Online":"Falha: "+h.msg}
+    return `<div class="source"><div class="sourceTop"><div class="sourceName">${name}</div><div class="sourceState ${cls}">${txt}</div></div></div>`;
+  }).join("");
+}
+
+function renderDashboard(){
+  const c=brClock();$("clock").textContent=c.time;$("date").textContent=c.date;$("city").textContent=state.city;
+  if(state.weather){
+    const w=state.weather;
+    $("temperature").textContent=Math.round(w.current.temperature_2m)+"°";
+    $("condition").textContent=weatherLabel(w.current.weather_code);
+    $("feels").textContent=Math.round(w.current.apparent_temperature)+"°C";
+    $("humidity").textContent=Math.round(w.current.relative_humidity_2m)+"%";
+    $("rain").textContent=Math.round(w.daily.precipitation_probability_max?.[0]??0)+"%";
+    $("wind").textContent=Math.round(w.current.wind_speed_10m)+" km/h";
+    $("pressure").textContent=Math.round(w.current.surface_pressure)+" hPa";
+    $("minmax").textContent=`${Math.round(w.daily.temperature_2m_min?.[0])}° / ${Math.round(w.daily.temperature_2m_max?.[0])}°`;
+  }
+  if(state.air){
+    $("uv").textContent=Number(state.air.current.uv_index??0).toFixed(1);
+    $("aqi").textContent=(state.air.current.us_aqi??"--")+" "+aqiState(state.air.current.us_aqi);
+  }
+  renderFX();renderCrypto();renderHoliday();renderAlerts();renderMoon();renderEconomy();renderPulse();renderEntertainment();renderFavorites();renderFipeResult();
+}
+
+function renderFX(){
+  const names={USD:"Dólar",EUR:"Euro",GBP:"Libra",JPY:"Iene"};
+  $("fxRows").innerHTML=["USD","EUR","GBP","JPY"].map(k=>`
+    <div class="row"><div class="asset"><div class="ico">${k}</div><div><div class="name">${names[k]}</div><div class="desc">1 ${k} em BRL</div></div></div>
+    <div class="value">${money(state.fx[k],k==="JPY"?4:2)}</div><div class="chg ${classChange(state.fxWeek[k])}">${state.fxWeek[k]==null?"7D --":pct(state.fxWeek[k])}</div></div>
+  `).join("");
+}
+function renderCrypto(){
+  const names={BTC:"Bitcoin",ETH:"Ethereum",SOL:"Solana",BNB:"BNB"};
+  $("cryptoRows").innerHTML=["BTC","ETH","SOL","BNB"].map(k=>`
+    <div class="row"><div class="asset"><div class="ico">${k}</div><div><div class="name">${names[k]}</div><div class="desc">variação 24h</div></div></div>
+    <div class="value">24h</div><div class="chg ${classChange(state.crypto[k])}">${pct(state.crypto[k],2)}</div></div>
+  `).join("");
+}
+function classChange(v){return v==null?"flat":v>0?"up":v<0?"down":"flat"}
+
+function getAlerts(){
+  const out=[],w=state.weather,a=state.air;
+  if(w){
+    const rain=w.minutely?.precipitation||w.minutely?.rain||[];
+    const idx=rain.findIndex((v,i)=>i>0&&Number(v)>0.1);
+    if(idx>=0){
+      const mins=idx*15,mm=Number(rain[idx]);
+      const hourlyP=w.hourly?.precipitation_probability||[];
+      const chance=hourlyP[Math.min(hourlyP.length-1,Math.floor(mins/60))];
+      out.push({kind:"rain",title:mins<=15?"Chuva muito próxima":`Chuva em ${mins} min`,sub:`${chance!=null?`${Math.round(chance)}% · `:""}${mm.toFixed(1)} mm previstos`,lcdA:mins<=15?"CHUVA AGORA":`CHUVA EM ${mins}MIN`,lcdB:`${chance!=null?`${Math.round(chance)}% | `:""}${mm.toFixed(1)}mm`});
+    }
+    const gust=Number(w.current?.wind_gusts_10m??0);
+    if(gust>=50)out.push({kind:"wind",title:"Rajadas fortes",sub:`Vento de até ${Math.round(gust)} km/h agora`,lcdA:"VENTO FORTE",lcdB:`RAJADAS ${Math.round(gust)}KM/H`});
+    const feel=Number(w.current?.apparent_temperature);
+    if(feel>=32)out.push({kind:"heat",title:"Calor intenso",sub:`Sensação térmica de ${Math.round(feel)}°C`,lcdA:"CALOR INTENSO",lcdB:`SENSACAO ${Math.round(feel)}C`});
+  }
+  if(a){
+    const uv=Number(a.current?.uv_index??0),aqi=Number(a.current?.us_aqi??0);
+    if(uv>=8)out.push({kind:"uv",title:"UV muito alto",sub:"Proteja-se do sol agora",lcdA:"UV MUITO ALTO",lcdB:"PROTEJA A PELE"});
+    else if(uv>=6)out.push({kind:"uv",title:"UV alto",sub:"Use proteção ao se expor ao sol",lcdA:"UV ALTO",lcdB:"USE PROTECAO"});
+    if(aqi>100)out.push({kind:"air",title:"Qualidade do ar baixa",sub:`AQI ${aqi} · ${aqiState(aqi)}`,lcdA:"AR NAO IDEAL",lcdB:`AQI ${aqi} ${aqiState(aqi)}`});
+  }
+  return out;
+}
+function renderAlerts(){
+  const alerts=getAlerts(),host=$("alertList");if(!host)return;
+  $("alertCount").textContent=alerts.length?`${alerts.length} alerta${alerts.length>1?"s":""}`:"Tudo certo";
+  host.innerHTML=alerts.length?alerts.slice(0,4).map(x=>itemHTML(x.title,x.sub,"ATENÇÃO")).join(""):
+    itemHTML("Condições tranquilas","Sem alerta relevante para agora","OK");
+}
+function renderMoon(){
+  const w=state.weather,phase=w?.daily?.moon_phase?.[0];
+  $("moonMain").textContent=phase==null?"Indisponível":moonLabel(phase);
+  const rise=w?.daily?.moonrise?.[0]?.slice(11,16),set=w?.daily?.moonset?.[0]?.slice(11,16);
+  $("moonSub").textContent=rise||set?`Nasce ${rise||"--:--"} · põe ${set||"--:--"}`:"Sem dados locais";
+}
+function renderEconomy(){
+  const e=state.economy;
+  $("economyRows").innerHTML=[
+    ["SELIC",rate(e.selic),"ao ano"],["CDI",rate(e.cdi),"ao dia"],["IPCA",rate(e.ipca),"12 meses"]
+  ].map(([name,value,desc])=>`<div class="row" style="grid-template-columns:1fr auto"><div class="asset"><div class="ico">${name}</div><div><div class="name">${name}</div><div class="desc">${desc}</div></div></div><div class="value">${value}</div></div>`).join("");
+}
+function renderPulse(){
+  const sport=state.sports.slice(0,6),trends=state.trends.slice(0,6),music=state.music.slice(0,5),games=state.games.slice(0,5),anime=state.anime.slice(0,5),movies=state.movies.slice(0,6);
+  if($("sportsList")){
+    $("sportsList").innerHTML=sport.length?sport.map(x=>itemHTML(`${x.home} x ${x.away}`,x.status,x.score)).join(""):`<div class="empty">Sem partidas de futebol encontradas hoje.</div>`;
+    $("sportsMeta").textContent=sport.length?`${sport.length} partidas`:"sem dados";
+    $("trendsList").innerHTML=trends.length?trends.map((x,i)=>itemHTML(x,"buscas em alta",`#${i+1}`)).join(""):`<div class="empty">Trends indisponíveis neste navegador.</div>`;
+    $("trendsMeta").textContent=trends.length?"Brasil · agora":"beta / CORS";
+    $("musicList").innerHTML=music.length?music.map((x,i)=>itemHTML(x.name,x.artist,`#${i+1}`)).join(""):`<div class="empty">Sem ranking disponível.</div>`;
+    $("gamesList").innerHTML=games.length?games.map(x=>itemHTML(x.name,x.desc,x.badge)).join(""):`<div class="empty">Ofertas indisponíveis agora.</div>`;
+    $("animeList").innerHTML=anime.length?anime.map((x,i)=>itemHTML(x.name,x.desc,`#${i+1}`)).join(""):`<div class="empty">Sem ranking disponível.</div>`;
+    $("moviesList").innerHTML=movies.length?movies.map((x,i)=>itemHTML(x.name,x.artist,`#${i+1}`)).join(""):`<div class="empty">Filmes indisponíveis neste navegador.</div>`;
+  }
+}
+
+function renderHoliday(){
+  if(!state.holiday){$("holidayMain").textContent="Indisponível";$("holidaySub").textContent="Sem dados";return}
+  const d=daysUntil(state.holiday.date);
+  $("holidayMain").textContent=state.holiday.name;
+  $("holidaySub").textContent=d===0?"É hoje":d===1?"Amanhã":`Em ${d} dias · ${state.holiday.date.split("-").reverse().join("/")}`;
+}
+function itemHTML(title,sub,pill=""){
+  return `<div class="item"><div class="itemMain"><div class="itemTitle">${escapeHTML(title)}</div><div class="itemSub">${escapeHTML(sub)}</div></div>${pill?`<span class="pill">${escapeHTML(pill)}</span>`:""}</div>`;
+}
+function escapeHTML(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+
+function networkName(ep){return ep?._embedded?.show?.network?.name||ep?._embedded?.show?.webChannel?.name||ep?._embedded?.show?.network?.country?.name||"TV"}
+function webName(ep){return ep?._embedded?.show?.webChannel?.name||"Streaming"}
+function showName(ep){return ep?._embedded?.show?.name||ep?.name||"Programa"}
+function epTime(ep){return ep.airtime||ep.airstamp?.slice(11,16)||"--:--"}
+function rating(ep){return Number(ep?._embedded?.show?.rating?.average??0)}
+
+function renderEntertainment(){
+  const tvFilter=$("networkFilter")?.value||"";
+  const streamFilter=$("streamFilter")?.value||"";
+  const tv=state.tvSchedule.filter(x=>!tvFilter||networkName(x)===tvFilter).slice(0,10);
+  const web=state.webSchedule.filter(x=>!streamFilter||webName(x)===streamFilter).slice(0,10);
+
+  if($("tvList")){
+    $("tvList").innerHTML=tv.length?tv.map(x=>itemHTML(showName(x),`${epTime(x)} · ${networkName(x)}`,x.season&&x.number?`S${x.season}E${x.number}`:"")).join(""):`<div class="empty">Sem programação encontrada para este filtro.</div>`;
+    $("tvCount").textContent=`${tv.length} exibidos`;
+  }
+  if($("streamList")){
+    $("streamList").innerHTML=web.length?web.map(x=>itemHTML(showName(x),webName(x),x.season&&x.number?`S${x.season}E${x.number}`:"")).join(""):`<div class="empty">Sem lançamentos encontrados.</div>`;
+    $("streamCount").textContent=`${web.length} exibidos`;
+  }
+
+  const highlights=[...state.webSchedule,...state.tvSchedule]
+    .filter(x=>rating(x)>0)
+    .sort((a,b)=>rating(b)-rating(a))
+    .filter((x,i,a)=>a.findIndex(y=>showName(y)===showName(x))===i)
+    .slice(0,8);
+  if($("highlightsList")){
+    $("highlightsList").innerHTML=highlights.length?highlights.map(x=>itemHTML(showName(x),`${networkName(x)} · ${epTime(x)}`,rating(x).toFixed(1))).join(""):`<div class="empty">Nenhum destaque com avaliação disponível hoje.</div>`;
+  }
+  const h=highlights[0]||state.webSchedule[0]||state.tvSchedule[0];
+  $("highlightMain").textContent=h?showName(h):"Sem destaque";
+  $("highlightSub").textContent=h?`${networkName(h)}${rating(h)?` · nota ${rating(h).toFixed(1)}`:""}`:"Nenhum item encontrado hoje";
+
+  populateFilters();
+}
+
+function populateFilters(){
+  if(!$("networkFilter"))return;
+  const cur=$("networkFilter").value;
+  const nets=[...new Set(state.tvSchedule.map(networkName))].sort();
+  $("networkFilter").innerHTML=`<option value="">Todos</option>`+nets.map(n=>`<option ${n===cur?"selected":""}>${escapeHTML(n)}</option>`).join("");
+  const curS=$("streamFilter").value;
+  const streams=[...new Set(state.webSchedule.map(webName))].sort();
+  $("streamFilter").innerHTML=`<option value="">Todos</option>`+streams.map(n=>`<option ${n===curS?"selected":""}>${escapeHTML(n)}</option>`).join("");
+}
+
+function renderFavorites(){
+  if(!$("favoritesList"))return;
+  if(!state.favoritesData.length){$("favoritesList").innerHTML=`<div class="empty">Nenhuma série favorita ainda.</div>`;return}
+  $("favoritesList").innerHTML=state.favoritesData.map(x=>{
+    const next=x.next;
+    const sub=next?`Próximo: ${next.airdate||"data indef."}${next.airtime?" "+next.airtime:""}`:"Sem próximo episódio anunciado";
+    return `<div class="item"><div class="itemMain"><div class="itemTitle">${escapeHTML(x.show.name)}</div><div class="itemSub">${escapeHTML(sub)}</div></div><button class="btn" data-remove-fav="${x.show.id}">Remover</button></div>`
+  }).join("");
+  document.querySelectorAll("[data-remove-fav]").forEach(b=>b.onclick=()=>{
+    favorites=favorites.filter(id=>id!==Number(b.dataset.removeFav));saveFavorites();fetchFavorites();
+  });
+}
+
+function renderFipeResult(){
+  if(!$("fipeResult"))return;
+  if(!state.fipe){$("fipeResult").innerHTML=`<div class="empty">Selecione um modelo FIPE.</div>`;return}
+  const f=state.fipe;
+  $("fipeResult").innerHTML=`<div class="item"><div class="itemMain"><div class="itemTitle">${escapeHTML(f.modelo||"Veículo")}</div><div class="itemSub">${escapeHTML(f.marca||"")} · ${escapeHTML(String(f.anoModelo||""))} · ${escapeHTML(f.combustivel||"")}</div></div><span class="pill">${escapeHTML(f.valor||"--")}</span></div>`;
+}
+
+function getScreens(){
+  const s=[],m=prefs.modules,c=brClock(),w=state.weather,a=state.air,lim=Number(prefs.entLimit||1);
+  const limit=key=>{const v=Number(prefs.sourceLimits?.[key]);return v===0?Infinity:Math.max(1,Number.isFinite(v)&&v>0?v:lim)};
+  const hour=Number(c.time.slice(0,2)),greet=hour<12?"BOM DIA":hour<18?"BOA TARDE":"BOA NOITE";
+  const firstName=(profile.name||"OZZY").trim().split(/\s+/)[0]||"OZZY";
+  s.push({name:"Ozzy",a:"OZZY",b:"CONTROL"});
+  s.push({name:"Boas-vindas",a:greet,b:firstName});
+  if(m.notes)state.notes.filter(n=>n.showOnLcd).forEach(n=>s.push({name:"Nota",a:n.line1||"OZZY",b:n.line2||""}));
+  const alerts=getAlerts();
+  if(m.alerts)alerts.slice(0,2).forEach(x=>s.push({name:"Alerta inteligente",a:x.lcdA,b:x.lcdB}));
+  if(m.comfort&&a){
+    const uv=Number(a.current.uv_index??0),aqi=a.current.us_aqi;
+    s.push({name:"Conforto",a:uv>=6?`UV ${uv.toFixed(1)} ${uvState(uv)}`:`UV ${uv.toFixed(1)} · tranquilo`,b:`AQI ${aqi??"--"} ${aqiState(aqi)}`});
+  }
+  if(m.moon&&w){
+    const rise=w.daily.moonrise?.[0]?.slice(11,16)||"--:--",set=w.daily.moonset?.[0]?.slice(11,16)||"--:--";
+    s.push({name:"Lua e noite",a:`LUA ${moonLabel(w.daily.moon_phase?.[0])}`,b:`Nasce ${rise} Poe ${set}`});
+  }
+  if(m.economy){
+    const e=state.economy;
+    if(e.selic!=null||e.cdi!=null)s.push({name:"Economia Brasil",a:`SELIC ${rate(e.selic)} aa`,b:`CDI ${rate(e.cdi)} ad`});
+    if(e.ipca!=null)s.push({name:"Inflação",a:"IPCA acumulado",b:`12 meses ${rate(e.ipca)}`});
+  }
+  if(m.weather){
+    s.push({name:"Clima agora",a:state.city,b:w?`${Math.round(w.current.temperature_2m)}C ${weatherLabel(w.current.weather_code)}`:"Obtendo clima"});
+    if(w){
+      s.push({name:"Sensação",a:`Umidade ${Math.round(w.current.relative_humidity_2m)}%`,b:`Sensacao ${Math.round(w.current.apparent_temperature)}C`});
+      s.push({name:"Chuva",a:`Chuva ${Math.round(w.daily.precipitation_probability_max?.[0]??0)}%`,b:`Vento ${Math.round(w.current.wind_speed_10m)} km/h`});
+    }
+  }
+  if(m.clock)s.push({name:"Hora",a:"Hora Brasilia",b:`${c.time} ${c.date}`});
+  if(m.fx){
+    if(state.fx.USD)s.push({name:"USD + EUR",a:`USD R$${Number(state.fx.USD).toFixed(2)}`,b:`EUR R$${Number(state.fx.EUR).toFixed(2)}`});
+    if(state.fx.GBP)s.push({name:"GBP + JPY",a:`GBP R$${Number(state.fx.GBP).toFixed(2)}`,b:`JPY R$${Number(state.fx.JPY).toFixed(4)}`});
+    if(state.fxWeek.USD!=null)s.push({name:"Câmbio 7 dias",a:`USD 7D ${pct(state.fxWeek.USD)}`,b:`EUR 7D ${pct(state.fxWeek.EUR)}`});
+  }
+  if(m.crypto){
+    if(prefs.cryptoMode==="individual"){
+      ["BTC","ETH","SOL","BNB"].filter(k=>state.crypto[k]!=null).forEach(k=>{
+        const raw=state.cryptoPrice[k],price=raw==null?"--":raw>=1000?`${(raw/1000).toFixed(1)}K`:(raw>=1?raw.toFixed(2):raw.toFixed(4));
+        const at=state.cryptoUpdated[k]||"--:--";
+        s.push({name:`Cripto ${k}`,a:`${k} US$ ${price}`,b:`24H ${pct(state.crypto[k],2)} ${at}`});
+      });
+    }else{
+      if(state.crypto.BTC!=null)s.push({name:"BTC + ETH",a:`BTC ${pct(state.crypto.BTC)}`,b:`ETH ${pct(state.crypto.ETH)}`});
+      if(state.crypto.SOL!=null)s.push({name:"SOL + BNB",a:`SOL ${pct(state.crypto.SOL)}`,b:`BNB ${pct(state.crypto.BNB)}`});
+    }
+  }
+  if(m.holiday&&state.holiday){
+    const d=daysUntil(state.holiday.date);
+    s.push({name:"Feriado",a:"Prox feriado",b:d===0?"Hoje":`${ascii(state.holiday.name).slice(0,9)} ${d}d`});
+  }
+  if(m.air&&a)s.push({name:"Ar + UV",a:`AQI ${a.current.us_aqi??"--"} ${aqiState(a.current.us_aqi)}`,b:`UV ${Number(a.current.uv_index??0).toFixed(1)} ${uvState(a.current.uv_index)}`});
+  if(m.sun&&w)s.push({name:"Sol",a:`Nascer ${w.daily.sunrise?.[0]?.slice(11,16)||"--:--"}`,b:`Por ${w.daily.sunset?.[0]?.slice(11,16)||"--:--"}`});
+  if(m.highlight){
+    const h=getHighlights()[0];if(h)s.push({name:"Destaque",a:"Destaque hoje",b:showName(h)});
+  }
+  if(m.tv)state.tvSchedule.slice(0,limit("tv")).forEach(x=>s.push({name:"TV hoje",a:`TV ${epTime(x)} ${networkName(x)}`,b:showName(x)}));
+  if(m.stream)state.webSchedule.slice(0,limit("stream")).forEach(x=>s.push({name:"Streaming",a:`${webName(x)} hoje`,b:showName(x)}));
+  if(m.favorites)state.favoritesData.filter(x=>x.next).slice(0,limit("favorites")).forEach(x=>s.push({name:"Favorita",a:`Prox ${x.show.name}`,b:`${x.next.airdate||""} ${x.next.airtime||""}`}));
+  if(m.sports)state.sports.slice(0,limit("sports")).forEach(x=>s.push({name:"Futebol",a:`${x.home} x ${x.away}`,b:`${x.score||x.status}`}));
+  if(m.trends)state.trends.slice(0,limit("trends")).forEach((x,i)=>s.push({name:"Trend Brasil",a:`TREND #${i+1} BR`,b:x}));
+  if(m.music)state.music.slice(0,limit("music")).forEach((x,i)=>s.push({name:"Top musica",a:`#${i+1} BR ${x.artist}`,b:x.name}));
+  if(m.games)state.games.slice(0,limit("games")).forEach(x=>s.push({name:"Game em oferta",a:x.name,b:x.badge||"Steam"}));
+  if(m.anime)state.anime.slice(0,limit("anime")).forEach((x,i)=>s.push({name:"Anime em alta",a:`#${i+1} ${x.name}`,b:x.desc}));
+  if(m.movies)state.movies.slice(0,limit("movies")).forEach((x,i)=>s.push({name:"Filmes em alta",a:`#${i+1} ${x.name}`,b:x.artist}));
+  if(m.fipe&&state.fipe)s.push({name:"FIPE",a:`FIPE ${state.fipe.marca||""}`,b:`${state.fipe.valor||"--"}`});
+  if(m.system)s.push({name:"Sistema",a:"OZZY LINK",b:linkReady?"ONLINE":"Aguardando"});
+  const moduleByScreen={"Nota":"notes","Alerta inteligente":"alerts","Conforto":"comfort","Lua e noite":"moon","Economia Brasil":"economy","Inflação":"economy","Clima agora":"weather","Sensação":"weather","Chuva":"weather","Hora":"clock","USD + EUR":"fx","GBP + JPY":"fx","Câmbio 7 dias":"fx","Feriado":"holiday","Ar + UV":"air","Sol":"sun","Destaque":"highlight","TV hoje":"tv","Streaming":"stream","Favorita":"favorites","Futebol":"sports","Trend Brasil":"trends","Top musica":"music","Game em oferta":"games","Anime em alta":"anime","Filmes em alta":"movies","FIPE":"fipe","Sistema":"system"};
+  const screenKey=x=>x.name.startsWith("Cripto")||["BTC + ETH","SOL + BNB"].includes(x.name)?"crypto":moduleByScreen[x.name]||"system";
+  const position=k=>{const i=prefs.flow.indexOf(k);return i<0?999:i};
+  const fixed=s.filter(x=>x.name==="Ozzy"||x.name==="Boas-vindas"), ordered=s.filter(x=>x.name!=="Ozzy"&&x.name!=="Boas-vindas").sort((a,b)=>position(screenKey(a))-position(screenKey(b)));
+  return [...fixed,...ordered].length?[...fixed,...ordered]:[{name:"Ozzy",a:"OZZY",b:"Sem modulos"}];
+}
+function getHighlights(){
+  return [...state.webSchedule,...state.tvSchedule].filter(x=>rating(x)>0).sort((a,b)=>rating(b)-rating(a)).filter((x,i,a)=>a.findIndex(y=>showName(y)===showName(x))===i);
+}
+async function showScreen(idx=screenIndex){
+  const screens=getScreens();screenIndex=((idx%screens.length)+screens.length)%screens.length;
+  const x=screens[screenIndex],l1=lcdText(x.a),l2=lcdText(x.b);
+  $("lcd1").textContent=l1;$("lcd2").textContent=l2;$("screenName").textContent=x.name;
+  $("screenCounter").textContent=`${screenIndex+1} / ${screens.length}`;progressStart=Date.now();
+  if(linkReady&&writer)await sendSerial(`MSG|${l1.trimEnd()}|${l2.trimEnd()}`);
+}
+function restartRotation(){
+  clearInterval(rotationTimer);screenIndex=0;showScreen(0);
+  rotationTimer=setInterval(()=>showScreen(screenIndex+1),prefs.rotationMs);
+  $("rotationLabel").textContent=(prefs.rotationMs/1000).toLocaleString("pt-BR")+" s";
+}
+function startProgress(){
+  clearInterval(progressTimer);progressTimer=setInterval(()=>{
+    $("progress").style.width=Math.min(100,((Date.now()-progressStart)%prefs.rotationMs)/prefs.rotationMs*100)+"%";
+  },100);
+}
+
+async function locate(){
+  if(!navigator.geolocation)return;
+  await new Promise(resolve=>navigator.geolocation.getCurrentPosition(async p=>{
+    state.lat=p.coords.latitude;state.lon=p.coords.longitude;
+    try{
+      const d=await getJSON(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${state.lat}&lon=${state.lon}&zoom=10&addressdetails=1&accept-language=pt-BR`,"geocode");
+      const a=d.address||{};state.city=a.city||a.town||a.municipality||a.village||a.county||"Minha cidade";
+    }catch{}
+    resolve();
+  },()=>resolve(),{timeout:12000,maximumAge:600000}));
+}
+async function fetchWeather(){
+  if(state.lat==null)return;
+  const current="temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_gusts_10m,surface_pressure";
+  const daily="temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset,moonrise,moonset,moon_phase";
+  const hourly="precipitation_probability";
+  const minutely="precipitation,rain";
+  state.weather=await getJSON(`${API.weather}?latitude=${state.lat}&longitude=${state.lon}&current=${current}&daily=${daily}&hourly=${hourly}&minutely_15=${minutely}&forecast_minutely_15=24&timezone=America%2FSao_Paulo&forecast_days=2`,"weather");
+}
+async function fetchAir(){
+  if(state.lat==null)return;
+  state.air=await getJSON(`${API.air}?latitude=${state.lat}&longitude=${state.lon}&current=us_aqi,pm2_5,uv_index&timezone=America%2FSao_Paulo`,"air");
+}
+function isoDaysAgo(n){const d=new Date();d.setDate(d.getDate()-n);return d.toISOString().slice(0,10)}
+async function fetchFX(){
+  const codes=["USD","EUR","GBP","JPY"];
+  await Promise.all(codes.map(async code=>{
+    try{
+      const d=await getJSON(`${API.fx}/latest?base=${code}&symbols=BRL`,"fx");state.fx[code]=d.rates?.BRL??state.fx[code];
+      const hist=await getJSON(`${API.fx}/${isoDaysAgo(8)}..?base=${code}&symbols=BRL`,"fx");
+      const dates=Object.keys(hist.rates||{}).sort();
+      if(dates.length>=2){
+        const first=hist.rates[dates[0]]?.BRL,last=hist.rates[dates.at(-1)]?.BRL;
+        if(first&&last)state.fxWeek[code]=(last/first-1)*100;
+      }
+    }catch{}
+  }));
+  $("fxUpdated").textContent="atualizado "+brClock().time;
+}
+async function fetchCrypto(){
+  const pairs={BTC:"BTCUSDT",ETH:"ETHUSDT",SOL:"SOLUSDT",BNB:"BNBUSDT"};
+  await Promise.all(Object.keys(pairs).map(fetchCryptoAsset));
+  $("cryptoUpdated").textContent="atualizado "+brClock().time;
+}
+async function fetchCryptoAsset(k){
+  const sym={BTC:"BTCUSDT",ETH:"ETHUSDT",SOL:"SOLUSDT",BNB:"BNBUSDT"}[k];if(!sym)return;
+  try{const d=await getJSON(`${API.crypto}?symbol=${sym}`,"crypto");state.crypto[k]=Number(d.priceChangePercent);state.cryptoPrice[k]=Number(d.lastPrice);state.cryptoUpdated[k]=brClock().time;renderCrypto();renderDashboard()}catch{}
+}
+function scheduleCryptoPolling(){
+  Object.values(cryptoTimers).forEach(clearInterval);cryptoTimers={};
+  ["BTC","ETH","SOL","BNB"].forEach(k=>{
+    const ms=Math.max(60000,Number(prefs.cryptoIntervals[k]||300000));
+    cryptoTimers[k]=setInterval(()=>fetchCryptoAsset(k),ms);
+  });
+}
+async function fetchSports(){
+  try{
+    const date=ymd().replaceAll("-",""),leagues=["bra.1","conmebol.libertadores","conmebol.sudamericana"];
+    const feeds=await Promise.all(leagues.map(l=>getJSONFallback(`${API.espn}/${l}/scoreboard?dates=${date}&limit=50`,"sports",{timeout:9000})));
+    const events=feeds.flatMap(x=>x.events||[]),seen=new Set();
+    state.sports=events.map(e=>{
+      const c=e.competitions?.[0]?.competitors||[],home=c.find(x=>x.homeAway==="home")||{},away=c.find(x=>x.homeAway==="away")||{};
+      const live=e.status?.type?.state==="in";const score=home.score!=null&&away.score!=null?`${home.score} x ${away.score}`:"";
+      return {id:e.id,home:home.team?.displayName||"Casa",away:away.team?.displayName||"Fora",score,status:live?`${e.status?.displayClock||""} AO VIVO`.trim():e.status?.type?.detail||e.date?.slice(11,16)||"Hoje",live};
+    }).filter(x=>x.home!=="Casa"&&x.away!=="Fora"&&!seen.has(x.id)&&seen.add(x.id)).sort((a,b)=>Number(b.live)-Number(a.live));
+    if(!state.sports.length)throw new Error("Sem jogos ESPN");
+  }catch{
+    try{const d=await getJSON(`${API.sports}/eventsday.php?d=${ymd()}&s=Soccer`,"sports");state.sports=(d.events||[]).map(x=>({home:x.strHomeTeam||"Casa",away:x.strAwayTeam||"Fora",score:x.intHomeScore!=null?`${x.intHomeScore} x ${x.intAwayScore??0}`:"",status:x.strStatus||x.strTime||"Hoje",live:/live|in progress/i.test(x.strStatus||"")}))}catch{state.sports=[]}
+  }
+}
+function scheduleSportsPolling(){clearInterval(sportsTimer);sportsTimer=setInterval(async()=>{await fetchSports();renderPulse();restartRotation()},60000)}
+async function fetchTrends(){
+  try{
+    const xml=await getTextFallback(API.trends,"trends",{timeout:9000}),doc=new DOMParser().parseFromString(xml,"text/xml");
+    state.trends=[...doc.querySelectorAll("item > title")].map(x=>x.textContent.trim()).filter(Boolean).slice(0,10);
+    if(!state.trends.length)throw new Error("sem itens");
+  }catch{state.trends=[]}
+}
+async function fetchMusic(){
+  try{
+    const d=await getJSONFallback(API.music,"music");state.music=(d.feed?.results||[]).map(x=>({name:x.name,artist:x.artistName})).filter(x=>x.name);
+    if(!state.music.length)throw new Error("Apple sem itens");
+  }catch{
+    try{const d=await getJSONFallback(API.musicFallback,"music");state.music=(d.data||[]).map(x=>({name:x.title,artist:x.artist?.name||"Deezer"})).filter(x=>x.name);if(!state.music.length)throw new Error("Deezer sem itens")}catch{state.music=[]}
+  }
+}
+async function fetchGames(){
+  try{
+    const d=await getJSONFallback(API.games,"games");
+    state.games=(d.specials?.items||[]).slice(0,10).map(x=>({name:x.name,desc:x.discount_percent?`${x.discount_percent}% de desconto`:"Oferta Steam",badge:x.final_price?`R$ ${(x.final_price/100).toFixed(2).replace(".",",")}`:"Steam"}));
+  }catch{state.games=[]}
+}
+async function fetchAnime(){
+  try{const d=await getJSON(API.anime,"anime");state.anime=(d.data||[]).map(x=>({name:x.title||x.title_english||"Anime",desc:x.type||"Anime"})).filter(x=>x.name)}catch{state.anime=[]}
+}
+async function fetchMovies(){
+  try{
+    const d=await getJSONFallback(API.movies,"movies");
+    state.movies=(d.feed?.entry||[]).map(x=>({name:x["im:name"]?.label||x.title?.label||"Filme",artist:x["im:artist"]?.label||"Cinema"}));
+  }catch{state.movies=[]}
+}
+async function fetchEconomy(){
+  const series={selic:1178,cdi:12,ipca:13522};
+  await Promise.all(Object.entries(series).map(async([key,id])=>{
+    try{state.economy[key]=lastValue(await getJSONFallback(`${API.bcb}.${id}/dados/ultimos/1?formato=json`,"economy"))}catch{}
+  }));
+}
+async function fetchHoliday(){
+  const year=Number(ymd().slice(0,4));
+  let all=[];
+  for(const y of [year,year+1]){
+    try{all.push(...await getJSON(`${API.holidays}/${y}`,"holidays"))}catch{}
+  }
+  const today=ymd();
+  state.holiday=all.filter(x=>x.date>=today).sort((a,b)=>a.date.localeCompare(b.date))[0]||null;
+}
+async function fetchEntertainment(){
+  const country=$("tvCountry")?.value||"BR",date=ymd();
+  try{state.tvSchedule=await getJSON(`${API.tv}/schedule?country=${country}&date=${date}`,"tv")}catch{state.tvSchedule=[]}
+  try{state.webSchedule=await getJSON(`${API.tv}/schedule/web?date=${date}`,"stream")}catch{state.webSchedule=[]}
+}
+async function searchShows(){
+  const q=$("showSearch").value.trim();if(!q)return;
+  $("searchResults").innerHTML=`<div class="empty">Buscando…</div>`;
+  try{
+    const d=await getJSON(`${API.tv}/search/shows?q=${encodeURIComponent(q)}`,"tv");
+    $("searchResults").innerHTML=d.slice(0,6).map(x=>`
+      <div class="item"><div class="itemMain"><div class="itemTitle">${escapeHTML(x.show.name)}</div><div class="itemSub">${escapeHTML(stripHtml(x.show.summary).slice(0,100)||x.show.genres?.join(", ")||"Série")}</div></div>
+      <button class="btn" data-add-fav="${x.show.id}">Adicionar</button></div>`).join("")||`<div class="empty">Nada encontrado.</div>`;
+    document.querySelectorAll("[data-add-fav]").forEach(b=>b.onclick=()=>{
+      const id=Number(b.dataset.addFav);if(!favorites.includes(id)){favorites.push(id);saveFavorites();fetchFavorites();toast("Série adicionada aos favoritos")}
+    });
+  }catch{$("searchResults").innerHTML=`<div class="empty">Falha na busca.</div>`}
+}
+async function fetchFavorites(){
+  const out=[];
+  await Promise.all(favorites.map(async id=>{
+    try{
+      const show=await getJSON(`${API.tv}/shows/${id}`,"tv");
+      let next=null;const href=show?._links?.nextepisode?.href;
+      if(href)try{next=await getJSON(href,"tv")}catch{}
+      out.push({show,next});
+    }catch{}
+  }));
+  state.favoritesData=out.sort((a,b)=>a.show.name.localeCompare(b.show.name));renderFavorites();restartRotation();
+}
+
+async function loadFipeBrands(){
+  const type=$("vehicleType").value;
+  $("vehicleBrand").innerHTML=`<option value="">Carregando…</option>`;
+  $("vehicleModel").innerHTML=`<option value="">Selecione a marca</option>`;
+  try{
+    const d=await getJSON(`${API.fipe}/marcas/v1/${type}`,"fipe",{timeout:16000});
+    $("vehicleBrand").innerHTML=`<option value="">Selecione</option>`+d.map(x=>`<option value="${escapeHTML(x.valor)}">${escapeHTML(x.nome)}</option>`).join("");
+    $("fipeState").textContent="BrasilAPI online";
+  }catch{
+    $("vehicleBrand").innerHTML=`<option value="">FIPE indisponível</option>`;$("fipeState").textContent="fonte indisponível";
+  }
+}
+async function loadFipeModels(){
+  const type=$("vehicleType").value,brand=$("vehicleBrand").value;
+  if(!brand)return;
+  $("vehicleModel").innerHTML=`<option value="">Carregando…</option>`;
+  try{
+    const d=await getJSON(`${API.fipe}/veiculos/v1/${type}/${encodeURIComponent(brand)}`,"fipe",{timeout:16000});
+    $("vehicleModel").innerHTML=`<option value="">Selecione</option>`+d.map(x=>`<option value="${escapeHTML(x.valor)}">${escapeHTML(x.modelo)}</option>`).join("");
+  }catch{$("vehicleModel").innerHTML=`<option value="">Não foi possível carregar</option>`}
+}
+async function loadFipePrice(){
+  const code=$("vehicleModel").value;if(!code)return;
+  try{
+    const d=await getJSON(`${API.fipe}/preco/v1/${encodeURIComponent(code)}`,"fipe",{timeout:18000});
+    const x=Array.isArray(d)?d[0]:d;
+    state.fipe=x||null;selectedFipe=state.fipe;saveFipe();renderFipeResult();restartRotation();
+  }catch{toast("Não foi possível consultar o preço FIPE agora.")}
+}
+
+async function refreshAll(){
+  $("refresh").disabled=true;$("statusText").textContent="Atualizando fontes…";
+  await locate();
+  await Promise.allSettled([fetchWeather(),fetchAir(),fetchFX(),fetchCrypto(),fetchEconomy(),fetchHoliday(),fetchEntertainment(),fetchFavorites(),fetchSports(),fetchTrends(),fetchMusic(),fetchGames(),fetchAnime(),fetchMovies()]);
+  renderDashboard();restartRotation();
+  $("statusText").textContent=linkReady?"Dados atualizados e sendo enviados ao LCD.":"Dados atualizados. Entre em Link no Ozzy para transmitir.";
+  $("refresh").disabled=false;
+}
+
+async function sendSerial(cmd){
+  if(!writer)return false;
+  try{await writer.write(new TextEncoder().encode(cmd+"\n"));return true}
+  catch(e){setHealth("serial",false,e.message);return false}
+}
+async function handleSerial(line){
+  if(line==="OZZY_LINK_OK"){
+    linkReady=true;setSerialStatus("Ozzy Link ativo","ok");setHealth("serial",true,"Link OK");
+    $("statusText").textContent="Link reconhecido. Carrossel ativo.";await showScreen(screenIndex)
+  }else if(line==="OZZY_LINK_BYE"){
+    linkReady=false;setSerialStatus("Serial conectada","warn")
+  }else if(line==="ERR|LINK_NOT_ACTIVE"){
+    linkReady=false;setSerialStatus("Selecione Link no LCD","warn")
+  }
+}
+async function readSerial(){
+  const dec=new TextDecoder();
+  while(port&&port.readable&&keepReading){
+    reader=port.readable.getReader();
+    try{
+      while(true){
+        const {value,done}=await reader.read();if(done)break;
+        serialBuffer+=dec.decode(value,{stream:true});let i;
+        while((i=serialBuffer.indexOf("\n"))!==-1){
+          const line=serialBuffer.slice(0,i).replace(/\r/g,"").trim();serialBuffer=serialBuffer.slice(i+1);
+          if(line)await handleSerial(line)
+        }
+      }
+    }catch(e){setHealth("serial",false,e.message)}
+    finally{if(reader){reader.releaseLock();reader=null}}
+  }
+}
+async function openPort(p,auto=false){
+  try{
+    port=p;if(!port.readable&&!port.writable)await port.open({baudRate:115200});
+    writer=port.writable.getWriter();keepReading=true;linkReady=false;$("connect").disabled=true;
+    setSerialStatus(auto?"Serial reconectada":"Serial conectada","warn");setHealth("serial",true,"porta aberta");
+    $("statusText").textContent="Porta aberta. Selecione Link no menu do Ozzy.";readSerial()
+  }catch(e){setHealth("serial",false,e.message);setSerialStatus("Serial desconectada")}
+}
+async function autoConnect(){
+  if(!("serial" in navigator)){setSerialStatus("Web Serial indisponível");$("connect").disabled=true;return}
+  try{const ports=await navigator.serial.getPorts();if(ports.length)await openPort(ports[0],true)}catch{}
+}
+
+function wire(){
+  setupTabs();renderModuleSettings();renderProfile();renderSources();
+  $("connect").onclick=async()=>{try{await openPort(await navigator.serial.requestPort())}catch{}};
+  $("refresh").onclick=refreshAll;
+  $("prev").onclick=()=>{clearInterval(rotationTimer);showScreen(screenIndex-1);rotationTimer=setInterval(()=>showScreen(screenIndex+1),prefs.rotationMs)};
+  $("next").onclick=()=>{clearInterval(rotationTimer);showScreen(screenIndex+1);rotationTimer=setInterval(()=>showScreen(screenIndex+1),prefs.rotationMs)};
+  $("speed").onchange=e=>{prefs.rotationMs=Number(e.target.value);savePrefs();restartRotation()};
+  $("entLimit").onchange=e=>{prefs.entLimit=Math.max(1,Number(e.target.value)||1);Object.keys(prefs.sourceLimits).forEach(k=>prefs.sourceLimits[k]=prefs.entLimit);savePrefs();renderModuleSettings();restartRotation();toast("Limite aplicado a todas as fontes")};
+  $("cryptoMode").onchange=e=>{prefs.cryptoMode=e.target.value;savePrefs();restartRotation()};
+  $("resetSettings").onclick=()=>{prefs=structuredClone(DEFAULTS);savePrefs();renderModuleSettings();scheduleCryptoPolling();restartRotation();toast("Configurações restauradas")};
+  $("savePreset").onclick=saveCurrentPreset;$("applyPreset").onclick=applySelectedPreset;$("deletePreset").onclick=deleteSelectedPreset;
+  document.querySelectorAll("[data-quick-preset]").forEach(b=>b.onclick=()=>applyQuickPreset(b.dataset.quickPreset));
+  [$("noteLine1"),$("noteLine2")].forEach(x=>x.oninput=()=>{x.value=cleanNote(x.value);updateNoteCounters()});
+  $("saveNote").onclick=saveNote;$("cancelNoteEdit").onclick=clearNoteForm;
+  $("saveProfile").onclick=async()=>{profile.name=$("profileName").value.trim();profile.city=$("profileCity").value.trim();try{const s=window.ozzyServices,u=window.ozzyUser;await s.setDoc(s.doc(s.db,"users",u.uid),{username:profile.name,city:profile.city,email:u.email||"",updatedAt:s.serverTimestamp()},{merge:true});saveProfile();renderProfile();toast("Perfil salvo")}catch{toast("Não foi possível salvar o perfil")}};
+  $("signOut").onclick=async()=>{try{await window.ozzyServices.signOut(window.ozzyServices.auth)}catch{toast("Não foi possível sair agora")}};
+  $("tvCountry").onchange=async()=>{await fetchEntertainment();renderEntertainment();restartRotation()};
+  $("networkFilter").onchange=renderEntertainment;$("streamFilter").onchange=renderEntertainment;
+  $("searchShowBtn").onclick=searchShows;$("showSearch").onkeydown=e=>{if(e.key==="Enter")searchShows()};
+  $("vehicleType").onchange=loadFipeBrands;$("vehicleBrand").onchange=loadFipeModels;$("vehicleModel").onchange=loadFipePrice;
+  if("serial" in navigator)navigator.serial.addEventListener("disconnect",()=>{
+    keepReading=false;linkReady=false;writer=null;reader=null;port=null;$("connect").disabled=false;
+    setSerialStatus("Serial desconectada");setHealth("serial",false,"desconectado")
+  });
+}
+
+window.addEventListener("ozzy-auth-ready",e=>{
+  profile={...profile,...(e.detail.data||{}),name:e.detail.data?.username||e.detail.user.displayName||profile.name,email:e.detail.user.email||""};
+  saveProfile();renderProfile();restartRotation();
+});
+window.addEventListener("ozzy-notes-updated",()=>{state.notes=window.ozzyNotes||[];renderNotes();restartRotation()});
+window.addEventListener("ozzy-presets-updated",renderPresets);
+
+(async()=>{
+  state.fipe=selectedFipe;
+  wire();renderDashboard();restartRotation();startProgress();scheduleCryptoPolling();scheduleSportsPolling();loadFipeBrands();
+  await Promise.all([autoConnect(),refreshAll()]);
+  setInterval(()=>{renderDashboard()},1000);
+  setInterval(refreshAll,10*60*1000);
+})();
+</script>
+<script src="pwa.js"></script>
+</body>
+</html>
