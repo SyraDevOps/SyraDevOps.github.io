@@ -1,0 +1,61 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function owner(uid) { return signedIn() && request.auth.uid == uid; }
+    function moderator() { return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+    function validImage(url) { return url == '' || (url is string && url.matches('https://.*')); }
+    function validInstagram(url) { return url == '' || (url is string && url.matches('https://(www\\.)?instagram\\.com/(p|reel|tv)/.*')); }
+    function markerPath(id) { return /databases/$(database)/documents/markers/$(id); }
+    function privatePath(uid) { return /databases/$(database)/documents/private_users/$(uid); }
+    function validMarker(data) {
+      return data.title is string && data.title.size() >= 3 && data.title.size() <= 70
+        && data.description is string && data.description.size() >= 3 && data.description.size() <= 700
+        && data.placeName is string && data.placeName.size() <= 120
+        && data.category in ['place','recommendation','discovery','event','alert','problem','information']
+        && data.life in ['permanent','pulse'] && data.location.lat is number && data.location.lng is number
+        && data.location.lat >= -90 && data.location.lat <= 90 && data.location.lng >= -180 && data.location.lng <= 180
+        && validImage(data.imageURL) && validInstagram(data.instagramURL);
+    }
+    function author(id) { return signedIn() && resource.data.authorId == request.auth.uid; }
+    function cleanAuthorEdit() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['title','description','placeName','category','life','durationHours','expiresAt','location','imageURL','instagramURL','updatedAt','editsCount'])
+        && request.resource.data.editsCount == resource.data.editsCount + 1 && validMarker(request.resource.data);
+    }
+    function likeChange(id) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likesCount']) && request.resource.data.likesCount == resource.data.likesCount + 1 && !exists(/databases/$(database)/documents/markers/$(id)/likes/$(request.auth.uid)) && getAfter(/databases/$(database)/documents/markers/$(id)/likes/$(request.auth.uid)).data.uid == request.auth.uid;
+    }
+    function confirmationChange(id) {
+      return request.auth.uid != resource.data.authorId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['confirmationsCount','lastConfirmedAt']) && request.resource.data.confirmationsCount == resource.data.confirmationsCount + 1 && !exists(/databases/$(database)/documents/markers/$(id)/confirmations/$(request.auth.uid)) && getAfter(/databases/$(database)/documents/markers/$(id)/confirmations/$(request.auth.uid)).data.uid == request.auth.uid;
+    }
+    function reportChange(id) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportsCount','visibility']) && !exists(/databases/$(database)/documents/markers/$(id)/reports/$(request.auth.uid)) && getAfter(/databases/$(database)/documents/markers/$(id)/reports/$(request.auth.uid)).data.uid == request.auth.uid && request.resource.data.reportsCount == resource.data.reportsCount + 1 && (request.resource.data.visibility == resource.data.visibility || (request.resource.data.reportsCount >= 3 && request.resource.data.visibility == 'reduced'));
+    }
+
+    match /users/{uid} {
+      allow read: if true;
+      allow create: if owner(uid) && validImage(request.resource.data.photoURL);
+      allow update: if owner(uid) && validImage(request.resource.data.photoURL);
+      allow delete: if owner(uid);
+      match /blocks/{blockedUid} { allow read, create, delete: if owner(uid); allow update: if false; }
+      match /notifications/{notificationId} { allow read, delete: if owner(uid); allow create: if signedIn() && request.resource.data.recipientId == uid; allow update: if false; }
+    }
+    match /private_users/{uid} { allow read, create, update, delete: if owner(uid); }
+    match /admins/{uid} { allow read: if owner(uid); allow write: if false; }
+
+    match /markers/{id} {
+      allow read: if true;
+      allow create: if signedIn() && request.resource.data.authorId == request.auth.uid && validMarker(request.resource.data)
+        && getAfter(privatePath(request.auth.uid)).data.lastMarkerCreatedAt == request.time
+        && request.time - get(privatePath(request.auth.uid)).data.lastMarkerCreatedAt > duration.value(1, 'm');
+      allow update: if moderator() || (author(id) && cleanAuthorEdit()) || (signedIn() && likeChange(id)) || (signedIn() && confirmationChange(id)) || (signedIn() && reportChange(id));
+      allow delete: if moderator() || author(id);
+      match /likes/{uid} { allow read: if true; allow create: if owner(uid) && request.resource.data.uid == uid; allow delete, update: if false; }
+      match /confirmations/{uid} { allow read: if true; allow create: if owner(uid) && request.resource.data.uid == uid && uid != get(markerPath(id)).data.authorId; allow delete, update: if false; }
+      match /reports/{uid} { allow create: if owner(uid) && request.resource.data.uid == uid && request.resource.data.reason is string && request.resource.data.reason.size() <= 240; allow read, delete: if moderator(); allow update: if false; }
+      match /comments/{commentId} { allow read: if true; allow create: if signedIn() && request.resource.data.authorId == request.auth.uid && request.resource.data.text is string && request.resource.data.text.size() <= 500; allow update, delete: if moderator() || (signedIn() && resource.data.authorId == request.auth.uid); }
+      match /suggestions/{suggestionId} { allow read: if signedIn() && (get(markerPath(id)).data.authorId == request.auth.uid || resource.data.authorId == request.auth.uid || moderator()); allow create: if signedIn() && request.resource.data.authorId == request.auth.uid && request.resource.data.text is string && request.resource.data.text.size() <= 500; allow update, delete: if moderator() || (signedIn() && get(markerPath(id)).data.authorId == request.auth.uid); }
+      match /history/{eventId} { allow read: if true; allow create: if signedIn() && request.resource.data.editorId == request.auth.uid && get(markerPath(id)).data.authorId == request.auth.uid; allow update, delete: if false; }
+    }
+  }
+}
