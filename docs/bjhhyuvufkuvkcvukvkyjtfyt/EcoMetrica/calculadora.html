@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Calcule sua pegada ecológica pessoal, seu Dia da Sobrecarga e o número de planetas necessários para sustentar seu estilo de vida.">
+  <meta name="theme-color" content="#f7f8f3">
+  <title>Calculadora de pegada ecológica — EcoMétrica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="calculator-page">
+  <header class="calculator-header"><a class="brand" href="index.html"><span class="brand-symbol" aria-hidden="true"></span><span>EcoMétrica</span></a><a class="exit-link" href="index.html">Salvar o planeta começa por entender <span>↗</span></a></header>
+
+  <main id="calculatorApp" class="calculator-app" aria-live="polite">
+    <aside class="calculator-aside"><div><span class="aside-kicker" id="asideKicker">SEU PONTO DE PARTIDA</span><h2 id="asideTitle">Toda escolha<br>deixa uma<br><span>medida.</span></h2><p id="asideText">Vamos entender, com calma, como o seu cotidiano se relaciona com os recursos da Terra.</p></div><div class="aside-visual" id="asideVisual" aria-hidden="true"><div class="aside-orbit"></div><div class="aside-core"></div><span></span></div><div class="aside-bottom"><span>ESTIMATIVA EDUCACIONAL</span><span>2026</span></div></aside>
+
+    <section class="question-area" id="questionArea"><div class="progress-block"><div class="progress-top"><span id="progressLabel">CONTEXTO</span><span id="progressCounter">01 / 20</span></div><div class="progress-track"><div id="progressBar" class="progress-fill"></div></div></div><div class="question-stage" id="questionStage"></div><div class="question-navigation"><button class="back-button" id="backButton" type="button">← Voltar</button><button class="button button-dark next-button" id="nextButton" type="button">Continuar <span>→</span></button></div><p class="privacy-note">Suas respostas permanecem neste navegador. Nenhum dado é enviado.</p></section>
+
+    <section class="result-area" id="resultArea" hidden></section>
+  </main>
+  <script src="calculator.js"></script>
+</body>
+</html>
