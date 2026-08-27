@@ -1,0 +1,17 @@
+{
+  "id": "/",
+  "name": "Aurora",
+  "short_name": "Aurora",
+  "description": "Uma jornada espacial de escolhas em que compreender física é necessário para sobreviver.",
+  "lang": "pt-BR",
+  "dir": "ltr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#090d18",
+  "theme_color": "#090d18",
+  "categories": ["games", "education"],
+  "icons": []
+}

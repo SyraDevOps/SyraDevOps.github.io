@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#08111d">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Aurora — uma aventura narrativa em que compreender física é necessário para sobreviver.">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Aurora">
+  <title>Aurora</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+  <main class="app-shell" id="app">
+    <div class="space-noise" aria-hidden="true"></div>
+
+    <section class="boot-intro" id="boot-intro" aria-label="Apresentação do jogo">
+      <div class="boot-phase partners-phase is-active" id="partners-phase">
+        <p class="eyebrow">Uma realização</p>
+        <div class="partner-lockup">
+          <article class="partner-brand">
+            <div class="brand-mark syra-mark" role="img" aria-label="Logo da Syra"><span>SY</span><span>RA</span></div>
+            <strong>Syra</strong>
+          </article>
+          <span class="partner-divider" aria-hidden="true"></span>
+          <article class="partner-brand">
+            <div class="brand-mark pibid-mark"><img src="./assets/brands/pibid-ufsj.webp" alt="Logo do PIBID Física da UFSJ"></div>
+            <strong>PIBID Física — UFSJ</strong>
+          </article>
+        </div>
+      </div>
+      <div class="boot-phase credits-phase" id="credits-phase">
+        <p class="eyebrow">Desenvolvido por</p>
+        <div class="developer-names">
+          <strong>Claudia Maria Aparecida</strong><span></span><strong>Kayque Faiolhe da Silva Alves</strong>
+        </div>
+      </div>
+      <button class="skip-intro" id="skip-intro" type="button">Pular introdução</button>
+    </section>
+
+    <section class="screen menu-screen is-active" id="menu-screen" aria-labelledby="game-title">
+      <div class="menu-atmosphere" aria-hidden="true"></div>
+      <div class="menu-copy">
+        <p class="eyebrow">Uma jornada de física e escolhas</p>
+        <h1 id="game-title">AURORA</h1>
+        <p class="tagline">O céu ainda está lá.</p>
+      </div>
+      <nav class="main-menu" aria-label="Menu principal">
+        <button class="menu-button primary" id="continue-button" type="button" disabled><span>Continuar</span><small id="continue-detail">Nenhuma jornada iniciada</small></button>
+        <button class="menu-button" id="new-game-button" type="button"><span>Nova jornada</span><small>Prólogo: A última resposta</small></button>
+        <button class="menu-button" id="archive-button" type="button"><span>Arquivo Aurora</span><small id="archive-percent">0%</small></button>
+      </nav>
+      <div class="menu-tools">
+        <button class="quiet-button" id="narration-button" type="button" aria-pressed="false">Narração: desligada</button>
+        <button class="quiet-button" id="install-button" type="button" hidden>Instalar aplicativo</button>
+      </div>
+      <p class="prototype-note">Prólogo jogável · 4 decisões conectadas</p>
+    </section>
+
+    <section class="screen story-screen" id="story-screen" aria-labelledby="story-title">
+      <div class="story-frame">
+        <img id="story-image" src="./assets/scenes/scene-vela.webp" alt="">
+        <div class="story-shade" aria-hidden="true"></div>
+        <div class="story-copy">
+          <div class="story-meta"><span id="story-location">Vela-1</span><span id="story-step">01 / 05</span></div>
+          <p class="speaker-line"><strong id="story-speaker">LUNA</strong><span id="story-role">Aluna-navegadora</span></p>
+          <h2 id="story-title"></h2>
+          <p id="story-text"></p>
+          <button class="action-button" id="story-next" type="button">Continuar</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen tutorial-screen" id="tutorial-screen" aria-labelledby="tutorial-title">
+      <div class="tutorial-panel">
+        <div class="character-chip"><span class="avatar aurora-avatar">A</span><div><strong>AURORA // ECO LOCAL</strong><small>3% do núcleo permanece na Vela-1</small></div></div>
+        <p class="eyebrow">Antes de começarmos</p>
+        <h2 id="tutorial-title">Você não precisa saber a resposta.</h2>
+        <p>Observe o que muda, arraste a carta devagar e compare as previsões. A física aparece primeiro como parte do problema; a explicação vem depois da sua decisão.</p>
+        <div class="tutorial-demo" aria-label="Demonstração dos controles">
+          <span>← opção A</span><div class="mini-card"><i></i><strong>Arraste</strong></div><span>opção B →</span>
+        </div>
+        <div class="tutorial-rules">
+          <span><b>1</b> Segure a carta</span><span><b>2</b> Veja o risco</span><span><b>3</b> Solte para decidir</span>
+        </div>
+        <button class="action-button" id="tutorial-start" type="button">Assumir os instrumentos</button>
+      </div>
+    </section>
+
+    <section class="screen game-screen" id="game-screen" aria-label="Missão em andamento">
+      <header class="game-header">
+        <button class="icon-button" id="back-button" type="button" aria-label="Voltar ao menu">←</button>
+        <div class="mission-copy"><span id="mission-act">Prólogo · A última resposta</span><strong id="mission-name">Vela-1 → Núcleo Aurora</strong></div>
+        <span class="card-counter" id="card-counter">01 / 04</span>
+      </header>
+
+      <section class="resources" aria-label="Estado da missão">
+        <article class="resource" data-resource="energy"><div><span>⚡</span><strong>Energia</strong><output>64</output></div><div class="resource-track"><i></i></div></article>
+        <article class="resource" data-resource="trajectory"><div><span>◎</span><strong>Trajetória</strong><output>62</output></div><div class="resource-track"><i></i></div></article>
+        <article class="resource" data-resource="integrity"><div><span>◇</span><strong>Integridade</strong><output>68</output></div><div class="resource-track"><i></i></div></article>
+        <article class="resource" data-resource="knowledge"><div><span>✦</span><strong>Conhecimento</strong><output>8</output></div><div class="resource-track"><i></i></div></article>
+      </section>
+
+      <p class="echo-line" id="echo-line" hidden></p>
+
+      <div class="choice-layout">
+        <aside class="choice-forecast left" id="left-forecast" aria-hidden="true">
+          <span>←</span><strong id="left-forecast-label"></strong><p id="left-forecast-effect"></p>
+        </aside>
+        <div class="choice-stage">
+          <article class="decision-card" id="decision-card" tabindex="0" aria-live="polite">
+            <img class="card-scene" id="card-image" src="" alt="">
+            <div class="card-vignette" aria-hidden="true"></div>
+            <div class="character-badge" id="character-badge"><span id="character-initial">R</span><div><strong id="card-speaker">RAVI MOURA</strong><small id="card-role">Comandante da Vela-1</small></div></div>
+            <div class="card-content">
+              <p class="scene-label" id="scene-label">Janela de aproximação</p>
+              <h2 id="card-title"></h2>
+              <p id="card-text"></p>
+              <div class="readings" id="card-readings"></div>
+            </div>
+            <div class="swipe-hint" aria-hidden="true"><span>←</span><i></i><span>→</span></div>
+          </article>
+        </div>
+        <aside class="choice-forecast right" id="right-forecast" aria-hidden="true">
+          <span>→</span><strong id="right-forecast-label"></strong><p id="right-forecast-effect"></p>
+        </aside>
+      </div>
+
+      <div class="mobile-forecast" id="mobile-forecast" aria-live="polite"><strong id="mobile-forecast-label">Arraste para prever</strong><span id="mobile-forecast-effect">As consequências aparecem aqui sem cobrir a carta.</span></div>
+      <div class="choice-controls" aria-label="Escolhas disponíveis">
+        <button class="choice-button left" id="left-choice" type="button"></button>
+        <button class="choice-button right" id="right-choice" type="button"></button>
+      </div>
+    </section>
+
+    <section class="screen consequence-screen" id="consequence-screen" aria-labelledby="consequence-title">
+      <div class="consequence-panel">
+        <div class="consequence-visual"><img id="consequence-image" src="" alt=""><span id="consequence-stamp">DECISÃO REGISTRADA</span></div>
+        <div class="consequence-copy">
+          <p class="speaker-line"><strong id="reaction-speaker">RAVI</strong><span>reage à sua escolha</span></p>
+          <blockquote id="reaction-line"></blockquote>
+          <p class="eyebrow">O que aconteceu</p>
+          <h2 id="consequence-title"></h2>
+          <p id="consequence-text"></p>
+          <div class="changes" id="changes"></div>
+          <aside class="physics-note"><span>O segredo desta cena</span><p id="physics-note"></p></aside>
+          <details class="learn-more"><summary>Como Aurora explicaria isso?</summary><div class="calculation" id="calculation"></div></details>
+          <p class="future-mark" id="future-mark" hidden></p>
+          <button class="action-button" id="next-button" type="button">Continuar</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen archive-screen" id="archive-screen" aria-labelledby="archive-title">
+      <header class="panel-header">
+        <button class="icon-button" id="archive-back-button" type="button" aria-label="Voltar ao menu">←</button>
+        <div><p class="eyebrow">Conhecimento reconstruído</p><h2 id="archive-title">Arquivo Aurora</h2></div>
+        <strong id="archive-progress">0%</strong>
+      </header>
+      <div class="archive-list" id="archive-list"></div>
+    </section>
+
+    <section class="screen ending-screen" id="ending-screen" aria-labelledby="ending-title">
+      <div class="ending-card">
+        <img src="./assets/scenes/scene-nadir.webp" alt="Ícaro Nadir em sua nave diante de mapas orbitais">
+        <div class="ending-copy">
+          <p class="eyebrow">Fim do prólogo</p>
+          <h2 id="ending-title"></h2>
+          <p id="ending-summary"></p>
+          <blockquote id="ending-message"></blockquote>
+          <div class="decision-trail" id="decision-trail"></div>
+          <div class="final-score" id="final-score"></div>
+          <button class="action-button" id="ending-menu-button" type="button">Voltar ao menu</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <noscript>Ative o JavaScript para executar Aurora.</noscript>
+  <script defer src="./js/app.js"></script>
+</body>
+</html>
