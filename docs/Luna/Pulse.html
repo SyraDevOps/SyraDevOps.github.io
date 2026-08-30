@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luna — agentes ao alcance</title>
+    <meta name="theme-color" content="#f8f9fb">
+    <meta name="description" content="Luna, uma interface minimalista para seus agentes.">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="icons/icon.svg">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Codec Pro", "Avenir Next", "Helvetica Neue", Arial, sans-serif;
+            font-weight: 300;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: #FFFFFF;
+            color: #1A1A1A;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow-x: hidden;
+        }
+
+        /* --- CABEÇALHO (Menu Sanduíche à Direita) --- */
+        header {
+            width: 100%;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+        }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .menu-btn:hover {
+            background-color: transparent;
+        }
+
+        .menu-btn span {
+            display: block;
+            width: 20px;
+            height: 1.5px;
+            background-color: #111827;
+            border-radius: 1px;
+        }
+
+        /* --- OVERLAY --- */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.12);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 90;
+        }
+
+        .overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* --- ABA LATERAL --- */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -342px;
+            width: 322px;
+            height: 100vh;
+            background-color: #FFFFFF;
+            box-shadow: 2px 0 28px rgba(15, 23, 42, 0.06);
+            border-right: 1px solid #F0F0F0;
+            z-index: 100;
+            transition: left 0.34s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 20px;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .sidebar-title {
+            font-size: 0.85rem;
+            color: #9CA3AF;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 300;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: #9CA3AF;
+            padding: 4px;
+            line-height: 1;
+            font-weight: 200;
+        }
+
+        .close-btn:hover {
+            color: #111827;
+        }
+
+        /* Seletor de Cripto no Topo */
+        .crypto-selector-label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #9CA3AF;
+            margin-bottom: 8px;
+        }
+
+        .crypto-selector-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: transparent;
+            border: 0;
+            border-bottom: 1px solid #EAEAEA;
+            border-radius: 0;
+            padding: 10px 2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .crypto-selector-box:hover {
+            border-color: #8c94a1;
+            background-color: transparent;
+        }
+
+        .crypto-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .crypto-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #111827;
+            color: #FFF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: 400;
+        }
+
+        .crypto-name {
+            font-size: 0.88rem;
+            font-weight: 300;
+            color: #111827;
+        }
+
+        .dropdown-arrow {
+            width: 14px;
+            height: 14px;
+            stroke: #6B7280;
+            stroke-width: 1.5;
+            fill: none;
+        }
+
+        .sidebar-menu {
+            margin-top: 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px;
+            border-radius: 0;
+            border: 0;
+            width: 100%;
+            background: transparent;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            color: #4B5563;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.15s ease;
+        }
+
+        .sidebar-item:hover {
+            background-color: transparent;
+            color: #111827;
+        }
+
+        .sidebar-item span.thin-number {
+            font-weight: 200;
+            font-size: 0.85rem;
+            color: #9CA3AF;
+        }
+
+        /* --- CONTEÚDO CENTRAL: LUA CROMÁTICA DINÂMICA --- */
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            flex-direction: column;
+            gap: 22px;
+            min-height: 0;
+        }
+
+        .moon-container {
+            position: relative;
+            width: 130px;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .orbit-ring {
+            position: absolute;
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            border: 1px dashed #E5E7EB;
+            animation: slowRotate 50s linear infinite;
+        }
+
+        @keyframes slowRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        canvas#moonCanvas {
+            width: 92px;
+            height: 92px;
+            border-radius: 50%;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.04);
+        }
+        .sidebar-tabs{display:flex;flex-direction:column;gap:1px;margin:2px 0 22px;padding-bottom:14px;border-bottom:1px solid #edf0f2}.sidebar-tab{display:flex;flex-direction:row;align-items:center;gap:11px;border:0;background:transparent;color:#8f96a1;padding:11px 3px;cursor:pointer;font:inherit;font-size:.76rem;text-align:left}.sidebar-tab svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5}.sidebar-tab.active,.sidebar-tab:hover{color:#111827}.sidebar-panel{display:none}.sidebar-panel.active{display:block}.session-model{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid #e7e9ed}.session-model .crypto-icon{width:31px;height:31px;background:linear-gradient(135deg,#131924,#667085)}.session-model strong{display:block;color:#39414c;font-size:.79rem;font-weight:400;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.session-model small{display:block;margin-top:3px;color:#9aa0aa;font-size:.66rem}.model-card .crypto-icon{border-radius:0;clip-path:polygon(50% 0,100% 34%,82% 100%,18% 100%,0 34%);background:linear-gradient(135deg,var(--model-a,#1b2230),var(--model-b,#65748d))}.chat-drawer{position:fixed;top:0;right:-330px;width:310px;height:100dvh;background:#fff;border-left:1px solid #edf0f2;box-shadow:-4px 0 28px rgba(15,23,42,.06);padding:24px 20px;z-index:100;transition:right .34s cubic-bezier(.16,1,.3,1);display:flex;flex-direction:column}.chat-drawer.open{right:0}.chat-drawer-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}.chat-new{display:flex;align-items:center;gap:8px;border:0;background:transparent;color:#303845;cursor:pointer;font:inherit;font-size:.78rem;padding:8px 0}.chat-new svg,.chat-session svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.5}.chat-search{width:100%;border:0;border-bottom:1px solid #e4e7eb;outline:0;padding:9px 0;margin:10px 0 18px;background:transparent;font:inherit;font-size:.76rem}.chat-session-list{display:flex;flex-direction:column;gap:13px;overflow:auto;padding:4px 0 18px}.chat-session{display:flex;align-items:flex-start;gap:10px;border:0;border-left:1px solid transparent;background:transparent;color:#707783;padding:9px 2px;cursor:pointer;text-align:left;font:inherit;font-size:.78rem}.chat-session.active{color:#171d28;border-left-color:#202733;padding-left:10px}.chat-session-body{min-width:0;flex:1}.chat-session-title{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chat-session-meta{display:block;margin-top:4px;color:#a0a6af;font-size:.62rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.session-delete,.session-rename{border:0;background:transparent;color:#a4aab3;font-size:1rem;cursor:pointer;padding:0 4px;opacity:0}.chat-session:hover .session-delete,.chat-session:hover .session-rename{opacity:1}.chat-menu-btn{margin-left:auto;background:transparent;border:0;color:#707783;cursor:pointer;padding:8px}.chat-menu-btn svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5}
+        .sidebar-tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin:2px 0 25px;padding-bottom:14px;border-bottom:1px solid #edf0f2}.sidebar-tab{display:flex;flex-direction:column;align-items:center;gap:5px;border:0;background:transparent;color:#9aa0aa;padding:7px 1px;cursor:pointer;font:inherit;font-size:.58rem;letter-spacing:.03em}.sidebar-tab svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.5}.sidebar-tab.active,.sidebar-tab:hover{color:#111827}.sidebar-panel{display:none}.sidebar-panel.active{display:block}.session-model{display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid #e7e9ed}.session-model .crypto-icon{width:31px;height:31px;background:linear-gradient(135deg,#131924,#667085)}.session-model strong{display:block;color:#39414c;font-size:.79rem;font-weight:400;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.session-model small{display:block;margin-top:3px;color:#9aa0aa;font-size:.66rem}.mode-switch{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:20px}.mode-switch button{border:1px solid #e1e4e8;background:transparent;color:#737b87;padding:10px 7px;cursor:pointer;font:inherit;font-size:.7rem;line-height:1.35;text-align:left}.mode-switch button.active{border-color:#202733;color:#202733}.mode-switch small{display:block;margin-top:3px;color:#a0a6af;font-size:.62rem}.about-link{display:flex;align-items:center;gap:8px;margin-top:auto;padding:20px 2px 0;color:#949aa4;text-decoration:none;font-size:.7rem}.about-link svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5}body.anonymous-mode{background:#f3f4f6;color:#151923}body.anonymous-mode .sidebar{background:#f6f7f8}body.anonymous-mode #exportChatBtn{display:none}body.anonymous-mode .chat-state.ready{color:#596570}
+        .menu-label{display:flex;align-items:center;gap:9px}.menu-label svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5}
+        .settings-section { margin-top: 24px; padding-top: 21px; border-top: 1px solid #f0f1f3; }
+        .load-diagnostics{margin-top:20px;padding-top:15px;border-top:1px solid #edf0f2}.load-line{display:flex;justify-content:space-between;color:#777f8b;font-size:.67rem}.load-progress{height:2px;background:#eceef1;margin:9px 0 14px;overflow:hidden}.load-progress i{display:block;width:0;height:100%;background:#1f2937;transition:width .25s ease}.load-diagnostics dl{display:grid;grid-template-columns:1fr 1fr;gap:13px 10px;margin:0}.load-diagnostics dt{color:#a0a6af;font-size:.59rem;letter-spacing:.04em}.load-diagnostics dd{margin:3px 0 0;color:#4b5563;font-size:.68rem;font-variant-numeric:tabular-nums}
+        .settings-title { display:block; margin-bottom:10px; font-size:.7rem; text-transform:uppercase; letter-spacing:.13em; color:#9298a3; }
+        .prompt-upload { position:relative; display:block; padding:10px 0; border-bottom:1px solid #e5e7eb; color:#4c5562; font-size:.8rem; line-height:1.45; cursor:pointer; transition:color .2s ease; }
+        .prompt-upload:hover { color:#111827; }.prompt-upload input{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer}.prompt-name{display:block;margin-top:5px;color:#9aa0aa;font-size:.68rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .generation-control { margin:16px 0; }.generation-row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px;color:#5d6571;font-size:.78rem}.generation-row output{color:#1f2937;font-size:.72rem;font-variant-numeric:tabular-nums}.generation-control input[type="range"]{width:100%;accent-color:#17202e}.token-input{width:68px;border:0;border-bottom:1px solid #dfe2e7;outline:0;text-align:right;color:#1f2937;background:transparent;font:inherit;font-size:.75rem;padding:3px 0}.token-input:focus{border-bottom-color:#17202e}
+
+        .model-picker { position: relative; }
+        .model-picker input { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; }
+        .model-status { margin: 12px 2px 0; font-size: .74rem; line-height: 1.55; color: #9CA3AF; }
+        .model-list { margin-top: 14px; display: flex; flex-direction: column; gap: 7px; }
+        .model-card { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 10px; cursor: pointer; transition: background .18s ease; }
+        .model-card:hover, .model-card.active { background: #F6F7F9; }
+        .model-card .crypto-icon { flex: 0 0 24px; background: linear-gradient(135deg, #111827, #64748B); font-size: .62rem; }
+        .model-card-text { min-width: 0; flex: 1; }
+        .model-card-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #374151; font-size: .82rem; }
+        .model-card-size { display: block; color: #9CA3AF; font-size: .7rem; margin-top: 2px; }
+        .model-remove { border: 0; background: transparent; color: #9CA3AF; cursor: pointer; padding: 4px; font-size: 1rem; }
+
+        .moon-caption { min-height: 2.8em; max-width: 600px; padding: 0 24px; text-align: center; color: #626876; font-size: clamp(.92rem, 1.8vw, 1.12rem); font-weight: 300; letter-spacing: .055em; line-height: 1.7; }
+        .moon-caption span { opacity: 0; transition: opacity .65s ease; }
+        .moon-caption span.visible { opacity: 1; }
+        .cursor { display: inline-block; width: 1px; height: 1em; margin-left: 5px; vertical-align: -.15em; background: #88909e; animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* --- CAIXA DE MENSAGEM (RODAPÉ) --- */
+        footer {
+            width: 100%;
+            padding: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .input-wrapper {
+            width: 100%;
+            max-width: 650px;
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 28px;
+            padding: 8px 10px 8px 22px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #037DD6;
+            box-shadow: 0 4px 20px rgba(3, 125, 214, 0.07);
+        }
+
+        .input-wrapper input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 0.92rem;
+            font-weight: 300;
+            color: #111827;
+        }
+
+        .input-wrapper input::placeholder {
+            color: #9CA3AF;
+            font-weight: 300;
+        }
+
+        .send-btn {
+            background-color: transparent;
+            border: none;
+            border-radius: 0;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.15s ease, background-color 0.2s ease;
+        }
+
+        .send-btn:hover {
+            background-color: transparent;
+            transform: translateY(-1px);
+        }
+
+        .send-btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: #111827;
+            stroke-width: 1.5;
+            fill: none;
+        }
+        .chat { width: min(1120px, 100%); flex: 1; min-height: 190px; max-height: 52vh; overflow-y: auto; padding: 16px max(22px, 4vw) 34px; scrollbar-width: thin; }
+        .chat:empty { display: none; }
+        .message { display: flex; flex-direction:column; gap:8px; margin: 31px 0; animation: rise .36s ease both; }
+        .message.user { align-items:flex-end; }
+        .message::before { color:#9ba0aa; font-size:.64rem; font-weight:400; letter-spacing:.2em; text-transform:uppercase; }
+        .message.user::before { content:'você'; padding-right:2px; }.message.assistant::before{content:'luna'; color:#596170;}
+        .bubble { max-width: min(82%, 820px); padding: 1px 0; color: #2e3440; font-size: clamp(1rem, 1.25vw, 1.08rem); line-height: 1.78; font-weight: 300; }
+        .message.user .bubble { background: transparent; color: #2e3440; border-radius: 0; border-right:1px solid #afb6c1; padding: 1px 18px 1px 0; line-height:1.7; }
+        .message.assistant .bubble { border-left:1px solid #dfe2e7; padding:0 30px 1px 18px; }
+        .markdown p { margin: 0 0 .7em; }.markdown p:last-child { margin-bottom: 0; }.markdown h1,.markdown h2,.markdown h3 { font-weight: 400; margin: .5em 0; }.markdown h1 { font-size: 1.24em; }.markdown h2 { font-size: 1.12em; }.markdown ul,.markdown ol { padding-left: 1.25em; margin: .45em 0; }.markdown code { background: rgba(0,0,0,.07); padding: .1em .3em; border-radius: 4px; font-family: ui-monospace, monospace; font-size: .87em; }.markdown pre { overflow:auto; padding:10px; background:#171b25; color:#f2f4f8; border-radius:8px; margin:.6em 0; }.markdown pre code { background: transparent; padding: 0; }.markdown a { color:#2563a8; }.markdown img { display:block; width:100%; max-width:420px; height:auto; margin:.7em 0; border-radius:8px; }
+        .message-actions{display:flex;gap:8px;align-items:center;opacity:0;transition:opacity .18s ease}.message:hover .message-actions,.message:focus-within .message-actions{opacity:1}.message.user .message-actions{justify-content:flex-end}.message-action{border:0;background:transparent;color:#9ba1ab;padding:2px 0;cursor:pointer;font:inherit;font-size:.65rem;letter-spacing:.09em;text-transform:uppercase}.message-action:hover{color:#202632}.token-count{color:#a6abb4;font-size:.64rem;letter-spacing:.04em;font-variant-numeric:tabular-nums}.composer-form { width: min(980px, calc(100% - 48px)); max-width:980px; margin-inline:auto; position:relative; }.composer-form::after{content:'Enter envia · Shift + Enter quebra linha';position:absolute;left:3px;bottom:-19px;font-size:.65rem;color:#a2a6ae;letter-spacing:.04em}.chat-state{position:absolute;right:3px;bottom:-19px;font-size:.65rem;color:#8e94a0;letter-spacing:.04em}.chat-state.ready{color:#3d755c}.chat-state.error{color:#a65757}.input-wrapper{max-width:none;border:0;border-bottom:1px solid #dfe2e7;border-radius:0;box-shadow:none;padding:8px 0}.input-wrapper:focus-within{border-color:#1b2330;box-shadow:none}.input-wrapper textarea { flex:1; min-height:24px; max-height:130px; resize:none; border:0; outline:0; background:transparent; font: inherit; font-size:.92rem; line-height:1.45; color:#111827; padding:5px 0; }.input-wrapper textarea::placeholder { color:#9CA3AF; }.attach-btn{display:grid;place-items:center;width:32px;height:32px;border:0;background:transparent;color:#737b88;cursor:pointer}.attach-btn:hover{color:#111827}.attach-btn svg,.sidebar-item svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5}.attachment-list{display:flex;flex-wrap:wrap;gap:8px;margin:9px 0 0}.attachment{display:flex;align-items:center;gap:5px;border-bottom:1px solid #d9dde3;padding:4px 0;color:#626a76;font-size:.7rem;max-width:220px}.attachment span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.attachment button{border:0;background:transparent;color:#969da8;cursor:pointer;font-size:1rem;line-height:1;padding:0}
+        .send-btn:disabled { opacity:.45; cursor:not-allowed; transform:none; }.typing { display:inline-flex; gap:4px; align-items:center; min-height:15px; }.typing i { width:4px; height:4px; border-radius:50%; background:#8d94a2; animation:pulse 1.1s infinite ease-in-out; }.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}@keyframes pulse{50%{opacity:.25;transform:translateY(-2px)}}@keyframes rise{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+        body.chat-active main { justify-content: flex-start; padding-top: 56px; gap: 0; }
+        body.chat-active .moon-caption { display: none; }
+        body.chat-active .moon-container { position: fixed; z-index: 20; top: 19px; left: 65px; width: 34px; height: 34px; transition: all .7s cubic-bezier(.16,1,.3,1); }
+        body.chat-active .orbit-ring { width: 33px; height: 33px; opacity: .5; }
+        body.chat-active canvas#moonCanvas { width: 25px; height: 25px; box-shadow: none; }
+        body.chat-active .moon-container::after { content: none; }
+        .active-model-name{display:none}body.chat-active .active-model-name{display:block;position:fixed;z-index:20;top:26px;left:110px;color:#171b24;font-size:.72rem;letter-spacing:.16em;font-weight:400;text-transform:uppercase;white-space:nowrap;max-width:40vw;overflow:hidden;text-overflow:ellipsis}
+        body.chat-active .chat { display: block; }
+        body.chat-active footer { padding-top: 16px; padding-bottom:35px; }
+        @media (max-width: 620px) { body { min-height: 100dvh; } header { padding: 13px 16px; } main { justify-content: flex-start; padding: 8px 14px; gap: 12px; }.moon-container { width:88px; height:88px; }.orbit-ring {width:87px;height:87px} canvas#moonCanvas{width:65px;height:65px}.moon-caption{font-size:.8rem;min-height:2.5em}.chat{max-height:none;flex:1;padding:10px 5px 22px}.message{margin:24px 0}.bubble{max-width:93%;font-size:.93rem}.message.assistant .bubble{padding-right:7px;padding-left:13px}.message-actions{opacity:1}footer{padding:14px;position:sticky;bottom:0;background:linear-gradient(transparent,#fff 18%)}.input-wrapper{border-radius:0;padding:7px 0}.sidebar{width:min(90vw,340px)} body.chat-active main{padding-top:48px}body.chat-active .moon-container{top:15px;left:56px}.active-model-name{font-size:.64rem;top:22px;left:98px}.composer-form{width:100%}.composer-form::after{display:none} }
+        @media (display-mode: standalone) { header { padding-top: max(20px, env(safe-area-inset-top)); } footer { padding-bottom: max(24px, env(safe-area-inset-bottom)); } }
+    </style>
+</head>
+<body>
+
+    <!-- Overlay -->
+    <div class="overlay" id="overlay" onclick="toggleMenu()"></div>
+
+    <!-- Aba Lateral -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-title">Menu</span>
+            <button class="close-btn" onclick="toggleMenu()" aria-label="Fechar">✕</button>
+        </div>
+
+        <nav class="sidebar-tabs" aria-label="Menu">
+            <button class="sidebar-tab active" data-panel="models"><svg viewBox="0 0 24 24"><path d="M12 3 4 7.5 12 12l8-4.5L12 3Zm-8 9 8 4.5 8-4.5M4 16.5 12 21l8-4.5"></path></svg><span>Modelos</span></button>
+            <button class="sidebar-tab" data-panel="agent"><svg viewBox="0 0 24 24"><path d="M12 3v18M4 7h16M4 17h16"></path></svg><span>Agente</span></button>
+            <button class="sidebar-tab" data-panel="generation"><svg viewBox="0 0 24 24"><path d="M4 17 10 11l4 3 6-8"></path><path d="M4 21h16"></path></svg><span>Geração</span></button>
+            <button class="sidebar-tab" data-panel="conversation"><svg viewBox="0 0 24 24"><path d="M21 11.5a8 8 0 0 1-8.5 8A8.8 8.8 0 0 1 8 18.2L3 20l1.8-4.4A8 8 0 1 1 21 11.5Z"></path></svg><span>Conversa</span></button>
+            <button class="sidebar-tab" data-panel="session"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 8v4l3 2"></path></svg><span>Sessão</span></button>
+        </nav>
+
+        <section class="sidebar-panel active" data-panel="models">
+        <span class="crypto-selector-label">Modelo local</span>
+        <label class="crypto-selector-box model-picker" title="Selecionar modelo GGUF">
+            <div class="crypto-info">
+                <div class="crypto-icon">LL</div>
+                <span class="crypto-name" id="modelPickerLabel">Adicionar modelo GGUF</span>
+            </div>
+            <svg class="dropdown-arrow" viewBox="0 0 24 24">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+            <input id="modelInput" type="file" accept=".gguf,application/octet-stream" multiple aria-label="Selecionar modelo GGUF">
+        </label>
+        <p class="model-status" id="modelStatus">Selecione um arquivo GGUF. O modelo fica somente neste dispositivo durante esta sessão.</p>
+        <div class="model-list" id="modelList" aria-live="polite"></div>
+        <section class="load-diagnostics" aria-label="Diagnóstico de carregamento">
+            <div class="load-line"><span id="loadPhase">Aguardando modelo</span><span id="loadTime">—</span></div>
+            <div class="load-progress"><i id="loadProgress"></i></div>
+            <dl><div><dt>Memória estimada</dt><dd id="loadMemory">—</dd></div><div><dt>Contexto</dt><dd id="loadContext">2.048 tokens</dd></div><div><dt>Backend</dt><dd id="loadBackend">WASM</dd></div><div><dt>Tempo previsto</dt><dd id="loadEstimate">—</dd></div></dl>
+            <p class="model-status" id="compatibilityStatus">Verificando compatibilidade do dispositivo…</p>
+        </section>
+        </section>
+
+        <section class="sidebar-panel" data-panel="agent">
+            <span class="settings-title">Agente & identidade</span>
+            <label class="prompt-upload">
+                Carregar prompt de sistema (.txt)
+                <span class="prompt-name" id="promptName">Nenhum prompt adicional</span>
+                <input id="systemPromptInput" type="file" accept=".txt,text/plain" aria-label="Carregar prompt de sistema">
+            </label>
+        </section>
+
+        <section class="sidebar-panel" data-panel="generation" aria-label="Parâmetros de geração">
+            <span class="settings-title">Geração</span>
+            <div class="generation-control">
+                <div class="generation-row"><label for="temperatureInput">Temperatura</label><output id="temperatureValue">0.70</output></div>
+                <input id="temperatureInput" type="range" min="0" max="1.5" step="0.05" value="0.70">
+            </div>
+            <div class="generation-control">
+                <div class="generation-row"><label for="topPInput">Top P</label><output id="topPValue">0.95</output></div>
+                <input id="topPInput" type="range" min="0.1" max="1" step="0.05" value="0.95">
+            </div>
+            <div class="generation-control">
+                <div class="generation-row"><label for="maxTokensInput">Limite por resposta</label><output>tokens</output></div>
+                <input class="token-input" id="maxTokensInput" type="number" min="32" max="2048" step="32" value="512">
+            </div>
+        </section>
+
+        <section class="sidebar-panel" data-panel="conversation">
+        <nav class="sidebar-menu">
+            <button class="sidebar-item" id="exportChatBtn" type="button">
+                <span class="menu-label"><svg viewBox="0 0 24 24"><path d="M12 16V3m0 0L7 8m5-5 5 5M5 13v6h14v-6" stroke-linecap="round" stroke-linejoin="round"></path></svg>Compartilhar conversa</span><span class="thin-number">.md</span>
+            </button>
+            <button class="sidebar-item" id="clearChatBtn" type="button">
+                <span class="menu-label"><svg viewBox="0 0 24 24"><path d="M4 7h16M10 11v6m4-6v6M6 7l1 14h10l1-14M9 7l1-3h4l1 3"></path></svg>Limpar conversa</span><span class="thin-number">nova</span>
+            </button>
+            <button class="sidebar-item" id="backupExportBtn" type="button"><span class="menu-label">Exportar backup completo</span><span class="thin-number">.json</span></button>
+            <label class="sidebar-item" for="backupImportInput"><span class="menu-label">Importar backup</span><span class="thin-number">.json</span></label><input id="backupImportInput" type="file" accept="application/json,.json" hidden>
+        </nav>
+        </section>
+        <section class="sidebar-panel" data-panel="session">
+            <span class="settings-title">Sessão atual</span>
+            <div class="session-model"><span class="crypto-icon" id="activeModelIcon">LL</span><div><strong id="activeModel">Nenhum modelo</strong><small id="sessionStatus">Aguardando modelo local</small></div></div>
+            <div class="mode-switch" aria-label="Modo de sessão">
+                <button id="contextModeBtn" class="active" type="button">Contexto<small>histórico e exportação</small></button>
+                <button id="anonymousModeBtn" type="button">Anônimo<small>sem exportação</small></button>
+            </div>
+        </section>
+        <a class="about-link" href="Sobre.html"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"></circle><path d="M12 11v5m0-8v.1"></path></svg>Sobre a Luna</a>
+    </aside>
+    <aside class="chat-drawer" id="chatDrawer" aria-label="Conversas">
+        <div class="chat-drawer-header"><span class="sidebar-title">Conversas</span><button class="close-btn" onclick="toggleChats()" aria-label="Fechar">✕</button></div>
+        <button class="chat-new" id="newChatBtn" type="button"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></svg>Novo chat</button>
+        <input class="chat-search" id="chatSearchInput" type="search" placeholder="Buscar conversas">
+        <div class="chat-session-list" id="chatSessionList"></div>
+    </aside>
+
+    <!-- Topo -->
+    <header>
+        <button class="menu-btn" onclick="toggleMenu()" aria-label="Abrir Menu Lateral">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <button class="chat-menu-btn" onclick="toggleChats()" aria-label="Abrir conversas"><svg viewBox="0 0 24 24"><path d="M20 11.5a7.5 7.5 0 0 1-8 7.5 8.1 8.1 0 0 1-3.8-.9L4 19.6l1.3-3.7A7.5 7.5 0 1 1 20 11.5Z"></path><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"></path></svg></button>
+    </header>
+
+    <!-- Centro: Lua crescente, símbolo do app -->
+    <main>
+        <div class="moon-container">
+            <div class="orbit-ring"></div>
+            <canvas id="moonCanvas"></canvas>
+        </div>
+        <span class="active-model-name" id="activeModelName">Luna</span>
+        <p class="moon-caption" aria-live="polite"><span id="typingText"></span><i class="cursor" aria-hidden="true"></i></p>
+        <section class="chat" id="chat" aria-live="polite" aria-label="Conversa"></section>
+    </main>
+
+    <!-- Rodapé -->
+    <footer>
+        <form class="composer-form" id="composerForm">
+        <div class="attachment-list" id="attachmentList" aria-live="polite"></div>
+        <div class="input-wrapper">
+            <button class="attach-btn" id="attachBtn" type="button" aria-label="Anexar arquivo"><svg viewBox="0 0 24 24"><path d="m20.5 11.5-8.8 8.8a6 6 0 0 1-8.5-8.5l9.1-9.1a4 4 0 0 1 5.7 5.7l-9.2 9.2a2 2 0 1 1-2.8-2.8l8.5-8.5"></path></svg></button>
+            <input id="attachmentInput" type="file" multiple hidden accept=".txt,.md,.csv,.json,.js,.ts,.html,.css,.py,.java,.c,.cpp,.h,.hpp,.xml,.yaml,.yml,.pdf,text/plain,text/*,application/pdf,application/json">
+            <textarea id="messageInput" placeholder="Escreva uma mensagem..." rows="1" aria-label="Mensagem"></textarea>
+            <button class="send-btn" id="sendBtn" type="submit" aria-label="Enviar" disabled>
+                <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                </svg>
+            </button>
+            <button class="attach-btn" id="stopBtn" type="button" aria-label="Parar geração" hidden><svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10"></rect></svg></button>
+        </div>
+        <span class="chat-state" id="chatState">Escolha um modelo</span>
+        </form>
+    </footer>
+
+    <script>
+        // Menu Lateral
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+        function toggleChats() { document.getElementById('chatDrawer').classList.toggle('open'); }
+        document.querySelectorAll('.sidebar-tab').forEach(tab => tab.addEventListener('click', () => {
+            const panel = tab.dataset.panel;
+            document.querySelectorAll('.sidebar-tab, .sidebar-panel').forEach(item => item.classList.toggle('active', item.dataset.panel === panel));
+        }));
+
+        // --- MODELOS GGUF LOCAIS / LLAMA NO NAVEGADOR ---
+        const modelInput = document.getElementById('modelInput');
+        const modelList = document.getElementById('modelList');
+        const modelStatus = document.getElementById('modelStatus');
+        const modelPickerLabel = document.getElementById('modelPickerLabel');
+        const activeModel = document.getElementById('activeModel');
+        const activeModelName = document.getElementById('activeModelName');
+        const activeModelIcon = document.getElementById('activeModelIcon');
+        const sessionStatus = document.getElementById('sessionStatus');
+        const loadPhase=document.getElementById('loadPhase'),loadTime=document.getElementById('loadTime'),loadProgress=document.getElementById('loadProgress'),loadMemory=document.getElementById('loadMemory'),loadBackend=document.getElementById('loadBackend'),loadEstimate=document.getElementById('loadEstimate');
+        let localModels = [];
+        let currentModel = null;
+        let wllama = null;
+        let modelReady = false;
+
+        const formatBytes = bytes => bytes >= 1e9 ? `${(bytes / 1e9).toFixed(2)} GB` : `${(bytes / 1e6).toFixed(0)} MB`;
+        function updateLoadDiagnostics(model,state='waiting',elapsed=0){const webgpu=!!navigator.gpu,speed=webgpu?115:32,estimate=Math.max(4,model.size/1e6/speed),used=performance.memory?.usedJSHeapSize||0;loadMemory.textContent=`${formatBytes(model.size*1.18+420e6)}${used?` · ${formatBytes(used)} JS`:''}`;loadBackend.textContent=webgpu?'WebGPU + WASM':'WASM';loadEstimate.textContent=`~ ${Math.ceil(estimate)} s`;loadTime.textContent=elapsed?`${elapsed.toFixed(1)} s`:'—';loadPhase.textContent=state==='ready'?'Modelo pronto':state==='error'?'Falha no carregamento':state==='loading'?'Inicializando modelo…':'Aguardando modelo';loadProgress.style.width=state==='ready'?'100%':state==='error'?'100%':state==='loading'?`${Math.min(92,12+elapsed/estimate*72)}%`:'0%';}
+        function modelInitials(name) { return name.replace(/\.gguf$/i, '').split(/[\s._-]+/).slice(0, 2).map(word => word[0]).join('').toUpperCase() || 'AI'; }
+        const modelColors = [['#1f2937','#5b677d'],['#164e63','#22a6b3'],['#4c1d95','#a78bfa'],['#7c2d12','#fb923c'],['#14532d','#4ade80']];
+        function renderModels() {
+            modelList.innerHTML = '';
+            localModels.forEach(model => {
+                const item = document.createElement('div');
+                item.className = `model-card${currentModel === model ? ' active' : ''}`;
+                item.innerHTML = `<div class="crypto-icon">${modelInitials(model.name)}</div><div class="model-card-text"><span class="model-card-name">${model.name}</span><span class="model-card-size">${formatBytes(model.size)} · GGUF local</span></div><button class="model-remove" aria-label="Remover ${model.name}">×</button>`;
+                const colors = modelColors[localModels.indexOf(model) % modelColors.length]; item.querySelector('.crypto-icon').style.setProperty('--model-a', colors[0]); item.querySelector('.crypto-icon').style.setProperty('--model-b', colors[1]);
+                item.addEventListener('click', event => { if (!event.target.closest('.model-remove')) selectModel(model); });
+                item.querySelector('.model-remove').addEventListener('click', () => { localModels = localModels.filter(entry => entry !== model); if (currentModel === model) currentModel = null; renderModels(); });
+                modelList.appendChild(item);
+            });
+        }
+        async function selectModel(model) {
+            currentModel = model;
+            modelReady = false;
+            setChatState('Carregando modelo…');
+            const started=performance.now(); updateLoadDiagnostics(model,'loading'); const loadTimer=setInterval(()=>updateLoadDiagnostics(model,'loading',(performance.now()-started)/1000),250);
+            modelPickerLabel.textContent = model.name;
+            const cleanModelName = model.name.replace(/\.gguf$/i, '');
+            activeModel.textContent = cleanModelName;
+            activeModelName.textContent = cleanModelName;
+            activeModelIcon.textContent = modelInitials(model.name);
+            sessionStatus.textContent = 'Carregando localmente';
+            modelStatus.textContent = `Selecionado: ${model.name}. Preparando o runtime local…`;
+            renderModels();
+            try {
+                modelStatus.textContent = `Carregando ${model.name} localmente…`;
+                if (!wllama) {
+                    const { Wllama } = await import('./runtime/wllama.mjs');
+                    // A API 3.x exige explicitamente a chave `default`.
+                    // O arquivo WASM é o build oficial distribuído pelo próprio pacote.
+                    const pathConfig = {
+                        default: './runtime/wllama.wasm'
+                    };
+                    wllama = new Wllama(pathConfig);
+                } else await wllama.exit();
+                await wllama.loadModel([model], { n_ctx: 2048, n_threads: Math.min(navigator.hardwareConcurrency || 4, 8), n_gpu_layers: 999, jinja: true });
+                modelReady = true;
+                modelStatus.textContent = `${model.name} carregado localmente. Nenhum dado saiu do dispositivo.`;
+                sessionStatus.textContent = 'Pronto para conversar';
+                saveSessionSettings();
+                clearInterval(loadTimer); updateLoadDiagnostics(model,'ready',(performance.now()-started)/1000);
+                setChatState('Luna pronta', 'ready');
+            } catch (error) {
+                clearInterval(loadTimer); updateLoadDiagnostics(model,'error',(performance.now()-started)/1000);
+                modelReady = false;
+                console.error(error);
+                modelStatus.textContent = `Modelo selecionado. Não foi possível iniciar o runtime: ${error.message || 'erro desconhecido'}.`;
+                setChatState('Modelo não carregou', 'error');
+            }
+        }
+        modelInput.addEventListener('change', event => {
+            const files = [...event.target.files].filter(file => /\.gguf$/i.test(file.name));
+            if (!files.length) { modelStatus.textContent = 'Escolha um arquivo com extensão .gguf.'; return; }
+            localModels.push(...files.filter(file => !localModels.some(model => model.name === file.name && model.size === file.size)));
+            modelStatus.textContent = `${files.length} modelo${files.length > 1 ? 's' : ''} adicionado${files.length > 1 ? 's' : ''}.`;
+            renderModels();
+            selectModel(files[0]);
+            modelInput.value = '';
+        });
+
+        // --- CONVERSA COM STREAMING E MARKDOWN SEGURO ---
+        const chat = document.getElementById('chat');
+        const composerForm = document.getElementById('composerForm');
+        const messageInput = document.getElementById('messageInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        let generationController = null;
+        const attachmentInput = document.getElementById('attachmentInput');
+        const attachmentList = document.getElementById('attachmentList');
+        let attachments = [];
+        const chatState = document.getElementById('chatState');
+        let history = [];
+        const chats = [{ title: 'Novo chat', messages: history }];
+        let activeChatIndex = 0;
+        const storageOpen = () => new Promise((resolve, reject) => { const request=indexedDB.open('luna-pulse',1); request.onupgradeneeded=()=>request.result.createObjectStore('state'); request.onsuccess=()=>resolve(request.result); request.onerror=()=>reject(request.error); });
+        async function saveChats() { if (typeof sessionMode !== 'undefined' && sessionMode === 'anonymous') return; try { const db=await storageOpen(); const tx=db.transaction('state','readwrite'); tx.objectStore('state').put({ chats, activeChatIndex },'chats'); } catch (error) { console.warn('Não foi possível salvar os chats localmente',error); } }
+        async function restoreChats() { try { const db=await storageOpen(); const tx=db.transaction('state','readonly'); const request=tx.objectStore('state').get('chats'); request.onsuccess=()=>{ const saved=request.result; if(!saved?.chats?.length)return; chats.splice(0,chats.length,...saved.chats); activeChatIndex=Math.min(saved.activeChatIndex||0,chats.length-1); history=chats[activeChatIndex].messages; chat.replaceChildren(); history.forEach(item=>appendMessage(item.role,item.content)); document.body.classList.toggle('chat-active',history.length>0); renderChatSessions(); }; } catch (error) { console.warn('Não foi possível restaurar os chats locais',error); } }
+        let sessionMode = 'context';
+        const defaultSystemPrompt = 'Você é Luna, uma assistente local, elegante e útil. Responda em português do Brasil quando apropriado. Use Markdown leve para organizar respostas. Seja honesta sobre limitações.';
+        let systemPrompt = defaultSystemPrompt;
+        const systemPromptInput = document.getElementById('systemPromptInput');
+        const promptName = document.getElementById('promptName');
+        const temperatureInput = document.getElementById('temperatureInput');
+        const temperatureValue = document.getElementById('temperatureValue');
+        const topPInput = document.getElementById('topPInput');
+        const topPValue = document.getElementById('topPValue');
+        const maxTokensInput = document.getElementById('maxTokensInput');
+        function setChatState(text, type = '') { chatState.textContent = text; chatState.className = `chat-state ${type}`; sendBtn.disabled = type !== 'ready'; }
+        function saveSessionSettings(){chats[activeChatIndex].settings={temperature:temperatureInput.value,topP:topPInput.value,maxTokens:maxTokensInput.value,systemPrompt,modelName:currentModel?.name||null};saveChats();}
+        function renderChatSessions() { const list = document.getElementById('chatSessionList'); const term=(document.getElementById('chatSearchInput')?.value||'').toLowerCase(); list.innerHTML = ''; chats.forEach((chatItem,index) => { const preview=chatItem.messages.at(-1)?.content?.replace(/\n/g,' ')||'Sem mensagens'; if(term && !(chatItem.title+' '+preview).toLowerCase().includes(term))return; const row=document.createElement('div'); row.className=`chat-session${index===activeChatIndex?' active':''}`; row.innerHTML=`<svg viewBox="0 0 24 24"><path d="M20 11.5a8 8 0 0 1-8.5 8A8.8 8.8 0 0 1 8 18.2L3 20l1.8-4.4A8 8 0 1 1 20 11.5Z"></path></svg><div class="chat-session-body"><span class="chat-session-title"></span><small class="chat-session-meta"></small></div><button class="session-rename" aria-label="Renomear chat">⌕</button><button class="session-delete" aria-label="Apagar chat">×</button>`; row.querySelector('.chat-session-title').textContent=chatItem.title; row.querySelector('.chat-session-meta').textContent=`${new Date(chatItem.updatedAt||Date.now()).toLocaleDateString('pt-BR')} · ${preview}`; row.onclick=()=>switchChat(index); row.querySelector('.session-rename').onclick=event=>{event.stopPropagation();const title=prompt('Nome da conversa:',chatItem.title);if(title?.trim()){chatItem.title=title.trim();chatItem.updatedAt=Date.now();renderChatSessions();saveChats();}}; row.querySelector('.session-delete').onclick=event=>{event.stopPropagation(); if(chats.length===1){history.splice(0);chat.replaceChildren();chats[0].title='Novo chat';}else{chats.splice(index,1);activeChatIndex=Math.max(0,activeChatIndex===index?index-1:activeChatIndex);history=chats[activeChatIndex].messages;chat.replaceChildren();history.forEach(item=>appendMessage(item.role,item.content));}renderChatSessions();saveChats();}; list.appendChild(row); }); }
+        function switchChat(index) { activeChatIndex=index; history=chats[index].messages; const s=chats[index].settings;if(s){temperatureInput.value=s.temperature||temperatureInput.value;topPInput.value=s.topP||topPInput.value;maxTokensInput.value=s.maxTokens||maxTokensInput.value;temperatureValue.value=Number(temperatureInput.value).toFixed(2);topPValue.value=Number(topPInput.value).toFixed(2);if(s.systemPrompt)systemPrompt=s.systemPrompt;} chat.replaceChildren(); history.forEach(item=>appendMessage(item.role,item.content)); document.body.classList.toggle('chat-active', history.length>0); renderChatSessions(); saveChats(); toggleChats(); }
+        function newChat() { history=[]; chats.push({title:'Novo chat',messages:history,updatedAt:Date.now()}); activeChatIndex=chats.length-1; chat.replaceChildren(); document.body.classList.remove('chat-active'); renderChatSessions(); saveChats(); toggleChats(); messageInput.focus(); }
+        document.getElementById('newChatBtn').onclick=newChat; document.getElementById('chatSearchInput').oninput=renderChatSessions; renderChatSessions(); restoreChats();
+        function setSessionMode(mode) { sessionMode = mode; document.body.classList.toggle('anonymous-mode', mode === 'anonymous'); document.getElementById('contextModeBtn').classList.toggle('active', mode === 'context'); document.getElementById('anonymousModeBtn').classList.toggle('active', mode === 'anonymous'); sessionStatus.textContent = mode === 'anonymous' ? 'Modo anônimo ativo' : (modelReady ? 'Pronto para conversar' : 'Aguardando modelo local'); }
+        document.getElementById('contextModeBtn').onclick = () => setSessionMode('context');
+        document.getElementById('anonymousModeBtn').onclick = () => setSessionMode('anonymous');
+        function renderAttachments() { attachmentList.innerHTML = ''; attachments.forEach((file, index) => { const item = document.createElement('div'); item.className = 'attachment'; item.innerHTML = `<span>${file.name} · ${(file.size/1024).toFixed(0)} KB</span><button type="button" aria-label="Remover ${file.name}">×</button>`; item.querySelector('span').onclick=async()=>{if(file.size>1024*1024)return; const preview=await (file.type==='application/pdf'?'Prévia de PDF disponível ao enviar.':file.text()); item.title=preview.slice(0,1200);}; item.querySelector('button').onclick = () => { attachments.splice(index, 1); renderAttachments(); }; attachmentList.appendChild(item); }); }
+        document.getElementById('attachBtn').onclick = () => attachmentInput.click();
+        attachmentInput.onchange = event => { const selected=[...event.target.files]; const allowed=selected.filter(file=>file.size<=8*1024*1024); if(allowed.length!==selected.length)setChatState('Limite de anexo: 8 MB', 'error'); attachments.push(...allowed.filter(file => !attachments.some(current => current.name === file.name && current.size === file.size))); attachmentInput.value = ''; renderAttachments(); };
+        async function attachmentText(file) {
+            if (file.type === 'application/pdf' || /\.pdf$/i.test(file.name)) {
+                const pdfjs = await import('./runtime/pdf.min.mjs');
+                pdfjs.GlobalWorkerOptions.workerSrc = './runtime/pdf.worker.min.mjs';
+                const pdf = await pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) }).promise;
+                let output = ''; for (let page = 1; page <= pdf.numPages; page++) { const content = await (await pdf.getPage(page)).getTextContent(); output += content.items.map(item => item.str).join(' ') + '\n'; }
+                return output;
+            }
+            return file.text();
+        }
+        temperatureInput.addEventListener('input', () => {temperatureValue.value = Number(temperatureInput.value).toFixed(2);saveSessionSettings();});
+        topPInput.addEventListener('input', () => {topPValue.value = Number(topPInput.value).toFixed(2);saveSessionSettings();});
+        maxTokensInput.addEventListener('change',saveSessionSettings);
+        systemPromptInput.addEventListener('change', async event => {
+            const file = event.target.files[0];
+            if (!file) return;
+            try {
+                systemPrompt = (await file.text()).trim() || defaultSystemPrompt;
+                promptName.textContent = file.name;
+                saveSessionSettings();
+            } catch { promptName.textContent = 'Não foi possível ler o arquivo'; }
+        });
+        const escapeHTML = value => value.replace(/[&<>'"]/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', "'":'&#39;', '"':'&quot;' }[char]));
+        function safeUrl(value) { try { const url = new URL(value, location.href); return ['http:', 'https:'].includes(url.protocol) ? url.href : null; } catch { return null; } }
+        function renderMarkdown(raw) {
+            const blocks = [];
+            let html = escapeHTML(raw).replace(/```([\s\S]*?)```/g, (_, code) => { const id = blocks.length; blocks.push(`<pre><code>${code.trim()}</code></pre>`); return `\u0000${id}\u0000`; });
+            html = html.replace(/!\[([^\]]*)\]\(([^\s)]+)\)/g, (_, alt, url) => { const safe = safeUrl(url); return safe ? `<img src="${safe}" alt="${alt}" loading="lazy">` : alt; });
+            html = html.replace(/\[([^\]]+)\]\(([^\s)]+)\)/g, (_, label, url) => { const safe = safeUrl(url); return safe ? `<a href="${safe}" target="_blank" rel="noopener noreferrer">${label}</a>` : label; });
+            html = html.replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/__([^_]+)__/g, '<strong>$1</strong>').replace(/(^|\n)### (.*)/g, '$1<h3>$2</h3>').replace(/(^|\n)## (.*)/g, '$1<h2>$2</h2>').replace(/(^|\n)# (.*)/g, '$1<h1>$2</h1>');
+            html = html.replace(/(^|\n)(?:- |\* )(.*)(?=(?:\n(?:- |\* )|\n\n|$))/g, '$1<li>$2</li>').replace(/(<li>[\s\S]*?<\/li>)(?!\n<li>)/g, '$1');
+            html = html.replace(/((?:<li>[\s\S]*?<\/li>\s*)+)/g, '<ul>$1</ul>');
+            html = html.split(/\n{2,}/).map(part => /^(<h\d|<ul|\u0000)/.test(part) ? part : `<p>${part.replace(/\n/g, '<br>')}</p>`).join('');
+            return html.replace(/\u0000(\d+)\u0000/g, (_, id) => blocks[Number(id)]);
+        }
+        function estimateTokens(text) { return Math.max(1, Math.ceil((text || '').trim().length / 4)); }
+        function appendMessage(role, text = '', tokens = estimateTokens(text)) {
+            const row = document.createElement('article'); row.className = `message ${role}`;
+            const bubble = document.createElement('div'); bubble.className = `bubble ${role === 'assistant' ? 'markdown' : ''}`;
+            role === 'assistant' ? bubble.innerHTML = renderMarkdown(text) : bubble.textContent = text;
+            const actions = document.createElement('div'); actions.className = 'message-actions';
+            const tokenCount = document.createElement('span'); tokenCount.className = 'token-count'; tokenCount.textContent = `≈ ${tokens} tokens`;
+            const copy = document.createElement('button'); copy.type = 'button'; copy.className = 'message-action'; copy.textContent = 'Copiar';
+            copy.addEventListener('click', async () => { await navigator.clipboard.writeText(text); copy.textContent = 'Copiado'; setTimeout(() => copy.textContent = 'Copiar', 1200); });
+            if(role==='user'){const edit=document.createElement('button');edit.type='button';edit.className='message-action';edit.textContent='Editar';edit.onclick=()=>{messageInput.value=text;resizeComposer();messageInput.focus();};actions.append(edit);}else{const regen=document.createElement('button');regen.type='button';regen.className='message-action';regen.textContent='Refazer';regen.onclick=()=>regenerateLast();actions.append(regen);} actions.append(tokenCount, copy); row.append(bubble, actions); chat.appendChild(row); chat.scrollTop = chat.scrollHeight;
+            bubble.tokenCount = tokenCount;
+            return bubble;
+        }
+        document.getElementById('exportChatBtn').addEventListener('click', () => {
+            if (sessionMode === 'anonymous') return;
+            const body = history.map(item => `## ${item.role === 'user' ? 'Você' : 'Luna'}\n\n${item.content}`).join('\n\n---\n\n');
+            const content = `# Conversa com Luna\n\n${body}\n`;
+            if (navigator.share) { navigator.share({ title: 'Conversa com Luna', text: content }).catch(() => {}); return; }
+            const file = new Blob([content], { type: 'text/markdown;charset=utf-8' });
+            const url = URL.createObjectURL(file); const link = document.createElement('a');
+            link.href = url; link.download = `conversa-luna-${new Date().toISOString().slice(0, 10)}.md`; link.click(); URL.revokeObjectURL(url);
+        });
+        function downloadJson(data,name){const u=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u)}
+        document.getElementById('backupExportBtn').onclick=()=>{if(sessionMode==='anonymous')return;downloadJson({app:'Luna Pulse',version:1,exportedAt:new Date().toISOString(),chats,activeChatIndex},'luna-backup.json')};
+        document.getElementById('backupImportInput').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());if(!Array.isArray(d.chats))throw Error();chats.splice(0,chats.length,...d.chats.filter(c=>Array.isArray(c.messages)).map(c=>({...c,settings:c.settings||{}}));activeChatIndex=Math.min(Math.max(0,d.activeChatIndex||0),chats.length-1);if(!chats.length)chats.push({title:'Novo chat',messages:[]});switchChat(activeChatIndex);saveChats();alert('Backup restaurado.')}catch{alert('Este arquivo não é um backup válido da Luna.')}e.target.value=''};
+        async function checkCompatibility(){const wasm=typeof WebAssembly==='object';const gpu=!!navigator.gpu;const mem=navigator.deviceMemory||0;const max=mem?Math.max(.5,Math.floor(mem*.35*10)/10):1;compatibilityStatus.textContent=!wasm?'Este navegador não suporta WASM.':gpu?`WebGPU disponível · recomendado até ${max} GB`:`WASM disponível · recomendado até ${max} GB`;loadBackend.textContent=gpu?'WebGPU + WASM':'WASM';loadMemory.textContent=mem?`${mem} GB RAM detectada`:'RAM não informada';}checkCompatibility();
+        document.getElementById('clearChatBtn').addEventListener('click', () => {
+            if (!history.length || !confirm('Limpar esta conversa?')) return;
+            history.splice(0, history.length); chat.replaceChildren(); chats[activeChatIndex].title='Novo chat'; renderChatSessions(); saveChats(); document.body.classList.remove('chat-active'); toggleMenu(); messageInput.focus();
+        });
+        function regenerateLast(){if(history.at(-1)?.role!=='assistant'||history.at(-2)?.role!=='user')return;const user=history.at(-2).content;history.splice(-2);chat.replaceChildren();history.forEach(item=>appendMessage(item.role,item.content));messageInput.value=user;composerForm.requestSubmit();}
+        function resizeComposer() { messageInput.style.height = 'auto'; messageInput.style.height = Math.min(messageInput.scrollHeight, 130) + 'px'; }
+        messageInput.addEventListener('input', resizeComposer);
+        messageInput.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); composerForm.requestSubmit(); } });
+        composerForm.addEventListener('submit', async event => {
+            event.preventDefault();
+            const message = messageInput.value.trim();
+            if ((!message && !attachments.length) || !wllama || !currentModel || !modelReady) { modelStatus.textContent = currentModel ? 'Aguarde o modelo terminar de carregar antes de conversar.' : 'Escolha e aguarde o carregamento de um modelo GGUF antes de conversar.'; setChatState(currentModel ? 'Aguarde o modelo' : 'Escolha um modelo', 'error'); return; }
+            let attachmentContext = '';
+            if (attachments.length) {
+                try {
+                    setChatState('Lendo anexos…');
+                    for (const file of attachments) attachmentContext += `\n\n--- Arquivo: ${file.name} ---\n${(await attachmentText(file)).slice(0, 40000)}`;
+                } catch (error) { setChatState('Não foi possível ler um anexo', 'error'); return; }
+            }
+            document.body.classList.add('chat-active');
+            appendMessage('user', message, estimateTokens(message + attachmentContext)); history.push({ role: 'user', content: message + attachmentContext });
+            if (history.length === 1) chats[activeChatIndex].title = (message || 'Arquivo anexado').slice(0, 34);
+            chats[activeChatIndex].updatedAt=Date.now();
+            renderChatSessions(); saveChats();
+            messageInput.value = ''; resizeComposer(); sendBtn.disabled = true; setChatState('Luna está respondendo…');
+            attachments = []; renderAttachments();
+            generationController = new AbortController(); stopBtn.hidden=false;
+            const replyBubble = appendMessage('assistant'); replyBubble.innerHTML = '<span class="typing"><i></i><i></i><i></i></span>';
+            let reply = '';
+            try {
+                const messages = sessionMode === 'anonymous' ? [{ role: 'system', content: systemPrompt }, history[history.length - 1]] : [{ role: 'system', content: systemPrompt }, ...history];
+                const stream = await wllama.createChatCompletion({
+                    messages,
+                    stream: true,
+                    max_tokens: Math.max(32, Math.min(2048, Number(maxTokensInput.value) || 512)),
+                    temperature: Number(temperatureInput.value),
+                    top_p: Number(topPInput.value),
+                    top_k: 40, abortSignal:generationController.signal
+                });
+                for await (const chunk of stream) {
+                    const token = chunk?.choices?.[0]?.delta?.content ?? chunk?.choices?.[0]?.text ?? '';
+                    if (!token) continue;
+                    reply += token;
+                    replyBubble.innerHTML = renderMarkdown(reply);
+                    replyBubble.tokenCount.textContent = `≈ ${estimateTokens(reply)} tokens`;
+                    chat.scrollTop = chat.scrollHeight;
+                }
+                if (!reply) reply = 'Não houve texto na resposta do modelo.';
+                replyBubble.innerHTML = renderMarkdown(reply);
+                history.push({ role: 'assistant', content: reply });
+                chats[activeChatIndex].updatedAt=Date.now();
+                renderChatSessions(); saveChats();
+            } catch (error) {
+                replyBubble.textContent = `Não consegui gerar a resposta: ${error.message || 'erro desconhecido'}.`;
+            } finally { generationController=null;stopBtn.hidden=true; setChatState(modelReady ? 'Luna pronta' : 'Modelo indisponível', modelReady ? 'ready' : 'error'); messageInput.focus(); }
+        });
+        stopBtn.onclick=()=>generationController?.abort();
+
+        // --- MOTOR DE EVOLUÇÃO CROMÁTICA & ILUMINAÇÃO CONTÍNUA ---
+        const canvas = document.getElementById('moonCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const dpr = window.devicePixelRatio || 2;
+        const res = 92;
+        canvas.width = res * dpr;
+        canvas.height = res * dpr;
+        ctx.scale(dpr, dpr);
+
+        const cx = res / 2;
+        const cy = res / 2;
+        const r = 44;
+
+        // Configuração de tempos
+        const PAUSE_DURATION = 1400;      // 1.4s parada em cada fase
+        const TRANSITION_DURATION = 1400; // 1.4s transição fluida
+        const STEP_TIME = PAUSE_DURATION + TRANSITION_DURATION;
+
+        function easeCos(t) {
+            return (1 - Math.cos(t * Math.PI)) / 2;
+        }
+
+        // PALETAS CROMÁTICAS EXCLUSIVAS PARA AS 8 FASES (Cores [R, G, B] e contraste)
+        const phasePalettes = [
+            // 0. Nova: Obsidiana Profunda / Ébano
+            { dark: [12, 15, 24], light: [32, 40, 56], contrast: 1.0 },
+
+            // 1. Crescente Côncava: Platina Lunar & Indigo
+            { dark: [15, 23, 42], light: [226, 232, 240], contrast: 1.15 },
+
+            // 2. Quarto Crescente: Esmeralda Noir & Pérola Suave
+            { dark: [10, 32, 28], light: [240, 253, 244], contrast: 1.25 },
+
+            // 3. Gibosa Crescente: Âmbar & Champagne Celestial
+            { dark: [36, 26, 18], light: [254, 243, 199], contrast: 1.1 },
+
+            // 4. Cheia: Ouro Solar & Branco Radiante
+            { dark: [48, 30, 16], light: [255, 255, 255], contrast: 0.95 },
+
+            // 5. Gibosa Minguante: Cobre Rosa & Crepúsculo
+            { dark: [34, 18, 28], light: [255, 228, 230], contrast: 1.15 },
+
+            // 6. Quarto Minguante: Cobalto Glacial & Gelo Puro
+            { dark: [11, 22, 48], light: [224, 242, 254], contrast: 1.3 },
+
+            // 7. Minguante Côncava: Verde Menta / Névoa Aquamarine
+            { dark: [13, 27, 32], light: [204, 251, 241], contrast: 1.1 }
+        ];
+
+        // Interpolação suave entre dois vetores RGB
+        function lerpColor(c1, c2, t) {
+            return [
+                c1[0] + (c2[0] - c1[0]) * t,
+                c1[1] + (c2[1] - c1[1]) * t,
+                c1[2] + (c2[2] - c1[2]) * t
+            ];
+        }
+
+        const imgData = ctx.createImageData(res * dpr, res * dpr);
+        const data = imgData.data;
+
+        function renderChromaticMoon(phi, currentDark, currentLight, currentContrast) {
+            const w = res * dpr;
+            const h = res * dpr;
+            const radius = r * dpr;
+            const centerX = cx * dpr;
+            const centerY = cy * dpr;
+
+            const lx = Math.sin(phi);
+            const lz = -Math.cos(phi);
+
+            let idx = 0;
+            for (let y = 0; y < h; y++) {
+                const dy = (y - centerY) / radius;
+                for (let x = 0; x < w; x++) {
+                    const dx = (x - centerX) / radius;
+                    const distSq = dx * dx + dy * dy;
+
+                    if (distSq <= 1.0) {
+                        const dz = Math.sqrt(1.0 - distSq);
+                        const dot = dx * lx + dz * lz;
+
+                        // Antialiasing do terminador de luz com contraste adaptativo
+                        let t = Math.min(Math.max((dot + 0.03) / 0.06, 0.0), 1.0);
+                        
+                        // Modulação de contraste da fase
+                        if (currentContrast !== 1.0) {
+                            t = Math.pow(t, currentContrast);
+                        }
+
+                        // Mistura cromática precisa
+                        const rCol = Math.round(currentDark[0] + (currentLight[0] - currentDark[0]) * t);
+                        const gCol = Math.round(currentDark[1] + (currentLight[1] - currentDark[1]) * t);
+                        const bCol = Math.round(currentDark[2] + (currentLight[2] - currentDark[2]) * t);
+
+                        let alpha = 255;
+                        if (distSq > 0.94) {
+                            alpha = Math.round(Math.max(0, Math.min(1, (1.0 - Math.sqrt(distSq)) / (1.0 - Math.sqrt(0.94)))) * 255);
+                        }
+
+                        data[idx] = rCol;
+                        data[idx + 1] = gCol;
+                        data[idx + 2] = bCol;
+                        data[idx + 3] = alpha;
+                    } else {
+                        data[idx + 3] = 0;
+                    }
+                    idx += 4;
+                }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+
+            // Anel externo fino
+            ctx.beginPath();
+            ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(229, 231, 235, 0.85)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        let startTime = null;
+
+        function loop(timestamp) {
+            if (!startTime) startTime = timestamp;
+            const elapsed = timestamp - startTime;
+
+            const step = Math.floor(elapsed / STEP_TIME);
+            const timeInStep = elapsed % STEP_TIME;
+
+            const curIndex = ((step % 8) + 8) % 8;
+            const nxtIndex = (curIndex + 1) % 8;
+
+            const baseAngle = step * (Math.PI / 4);
+
+            let currentPhi;
+            let darkCol, lightCol, contrastVal;
+
+            if (timeInStep < PAUSE_DURATION) {
+                // Parada na fase atual com sua paleta pura
+                currentPhi = baseAngle;
+                darkCol = phasePalettes[curIndex].dark;
+                lightCol = phasePalettes[curIndex].light;
+                contrastVal = phasePalettes[curIndex].contrast;
+            } else {
+                // Transição contínua tanto de geometria quanto de cores/contrastes
+                const progress = (timeInStep - PAUSE_DURATION) / TRANSITION_DURATION;
+                const smoothT = easeCos(progress);
+
+                currentPhi = baseAngle + smoothT * (Math.PI / 4);
+
+                // Fusão cromática suave entre a paleta atual e a próxima
+                darkCol = lerpColor(phasePalettes[curIndex].dark, phasePalettes[nxtIndex].dark, smoothT);
+                lightCol = lerpColor(phasePalettes[curIndex].light, phasePalettes[nxtIndex].light, smoothT);
+                contrastVal = phasePalettes[curIndex].contrast + (phasePalettes[nxtIndex].contrast - phasePalettes[curIndex].contrast) * smoothT;
+            }
+
+            renderChromaticMoon(currentPhi, darkCol, lightCol, contrastVal);
+            requestAnimationFrame(loop);
+        }
+
+        requestAnimationFrame(loop);
+
+        const phrases = [
+            'seus agentes nas pontas dos seus dedos.',
+            'criando vários hello world pelo mundo.',
+            'ideias locais. alcance sem limites.',
+            'uma presença silenciosa, pronta quando você estiver.',
+            'a sua próxima conversa começa aqui.'
+        ];
+        const typingText = document.getElementById('typingText');
+        let phraseIndex = 0;
+        const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        async function typePhrases() {
+            while (true) {
+                const phrase = phrases[phraseIndex];
+                typingText.textContent = '';
+                typingText.classList.add('visible');
+                for (const char of phrase) { typingText.textContent += char; await wait(char === ' ' ? 28 : 42); }
+                await wait(2800);
+                typingText.classList.remove('visible');
+                await wait(750);
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+            }
+        }
+        typePhrases();
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => navigator.serviceWorker.register('./service-worker.js'));
+        }
+    </script>
+
+</body>
+</html>

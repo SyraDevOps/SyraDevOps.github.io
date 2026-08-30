@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111622">
+  <meta name="description" content="Luna: inteligência local, no seu dispositivo.">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <title>Luna — inteligência local</title>
+  <style>
+    *{box-sizing:border-box} body{margin:0;min-height:100dvh;background:#fbfbfc;color:#151923;font-family:"Codec Pro","Avenir Next","Helvetica Neue",Arial,sans-serif;font-weight:300;letter-spacing:.01em}.shell{min-height:100dvh;padding:28px clamp(22px,6vw,92px);display:flex;flex-direction:column}.brand{display:flex;align-items:center;gap:13px;color:#1a1e29;font-size:.78rem;letter-spacing:.32em;font-weight:400}.brand img{width:30px;height:30px}.hero{width:min(920px,100%);margin:auto 0;padding:70px 0 52px}.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.22em;color:#787f8e}.hero h1{max-width:720px;margin:19px 0 21px;font-weight:300;letter-spacing:-.06em;font-size:clamp(3rem,8vw,6.8rem);line-height:.96}.hero p{max-width:480px;margin:0;color:#666d7a;font-size:clamp(1rem,1.6vw,1.16rem);line-height:1.7}.actions{display:flex;gap:12px;align-items:center;margin-top:38px}.action{appearance:none;border:0;text-decoration:none;cursor:pointer;font:inherit;font-size:.88rem;letter-spacing:.04em;padding:15px 20px;transition:transform .2s ease,background .2s ease}.primary{background:#141923;color:#fff}.primary:hover{background:#303847;transform:translateY(-2px)}.secondary{padding-left:5px;color:#525966;background:transparent}.secondary:hover{color:#111622}.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:26px;border-top:1px solid #e7e8ec;padding-top:21px;max-width:920px}.feature h2{margin:0 0 7px;font-size:.82rem;font-weight:400;letter-spacing:.08em}.feature p{margin:0;max-width:220px;color:#7a808b;font-size:.82rem;line-height:1.55}.note{margin-top:22px;color:#a1a5ad;font-size:.7rem}@media(max-width:620px){.shell{padding:22px}.hero{padding:45px 0}.hero h1{font-size:clamp(3.1rem,16vw,4.6rem)}.actions{align-items:flex-start;flex-direction:column}.features{grid-template-columns:1fr;gap:18px}.feature p{max-width:340px}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="brand"><img src="icons/icon.svg" alt=""> LUNA</div>
+    <section class="hero">
+      <span class="eyebrow">processamento local</span>
+      <h1>Inteligência no seu computador.</h1>
+      <p>Escolha seu modelo, converse com privacidade e deixe a Luna trabalhar diretamente no seu dispositivo.</p>
+      <div class="actions">
+        <button class="action primary" id="installButton" hidden>Instalar aplicativo</button>
+        <a class="action primary" id="openButton" href="Pulse.html">Abrir a Luna</a>
+        <a class="action secondary" href="Pulse.html">Ir direto ao chat →</a>
+      </div>
+    </section>
+    <section class="features" aria-label="Princípios da Luna">
+      <article class="feature"><h2>Privada</h2><p>Seus modelos e conversas permanecem no seu dispositivo.</p></article>
+      <article class="feature"><h2>Flexível</h2><p>Use os seus próprios arquivos GGUF, sem depender de uma conta.</p></article>
+      <article class="feature"><h2>Presente</h2><p>Uma interface leve, instalada como aplicativo quando você quiser.</p></article>
+    </section>
+    <p class="note">O navegador baixa o runtime na primeira utilização.</p>
+  </main>
+  <script>
+    let installEvent;
+    const installButton=document.getElementById('installButton');
+    window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installEvent=event;installButton.hidden=false;document.getElementById('openButton').hidden=true});
+    installButton.addEventListener('click',async()=>{if(!installEvent)return;installEvent.prompt();await installEvent.userChoice;installButton.hidden=true;installEvent=null});
+    if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./service-worker.js'));
+  </script>
+</body>
+</html>

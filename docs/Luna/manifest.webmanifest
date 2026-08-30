@@ -1,0 +1,15 @@
+{
+  "name": "Luna — agentes ao alcance",
+  "short_name": "Luna",
+  "description": "Uma interface minimalista para seus agentes.",
+  "lang": "pt-BR",
+  "start_url": "./Pulse.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#f8f9fb",
+  "orientation": "portrait-primary",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
