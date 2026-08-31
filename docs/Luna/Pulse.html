@@ -1,3 +1,32 @@
+Baixar 
+Pulse.html corrigido
+
+Pulse.html
+HTML
+Me passe um link de um modelo bom pra telefone 
+
+Para telefone, eu usaria o Qwen2.5 1.5B Instruct — Q4_K_M. É leve, conversa bem em português e tende a ser uma escolha mais realista para navegador/celular.
+
+Baixe este arquivo:
+
+Qwen2.5-1.5B-Instruct Q4_K_M.gguf
+
+Ele tem cerca de 1,1 GB. Não recomendo Q8 no celular; ocupa mais RAM e pode travar. O repositório oficial oferece essa quantização GGUF. Hugging Face — Qwen
+
+Me dê um link direto 
+
+Baixar diretamente o Qwen2.5 1.5B Q4_K_M
+
+selecionado. Não foi possível iniciar o runtime: Received abort signal from llama.cpp; Message: (empty).
+
+Corrigido no 
+Pulse.html: em celulares sem WebGPU, a Luna não força mais GPU; usa menos threads e contexto menor.
+
+Baixar 
+Pulse.html corrigido
+
+Se ainda abortar, o modelo de 1,1 GB é grande para seu celular. Use um GGUF de até 600–800 MB, de preferência Q4_K_M.
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -597,7 +626,15 @@
                     };
                     wllama = new Wllama(pathConfig);
                 } else await wllama.exit();
-                await wllama.loadModel([model], { n_ctx: 2048, n_threads: Math.min(navigator.hardwareConcurrency || 4, 8), n_gpu_layers: 999, jinja: true });
+                const hasWebGPU = !!navigator.gpu;
+                const phoneMemory = navigator.deviceMemory || 0;
+                const contextSize = hasWebGPU ? 2048 : (phoneMemory && phoneMemory <= 4 ? 512 : 1024);
+                await wllama.loadModel([model], {
+                    n_ctx: contextSize,
+                    n_threads: Math.min(navigator.hardwareConcurrency || 4, 4),
+                    n_gpu_layers: hasWebGPU ? 999 : 0,
+                    jinja: true
+                });
                 modelReady = true;
                 modelStatus.textContent = `${model.name} carregado localmente. Nenhum dado saiu do dispositivo.`;
                 sessionStatus.textContent = 'Pronto para conversar';
@@ -975,3 +1012,5 @@
 
 </body>
 </html>
+Pulse.html
+HTML
