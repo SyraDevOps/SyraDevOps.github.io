@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-title-key="pageTitleAbout">
+<head>
+<meta charset="UTF-8">
+<script>try{var s=JSON.parse(localStorage.getItem("nex_theme"));var th=(s==="light"||s==="dark")?s:(matchMedia("(prefers-color-scheme: light)").matches?"light":"dark");document.documentElement.setAttribute("data-theme",th);}catch(e){}</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover">
+<title>Nex — Sobre</title>
+<meta name="description" content="O que é o Nex, como funciona e para que usar: chat de pessoa para pessoa, sem servidor de mensagens.">
+<meta name="theme-color" content="#0A0812">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="./icons/favicon-16.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,500;1,600&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./nex.css">
+<link rel="stylesheet" href="./nex-app.css">
+</head>
+<body>
+<div class="field-grain"></div>
+<div class="scanlines"></div>
+
+<div class="auth-view about-view">
+  <div class="auth-top">
+    <a class="brand" href="./index.html" style="text-decoration:none;">
+      <svg class="brand-mark" viewBox="0 0 34 34" fill="none">
+        <circle cx="17" cy="17" r="15.5" stroke="#9B6BFF" stroke-width="1.2" opacity="0.5"/>
+        <circle cx="17" cy="17" r="9.5" stroke="#9B6BFF" stroke-width="1.2" opacity="0.8"/>
+        <circle cx="17" cy="17" r="2.6" fill="#9B6BFF"/>
+      </svg>
+      <div>
+        <div class="brand-name">Nex</div>
+        <div class="brand-tag" data-i18n="brandTag">Sinal para Sinal</div>
+      </div>
+    </a>
+    <div class="header-actions">
+      <a class="nav-link" href="./index.html" data-i18n="navEnter">Entrar</a>
+      <button class="icon-btn theme-btn" data-theme-toggle type="button" style="width:38px;height:38px;"></button>
+      <button class="icon-btn" data-lang-toggle title="Português / English" aria-label="Alternar idioma" style="font-size:11px; font-weight:700; width:auto; padding:0 12px; height:38px;">PT</button>
+    </div>
+  </div>
+
+  <main class="about-main">
+    <header class="about-hero">
+      <div class="about-eyebrow" data-i18n="aboutEyebrow">SOBRE O NEX</div>
+      <h1><span data-l="pt">Conversas direto entre você e quem importa.</span><span data-l="en">Conversations straight between you and the people who matter.</span></h1>
+      <p data-l="pt">Um chat sem servidor de mensagens, sem e-mail e sem telefone. Seu ID curto, seu token secreto e pronto.</p>
+      <p data-l="en">A chat with no message server, no email and no phone number. Your short ID, your secret token, and you're set.</p>
+      <div class="about-cta">
+        <a class="btn btn-primary" href="./registro.html" data-i18n="aboutCtaCreate">Criar conta</a>
+        <a class="btn" href="./index.html" data-i18n="aboutCtaLogin">Já tenho conta</a>
+      </div>
+    </header>
+
+    <nav class="about-toc" aria-label="Sumário"><a href="#s01"><i>01</i><span data-l="pt">O que é o Nex</span><span data-l="en">What Nex is</span></a><a href="#s02"><i>02</i><span data-l="pt">Como funciona por dentro</span><span data-l="en">How it works</span></a><a href="#s03"><i>03</i><span data-l="pt">Sua conta: ID, token e arquivo .json</span><span data-l="en">Your account: ID, token and .json file</span></a><a href="#s04"><i>04</i><span data-l="pt">Agenda e várias conversas</span><span data-l="en">Contacts and multiple chats</span></a><a href="#s05"><i>05</i><span data-l="pt">O que dá para fazer</span><span data-l="en">What you can do</span></a><a href="#s06"><i>06</i><span data-l="pt">Segurança e privacidade</span><span data-l="en">Security and privacy</span></a><a href="#s07"><i>07</i><span data-l="pt">Limites que vale conhecer</span><span data-l="en">Limits worth knowing</span></a></nav>
+
+    <section class="panel about-card" id="s01">
+      <div class="panel-number">01</div>
+      <h2><span data-l="pt">O que é o Nex</span><span data-l="en">What Nex is</span></h2>
+      <div class="about-body" data-l="pt"><p>O Nex é um chat <b>de pessoa para pessoa</b>: as mensagens vão direto do seu aparelho para o do seu amigo, sem passar por um servidor que guarde conversas. Não existe cadastro com e-mail ou telefone — sua conta é só um ID curto e um token secreto.</p><p>Serve para quem quer conversar, mandar arquivos, áudios e fazer chamadas com privacidade, com uma agenda de contatos e várias conversas ao mesmo tempo, como num mensageiro comum.</p></div>
+      <div class="about-body" data-l="en"><p>Nex is a <b>person-to-person</b> chat: messages travel straight from your device to your friend's, never through a server that stores conversations. There's no sign-up with email or phone — your account is just a short ID and a secret token.</p><p>It's for talking, sending files and voice notes, and making calls privately, with a contact book and several conversations at once, like a regular messenger.</p></div>
+    </section>
+    <section class="panel about-card" id="s02">
+      <div class="panel-number">02</div>
+      <h2><span data-l="pt">Como funciona por dentro</span><span data-l="en">How it works</span></h2>
+      <div class="about-body" data-l="pt"><p>O Nex usa <b>WebRTC</b>. Um serviço público de sinalização (PeerJS) só ajuda os dois aparelhos a se encontrarem — como uma telefonista que conecta a ligação e sai da linha. Depois disso, tudo trafega direto entre vocês e criptografado pelo próprio WebRTC.</p><ol class="steps"><li>Você entra com seu ID e seu token.</li><li>O Nex abre uma conexão usando o seu ID como endereço.</li><li>Quando você abre um contato, os dois aparelhos se conectam e se verificam mutuamente.</li><li>Mensagens, arquivos, áudios e chamadas passam por esse canal direto.</li></ol></div>
+      <div class="about-body" data-l="en"><p>Nex uses <b>WebRTC</b>. A public signaling service (PeerJS) only helps two devices find each other — like an operator who connects the call and then leaves the line. After that, everything flows directly between you, encrypted by WebRTC itself.</p><ol class="steps"><li>You sign in with your ID and token.</li><li>Nex opens a connection using your ID as its address.</li><li>When you open a contact, both devices connect and verify each other.</li><li>Messages, files, voice notes and calls use that direct channel.</li></ol></div>
+    </section>
+    <section class="panel about-card" id="s03">
+      <div class="panel-number">03</div>
+      <h2><span data-l="pt">Sua conta: ID, token e arquivo .json</span><span data-l="en">Your account: ID, token and .json file</span></h2>
+      <div class="about-body" data-l="pt"><p>Ao criar a conta você recebe:</p><ul><li><b>ID</b> — curto e único, formado pelo seu nome mais um código do momento do cadastro, como <code>ana-xbwfq63</code>. É público: é ele que você passa aos amigos, por texto, link ou QR code.</li><li><b>Token secreto</b> — a sua senha, como <code>ZMQPG-E2CC0-…</code>. Nunca compartilhe.</li><li><b>Arquivo .json</b> — a cópia de segurança com o token e as chaves. Serve para entrar em outro aparelho.</li></ul><p class="note">Não há servidor com cópia da sua conta. Se perder o token e o arquivo, não existe recuperação.</p></div>
+      <div class="about-body" data-l="en"><p>When you create an account you get:</p><ul><li><b>ID</b> — short and unique, made of your name plus a code from the moment you signed up, like <code>ana-xbwfq63</code>. It's public: it's what you give friends, as text, link or QR code.</li><li><b>Secret token</b> — your password, like <code>ZMQPG-E2CC0-…</code>. Never share it.</li><li><b>.json file</b> — the backup with your token and keys. Use it to sign in on another device.</li></ul><p class="note">No server holds a copy of your account. If you lose both the token and the file, there is no recovery.</p></div>
+    </section>
+    <section class="panel about-card" id="s04">
+      <div class="panel-number">04</div>
+      <h2><span data-l="pt">Agenda e várias conversas</span><span data-l="en">Contacts and multiple chats</span></h2>
+      <div class="about-body" data-l="pt"><p>Para adicionar alguém, digite o ID dele, abra o link que ele compartilhou ou leia o QR code. Cada contato tem apelido, indicador de online, mensagens não lidas e histórico de texto. Você pode alternar entre conversas livremente.</p><p>Se um desconhecido te escrever, aparece um <b>pedido de contato</b>: você aceita, ignora ou bloqueia.</p></div>
+      <div class="about-body" data-l="en"><p>To add someone, type their ID, open the link they shared, or scan their QR code. Each contact has a nickname, online indicator, unread count and text history. Switch between chats freely.</p><p>If a stranger writes to you, a <b>contact request</b> appears: accept, ignore or block.</p></div>
+    </section>
+    <section class="panel about-card" id="s05">
+      <div class="panel-number">05</div>
+      <h2><span data-l="pt">O que dá para fazer</span><span data-l="en">What you can do</span></h2>
+      <div class="about-body" data-l="pt"><ul><li><b>Texto</b> com formatação leve, indicador de digitação e fila para quem está offline.</li><li><b>Arquivos</b> de qualquer tipo, com verificação de integridade (SHA-256) e confirmação do destinatário.</li><li><b>Notas de voz</b> segurando o botão do microfone; ouça em 1x, 1,5x ou 2x.</li><li><b>Chamadas</b> de voz e vídeo.</li><li><b>Tema claro ou escuro</b> e interface em português ou inglês.</li><li><b>Instalável</b> como app (PWA) no celular ou computador.</li></ul></div>
+      <div class="about-body" data-l="en"><ul><li><b>Text</b> with light formatting, typing indicator, and a queue for offline contacts.</li><li><b>Files</b> of any kind, with integrity check (SHA-256) and recipient confirmation.</li><li><b>Voice notes</b> by holding the mic button; listen at 1x, 1.5x or 2x.</li><li><b>Voice and video calls</b>.</li><li><b>Light or dark theme</b> and a Portuguese or English interface.</li><li><b>Installable</b> as an app (PWA) on phone or desktop.</li></ul></div>
+    </section>
+    <section class="panel about-card" id="s06">
+      <div class="panel-number">06</div>
+      <h2><span data-l="pt">Segurança e privacidade</span><span data-l="en">Security and privacy</span></h2>
+      <div class="about-body" data-l="pt"><p>Como o ID é público, o Nex confirma que quem responde é mesmo o dono dele:</p><ul><li>Cada conta tem um par de chaves. A chave privada fica <b>cifrada com o seu token</b>.</li><li>Ao conectar, os dois lados provam a identidade assinando um desafio — ninguém consegue se passar por você só sabendo o seu ID.</li><li>A chave de cada contato é <b>fixada</b> na primeira conversa. Se mudar, você é avisado.</li><li>O <b>código de segurança</b> permite conferir com o amigo, por outro meio, que vocês falam com as pessoas certas.</li></ul><p>Seus dados ficam só no seu aparelho (<code>localStorage</code>). Você pode apagar uma conta, ou tudo, a qualquer momento — sem deixar rastros.</p></div>
+      <div class="about-body" data-l="en"><p>Since the ID is public, Nex makes sure whoever answers really owns it:</p><ul><li>Each account has a key pair. The private key is <b>encrypted with your token</b>.</li><li>On connect, both sides prove identity by signing a challenge — nobody can impersonate you just by knowing your ID.</li><li>Each contact's key is <b>pinned</b> on first contact. If it changes, you're warned.</li><li>The <b>safety code</b> lets you check with your friend, over another channel, that you're talking to the right people.</li></ul><p>Your data stays only on your device (<code>localStorage</code>). You can delete one account, or everything, at any time — leaving no trace.</p></div>
+    </section>
+    <section class="panel about-card" id="s07">
+      <div class="panel-number">07</div>
+      <h2><span data-l="pt">Limites que vale conhecer</span><span data-l="en">Limits worth knowing</span></h2>
+      <div class="about-body" data-l="pt"><ul><li>Por ser direto, as mensagens só chegam quando <b>os dois estão online</b>. Texto enviado a quem está offline fica na fila e sai quando a pessoa voltar.</li><li>Imagens, áudios e arquivos <b>não ficam no histórico</b>; só o texto é salvo.</li><li>Limpar os dados do navegador apaga a conta daquele aparelho — por isso guarde o .json.</li><li>Redes muito restritivas podem impedir a conexão direta.</li><li>Chamadas e gravação de áudio exigem <b>https</b> e permissão do navegador.</li></ul></div>
+      <div class="about-body" data-l="en"><ul><li>Because it's direct, messages only arrive when <b>both are online</b>. Text sent to an offline contact is queued and goes out when they return.</li><li>Images, voice notes and files are <b>not kept in history</b>; only text is saved.</li><li>Clearing browser data erases the account on that device — so keep the .json.</li><li>Very restrictive networks can block the direct connection.</li><li>Calls and audio recording need <b>https</b> and browser permission.</li></ul></div>
+    </section>
+
+    <section class="panel about-card" id="faq">
+      <div class="panel-number">FAQ</div>
+      <h2><span data-l="pt">Perguntas rápidas</span><span data-l="en">Quick questions</span></h2>
+      <div class="faq">
+        <details><summary><span data-l="pt">Preciso de e-mail ou telefone?</span><span data-l="en">Do I need an email or phone?</span></summary><p data-l="pt">Não. Só um nome de exibição; o ID e o token são gerados no seu aparelho.</p><p data-l="en">No. Just a display name; the ID and token are generated on your device.</p></details>
+        <details><summary><span data-l="pt">Esqueci meu token. E agora?</span><span data-l="en">I forgot my token. Now what?</span></summary><p data-l="pt">Se tiver o arquivo .json, importe-o na tela de entrada. Sem token e sem arquivo, a conta não pode ser recuperada — crie uma nova.</p><p data-l="en">If you have the .json file, import it on the sign-in screen. With neither token nor file the account can't be recovered — create a new one.</p></details>
+        <details><summary><span data-l="pt">Posso usar a mesma conta em dois aparelhos?</span><span data-l="en">Can I use one account on two devices?</span></summary><p data-l="pt">Sim, importando o .json no segundo aparelho. Mas só um deles deve ficar online por vez: o ID é o endereço da conexão.</p><p data-l="en">Yes, by importing the .json on the second device. Only one should be online at a time: the ID is the connection address.</p></details>
+        <details><summary><span data-l="pt">Como o amigo me encontra?</span><span data-l="en">How does a friend find me?</span></summary><p data-l="pt">Compartilhe seu ID, o link de convite ou o QR code (botão de compartilhar no app).</p><p data-l="en">Share your ID, invite link or QR code (share button in the app).</p></details>
+      </div>
+    </section>
+
+    <div class="about-cta end">
+      <a class="btn btn-primary" href="./registro.html" data-i18n="aboutCtaCreate">Criar conta</a>
+      <a class="btn" href="./index.html" data-i18n="aboutCtaLogin">Já tenho conta</a>
+    </div>
+  </main>
+
+  <div class="auth-foot">
+    <div class="credit-line">
+      <span data-i18n="madeBy">Feito por</span> <a href="https://github.com/Syradevops" target="_blank" rel="noopener noreferrer">@Syradevops</a>
+    </div>
+  </div>
+</div>
+
+<script src="./nex-core.js"></script>
+<script>window.Nex.initPage();</script>
+</body>
+</html>
