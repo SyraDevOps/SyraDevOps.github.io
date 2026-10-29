@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Selene</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    background: #ffffff;
+    overflow: hidden;
+  }
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Área inferior: mensagens + campo de texto */
+  #dock {
+    position: fixed;
+    left: 50%;
+    bottom: 5vh;
+    transform: translateX(-50%);
+    width: min(720px, 88vw);
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  #chat {
+    max-height: 32vh;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #cfe6d6 transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+            mask-image: linear-gradient(to bottom, transparent 0, #000 18px);
+  }
+  #chat::-webkit-scrollbar { width: 6px; }
+  #chat::-webkit-scrollbar-thumb { background: #cfe6d6; border-radius: 6px; }
+
+  #user {
+    max-width: 60ch;
+    margin: 0 auto;
+    font-size: 13.5px;
+    line-height: 1.45;
+    color: #9aaba1;
+    opacity: 0;
+    transition: opacity .5s ease;
+    text-wrap: balance;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: break-word;
+  }
+
+  /* Resposta do modelo: coluna com largura de leitura confortável */
+  #reply {
+    width: 100%;
+    max-width: 66ch;
+    margin: 0 auto;
+    box-sizing: border-box;
+    text-align: left;
+    font-size: clamp(15px, 0.9vw + 11px, 17px);
+    line-height: 1.7;
+    color: #1f3d2b;
+    opacity: 0;
+    transition: opacity .6s ease;
+    text-wrap: pretty;
+    overflow-wrap: break-word;
+  }
+  #reply.short { text-align: center; text-wrap: balance; }
+  #reply > :first-child { margin-top: 0; }
+  #reply > :last-child { margin-bottom: 0; }
+  #reply p { margin: 0 0 .85em; }
+  #reply h4 { margin: 1.1em 0 .4em; font-size: 1em; font-weight: 600; color: #14532d; letter-spacing: .01em; }
+  #reply ul, #reply ol { margin: 0 0 .85em; padding-left: 1.3em; }
+  #reply li { margin: .2em 0; padding-left: .15em; }
+  #reply li::marker { color: #22c55e; }
+  #reply strong { color: #14532d; font-weight: 600; }
+  #reply a { color: #16a34a; text-decoration: underline; text-underline-offset: 3px; }
+  #reply code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .88em;
+    background: #f1f8f3;
+    color: #14532d;
+    padding: .12em .4em;
+    border-radius: 6px;
+  }
+  #reply pre {
+    margin: 0 0 .9em;
+    padding: 12px 14px;
+    background: #f4faf6;
+    border-radius: 12px;
+    overflow-x: auto;
+    text-align: left;
+  }
+  #reply pre code { background: none; padding: 0; font-size: 13px; line-height: 1.55; }
+
+  #msg {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 0;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #14532d;
+    caret-color: #22c55e;
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.3;
+    text-align: center;
+  }
+  #msg::placeholder { color: #a9c4b3; }
+
+  /* Barra de mensagem: anexar · texto · microfone */
+  #bar { display: flex; align-items: center; gap: 4px; }
+  #bar #msg { flex: 1; min-width: 0; width: auto; }
+  .ibtn {
+    flex: none;
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #8fb79c;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background .2s, color .2s;
+  }
+  .ibtn:hover { background: #f1f8f3; color: #14532d; }
+  .ibtn:disabled { opacity: .4; cursor: not-allowed; background: transparent; color: #8fb79c; }
+  .ibtn svg {
+    width: 19px;
+    height: 19px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .ibtn.rec { background: #22c55e; color: #fff; animation: recpulse 1.6s infinite; }
+  @keyframes recpulse {
+    0%   { box-shadow: 0 0 0 0 rgba(34, 197, 94, .45); }
+    70%  { box-shadow: 0 0 0 12px rgba(34, 197, 94, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+  }
+
+  /* Botão de parar */
+  .ibtn.stop { background: #22c55e; color: #fff; }
+  .ibtn.stop:hover { background: #16a34a; color: #fff; }
+  .ibtn.stop svg rect { fill: currentColor; stroke: none; }
+  #reply .cutnote {
+    margin-top: .6em;
+    color: #9aaba1;
+    font-size: .82em;
+    font-style: italic;
+    letter-spacing: .02em;
+  }
+
+  /* Anexos selecionados */
+  #chips { display: none; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  #chips.has { display: flex; }
+  .chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 220px;
+    padding: 5px 6px 5px 10px;
+    border-radius: 999px;
+    background: #f1f8f3;
+    color: #14532d;
+    font-size: 12px;
+  }
+  .chip img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; }
+  .chip span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chip button {
+    border: 0;
+    background: transparent;
+    color: #7d9a89;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 1;
+    padding: 0 5px;
+    border-radius: 50%;
+  }
+  .chip button:hover { color: #14532d; }
+
+  /* Crédito */
+  #credit {
+    margin-top: -4px;
+    text-align: center;
+    font-size: 10.5px;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: #b5cfbe;
+    user-select: none;
+  }
+  #credit a {
+    margin-left: .5em;
+    font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+    font-style: italic;
+    font-size: 15px;
+    letter-spacing: .05em;
+    text-transform: none;
+    color: #000;
+    text-decoration: none;
+    transition: color .2s;
+  }
+  #credit a[href]:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* Nome (canto superior esquerdo) */
+  #brand {
+    position: fixed;
+    top: 14px;
+    left: 24px;
+    z-index: 5;
+    font-family: 'Cormorant Garamond', 'Cormorant', Georgia, 'Times New Roman', serif;
+    font-size: 30px;
+    font-weight: 400;
+    font-style: italic;
+    letter-spacing: .04em;
+    line-height: 38px;
+    color: #14532d;
+    user-select: none;
+  }
+  @media (max-width: 520px) {
+    #brand { left: 16px; font-size: 25px; }
+  }
+
+  /* Ícones de provedores (canto superior direito) */
+  #tools {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 5;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  #icons { display: flex; gap: 4px; justify-content: flex-end; }
+  .tbtn {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #8fb79c;
+    cursor: pointer;
+    display: grid;
+    place-items: center;
+    transition: background .2s, color .2s;
+  }
+  .tbtn:hover, .tbtn.sel { background: #f1f8f3; color: #14532d; }
+  .tbtn svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .tbtn.on::after {
+    content: '';
+    position: absolute;
+    right: 6px;
+    top: 6px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #22c55e;
+  }
+
+  #panel {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    width: min(300px, 86vw);
+    box-sizing: border-box;
+    padding: 18px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 10px 36px rgba(20, 83, 45, .14);
+    font-size: 13px;
+    color: #1f3d2b;
+    opacity: 0;
+    transform: translateY(-6px);
+    pointer-events: none;
+    transition: opacity .2s, transform .2s;
+  }
+  #panel.open { opacity: 1; transform: none; pointer-events: auto; }
+  #panel h3 { margin: 0 0 12px; font-size: 14px; font-weight: 600; color: #14532d; }
+  #panel label { display: block; margin-bottom: 12px; color: #7d9a89; font-size: 12px; }
+  #panel input, #panel select {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 5px;
+    padding: 9px 12px;
+    border: 0;
+    outline: 0;
+    border-radius: 10px;
+    background: #f1f8f3;
+    color: #14532d;
+    font: inherit;
+    font-size: 13px;
+  }
+  #panel input:focus, #panel select:focus { background: #e8f5ec; }
+  #panel .row { display: flex; gap: 6px; align-items: center; margin-top: 5px; }
+  #panel .row select { margin-top: 0; flex: 1; min-width: 0; }
+  #panel button {
+    border: 0;
+    border-radius: 10px;
+    padding: 9px 14px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+  #panel .primary { background: #22c55e; color: #fff; }
+  #panel .primary:hover { background: #16a34a; }
+  #panel .ghost { background: transparent; color: #7d9a89; }
+  #panel .ghost:hover { background: #f1f8f3; color: #14532d; }
+  #panel .actions { display: flex; gap: 6px; margin-top: 4px; }
+  #panel .hint, #panel .status {
+    margin-top: 10px;
+    font-size: 11.5px;
+    line-height: 1.45;
+    color: #9aaba1;
+  }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="brand">Selene</div>
+
+<div id="tools">
+  <div id="icons">
+    <button class="tbtn" data-id="openai" type="button" title="OpenAI (GPT)" aria-label="OpenAI (GPT)">
+      <svg viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M18.5 16.5v3M17 18h3"/></svg>
+    </button>
+    <button class="tbtn" data-id="groq" type="button" title="Groq" aria-label="Groq">
+      <svg viewBox="0 0 24 24"><path d="M13 3L5 13h6l-1 8 8-10h-6z"/></svg>
+    </button>
+    <button class="tbtn" data-id="llama" type="button" title="Llama local" aria-label="Llama local">
+      <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="6" rx="2"/><rect x="4" y="13" width="16" height="6" rx="2"/><path d="M8 8h.01M8 16h.01"/></svg>
+    </button>
+  </div>
+  <div id="panel"></div>
+</div>
+
+<div id="dock">
+  <div id="chat">
+    <div id="user"></div>
+    <div id="reply"></div>
+  </div>
+  <div id="chips"></div>
+  <div id="bar">
+    <button id="attach" class="ibtn" type="button" title="Anexar arquivos" aria-label="Anexar arquivos">
+      <svg viewBox="0 0 24 24"><path d="M20 11.5l-7.6 7.6a4.5 4.5 0 0 1-6.4-6.4l8-8a3 3 0 0 1 4.2 4.2l-8 8a1.5 1.5 0 0 1-2.1-2.1l7.4-7.4"/></svg>
+    </button>
+    <input id="msg" type="text" placeholder="Digite uma mensagem…" autocomplete="off" spellcheck="false" autofocus>
+    <button id="mic" class="ibtn" type="button" title="Falar (ditado por voz)" aria-label="Falar (ditado por voz)">
+      <svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>
+    </button>
+    <button id="stop" class="ibtn stop" type="button" title="Parar (Esc)" aria-label="Parar" style="display:none">
+      <svg viewBox="0 0 24 24"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+    </button>
+    <input id="file" type="file" multiple hidden>
+  </div>
+  <div id="credit">feito por <a id="creditLink">@Syradevops</a></div>
+</div>
+
+<script>
+(function () {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const input = document.getElementById('msg');
+  const chatEl = document.getElementById('chat');
+  const userEl = document.getElementById('user');
+  const replyEl = document.getElementById('reply');
+  const dockEl = document.getElementById('dock');
+
+  const COUNT = 1800;
+  const SPEED_Y = 0.0025;
+  const FOCAL = 900;
+  const SIGMA = 0.38;          // tamanho da região afetada por cada caractere
+
+  let w, h, dpr, radius, cy;
+  let baseR = 0, baseCy = 0, tR = 0, tC = 0, dockTop = 0;   // tamanho/posição da esfera (alvo e base)
+
+  // Distribuição uniforme na esfera (espiral de Fibonacci)
+  const points = [];
+  const golden = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < COUNT; i++) {
+    const y = 1 - (i / (COUNT - 1)) * 2;
+    const r = Math.sqrt(1 - y * y);
+    const theta = golden * i;
+    points.push({
+      x: Math.cos(theta) * r,
+      y: y,
+      z: Math.sin(theta) * r,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+
+  function resize() {
+    dpr = window.devicePixelRatio || 1;
+    w = window.innerWidth;
+    h = window.innerHeight;
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    baseR = Math.min(w, h) * 0.28;
+    baseCy = h * 0.40;
+    updateTargets();
+    radius = tR;
+    cy = h * 0.40;             // esfera um pouco acima do centro, abrindo espaço para as mensagens
+  }
+  // A esfera só encolhe/sobe o necessário para nunca ficar atrás das mensagens
+  function updateTargets() {
+    const avail = (dockTop > 0 ? Math.min(dockTop, h) : h) - 20;
+    const r = Math.max(60, Math.min(baseR, (avail - 56) / 2.24));
+    tR = r;
+    tC = Math.min(baseCy, avail - r * 1.12 - 4);
+  }
+  function measureDock() {
+    dockTop = dockEl.getBoundingClientRect().top;
+    updateTargets();
+  }
+  window.addEventListener('resize', function () { resize(); measureDock(); });
+  resize();
+  measureDock();
+  radius = tR;
+  cy = tC;
+  if (window.ResizeObserver) new ResizeObserver(measureDock).observe(dockEl);
+
+  // ---- Pulsos (reação aos caracteres) ----
+  const pulses = [];
+
+  // Cada caractere sempre aponta para a mesma região da esfera
+  function regionFor(ch) {
+    const code = ch.codePointAt(0);
+    const lon = (code * 2.399963) % (Math.PI * 2);
+    const v = ((code * 37) % 101) / 100;
+    const lat = Math.asin(v * 2 - 1);
+    return {
+      x: Math.cos(lat) * Math.cos(lon),
+      y: Math.sin(lat),
+      z: Math.cos(lat) * Math.sin(lon)
+    };
+  }
+
+  // Cada caractere também tem seu próprio desvio de cor (de azul-esverdeado a amarelo-esverdeado)
+  function hueFor(ch) {
+    const v = ((ch.codePointAt(0) * 47) % 100) / 100;
+    return -35 + v * 80;
+  }
+
+  function addPulse(dir, amp, hue) {
+    pulses.push({ x: dir.x, y: dir.y, z: dir.z, t0: performance.now(), amp: amp, hue: hue });
+    if (pulses.length > 60) pulses.shift();
+  }
+
+  // ---- Estado "pensando" ----
+  let thinkStart = 0;          // quando começou (0 = inativo)
+  let thinkEnd = 0;            // quando terminou (0 = ainda pensando)
+  const PLACEHOLDER = input.placeholder;
+
+  function startThinking() {
+    thinkStart = performance.now();
+    thinkEnd = 0;
+    input.placeholder = 'Pensando…';
+  }
+  function stopThinking() {
+    thinkEnd = performance.now();
+    input.placeholder = PLACEHOLDER;
+  }
+
+  // ---- Conversa ----
+  const sleep = function (ms) { return new Promise(function (r) { setTimeout(r, ms); }); };
+  let busy = false;
+  let stopRequested = false;   // o usuário pediu para parar
+  let abortCtl = null;         // cancela a requisição em andamento
+
+  // Envia a mensagem ao provedor ativo (OpenAI, Groq ou Llama local) e devolve o texto da resposta.
+  const convo = [];   // histórico da conversa
+
+  async function errorText(res) {
+    let msg = 'erro ' + res.status;
+    try {
+      const d = await res.json();
+      if (d && d.error && d.error.message) msg += ': ' + d.error.message;
+    } catch (e) {}
+    return msg;
+  }
+
+  // Monta o conteúdo da mensagem: texto + arquivos de texto embutidos + imagens/PDF como partes próprias
+  function buildContent(text, files, provider) {
+    let block = text;
+    const media = [];
+    const notes = [];
+    files.forEach(function (f) {
+      if (f.kind === 'text') {
+        block += '\n\n--- Arquivo: ' + f.name + ' ---\n' + f.data + (f.truncated ? '\n[…arquivo truncado]' : '') + '\n--- fim do arquivo ---';
+      } else if (f.kind === 'image') {
+        media.push({ type: 'image_url', image_url: { url: f.data } });
+        notes.push('[imagem: ' + f.name + ']');
+      } else if (f.kind === 'pdf') {
+        if (provider !== 'openai') throw new Error('PDF só é aceito com o provedor OpenAI nesta versão (' + f.name + ').');
+        media.push({ type: 'file', file: { filename: f.name, file_data: f.data } });
+        notes.push('[PDF: ' + f.name + ']');
+      }
+    });
+    return {
+      content: media.length ? [{ type: 'text', text: block }].concat(media) : block,
+      textOnly: notes.length ? block + '\n' + notes.join(' ') : block   // o que fica no histórico
+    };
+  }
+
+  async function askModel(text, files) {
+    files = files || [];
+    const ctl = new AbortController();
+    abortCtl = ctl;
+    const id = cfg.active;
+    if (!id) {
+      await new Promise(function (resolve, reject) {
+        const t = setTimeout(resolve, 1800);
+        ctl.signal.addEventListener('abort', function () {
+          clearTimeout(t);
+          reject(new DOMException('Cancelado', 'AbortError'));
+        });
+      });
+      return 'Nenhum provedor ativo ainda. Clique em um dos ícones no canto superior direito, configure e salve para conversar de verdade.';
+    }
+
+    const headers = { 'Content-Type': 'application/json' };
+    let url, model;
+    if (id === 'openai') {
+      if (!cfg.openai.key) throw new Error('falta a chave da OpenAI.');
+      url = 'https://api.openai.com/v1/chat/completions';
+      headers.Authorization = 'Bearer ' + cfg.openai.key;
+      model = cfg.openai.model || 'gpt-4o-mini';
+    } else if (id === 'groq') {
+      if (!cfg.groq.key) throw new Error('falta a chave da Groq.');
+      url = 'https://api.groq.com/openai/v1/chat/completions';
+      headers.Authorization = 'Bearer ' + cfg.groq.key;
+      model = cfg.groq.model;
+    } else {
+      let base = (cfg.llama.url || '').trim().replace(/\/+$/, '');
+      if (!base) throw new Error('falta o endereço da API do Llama.');
+      if (!/^https?:\/\//i.test(base)) base = 'http://' + base;
+      url = /\/v1$/.test(base) ? base + '/chat/completions' : base + '/v1/chat/completions';
+      model = cfg.llama.model || 'local';
+    }
+
+    const built = buildContent(text, files, id);
+    const idx = convo.length;
+    convo.push({ role: 'user', content: built.content });
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ model: model, messages: convo.slice(-20) }),
+        signal: ctl.signal
+      });
+      if (!res.ok) throw new Error(await errorText(res));
+      const data = await res.json();
+      const reply = (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+      if (!reply.trim()) throw new Error('a resposta veio vazia.');
+      convo[idx].content = built.textOnly;   // imagens/PDF não são reenviados nos próximos turnos
+      convo.push({ role: 'assistant', content: reply });
+      return reply;
+    } catch (err) {
+      convo.pop();
+      if (err instanceof TypeError) {
+        throw new Error('falha de conexão. Verifique o endereço, a internet e o CORS.');
+      }
+      throw err;
+    }
+  }
+
+  // ---- Formatação da resposta (Markdown básico, sempre escapado) ----
+  function esc(s) {
+    return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function inline(raw) {
+    const codes = [];
+    let s = esc(raw).replace(/`([^`]+)`/g, function (m, c) {
+      codes.push(c);
+      return '\u0000' + (codes.length - 1) + '\u0000';
+    });
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    s = s.replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\w)/g, '$1<em>$2</em>');
+    return s.replace(/\u0000(\d+)\u0000/g, function (m, i) { return '<code>' + codes[i] + '</code>'; });
+  }
+
+  function renderMarkdown(src) {
+    const lines = src.replace(/\r/g, '').split('\n');
+    const ulRe = /^\s*[-*•]\s+/, olRe = /^\s*\d+[.)]\s+/, hRe = /^#{1,3}\s+/;
+    const out = [];
+    let i = 0;
+    while (i < lines.length) {
+      const line = lines[i];
+      if (/^```/.test(line)) {
+        const buf = [];
+        i++;
+        while (i < lines.length && !/^```/.test(lines[i])) { buf.push(lines[i]); i++; }
+        i++;
+        out.push('<pre><code>' + esc(buf.join('\n')) + '</code></pre>');
+        continue;
+      }
+      if (!line.trim()) { i++; continue; }
+      if (hRe.test(line)) {
+        out.push('<h4>' + inline(line.replace(hRe, '')) + '</h4>');
+        i++;
+        continue;
+      }
+      if (ulRe.test(line) || olRe.test(line)) {
+        const ordered = olRe.test(line);
+        const re = ordered ? olRe : ulRe;
+        const items = [];
+        while (i < lines.length && re.test(lines[i])) {
+          items.push('<li>' + inline(lines[i].replace(re, '')) + '</li>');
+          i++;
+        }
+        out.push((ordered ? '<ol>' : '<ul>') + items.join('') + (ordered ? '</ol>' : '</ul>'));
+        continue;
+      }
+      const para = [];
+      while (i < lines.length && lines[i].trim() && !/^```/.test(lines[i]) &&
+             !hRe.test(lines[i]) && !ulRe.test(lines[i]) && !olRe.test(lines[i])) {
+        para.push(lines[i]);
+        i++;
+      }
+      out.push('<p>' + inline(para.join(' ')) + '</p>');
+    }
+    return out.join('');
+  }
+
+  // Escreve a resposta aos poucos (formatada); a esfera reage de leve ao texto
+  async function streamReply(text) {
+    replyEl.classList.toggle('short', text.length <= 110 && text.indexOf('\n') < 0);
+    replyEl.style.opacity = 1;
+    const chars = Array.from(text);
+    const step = Math.max(1, Math.ceil(chars.length / 220));   // respostas longas não demoram demais
+    let n = 0;
+    let shown = '';
+    for (let i = 0; i < chars.length; i += step, n++) {
+      if (stopRequested) {
+        // truncado pelo usuário: mantém o que já apareceu
+        replyEl.insertAdjacentHTML('beforeend', '<div class="cutnote">interrompido</div>');
+        return shown;
+      }
+      const end = Math.min(i + step, chars.length);
+      shown = chars.slice(0, end).join('');
+      replyEl.innerHTML = renderMarkdown(shown);
+      chatEl.scrollTop = chatEl.scrollHeight;
+      const ch = chars[end - 1];
+      if (n % 2 === 0 && ch.trim()) addPulse(regionFor(ch), 0.025, hueFor(ch));
+      await sleep(22);
+    }
+    replyEl.innerHTML = renderMarkdown(text);
+    return text;
+  }
+
+  async function send(text) {
+    busy = true;
+    stopListening();
+    stopRequested = false;
+    setBusyUI(true);
+    const files = attached.slice();
+    attached.length = 0;
+    renderChips();
+    input.value = '';
+    prev = '';
+
+    userEl.textContent = text + (files.length ? ' · anexos: ' + files.map(function (f) { return f.name; }).join(', ') : '');
+    userEl.style.opacity = 1;
+    replyEl.style.opacity = 0;
+    replyEl.innerHTML = '';
+
+    startThinking();
+    let answer;
+    const before = convo.length;
+    try {
+      answer = await askModel(text, files);
+    } catch (err) {
+      if (err && err.name === 'AbortError') {
+        // cancelado enquanto esperava: devolve o texto e os anexos para editar
+        stopThinking();
+        userEl.style.opacity = 0;
+        input.value = text;
+        prev = text;
+        attached.push.apply(attached, files);
+        renderChips();
+        replyEl.classList.add('short');
+        replyEl.style.opacity = 1;
+        replyEl.innerHTML = '<div class="cutnote">cancelado</div>';
+        busy = false;
+        setBusyUI(false);
+        input.focus();
+        return;
+      }
+      answer = 'Não consegui obter a resposta: ' + err.message;
+    }
+    stopThinking();
+    const shown = await streamReply(answer);
+    // se foi interrompida, o histórico guarda só o que apareceu na tela
+    if (stopRequested && convo.length > before && convo[convo.length - 1].role === 'assistant') {
+      convo[convo.length - 1].content = shown.trim() ? shown : '(resposta interrompida)';
+    }
+    busy = false;
+    setBusyUI(false);
+    input.focus();
+  }
+
+  let prev = '';
+  input.addEventListener('input', function () {
+    const val = input.value;
+    if (val.length > prev.length) {
+      for (const ch of Array.from(val.slice(prev.length))) {
+        addPulse(regionFor(ch), 0.06, hueFor(ch));
+      }
+    } else if (val.length < prev.length) {
+      for (const ch of Array.from(prev.slice(val.length))) {
+        addPulse(regionFor(ch), -0.04, hueFor(ch));
+      }
+    }
+    prev = val;
+  });
+
+  input.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && !busy) {
+      const text = input.value.trim();
+      if (text || attached.length) send(text || 'Descreva e resuma o conteúdo do anexo.');
+    }
+  });
+
+  // ---- Provedores: configuração (chaves, modelo, endereço) ----
+  const STORE_KEY = 'esfera.provedores';
+  const GROQ_FALLBACK = ['llama-3.3-70b-versatile', 'llama-3.1-8b-instant'];
+  const DEFAULT_CFG = {
+    openai: { key: '', model: 'gpt-4o-mini' },
+    groq:   { key: '', model: 'llama-3.3-70b-versatile', models: [] },
+    llama:  { url: 'http://localhost:11434', model: '' }
+  };
+  const TITLES = { openai: 'OpenAI · GPT', groq: 'Groq', llama: 'Llama local' };
+
+  function loadCfg() {
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem(STORE_KEY) || '{}') || {}; } catch (e) {}
+    return {
+      active: saved.active || null,
+      openai: Object.assign({}, DEFAULT_CFG.openai, saved.openai),
+      groq:   Object.assign({}, DEFAULT_CFG.groq,   saved.groq),
+      llama:  Object.assign({}, DEFAULT_CFG.llama,  saved.llama)
+    };
+  }
+  function saveCfg() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(cfg)); } catch (e) {}
+  }
+  const cfg = loadCfg();
+
+  const toolsEl = document.getElementById('tools');
+  const panelEl = document.getElementById('panel');
+  const tbtns = Array.prototype.slice.call(toolsEl.querySelectorAll('.tbtn'));
+  let openId = null;
+
+  function $(sel) { return panelEl.querySelector(sel); }
+
+  function updateButtons() {
+    tbtns.forEach(function (b) {
+      b.classList.toggle('on', cfg.active === b.dataset.id);
+      b.classList.toggle('sel', openId === b.dataset.id);
+    });
+  }
+
+  function fillGroqModels(selected) {
+    const sel = $('#f-model');
+    const list = cfg.groq.models.length ? cfg.groq.models.slice() : GROQ_FALLBACK.slice();
+    if (selected && list.indexOf(selected) < 0) list.unshift(selected);
+    sel.innerHTML = '';
+    list.forEach(function (m) {
+      const o = document.createElement('option');
+      o.value = m;
+      o.textContent = m;
+      sel.appendChild(o);
+    });
+    sel.value = selected;
+  }
+
+  async function refreshGroqModels() {
+    const status = $('#f-status');
+    const key = $('#f-key').value.trim();
+    if (!key) { status.textContent = 'Digite a chave primeiro.'; return; }
+    status.textContent = 'Carregando modelos…';
+    try {
+      const res = await fetch('https://api.groq.com/openai/v1/models', {
+        headers: { Authorization: 'Bearer ' + key }
+      });
+      if (!res.ok) throw new Error(await errorText(res));
+      const data = await res.json();
+      const ids = (data.data || [])
+        .map(function (m) { return m.id; })
+        .filter(function (id) { return !/whisper|tts|guard/i.test(id); })
+        .sort();
+      if (!ids.length) throw new Error('nenhum modelo encontrado.');
+      cfg.groq.models = ids;
+      saveCfg();
+      fillGroqModels($('#f-model').value);
+      status.textContent = ids.length + ' modelos carregados.';
+    } catch (err) {
+      status.textContent = 'Não foi possível carregar: ' + (err instanceof TypeError ? 'falha de conexão.' : err.message);
+    }
+  }
+
+  function renderPanel(id) {
+    let html = '<h3>' + TITLES[id] + '</h3>';
+    if (id === 'openai') {
+      html += '<label>Chave da API<input id="f-key" type="password" placeholder="sk-…" autocomplete="off" spellcheck="false"></label>' +
+              '<label>Modelo<input id="f-model" type="text" placeholder="gpt-4o-mini" spellcheck="false"></label>';
+    } else if (id === 'groq') {
+      html += '<label>Chave da API<input id="f-key" type="password" placeholder="gsk_…" autocomplete="off" spellcheck="false"></label>' +
+              '<label>Modelo<span class="row"><select id="f-model"></select>' +
+              '<button type="button" class="ghost" id="f-refresh">Atualizar</button></span></label>' +
+              '<div class="status" id="f-status"></div>';
+    } else {
+      html += '<label>Endereço da API<input id="f-url" type="text" placeholder="http://localhost:11434" spellcheck="false"></label>' +
+              '<label>Modelo (opcional)<input id="f-model" type="text" placeholder="ex.: llama3.2" spellcheck="false"></label>' +
+              '<div class="hint">Funciona com servidores compatíveis com a API da OpenAI (llama.cpp, Ollama…). Se o navegador bloquear, libere o CORS no servidor.</div>';
+    }
+    html += '<div class="actions"><button type="button" class="primary" id="f-save">Salvar e usar</button>' +
+            '<button type="button" class="ghost" id="f-clear">Limpar</button></div>' +
+            '<div class="hint">Os dados ficam salvos só neste navegador.</div>';
+    panelEl.innerHTML = html;
+
+    const c = cfg[id];
+    if (id === 'llama') {
+      $('#f-url').value = c.url;
+      $('#f-model').value = c.model;
+    } else {
+      $('#f-key').value = c.key;
+      if (id === 'groq') {
+        fillGroqModels(c.model);
+        $('#f-refresh').addEventListener('click', refreshGroqModels);
+      } else {
+        $('#f-model').value = c.model;
+      }
+    }
+
+    $('#f-save').addEventListener('click', function () {
+      if (id === 'llama') {
+        cfg.llama = { url: $('#f-url').value.trim(), model: $('#f-model').value.trim() };
+      } else if (id === 'openai') {
+        cfg.openai = { key: $('#f-key').value.trim(), model: $('#f-model').value.trim() || DEFAULT_CFG.openai.model };
+      } else {
+        cfg.groq.key = $('#f-key').value.trim();
+        cfg.groq.model = $('#f-model').value;
+      }
+      cfg.active = id;
+      saveCfg();
+      closePanel();
+      input.focus();
+    });
+
+    $('#f-clear').addEventListener('click', function () {
+      cfg[id] = Object.assign({}, DEFAULT_CFG[id]);
+      if (cfg.active === id) cfg.active = null;
+      saveCfg();
+      renderPanel(id);
+      updateButtons();
+    });
+  }
+
+  function openPanel(id) {
+    openId = id;
+    renderPanel(id);
+    panelEl.classList.add('open');
+    updateButtons();
+  }
+  function closePanel() {
+    openId = null;
+    panelEl.classList.remove('open');
+    updateButtons();
+  }
+
+  tbtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (openId === b.dataset.id) closePanel(); else openPanel(b.dataset.id);
+    });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && openId) { closePanel(); input.focus(); }
+  });
+  updateButtons();
+
+  // ---- Crédito ----
+  const CREDIT_URL = '';   // coloque aqui o link do perfil (ex.: 'https://...') para o nome virar um link
+  const creditEl = document.getElementById('creditLink');
+  if (CREDIT_URL) {
+    creditEl.href = CREDIT_URL;
+    creditEl.target = '_blank';
+    creditEl.rel = 'noopener noreferrer';
+  }
+
+  // Aviso curto no lugar do texto de fundo da barra
+  let flashT = 0;
+  function flash(msg) {
+    input.placeholder = msg;
+    clearTimeout(flashT);
+    flashT = setTimeout(function () {
+      input.placeholder = (thinkStart && !thinkEnd) ? 'Pensando…' : PLACEHOLDER;
+    }, 3200);
+  }
+
+  // ---- Anexos ----
+  const attached = [];
+  const MAX_FILES = 5;
+  const MAX_TEXT = 200000;   // caracteres por arquivo de texto
+  const TEXT_EXT = /\.(txt|md|markdown|csv|tsv|json|jsonl|xml|html?|css|js|jsx|ts|tsx|py|java|c|h|cpp|cs|go|rs|rb|php|sh|sql|ya?ml|toml|ini|log|r|swift|kt)$/i;
+  const chipsEl = document.getElementById('chips');
+  const fileEl = document.getElementById('file');
+  fileEl.accept = 'image/*,application/pdf,text/*,.md,.csv,.json,.xml,.yaml,.yml,.js,.ts,.tsx,.jsx,.py,.java,.c,.cpp,.cs,.go,.rs,.rb,.php,.sh,.sql,.toml,.ini,.log';
+
+  function readDataURL(file) {
+    return new Promise(function (resolve, reject) {
+      const r = new FileReader();
+      r.onload = function () { resolve(r.result); };
+      r.onerror = function () { reject(new Error('Não consegui ler ' + file.name)); };
+      r.readAsDataURL(file);
+    });
+  }
+
+  // Reduz imagens grandes para não pesar no envio
+  function shrinkImage(file) {
+    return new Promise(function (resolve, reject) {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = function () {
+        const k = Math.min(1, 1568 / Math.max(img.width, img.height));
+        const cw = Math.max(1, Math.round(img.width * k));
+        const ch = Math.max(1, Math.round(img.height * k));
+        const c = document.createElement('canvas');
+        c.width = cw;
+        c.height = ch;
+        const g = c.getContext('2d');
+        g.fillStyle = '#fff';
+        g.fillRect(0, 0, cw, ch);
+        g.drawImage(img, 0, 0, cw, ch);
+        URL.revokeObjectURL(url);
+        resolve(c.toDataURL('image/jpeg', 0.85));
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error('Não consegui abrir a imagem ' + file.name));
+      };
+      img.src = url;
+    });
+  }
+
+  async function processFile(file) {
+    const name = file.name || 'arquivo';
+    if (file.type.indexOf('image/') === 0) {
+      return { name: name, kind: 'image', data: await shrinkImage(file) };
+    }
+    if (file.type === 'application/pdf' || /\.pdf$/i.test(name)) {
+      if (file.size > 10 * 1024 * 1024) throw new Error(name + ' é grande demais (máx. 10 MB).');
+      const data = (await readDataURL(file)).replace(/^data:[^;]*;/, 'data:application/pdf;');
+      return { name: name, kind: 'pdf', data: data };
+    }
+    if (file.type.indexOf('text/') === 0 || file.type === 'application/json' || TEXT_EXT.test(name)) {
+      let text = await file.text();
+      const truncated = text.length > MAX_TEXT;
+      if (truncated) text = text.slice(0, MAX_TEXT);
+      return { name: name, kind: 'text', data: text, truncated: truncated };
+    }
+    throw new Error('Formato não suportado: ' + name);
+  }
+
+  function renderChips() {
+    chipsEl.innerHTML = '';
+    attached.forEach(function (f, i) {
+      const chip = document.createElement('div');
+      chip.className = 'chip';
+      if (f.kind === 'image') {
+        const im = document.createElement('img');
+        im.src = f.data;
+        im.alt = '';
+        chip.appendChild(im);
+      }
+      const sp = document.createElement('span');
+      sp.textContent = f.name;
+      chip.appendChild(sp);
+      const x = document.createElement('button');
+      x.type = 'button';
+      x.textContent = '×';
+      x.setAttribute('aria-label', 'Remover ' + f.name);
+      x.addEventListener('click', function () {
+        attached.splice(i, 1);
+        renderChips();
+      });
+      chip.appendChild(x);
+      chipsEl.appendChild(chip);
+    });
+    chipsEl.classList.toggle('has', attached.length > 0);
+  }
+
+  async function addFiles(list) {
+    const arr = Array.prototype.slice.call(list);
+    for (let i = 0; i < arr.length; i++) {
+      if (attached.length >= MAX_FILES) { flash('Máximo de ' + MAX_FILES + ' anexos.'); break; }
+      try {
+        attached.push(await processFile(arr[i]));
+      } catch (err) {
+        flash(err.message);
+      }
+    }
+    renderChips();
+  }
+
+  document.getElementById('attach').addEventListener('click', function () { fileEl.click(); });
+  fileEl.addEventListener('change', function () {
+    if (fileEl.files.length) addFiles(fileEl.files);
+    fileEl.value = '';
+  });
+  // arrastar e soltar arquivos na página
+  document.addEventListener('dragover', function (e) { e.preventDefault(); });
+  document.addEventListener('drop', function (e) {
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+  });
+
+  // ---- Microfone (ditado por voz) ----
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.getElementById('mic');
+  let rec = null;
+  let listening = false;
+
+  if (!SR) {
+    micBtn.disabled = true;
+    micBtn.title = 'Ditado por voz não é suportado neste navegador (use Chrome, Edge ou Safari)';
+  }
+
+  function setInput(val) {
+    input.value = val;
+    input.dispatchEvent(new Event('input'));   // faz a esfera reagir ao texto transcrito
+  }
+
+  function startListening() {
+    rec = new SR();
+    rec.lang = 'pt-BR';
+    rec.interimResults = true;
+    rec.continuous = true;
+    const base = input.value ? input.value.replace(/\s+$/, '') + ' ' : '';
+    let finals = '';
+
+    rec.onresult = function (e) {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finals += t; else interim += t;
+      }
+      setInput(base + finals + interim);
+    };
+    rec.onerror = function (e) {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') flash('Permita o uso do microfone no navegador.');
+      else if (e.error === 'audio-capture') flash('Microfone não encontrado.');
+      else if (e.error === 'network') flash('Sem conexão para o ditado por voz.');
+    };
+    rec.onend = function () {
+      listening = false;
+      micBtn.classList.remove('rec');
+      input.focus();
+    };
+
+    try {
+      rec.start();
+      listening = true;
+      micBtn.classList.add('rec');
+    } catch (err) {
+      flash('Não foi possível iniciar o microfone.');
+    }
+  }
+
+  function stopListening() {
+    if (rec && listening) {
+      try { rec.stop(); } catch (e) {}
+    }
+  }
+
+  micBtn.addEventListener('click', function () {
+    if (!SR) return;
+    if (listening) stopListening(); else startListening();
+  });
+
+  // ---- Parar processamento (cancela a espera ou trunca a resposta) ----
+  const stopBtn = document.getElementById('stop');
+  function setBusyUI(on) {
+    stopBtn.style.display = on ? '' : 'none';
+    micBtn.style.display = on ? 'none' : '';
+  }
+  function stopAll() {
+    if (!busy) return;
+    stopRequested = true;
+    if (abortCtl) abortCtl.abort();
+  }
+  stopBtn.addEventListener('click', stopAll);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && busy && !openId) stopAll();
+  });
+
+  // mantém o foco na barra (sem atrapalhar o painel de configuração)
+  document.addEventListener('click', function (e) {
+    if (toolsEl.contains(e.target)) return;
+    if (openId) closePanel();
+    input.focus();
+  });
+  input.focus();
+
+  // ---- Animação ----
+  let angleY = 0;
+  const tiltX = 0.35;
+  const cosX = Math.cos(tiltX), sinX = Math.sin(tiltX);
+  let t = 0;
+
+  function frame(now) {
+    ctx.clearRect(0, 0, w, h);
+
+    // acompanha suavemente o espaço disponível acima das mensagens
+    radius += (tR - radius) * 0.06;
+    cy += (tC - cy) * 0.06;
+
+    // intensidade do "pensando": sobe suave, segura enquanto espera e desce suave
+    let level = 0, tk = 0;
+    if (thinkStart) {
+      const el = now - thinkStart;
+      let l = Math.min(1, el / 600);
+      if (thinkEnd) {
+        const out = (now - thinkEnd) / 1000;
+        if (out >= 1) { thinkStart = 0; l = 0; }
+        else l *= 1 - out;
+      }
+      if (thinkStart) {
+        level = l * l * (3 - 2 * l);
+        tk = el / 1000;
+      }
+    }
+
+    angleY += SPEED_Y * (1 + 3 * level);
+    t += 0.01;
+
+    const cosY = Math.cos(angleY), sinY = Math.sin(angleY);
+
+    // remove pulsos já apagados
+    for (let i = pulses.length - 1; i >= 0; i--) {
+      if ((now - pulses[i].t0) / 1000 > 3) pulses.splice(i, 1);
+    }
+    const act = pulses.map(function (p) {
+      const age = (now - p.t0) / 1000;
+      return { x: p.x, y: p.y, z: p.z, age: age, env: Math.exp(-age * 1.5), amp: p.amp, hue: p.hue };
+    });
+
+    // dois pontos que orbitam a esfera enquanto ela "pensa"
+    const orbits = [];
+    if (level > 0) {
+      const a1 = tk * 1.9, a2 = tk * 1.3 + 2.4;
+      orbits.push(
+        { x: Math.cos(a1), y: Math.sin(tk * 1.1) * 0.7, z: Math.sin(a1) },
+        { x: -Math.cos(a2), y: Math.cos(tk * 0.9) * 0.7, z: Math.sin(a2) }
+      );
+      for (const o of orbits) {
+        const l = Math.sqrt(o.x * o.x + o.y * o.y + o.z * o.z);
+        o.x /= l; o.y /= l; o.z /= l;
+      }
+    }
+    const breath = level * 0.025 * Math.sin(tk * 3.2);
+
+    const projected = [];
+    for (const p of points) {
+      let disp = 0, glow = 0, hueShift = 0;
+      for (const a of act) {
+        const dx = p.x - a.x, dy = p.y - a.y, dz = p.z - a.z;
+        const d2 = dx * dx + dy * dy + dz * dz;
+        const g = Math.exp(-d2 / (2 * SIGMA * SIGMA));
+        if (g < 0.01) continue;
+        const wave = 0.65 + 0.35 * Math.sin(a.age * 12 - Math.sqrt(d2) * 9);
+        disp += a.amp * g * a.env * wave;
+        glow += g * a.env;
+        hueShift += a.hue * g * a.env;
+      }
+      if (level > 0) {
+        // faixas de onda percorrendo a esfera de cima a baixo
+        const band = Math.sin(p.y * 5 - tk * 4.5);
+        disp += level * 0.03 * band;
+        glow += level * 0.2 * (band * 0.5 + 0.5);
+        hueShift += level * 22 * Math.sin(p.y * 3 - tk * 3 + p.x * 1.5);
+        // regiões brilhantes que orbitam
+        for (const o of orbits) {
+          const dx = p.x - o.x, dy = p.y - o.y, dz = p.z - o.z;
+          const g = Math.exp(-(dx * dx + dy * dy + dz * dz) / (2 * 0.3 * 0.3));
+          glow += level * g * 0.8;
+          disp += level * g * 0.05;
+          hueShift += level * g * 30;
+        }
+      }
+      if (glow > 1) glow = 1;
+
+      const m = 1 + Math.sin(t + p.phase) * 0.008 + disp + breath;
+      const px = p.x * m, py = p.y * m, pz = p.z * m;
+
+      // rotação em Y e inclinação em X
+      const x = px * cosY + pz * sinY;
+      const z = -px * sinY + pz * cosY;
+      const y2 = py * cosX - z * sinX;
+      const z2 = py * sinX + z * cosX;
+
+      const scale = FOCAL / (FOCAL + z2 * radius);
+      projected.push({
+        sx: w / 2 + x * radius * scale,
+        sy: cy + y2 * radius * scale,
+        depth: (z2 + 1) / 2,
+        scale: scale,
+        z: z2,
+        glow: glow,
+        hue: hueShift
+      });
+    }
+
+    projected.sort(function (a, b) { return b.z - a.z; });
+
+    for (const q of projected) {
+      const front = 1 - q.depth;
+      const size = (0.8 + front * 1.9 * q.scale) * (1 + q.glow * 0.4);
+      const alpha = Math.min(1, 0.18 + front * 0.82 + q.glow * 0.15);
+      const light = 52 - front * 14 + q.glow * 3;
+      const sat = 70 + q.glow * 10;
+      const hue = 140 + Math.max(-45, Math.min(55, q.hue));
+      ctx.beginPath();
+      ctx.fillStyle = 'hsla(' + hue + ',' + sat + '%,' + light + '%,' + alpha + ')';
+      ctx.arc(q.sx, q.sy, size, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
