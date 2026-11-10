@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#f7fbf8">
+<title>Selene · Cripto-Prompt</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14532d;
+    --ink2: #1f3d2b;
+    --mut: #9aaba1;
+    --mut2: #7d9a89;
+    --soft: #f1f8f3;
+    --soft2: #e8f5ec;
+    --line: #e3f0e7;
+    --green: #22c55e;
+    --green-dark: #16a34a;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: #fff; color: var(--ink2); font-family: var(--sans); }
+  body { min-height: 100vh; animation: page-enter .28s ease both; }
+  button, input, textarea { font: inherit; }
+  button { cursor: pointer; }
+  @keyframes page-enter { from { opacity: 0; } to { opacity: 1; } }
+
+  #selene-nav {
+    position: fixed; top: 14px; left: 18px; z-index: 20; color: var(--ink2);
+  }
+  #selene-nav > button {
+    width: 42px; height: 42px; padding: 0; border: 1px solid rgba(227,240,231,.9);
+    border-radius: 50%; background: rgba(255,255,255,.9); color: var(--ink);
+    display: grid; place-items: center; box-shadow: 0 4px 16px rgba(20,83,45,.08);
+    backdrop-filter: blur(12px); transition: background .2s, box-shadow .2s, transform .2s;
+  }
+  #selene-nav > button:hover, #selene-nav.open > button { background: var(--soft); box-shadow: 0 6px 20px rgba(20,83,45,.12); }
+  #selene-nav > button:active { transform: scale(.96); }
+  #selene-nav > button:focus-visible, #selene-nav a:focus-visible { outline: 2px solid #86d9a3; outline-offset: 3px; }
+  #selene-nav > button svg { width: 19px; height: 19px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+  #selene-nav .selene-menu-panel {
+    position: absolute; top: 52px; left: 0; width: 232px; padding: 10px;
+    border: 1px solid var(--line); border-radius: 18px; background: rgba(255,255,255,.97);
+    box-shadow: 0 16px 42px rgba(20,83,45,.14); backdrop-filter: blur(16px);
+    opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(-7px) scale(.98);
+    transform-origin: top left; transition: opacity .2s ease, transform .2s ease, visibility .2s;
+  }
+  #selene-nav.open .selene-menu-panel { opacity: 1; visibility: visible; pointer-events: auto; transform: none; }
+  #selene-nav .selene-menu-title { margin: 4px 9px 8px; color: var(--mut); font-size: 10px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; }
+  #selene-nav a { display: flex; align-items: center; gap: 11px; padding: 10px 11px; border-radius: 12px; color: #52705d; font-size: 13px; text-decoration: none; transition: background .18s, color .18s; }
+  #selene-nav a:hover, #selene-nav a[aria-current="page"] { background: var(--soft); color: var(--ink); }
+  #selene-nav a[aria-current="page"] { font-weight: 600; }
+  #selene-nav a svg { width: 17px; height: 17px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+
+  .page { width: min(1320px, 100%); margin: 0 auto; padding: 28px 34px 60px; }
+  .topline { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-left: 52px; }
+  .brand { color: var(--ink); font: italic 400 25px/1 var(--serif); }
+  .brand small { margin-left: 8px; color: var(--mut); font: 10px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+  .format-chip { display: inline-flex; align-items: center; gap: 7px; color: var(--mut2); font: 10px var(--mono); letter-spacing: .06em; }
+  .format-chip::before { width: 7px; height: 7px; border-radius: 50%; background: var(--green); content: ''; box-shadow: 0 0 0 4px rgba(34,197,94,.1); }
+  header { max-width: 760px; margin: 54px auto 34px; text-align: center; }
+  .eyebrow { margin: 0 0 8px; color: var(--mut2); font: 10px var(--mono); letter-spacing: .16em; text-transform: uppercase; }
+  h1 { margin: 0; color: var(--ink); font: italic 400 clamp(38px, 6vw, 58px)/1 var(--serif); }
+  h1 em { color: var(--green-dark); font-weight: 300; }
+  header p { margin: 13px auto 0; max-width: 560px; color: var(--mut2); font-size: 13px; line-height: 1.65; }
+
+  .workspace { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(350px, .95fr); gap: 18px; align-items: start; }
+  .column { min-width: 0; }
+  .card { margin-bottom: 16px; padding: 20px; border: 1px solid var(--line); border-radius: 18px; background: #fff; box-shadow: 0 6px 24px rgba(20,83,45,.035); }
+  .card-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; margin-bottom: 17px; }
+  .card-heading h2 { margin: 0; color: var(--ink); font: italic 400 24px/1.1 var(--serif); }
+  .card-heading p { margin: 5px 0 0; color: var(--mut); font-size: 11px; line-height: 1.5; }
+  .step { flex: none; color: #a4cbb0; font: 10px var(--mono); }
+  .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .field { min-width: 0; }
+  .field.full { grid-column: 1 / -1; }
+  label { display: block; margin-bottom: 6px; color: #52705d; font-size: 11px; font-weight: 600; }
+  .optional { color: #a1b4a8; font-size: 10px; font-weight: 400; }
+  input, textarea {
+    display: block; width: 100%; border: 1px solid #e8f1eb; border-radius: 11px; outline: none;
+    background: #f8fbf9; color: var(--ink2); font-size: 12px; line-height: 1.55;
+    transition: border-color .2s, background .2s, box-shadow .2s;
+  }
+  input { height: 42px; padding: 0 12px; }
+  textarea { min-height: 105px; padding: 11px 12px; resize: vertical; }
+  input::placeholder, textarea::placeholder { color: #b0c1b6; }
+  input:focus, textarea:focus { border-color: #9bd6ac; background: #fff; box-shadow: 0 0 0 3px rgba(34,197,94,.08); }
+  .field-hint { margin: 5px 0 0; color: #a0b1a6; font-size: 10px; line-height: 1.45; }
+  .knowledge-list { display: grid; gap: 10px; }
+  .knowledge-item { position: relative; padding: 13px; border: 1px solid var(--line); border-radius: 13px; background: #fbfdfb; }
+  .knowledge-item .field + .field { margin-top: 10px; }
+  .knowledge-item textarea { min-height: 78px; }
+  .knowledge-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 10px; color: var(--mut2); font: 10px var(--mono); }
+  .remove-knowledge { display: grid; width: 28px; height: 28px; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #91aa99; }
+  .remove-knowledge:hover { background: #fff0ef; color: #b91c1c; }
+  .remove-knowledge svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
+
+  .preview-card { position: sticky; top: 18px; overflow: hidden; padding: 0; }
+  .preview-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 15px 17px; border-bottom: 1px solid var(--line); background: #fbfdfb; }
+  .preview-title { display: flex; align-items: center; gap: 9px; color: var(--ink); font-size: 12px; font-weight: 600; }
+  .preview-title svg { width: 17px; height: 17px; fill: none; stroke: var(--green-dark); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .preview-meta { color: var(--mut); font: 10px var(--mono); }
+  pre { min-height: 390px; max-height: min(62vh, 720px); margin: 0; overflow: auto; padding: 19px; background: #fff; color: #355a43; font: 11px/1.75 var(--mono); tab-size: 2; white-space: pre-wrap; overflow-wrap: anywhere; }
+  pre::-webkit-scrollbar { width: 7px; height: 7px; }
+  pre::-webkit-scrollbar-thumb { border-radius: 8px; background: #d9eade; }
+  .preview-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 16px; border-top: 1px solid var(--line); color: var(--mut); font-size: 10px; }
+  .preview-foot strong { color: var(--mut2); font-weight: 500; }
+  .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 13px; }
+  .button { min-height: 40px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 0 15px; border: 1px solid var(--line); border-radius: 999px; background: #fff; color: var(--mut2); font-size: 11px; font-weight: 600; transition: background .18s, border-color .18s, color .18s, transform .12s; }
+  .button:hover { border-color: #c9e6d1; background: var(--soft); color: var(--ink); }
+  .button:active { transform: scale(.98); }
+  .button:focus-visible { outline: 2px solid #86d9a3; outline-offset: 2px; }
+  .button svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+  .button.primary { border-color: var(--green); background: var(--green); color: #fff; box-shadow: 0 4px 14px rgba(34,197,94,.2); }
+  .button.primary:hover { border-color: var(--green-dark); background: var(--green-dark); }
+  .button.compact { min-height: 32px; padding: 0 11px; font-size: 10px; }
+  .status { min-height: 18px; margin: 9px 2px 0; color: var(--mut2); font-size: 11px; }
+  .status.error { color: #b91c1c; }
+  .schema-note { margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--soft); color: #62806c; font-size: 11px; line-height: 1.55; }
+  .schema-note code { color: var(--ink); font: 10px var(--mono); }
+  #importFile { display: none; }
+  .modal-backdrop { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 18px; background: rgba(15, 41, 25, .28); backdrop-filter: blur(5px); }
+  .modal-backdrop[hidden] { display: none; }
+  .modal { width: min(460px, 100%); padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: #fff; box-shadow: 0 24px 80px rgba(20,83,45,.22); }
+  .modal h2 { margin: 0; color: var(--ink); font: italic 400 28px/1.1 var(--serif); }
+  .modal p { margin: 10px 0 15px; color: var(--mut2); font-size: 12px; line-height: 1.6; }
+  .modal .warning { padding: 11px 12px; border: 1px solid #f1e4c9; border-radius: 11px; background: #fffaf0; color: #876334; font-size: 11px; line-height: 1.5; }
+  .modal .key-display { font: 12px/1.6 var(--mono); overflow-wrap: anywhere; }
+  .modal .actions { margin-top: 15px; }
+  .modal .modal-error { min-height: 18px; margin: 8px 0 0; color: #b91c1c; font-size: 11px; }
+  footer { margin-top: 20px; color: #a3b4a8; text-align: center; font-size: 10px; }
+
+  @media (max-width: 880px) {
+    .page { padding: 22px 22px 44px; }
+    .workspace { grid-template-columns: 1fr; }
+    .preview-card { position: static; }
+    pre { min-height: 310px; max-height: 58vh; }
+  }
+  @media (max-width: 520px) {
+    .page { padding: 18px 14px 36px; }
+    .topline { padding-left: 50px; }
+    .brand small { display: block; margin: 5px 0 0; font-size: 8px; }
+    .format-chip { font-size: 9px; }
+    header { margin: 48px auto 26px; }
+    .fields { grid-template-columns: 1fr; gap: 12px; }
+    .field.full { grid-column: auto; }
+    .card { padding: 16px; }
+    .preview-head { padding: 13px; }
+    pre { min-height: 270px; padding: 14px; font-size: 10px; }
+    .preview-foot { padding: 10px 13px; }
+    .actions .button { flex: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+  }
+</style>
+</head>
+<body>
+<div id="selene-nav">
+  <button type="button" aria-label="Abrir menu de navegação" aria-expanded="false" aria-controls="selene-menu">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+  </button>
+  <nav class="selene-menu-panel" id="selene-menu" aria-label="Navegação Selene">
+    <div class="selene-menu-title">Explorar Selene</div>
+    <a href="Index.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M3 12h18"/><circle cx="12" cy="12" r="8"/></svg><span>Assistente</span></a>
+    <a href="selene-datasets.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5C4 4.1 7.6 3 12 3s8 1.1 8 2.5S16.4 8 12 8 4 6.9 4 5.5Z"/><path d="M4 5.5v6C4 12.9 7.6 14 12 14s8-1.1 8-2.5v-6M4 11.5v7C4 19.9 7.6 21 12 21s8-1.1 8-2.5v-7"/></svg><span>Dataset Forge</span></a>
+    <a href="Selene-Lora.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5m0 14h16M8 15l3-4 3 2 5-7"/></svg><span>LoRA Forge</span></a>
+    <a href="Selene-Gateway.html"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l7.5 3.2v5.8c0 5-3.2 8.5-7.5 10-4.3-1.5-7.5-5-7.5-10V5.7L12 2.5z"/><path d="M8.7 12.2l2.3 2.3 4.4-4.7"/></svg><span>Selene Gateway</span></a>
+    <a href="cripto-Prompt.html" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4V20a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 20V5a1.5 1.5 0 0 1 1-1.5Z"/><path d="M14 3.5V8h4M9 12h6M9 16h6"/></svg><span>Cripto-Prompt</span></a>
+  </nav>
+</div>
+
+<div class="page">
+  <div class="topline">
+    <div class="brand">Selene<small>persona studio</small></div>
+    <div class="format-chip">JSON · PORTÁTIL</div>
+  </div>
+  <header>
+    <p class="eyebrow">PERSONA · INSTRUÇÕES · CONHECIMENTO</p>
+    <h1>Cipto-<em>Prompt</em></h1>
+    <p>Construa a identidade da sua IA com cuidado. Organize a persona, defina como ela deve agir e reúna as informações que precisa conhecer — tudo pronto para exportar.</p>
+  </header>
+
+  <main class="workspace">
+    <div class="column">
+      <section class="card" aria-labelledby="personaTitle">
+        <div class="card-heading">
+          <div><h2 id="personaTitle">A persona</h2><p>Dê forma à voz, ao papel e ao propósito da sua IA.</p></div>
+          <span class="step">01 / IDENTIDADE</span>
+        </div>
+        <div class="fields">
+          <div class="field">
+            <label for="personaName">Nome da persona</label>
+            <input id="personaName" maxlength="100" placeholder="Ex.: Selene" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="personaRole">Papel ou especialidade</label>
+            <input id="personaRole" maxlength="160" placeholder="Ex.: assistente de pesquisa">
+          </div>
+          <div class="field full">
+            <label for="personaDescription">Quem é essa IA?</label>
+            <textarea id="personaDescription" maxlength="3000" placeholder="Descreva sua identidade, experiência e limites."></textarea>
+          </div>
+          <div class="field">
+            <label for="personaTone">Tom e estilo</label>
+            <input id="personaTone" maxlength="500" placeholder="Ex.: acolhedor, claro e objetivo">
+          </div>
+          <div class="field">
+            <label for="personaObjective">Objetivo principal</label>
+            <input id="personaObjective" maxlength="500" placeholder="O que ela ajuda a realizar?">
+          </div>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="instructionsTitle">
+        <div class="card-heading">
+          <div><h2 id="instructionsTitle">Como ela deve agir</h2><p>Escreva uma regra por linha; cada uma vira uma instrução própria no JSON.</p></div>
+          <span class="step">02 / CONDUTA</span>
+        </div>
+        <div class="field">
+          <label for="instructions">Instruções da IA</label>
+          <textarea id="instructions" maxlength="12000" style="min-height:180px" placeholder="Responda no idioma usado pela pessoa.&#10;Seja transparente quando não souber algo.&#10;Faça perguntas quando faltar contexto."></textarea>
+          <p class="field-hint">Dica: prefira orientações específicas, claras e fáceis de verificar.</p>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="knowledgeTitle">
+        <div class="card-heading">
+          <div><h2 id="knowledgeTitle">O que ela precisa saber</h2><p>Adicione fatos, referências, contexto do projeto ou informações úteis.</p></div>
+          <span class="step">03 / CONHECIMENTO</span>
+        </div>
+        <div id="knowledgeList" class="knowledge-list"></div>
+        <div class="actions">
+          <button type="button" class="button compact" id="addKnowledge">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+            Adicionar informação
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <aside class="column">
+      <div class="schema-note"><strong>Pronto para usar:</strong> o arquivo protegido inclui os dados estruturados e um campo <code>systemPrompt</code> consolidado para modelos compatíveis. A prévia é legível só nesta página; exportar ou copiar gera um arquivo criptografado e uma chave secreta.</div>
+      <section class="card preview-card" aria-labelledby="previewTitle">
+        <div class="preview-head">
+          <div class="preview-title" id="previewTitle">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h7l4 4V20a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6 20V5a1.5 1.5 0 0 1 1-1.5Z"/><path d="M14 3.5V8h4M9 12h6M9 16h6"/></svg>
+            Prévia legível
+          </div>
+          <span class="preview-meta">JSON</span>
+        </div>
+        <pre id="jsonPreview" aria-live="polite"></pre>
+        <div class="preview-foot"><span>Codificação <strong>UTF-8</strong></span><span id="jsonSize">0 bytes</span></div>
+      </section>
+      <div class="actions">
+        <button type="button" class="button primary" id="exportJson">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 20h16"/></svg>
+          Exportar criptografado
+        </button>
+        <button type="button" class="button" id="copyJson">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg>
+          Copiar criptografado
+        </button>
+        <button type="button" class="button" id="importJson">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5M4 14v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-5"/></svg>
+          Abrir JSON
+        </button>
+        <input id="importFile" type="file" accept=".json,application/json">
+      </div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+    </aside>
+  </main>
+  <footer>Seu conteúdo é processado nesta página e não é enviado a um servidor.</footer>
+</div>
+<div class="modal-backdrop" id="keyModal" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="keyModalTitle" aria-describedby="keyModalDescription">
+    <h2 id="keyModalTitle">Guarde sua chave</h2>
+    <p id="keyModalDescription">O arquivo foi criptografado com AES-256-GCM. Esta chave é necessária para descriptografar e importar a persona.</p>
+    <div class="field">
+      <label for="generatedKey">Chave secreta</label>
+      <input id="generatedKey" class="key-display" type="text" readonly spellcheck="false" autocomplete="off">
+    </div>
+    <p class="warning">A chave não é armazenada nesta página nem dentro do arquivo. Guarde-a em local seguro. Sem ela, o conteúdo não poderá ser recuperado.</p>
+    <p class="modal-error" id="keyModalError" role="status" aria-live="polite"></p>
+    <div class="actions">
+      <button type="button" class="button" id="copyKey">Copiar chave</button>
+      <button type="button" class="button primary" id="closeKeyModal">Concluído</button>
+    </div>
+  </section>
+</div>
+<div class="modal-backdrop" id="unlockModal" hidden>
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="unlockModalTitle" aria-describedby="unlockModalDescription">
+    <h2 id="unlockModalTitle">Descriptografar persona</h2>
+    <p id="unlockModalDescription">Informe a chave secreta usada para criptografar este arquivo. A chave não será salva.</p>
+    <form id="unlockForm">
+      <div class="field">
+        <label for="unlockKey">Chave secreta</label>
+        <input id="unlockKey" type="password" required minlength="43" maxlength="43" pattern="[A-Za-z0-9_-]{43}" autocomplete="off" spellcheck="false" placeholder="Cole a chave de 256 bits">
+      </div>
+      <p class="modal-error" id="unlockError" role="alert" aria-live="polite"></p>
+      <div class="actions">
+        <button type="button" class="button" id="cancelUnlock">Cancelar</button>
+        <button type="submit" class="button primary" id="decryptJson">Descriptografar</button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<script>
+(function () {
+  const nav = document.getElementById('selene-nav');
+  const toggle = nav.querySelector('button');
+  const currentPage = (location.pathname.split('/').pop() || 'cripto-Prompt.html').toLowerCase();
+  nav.querySelectorAll('a').forEach(function (link) {
+    const page = new URL(link.href, location.href).pathname.split('/').pop().toLowerCase();
+    if (page === currentPage) link.setAttribute('aria-current', 'page');
+  });
+  function setOpen(open) {
+    nav.classList.toggle('open', open);
+    toggle.setAttribute('aria-expanded', String(open));
+  }
+  toggle.addEventListener('click', function () {
+    setOpen(toggle.getAttribute('aria-expanded') !== 'true');
+  });
+  document.addEventListener('click', function (event) {
+    if (!nav.contains(event.target)) setOpen(false);
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && nav.classList.contains('open')) setOpen(false);
+  });
+})();
+
+(function () {
+  const $ = function (selector, root) { return (root || document).querySelector(selector); };
+  const knowledgeList = $('#knowledgeList');
+  const preview = $('#jsonPreview');
+  const sizeLabel = $('#jsonSize');
+  const status = $('#status');
+  const fields = {
+    name: $('#personaName'),
+    role: $('#personaRole'),
+    description: $('#personaDescription'),
+    tone: $('#personaTone'),
+    objective: $('#personaObjective'),
+    instructions: $('#instructions')
+  };
+  let knowledgeCount = 0;
+  let statusTimer;
+  let pendingEncryptedEnvelope = null;
+  const MAX_ENCRYPTED_FILE_BYTES = 5 * 1024 * 1024;
+
+  function cleanText(value) {
+    return String(value || '').trim();
+  }
+  function words(value) {
+    return String(value || '').split(/\r?\n/).map(function (item) { return item.trim(); }).filter(Boolean);
+  }
+  function setStatus(message, isError) {
+    clearTimeout(statusTimer);
+    status.textContent = message;
+    status.classList.toggle('error', !!isError);
+    if (message && !isError) statusTimer = setTimeout(function () { status.textContent = ''; }, 4000);
+  }
+  function collectKnowledge() {
+    return Array.from(knowledgeList.querySelectorAll('.knowledge-item')).map(function (item) {
+      return {
+        title: cleanText($('.knowledge-name', item).value),
+        content: cleanText($('.knowledge-content', item).value)
+      };
+    }).filter(function (item) { return item.title || item.content; });
+  }
+  function buildSystemPrompt(persona, instructions, knowledge) {
+    const sections = [];
+    if (persona.name) sections.push('IDENTIDADE\nSeu nome é ' + persona.name + '.');
+    if (persona.role) sections.push('PAPEL\n' + persona.role);
+    if (persona.description) sections.push('SOBRE VOCÊ\n' + persona.description);
+    if (persona.tone) sections.push('TOM E ESTILO\n' + persona.tone);
+    if (persona.objective) sections.push('OBJETIVO\n' + persona.objective);
+    if (instructions.length) sections.push('INSTRUÇÕES\n' + instructions.map(function (item) { return '- ' + item; }).join('\n'));
+    if (knowledge.length) {
+      sections.push('INFORMAÇÕES DE REFERÊNCIA\n' + knowledge.map(function (item) {
+        return (item.title ? item.title + ':\n' : '') + item.content;
+      }).join('\n\n'));
+    }
+    return sections.join('\n\n');
+  }
+  function buildPersona() {
+    const persona = {
+      name: cleanText(fields.name.value),
+      role: cleanText(fields.role.value),
+      description: cleanText(fields.description.value),
+      tone: cleanText(fields.tone.value),
+      objective: cleanText(fields.objective.value)
+    };
+    const instructions = words(fields.instructions.value);
+    const knowledge = collectKnowledge();
+    return {
+      format: 'selene-persona',
+      version: 1,
+      persona: persona,
+      instructions: instructions,
+      knowledge: knowledge,
+      systemPrompt: buildSystemPrompt(persona, instructions, knowledge)
+    };
+  }
+  function updatePreview() {
+    const json = JSON.stringify(buildPersona(), null, 2);
+    preview.textContent = json;
+    sizeLabel.textContent = new TextEncoder().encode(json).length.toLocaleString('pt-BR') + ' bytes';
+    return json;
+  }
+  function encodeBase64Url(bytes) {
+    let binary = '';
+    for (let offset = 0; offset < bytes.length; offset += 0x8000) {
+      binary += String.fromCharCode.apply(null, bytes.subarray(offset, Math.min(offset + 0x8000, bytes.length)));
+    }
+    return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+  }
+  function decodeBase64Url(value) {
+    if (typeof value !== 'string' || !/^[A-Za-z0-9_-]+$/.test(value)) throw new Error('O arquivo criptografado está inválido.');
+    const base64 = value.replace(/-/g, '+').replace(/_/g, '/') + '='.repeat((4 - value.length % 4) % 4);
+    const binary = atob(base64);
+    return Uint8Array.from(binary, function (character) { return character.charCodeAt(0); });
+  }
+  function ensureCrypto() {
+    if (!window.crypto || !window.crypto.subtle || typeof window.crypto.getRandomValues !== 'function') {
+      throw new Error('A criptografia segura não está disponível. Abra esta página em HTTPS ou em localhost com um navegador atualizado.');
+    }
+  }
+  async function encryptPersona(plaintext) {
+    ensureCrypto();
+    const rawKey = window.crypto.getRandomValues(new Uint8Array(32));
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    const cryptoKey = await window.crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['encrypt']);
+    const ciphertext = await window.crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv: iv, tagLength: 128 },
+      cryptoKey,
+      new TextEncoder().encode(plaintext)
+    );
+    return {
+      key: encodeBase64Url(rawKey),
+      contents: JSON.stringify({
+        format: 'selene-encrypted-persona',
+        version: 1,
+        algorithm: 'AES-256-GCM',
+        iv: encodeBase64Url(iv),
+        ciphertext: encodeBase64Url(new Uint8Array(ciphertext))
+      }, null, 2)
+    };
+  }
+  function validateEncryptedEnvelope(envelope) {
+    if (!envelope || typeof envelope !== 'object' || Array.isArray(envelope) ||
+        envelope.format !== 'selene-encrypted-persona' || envelope.version !== 1 ||
+        envelope.algorithm !== 'AES-256-GCM') {
+      throw new Error('Este arquivo não é uma persona criptografada compatível.');
+    }
+    const iv = decodeBase64Url(envelope.iv);
+    if (iv.length !== 12 || typeof envelope.ciphertext !== 'string' ||
+        envelope.ciphertext.length > Math.ceil(MAX_ENCRYPTED_FILE_BYTES * 4 / 3)) {
+      throw new Error('O arquivo criptografado está inválido ou excede o limite permitido.');
+    }
+    return { iv: iv, ciphertext: decodeBase64Url(envelope.ciphertext) };
+  }
+  function validatePersona(data) {
+    if (!data || typeof data !== 'object' || Array.isArray(data) ||
+        data.format !== 'selene-persona' || data.version !== 1 ||
+        !data.persona || typeof data.persona !== 'object' || Array.isArray(data.persona) ||
+        !Array.isArray(data.instructions) || !Array.isArray(data.knowledge)) {
+      throw new Error('O conteúdo descriptografado não tem o formato de persona esperado.');
+    }
+    Object.keys(fields).filter(function (key) { return key !== 'instructions'; }).forEach(function (key) {
+      const value = data.persona[key];
+      if (value !== undefined && (typeof value !== 'string' || value.length > fields[key].maxLength)) {
+        throw new Error('O arquivo contém um campo de persona inválido.');
+      }
+    });
+    if (data.instructions.length > 500 || data.instructions.some(function (item) { return typeof item !== 'string'; }) ||
+        data.instructions.join('\n').length > fields.instructions.maxLength) {
+      throw new Error('O arquivo contém instruções inválidas ou muito longas.');
+    }
+    if (data.knowledge.length > 50 || data.knowledge.some(function (item) {
+      return !item || typeof item !== 'object' || Array.isArray(item) ||
+        (item.title !== undefined && (typeof item.title !== 'string' || item.title.length > 160)) ||
+        (item.content !== undefined && (typeof item.content !== 'string' || item.content.length > 6000)) ||
+        (item.title === undefined && item.content === undefined);
+    })) {
+      throw new Error('O arquivo contém informações de referência inválidas ou demais itens.');
+    }
+  }
+  async function decryptPersona(envelope, keyText) {
+    ensureCrypto();
+    const validated = validateEncryptedEnvelope(envelope);
+    const trimmedKey = keyText.trim();
+    if (trimmedKey.length !== 43) throw new Error('A chave deve conter 43 caracteres.');
+    const rawKey = decodeBase64Url(trimmedKey);
+    if (rawKey.length !== 32) throw new Error('A chave deve conter exatamente 256 bits.');
+    const cryptoKey = await window.crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['decrypt']);
+    const plaintext = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: validated.iv, tagLength: 128 },
+      cryptoKey,
+      validated.ciphertext
+    );
+    const data = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(plaintext));
+    validatePersona(data);
+    return data;
+  }
+  function showKeyModal(key, message) {
+    $('#generatedKey').value = key;
+    $('#keyModalError').textContent = message || '';
+    $('#keyModal').hidden = false;
+    $('#closeKeyModal').focus();
+  }
+  function hideKeyModal() {
+    $('#keyModal').hidden = true;
+    $('#generatedKey').value = '';
+    $('#keyModalError').textContent = '';
+  }
+  function showUnlockModal(envelope) {
+    pendingEncryptedEnvelope = envelope;
+    $('#unlockError').textContent = '';
+    $('#unlockKey').value = '';
+    $('#unlockModal').hidden = false;
+    $('#unlockKey').focus();
+  }
+  function hideUnlockModal() {
+    pendingEncryptedEnvelope = null;
+    $('#unlockKey').value = '';
+    $('#unlockError').textContent = '';
+    $('#unlockModal').hidden = true;
+  }
+  function downloadEncryptedFile(contents) {
+    const blob = new Blob([contents], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename();
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+  }
+  async function createEncryptedExport(copyToClipboard) {
+    const encrypted = await encryptPersona(updatePreview());
+    let modalMessage = '';
+    if (copyToClipboard) {
+      try {
+        await navigator.clipboard.writeText(encrypted.contents);
+        setStatus('JSON criptografado copiado. Guarde também a chave exibida.');
+      } catch (error) {
+        downloadEncryptedFile(encrypted.contents);
+        modalMessage = 'Não foi possível copiar para a área de transferência. O arquivo criptografado foi baixado.';
+        setStatus('Arquivo criptografado baixado; guarde a chave exibida.');
+      }
+    } else {
+      downloadEncryptedFile(encrypted.contents);
+      setStatus('Arquivo criptografado exportado; guarde a chave exibida.');
+    }
+    showKeyModal(encrypted.key, modalMessage);
+  }
+  function addKnowledgeItem(values, shouldFocus) {
+    knowledgeCount += 1;
+    const item = document.createElement('div');
+    item.className = 'knowledge-item';
+    const top = document.createElement('div');
+    top.className = 'knowledge-top';
+    const index = document.createElement('span');
+    index.textContent = 'INFORMAÇÃO ' + String(knowledgeCount).padStart(2, '0');
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'remove-knowledge';
+    remove.setAttribute('aria-label', 'Remover informação');
+    remove.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 11v6M14 11v6M8 7l1 13h6l1-13M9 7V4h6v3"/></svg>';
+    remove.addEventListener('click', function () {
+      item.remove();
+      updatePreview();
+    });
+    top.append(index, remove);
+    const titleField = document.createElement('div');
+    titleField.className = 'field';
+    const titleLabel = document.createElement('label');
+    titleLabel.textContent = 'Título';
+    const titleInput = document.createElement('input');
+    titleInput.type = 'text';
+    titleInput.maxLength = 160;
+    titleInput.className = 'knowledge-name';
+    titleInput.placeholder = 'Ex.: Sobre o projeto';
+    titleInput.value = values && typeof values.title === 'string' ? values.title : '';
+    titleLabel.appendChild(titleInput);
+    titleField.appendChild(titleLabel);
+    const contentField = document.createElement('div');
+    contentField.className = 'field';
+    const contentLabel = document.createElement('label');
+    contentLabel.textContent = 'Informação';
+    const contentInput = document.createElement('textarea');
+    contentInput.maxLength = 6000;
+    contentInput.className = 'knowledge-content';
+    contentInput.placeholder = 'Escreva o contexto, fatos ou referências que a IA deve conhecer.';
+    contentInput.value = values && typeof values.content === 'string' ? values.content : '';
+    contentLabel.appendChild(contentInput);
+    contentField.appendChild(contentLabel);
+    item.append(top, titleField, contentField);
+    knowledgeList.appendChild(item);
+    item.addEventListener('input', updatePreview);
+    updatePreview();
+    if (shouldFocus !== false) titleInput.focus();
+  }
+  function loadPersona(data) {
+    validatePersona(data);
+    const persona = data.persona;
+    ['name', 'role', 'description', 'tone', 'objective'].forEach(function (key) {
+      fields[key].value = typeof persona[key] === 'string' ? persona[key] : '';
+    });
+    const instructions = Array.isArray(data.instructions)
+      ? data.instructions.filter(function (item) { return typeof item === 'string'; })
+      : [];
+    fields.instructions.value = instructions.join('\n');
+    knowledgeList.replaceChildren();
+    knowledgeCount = 0;
+    if (Array.isArray(data.knowledge)) {
+      data.knowledge.forEach(function (item) {
+        addKnowledgeItem(item, false);
+      });
+    }
+    updatePreview();
+  }
+  function filename() {
+    const base = cleanText(fields.name.value).normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 60);
+    return (base || 'persona-selene') + '.json';
+  }
+
+  Object.keys(fields).forEach(function (key) { fields[key].addEventListener('input', updatePreview); });
+  $('#addKnowledge').addEventListener('click', function () { addKnowledgeItem(); });
+  $('#exportJson').addEventListener('click', async function () {
+    try {
+      await createEncryptedExport(false);
+    } catch (error) {
+      setStatus('Não foi possível criptografar a persona: ' + error.message, true);
+    }
+  });
+  $('#copyJson').addEventListener('click', async function () {
+    try {
+      await createEncryptedExport(true);
+    } catch (error) {
+      setStatus('Não foi possível criptografar a persona: ' + error.message, true);
+    }
+  });
+  const importFile = $('#importFile');
+  $('#importJson').addEventListener('click', function () { importFile.click(); });
+  importFile.addEventListener('change', async function () {
+    const file = importFile.files && importFile.files[0];
+    if (!file) return;
+    try {
+      if (file.size > MAX_ENCRYPTED_FILE_BYTES) throw new Error('O arquivo excede o limite de 5 MB.');
+      const contents = await file.text();
+      const envelope = JSON.parse(contents);
+      validateEncryptedEnvelope(envelope);
+      showUnlockModal(envelope);
+    } catch (error) {
+      setStatus('Não foi possível abrir o JSON: ' + error.message, true);
+    } finally {
+      importFile.value = '';
+    }
+  });
+  $('#closeKeyModal').addEventListener('click', hideKeyModal);
+  $('#copyKey').addEventListener('click', async function () {
+    try {
+      await navigator.clipboard.writeText($('#generatedKey').value);
+      $('#keyModalError').textContent = 'Chave copiada. Armazene-a separadamente do arquivo.';
+    } catch (error) {
+      $('#keyModalError').textContent = 'Não foi possível copiar automaticamente; selecione e copie a chave manualmente.';
+      $('#generatedKey').focus();
+      $('#generatedKey').select();
+    }
+  });
+  $('#cancelUnlock').addEventListener('click', function () {
+    hideUnlockModal();
+  });
+  $('#unlockForm').addEventListener('submit', async function (event) {
+    event.preventDefault();
+    if (!pendingEncryptedEnvelope) return;
+    const submitButton = $('#decryptJson');
+    submitButton.disabled = true;
+    $('#unlockError').textContent = '';
+    try {
+      const data = await decryptPersona(pendingEncryptedEnvelope, $('#unlockKey').value);
+      loadPersona(data);
+      hideUnlockModal();
+      setStatus('Persona descriptografada e carregada.');
+    } catch (error) {
+      $('#unlockError').textContent = error.name === 'OperationError'
+        ? 'Chave incorreta ou arquivo alterado. Confira a chave e tente novamente.'
+        : error.message;
+    } finally {
+      submitButton.disabled = false;
+    }
+  });
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !$('#keyModal').hidden) hideKeyModal();
+    else if (event.key === 'Escape' && !$('#unlockModal').hidden) hideUnlockModal();
+  });
+  updatePreview();
+})();
+</script>
+</body>
+</html>
